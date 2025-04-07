@@ -50,6 +50,10 @@ export class SidebarComponent {
   isSubCRMOpen = false; // Controlar si el submenú de CRM está abierto
   isInventarioB2 = false; // Controlar si el submenú de Inventario B2 está abierto
   isReqCompras = false; // Controlar si el submenú de Requerimiento de Compras está abierto
+  isSociosNegocio = false;
+  isReconciliacion = false;
+  isSubReconciliacion = false;
+  
   toggleClientes(): void {
     this.isClientesOpen = !this.isClientesOpen;
     
@@ -248,6 +252,15 @@ export class SidebarComponent {
 
     toggleRequeCompras(){
       this.isReqCompras = !this.isReqCompras;
+    }
+    toggleSociosNegocio(){
+      this.isSociosNegocio = !this.isSociosNegocio;
+    }
+    toggleReconciliacionInterna(){
+      this.isReconciliacion = !this.isReconciliacion;
+    }
+    toggleReconciliacion(){
+      this.isSubReconciliacion = !this.isSubReconciliacion;
     }
 
 }

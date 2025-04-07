@@ -27,7 +27,7 @@
   id="componentsNav"
 >
   <div class="cs-offcanvas-cap d-none d-lg-block py-4">
-    <a class="navbar-brand" routerLink="/">FIBRAWEB 3.0</a>
+    <a class="navbar-brand" routerLink="/">FIBRAWEB 2.0</a>
   </div>
   <div class="cs-offcanvas-cap d-flex d-lg-none">
     <div class="d-flex align-items-center mt-1">
@@ -1513,32 +1513,33 @@
 
       <!-- Interlocutores Comerciales-->
       <li class="nav-item">
-              <a class="nav-link px-4" href="#" (click)="toggleCompras()">
+              <a class="nav-link px-4" href="#" (click)="toggleSociosNegocio()">
                 <i class="fas fas fa-user mr-2"></i> <!-- Ícono de auditoría -->
                 Socios de Negocio
                 <i class="fas"
-                  [ngClass]="{'fa-chevron-down': isInventario, 'fa-chevron-right': !isInventario}"
+                  [ngClass]="{'fa-chevron-down': isSociosNegocio, 'fa-chevron-right': !isSociosNegocio}"
                   style="margin-left:auto;"></i>
               </a>
-              <ul class="submenu" *ngIf="isInventario">
-                <!-- Submenú de Reportes -->
-                <li class="nav-item">
-                  <a class="nav-link px-4" href="#" (click)="toggleRequeCompras()">
-                    <i class="fas fa-file-alt mr-2"></i> <!-- Ícono de reportes -->
-                    Req. de Compras 
-                    <i class="fas"
-                      [ngClass]="{'fa-chevron-down': isDespachoVentas, 'fa-chevron-right': !isDespachoVentas}"
-                      style="margin-left:auto;"></i>
-                  </a>
-                  <ul class="submenu" *ngIf="isDespachoVentas">
-                    <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']"><i class="fas fa-cogs mr-2"></i>Registro Req. Compras</a></li>
-                    <li><a class="nav-link" [routerLink]="['/panel/produccion/auditoria']"><i class="fas fa-clipboard-list mr-2"></i>Reque. Pendientes</a></li>
-                    <li><a class="nav-link" [routerLink]="['/panel/produccion/control-guias']"><i class="fas fa-clipboard-check mr-2"></i>Requer.Pendientes Usuario</a></li>
-      
+                  <ul class="submenu" *ngIf="isSociosNegocio">
+                    <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Registro Req. Compras</a></li>
+                    <li><a class="nav-link" [routerLink]="['/panel/produccion/auditoria']">Reque. Pendientes</a></li>
+                    <li><a class="nav-link" [routerLink]="['/panel/produccion/control-guias']">Requer.Pendientes Usuario</a></li>
+                    <li><a class="nav-link" [routerLink]="['/panel/produccion/control-guias']">Campaña</a></li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="#" (click)="toggleReconciliacionInterna()">
+                        Reconciliación Interna
+                        <i class="fas" [ngClass]="{'fa-chevron-down': isReconciliacion, 'fa-chevron-right': !isReconciliacion}" style="margin-left:auto;"></i>
+                      </a>
+                      <ul *ngIf="isReconciliacion" class="nav flex-column pl-4">
+                        <!-- Nuevo submenú dentro de "Definiciones" -->
+                        <li class="nav-item">
+                          <a class="nav-link" href="#" (click)="toggleReconciliacion()">
+                            Reconciliación
+                            <i class="fas" [ngClass]="{'fa-chevron-down': isSubReconciliacion, 'fa-chevron-right': !isSubReconciliacion}" style="margin-left:auto;"></i>
+                          </a>
+                        </li>
+                      </ul>
                   </ul>
-                </li>
-      
-              </ul>
       </li>
 
       <!-- Inventario-->

@@ -6,7 +6,7 @@
 
 /* Estilo general del sidebar */
 .sidebar {
-  width: 220px;              /* Ancho del sidebar */
+  width: 250px;              /* Ancho del sidebar */
   font-size: 0.85rem;        /* Tamaño de fuente más pequeño */
   background-color: #093045; /* Color de fondo azul oscuro */
   color: #fff !important;    /* Asegura que el texto sea blanco */

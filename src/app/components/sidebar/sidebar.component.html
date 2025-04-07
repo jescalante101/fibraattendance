@@ -1531,14 +1531,53 @@
                         <i class="fas" [ngClass]="{'fa-chevron-down': isReconciliacion, 'fa-chevron-right': !isReconciliacion}" style="margin-left:auto;"></i>
                       </a>
                       <ul *ngIf="isReconciliacion" class="nav flex-column pl-4">
-                        <!-- Nuevo submenú dentro de "Definiciones" -->
-                        <li class="nav-item">
-                          <a class="nav-link" href="#" (click)="toggleReconciliacion()">
-                            Reconciliación
-                            <i class="fas" [ngClass]="{'fa-chevron-down': isSubReconciliacion, 'fa-chevron-right': !isSubReconciliacion}" style="margin-left:auto;"></i>
-                          </a>
-                        </li>
+                        <!-- Nuevo submenú dentro de "Reconciliación interna" -->
+                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Reconciliación</a></li>
+                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Gestionar reconciliaciones precedentes</a></li>
                       </ul>
+
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="#" (click)="toggleInformesSociosNegocios()">
+                        Informes de Socio de Negocios
+                        <i class="fas" [ngClass]="{'fa-chevron-down': isInformesSocios, 'fa-chevron-right': !isInformesSocios}" style="margin-left:auto;"></i>
+                      </a>
+                      <ul *ngIf="isInformesSocios" class="nav flex-column pl-4">
+                        <!-- Nuevo submenú dentro de "Reconciliación interna" -->
+                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Mis actividades</a></li>
+                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Resumen de actividades</a></li>
+                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Clientes inactivos</a></li>
+                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Historial de reclamaciones</a></li>
+                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Créditos de cliente p. todas secciones cliente</a></li>
+                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Desviación límite crédito clientes</a></li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="#" (click)="toggleAntiguedad()">
+                            Antigüedad
+                            <i class="fas" [ngClass]="{'fa-chevron-down': isAntiguedad, 'fa-chevron-right': !isAntiguedad}" style="margin-left:auto;"></i>
+                          </a>
+                          <ul *ngIf="isAntiguedad" class="nav flex-column pl-4">
+                            <!-- Nuevo submenú dentro de "Reconciliación interna" -->
+                            <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Antigüedad de saldos de clientes</a></li>
+                            <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Antigüedad de saldos de proveedores</a></li>
+                          </ul>
+    
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="#" (click)="toggleReconciliacion2()">
+                            Reconciliación Interna
+                            <i class="fas" [ngClass]="{'fa-chevron-down': isReconciliacion2, 'fa-chevron-right': !isReconciliacion2}" style="margin-left:auto;"></i>
+                          </a>
+                          <ul *ngIf="isReconciliacion2" class="nav flex-column pl-4">
+                            <!-- Nuevo submenú dentro de "Reconciliación interna" -->
+                            <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Reconciliación interna por fecha de vencimiento</a></li>
+                            <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Reconciliación interna por importe exacto</a></li>
+                            <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Reconciliación interna por número trans.</a></li>
+                          </ul>
+                        </li>
+                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Lista de Campañas</a></li>
+                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Informe de correos electrónicos enviados</a></li>
+                      </ul>
+                    </li>
                   </ul>
       </li>
 

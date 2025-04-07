@@ -53,6 +53,9 @@ export class SidebarComponent {
   isSociosNegocio = false;
   isReconciliacion = false;
   isSubReconciliacion = false;
+  isInformesSocios = false;
+  isAntiguedad = false;
+  isReconciliacion2 = false;
   
   toggleClientes(): void {
     this.isClientesOpen = !this.isClientesOpen;
@@ -261,6 +264,15 @@ export class SidebarComponent {
     }
     toggleReconciliacion(){
       this.isSubReconciliacion = !this.isSubReconciliacion;
+    }
+    toggleInformesSociosNegocios(){
+      this.isInformesSocios = !this.isInformesSocios;
+    }
+    toggleAntiguedad(){
+      this.isAntiguedad = !this.isAntiguedad;
+    }
+    toggleReconciliacion2(){
+      this.isReconciliacion2 = !this.isReconciliacion2;
     }
 
 }

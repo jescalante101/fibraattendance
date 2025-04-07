@@ -8,21 +8,20 @@
 <div class="main-container">
 <div class="content">
   <h3 class="title">Despacho de Pedidos</h3>
-
   <!-- Control de pestañas -->
   <mat-tab-group>
     <!-- Pestaña 1: Despacho de Pedidos -->
     <mat-tab label="Despacho de Pedidos">
       <div class="form-container">
-        <div style="display: flex; flex-direction: column; margin-bottom: 15px;">
-          <label style="font-weight: bold; margin-bottom: 8px;">Cliente</label>
-          <input type="text" [(ngModel)]="searchClient" (input)="filterClients()" placeholder="Buscar Cliente" style="border: 1px solid #ccc; border-radius: 5px; padding: 10px; width: 100%; max-width: 400px;" />
-          <!-- Mostrar resultados de búsqueda -->
-          <ul *ngIf="filteredClients.length > 0" style="list-style-type: none; padding: 0;">
-            <li *ngFor="let cliente of filteredClients" (click)="selectClient(cliente)" style="cursor: pointer; padding: 5px; background-color: #f0f0f0; border-bottom: 1px solid #ccc;">
-              {{ cliente }}
-            </li>
-          </ul>
+        <label style="font-weight: bold; margin-bottom: 8px;">Cliente</label>
+
+        <div style="position: relative; display: flex; align-items: center; width: 100%; max-width: 400px;">
+          <input type="text" [(ngModel)]="searchClient" placeholder="Buscar Cliente" 
+                 style="border: 1px solid #ccc; border-radius: 2px; padding: 10px 35px 10px 10px; width: 100%;" />
+          <!-- Ícono de búsqueda dentro del input -->
+          <button mat-icon-button (click)="openSearchModal()" style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%);">
+            <i class="fas fa-search"></i> <!-- Ícono de búsqueda -->
+          </button>
         </div>
 
         <div style="display: flex; flex-direction: column; margin-bottom: 15px;">
@@ -43,7 +42,6 @@
 
         <button 
           (click)="pistolear()" 
-          [disabled]="!selectedClient || !selectedPedido || !selectedAlmacen"
           style="background-color: #1976d2; color: white; padding: 10px 20px; font-size: 1rem; border-radius: 4px;">
           PISTOLEAR
         </button>

@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-
 @Component({
     selector: 'app-lectura-codebar',
     templateUrl: './lectura-codebar.component.html',
@@ -9,22 +8,21 @@ import { Component } from '@angular/core';
 export class LecturaCodebarComponent {
   public page = 1;        // Página actual
   public pageSize = 5;   // Número de elementos por página
-  
+  isModalOpen: boolean = false;  
+  selectedClient: string = '';  
   // Arreglo para almacenar los productos escaneados
   scanResults: any[] = [];
   
   // Variables para controlar el estado de los modales
-  isModalOpen = false;
   isModalOpenResumen = false;
   isModalOpenAgregar = false;
-
+  isVentanaCliente  = false;
   // Lista de clientes, pedidos y almacenes
   clientes = ['QUALAMEX, S.A. DE C.V.', 'CLIENTE B', 'CLIENTE C', 'CLIENTE D'];
   pedidos = ['100005653', '100005658', '100005463', '100005658'];
   almacenes = ['AMP-CH', 'PT-LOG', 'AMP-CH3', 'AMATL-CH'];
 
   // Variables para almacenar las opciones seleccionadas
-  selectedClient: string = '';
   selectedPedido: string = '';
   selectedAlmacen: string = '';
 
@@ -99,8 +97,10 @@ export class LecturaCodebarComponent {
 
   // Función para abrir el modal
   pistolear() {
-    if (this.selectedClient && this.selectedPedido && this.selectedAlmacen) {
+    debugger
+    if (this.selectedPedido && this.selectedAlmacen) {
       this.isModalOpen = true;  // Abre el modal si todo está correcto
+      console.log()
     } else {
       console.log("Debe seleccionar Cliente, Pedido y Almacen");
     }
@@ -127,5 +127,14 @@ export class LecturaCodebarComponent {
       this.scanResults.splice(index, 1); // Eliminar la fila
     }
   }
+  
+  openSearchModal(){
+    this.isVentanaCliente = true;  // Open the modal when the button is clicked
+  }
+
+  closeSearchModal() {
+    this.isVentanaCliente = false;  // Close the modal
+  }
+
 }
 

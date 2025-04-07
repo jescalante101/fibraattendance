@@ -1,0 +1,16 @@
+<div class="modal" *ngIf="isModalOpen">
+    <div class="modal-content">
+      <h4>LEER CÓDIGOS DE PEDIDO</h4>
+      <div class="input-container">
+        <label for="codigo">Código:</label>
+        <div class="input-group">
+          <input type="text" id="codigo" [(ngModel)]="codigo" placeholder="Ingrese el código" />
+          <button class="search-btn" (click)="addScan()">Buscar</button>
+        </div>
+      </div>
+      <div>
+        <p><strong>CLIENTE:</strong> {{ selectedClient }}</p>
+      </div>
+      <button class="close-btn" (click)="closeModal()">Cerrar</button>
+    </div>
+</div>

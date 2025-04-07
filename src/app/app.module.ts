@@ -45,8 +45,8 @@ import { MatTabsModule } from '@angular/material/tabs'; // Importar MatTabsModul
 import { MatButtonModule } from '@angular/material/button'; // Para botones
 import { MatFormFieldModule } from '@angular/material/form-field'; // Para formularios
 import { MatSelectModule } from '@angular/material/select';
-import { RegistroComprasComponent } from './components/compras/registro-compras/registro-compras.component'; // Para selects
-
+import { RegistroComprasComponent } from './components/compras/registro-compras/registro-compras.component';
+import { InvLecturaComponent } from './components/modal/inv-lectura/inv-lectura.component'; // Para selects
 
 
 @NgModule({
@@ -82,6 +82,7 @@ import { RegistroComprasComponent } from './components/compras/registro-compras/
     LecturaCodebarComponent,
     GanttProduccionComponent,
     RegistroComprasComponent,
+    InvLecturaComponent,
 
 
 

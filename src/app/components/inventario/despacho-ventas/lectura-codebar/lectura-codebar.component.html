@@ -1,0 +1,125 @@
+<head>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<app-sidebar></app-sidebar>
+<br>
+<br>
+<div class="main-container">
+<div class="content">
+  <h3 class="title">Despacho de Pedidos</h3>
+
+  <!-- Control de pestañas -->
+  <mat-tab-group>
+    <!-- Pestaña 1: Despacho de Pedidos -->
+    <mat-tab label="Despacho de Pedidos">
+      <div class="form-container">
+        <div style="display: flex; flex-direction: column; margin-bottom: 15px;">
+          <label style="font-weight: bold; margin-bottom: 8px;">Cliente</label>
+          <input type="text" [(ngModel)]="searchClient" (input)="filterClients()" placeholder="Buscar Cliente" style="border: 1px solid #ccc; border-radius: 5px; padding: 10px; width: 100%; max-width: 400px;" />
+          <!-- Mostrar resultados de búsqueda -->
+          <ul *ngIf="filteredClients.length > 0" style="list-style-type: none; padding: 0;">
+            <li *ngFor="let cliente of filteredClients" (click)="selectClient(cliente)" style="cursor: pointer; padding: 5px; background-color: #f0f0f0; border-bottom: 1px solid #ccc;">
+              {{ cliente }}
+            </li>
+          </ul>
+        </div>
+
+        <div style="display: flex; flex-direction: column; margin-bottom: 15px;">
+          <label style="font-weight: bold; margin-bottom: 8px;">Pedido</label>
+          <select [(ngModel)]="selectedPedido" style="border: 1px solid #ccc; border-radius: 5px; padding: 10px; width: 100%; max-width: 400px;">
+            <option value="" disabled>Seleccione un Pedido</option>
+            <option *ngFor="let pedido of pedidos" [value]="pedido">{{ pedido }}</option>
+          </select>
+        </div>
+
+        <div style="display: flex; flex-direction: column; margin-bottom: 15px;">
+          <label style="font-weight: bold; margin-bottom: 8px;">Almacen</label>
+          <select [(ngModel)]="selectedAlmacen" style="border: 1px solid #ccc; border-radius: 5px; padding: 10px; width: 100%; max-width: 400px;">
+            <option value="" disabled>Seleccione un Almacen</option>
+            <option *ngFor="let almacen of almacenes" [value]="almacen">{{ almacen }}</option>
+          </select>
+        </div>
+
+        <button 
+          (click)="pistolear()" 
+          [disabled]="!selectedClient || !selectedPedido || !selectedAlmacen"
+          style="background-color: #1976d2; color: white; padding: 10px 20px; font-size: 1rem; border-radius: 4px;">
+          PISTOLEAR
+        </button>
+      </div>
+    </mat-tab>
+
+    <!-- Pestaña 2: Resultados -->
+    <mat-tab label="Scaneos realizados...">
+      <div class="scan-results">
+        <table>
+          <thead>
+            <tr>
+              <th>ItemCode</th>
+              <th>Descripción</th>
+              <th>Cantidad</th>
+              <th>Peso Bruto</th>
+              <th>Peso Neto</th>
+              <th>Cantidad</th>
+              <th>Detalle</th>
+              <th>Eliminar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let resultado of scanResults | paginate: { itemsPerPage: pageSize, currentPage: page }">
+              <td>{{ resultado.itemCode }}</td>
+              <td>{{ resultado.description }}</td>
+              <td>{{ resultado.quantity }}</td>
+              <td>{{ resultado.grossWeight }}</td>
+              <td>{{ resultado.netWeight }}</td>
+              <td>{{ resultado.cantidad }}</td>
+              <td>{{ resultado.details }}</td>
+              <td><button (click)="deleteRow(resultado)">Eliminar</button></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Paginación -->
+        <pagination-controls (pageChange)="page = $event"></pagination-controls>
+      </div>
+    </mat-tab>
+
+    <!-- Pestaña 3: Resumen -->
+    <mat-tab label="Resumen">
+      <div>
+        <p>Detalles del resumen...</p>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+</div>
+
+<!-- Modal para resumen -->
+<div class="modal" *ngIf="isModalOpenResumen">
+<app-resumen (cerrar)="closeModalResumen()"></app-resumen>
+</div>
+
+<!-- Modal para agregar -->
+<div class="modal" *ngIf="isModalOpenAgregar">
+<app-agregar (cerrar)="closeModalAgregar()"></app-agregar>
+</div>
+
+<!-- Modal para leer códigos -->
+<div class="modal" *ngIf="isModalOpen">
+<div class="modal-content">
+  <h4>LEER CÓDIGOS DE PEDIDO</h4>
+  <div class="input-container">
+    <label for="codigo">Código:</label>
+    <div class="input-group">
+      <input type="text" id="codigo" [(ngModel)]="codigo" placeholder="Ingrese el código" />
+      <button class="search-btn" (click)="addScan()">Buscar</button>
+    </div>
+  </div>
+  <div>
+    <p><strong>CLIENTE:</strong> {{ selectedClient }}</p>
+  </div>
+  <button class="close-btn" (click)="closeModal()">Cerrar</button>
+</div>
+</div>
+

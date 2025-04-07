@@ -1,0 +1,136 @@
+/* Estilo general del header */
+.header-blue {
+  background-color: #093045; /* Fondo azul oscuro */
+  color: #fff;               /* Texto blanco */
+}
+
+/* Estilo general del sidebar */
+.sidebar {
+  width: 220px;              /* Ancho del sidebar */
+  font-size: 0.85rem;        /* Tamaño de fuente más pequeño */
+  background-color: #093045; /* Color de fondo azul oscuro */
+  color: #fff !important;    /* Asegura que el texto sea blanco */
+  min-height: 100vh;         /* Altura completa */
+  position: fixed;           /* Fijo en el lateral */
+  top: 50px;
+  left: 0;
+}
+
+.navbar-nav{
+  width: 100%;
+  text-align: center;
+  justify-content: center;
+
+}
+
+/* Asegurarse de que el texto en el logo sea blanco */
+.navbar-brand {
+  color: #fff !important;
+  font-size: 1em;  /* Cambia el color del texto a blanco */
+}
+
+/* Estilo de los enlaces del menú */
+.nav-link i {
+  font-size: 1.1rem;            /* Ajusta el tamaño de los íconos */
+  min-width: 20px;              /* Asegura que los íconos tengan espacio */
+  text-align: center;          /* Centra el ícono dentro del espacio */
+  color: #fff;                 /* Asegura que los íconos sean blancos */
+}
+
+.nav-link:hover {
+  background-color: #052731; /* Fondo más oscuro al pasar el ratón */
+  color: #fff;               /* Cambia el texto a blanco al hacer hover */
+  text-decoration: none;
+}
+
+/* Cambiar color de los enlaces del menú */
+.nav-link {
+  padding: 0.5rem 0.75rem;     /* Ajusta el padding dentro de los enlaces */
+  display: flex;
+  justify-content: space-between; /* Separa el texto y las flechas */
+  width: 100%;                 /* Hace que el ancho ocupe todo el contenedor */
+  color: #fff;                 /* Asegura que el texto sea blanco */
+  align-items: center;
+}
+
+/* Estilo para las flechas */
+.nav-link i.fas {
+  margin-left: 10px;            /* Espaciado entre el texto y la flecha */
+  font-size: 1.2rem;            /* Ajusta el tamaño de la flecha */
+}
+
+/* Estilo para los submenús */
+.submenu {
+  list-style-type: none;        /* Elimina los puntos del submenú */
+  margin-left: 0;               /* Elimina margen extra a la izquierda */
+  padding-left: 0;              /* Elimina padding extra */
+}
+
+.submenu li {
+  padding-left: 20px;           /* Alineación de los elementos del submenú */
+}
+
+/* Estilo para los enlaces del submenú */
+.submenu a {
+  padding-left: 10px;           /* Ajuste del espaciado dentro de los enlaces del submenú */
+  font-size: 0.95rem;           /* Ajuste del tamaño de la fuente */
+  color: #fff;                  /* Asegura que el texto en el submenú sea blanco */
+}
+
+/* Submenú abierto: resalta la sección activa */
+.submenu a:hover {
+  background-color: #052731;    /* Cambio de color al pasar el ratón */
+  color: #fff;                  /* Mantiene el texto blanco */
+}
+
+/* Contenedor de la página */
+.content-wrapper {
+  margin-left: 220px;           /* Margen izquierdo igual al ancho del sidebar */
+  padding: 1rem;
+  min-height: 100vh;
+  background-color: #f8f9fa;    /* Fondo del contenido */
+}
+
+/* Estilos para elementos responsivos */
+@media (max-width: 768px) {
+  .sidebar {
+    position: relative;
+    width: 100%;                 /* Sidebar ocupa el 100% en pantallas pequeñas */
+    min-height: auto;
+  }
+  .content-wrapper {
+    margin-left: 0;
+  }
+}
+
+
+
+
+
+/* NUEVO */
+
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  margin-left: 30px;
+}
+
+.logo {
+  display: flex; 
+  align-items: center; /* Asegura que la imagen también se centre si hay más contenido */
+}
+
+.logo img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.company-info {
+  display: flex;
+    flex-direction: column; /* Acomoda los elementos en columna */
+    align-items: center;
+    margin-left: 20px;
+    margin-top: 25px;
+}

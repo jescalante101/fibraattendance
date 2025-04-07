@@ -1,0 +1,15 @@
+/* You can add global styles to this file, and also import other style files */
+@media (min-width: 991.98px) {
+    /* Asegúrate de que el selector esté definido */
+    #bloque {
+        padding-left: 15rem;
+    }
+}
+@media (min-width: 991.98px) {
+    /* Asegúrate de que el selector esté definido */
+    #bloque {
+        padding-left: 15rem;
+    }
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

@@ -1,0 +1,294 @@
+/* Estilo general para la página */
+.main-container {
+    display: flex;
+    flex-direction: row;
+    height: 100vh; /* Asegura que ocupe toda la altura */
+    padding-left: 250px; /* Ajusta el contenido para que no se solape con el sidebar */
+  }
+  
+  app-sidebar {
+    width: 250px;
+    background-color: #f4f4f4;
+    position: fixed;
+    height: 100%;
+    top: 0;
+    left: 0;
+  }
+  
+  .content {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+  }
+  
+  .title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  
+  .form-container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .form-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+  }
+  
+  .form-item p {
+    font-size: 1rem;
+    margin: 0;
+    font-weight: bold;
+  }
+  
+  .form-item input {
+    padding: 10px;
+    margin-top: 5px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .button-group button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .button-group button:hover {
+    background-color: #1565c0;
+  }
+  
+  /* Tabla de resultados */
+  .scan-results {
+    margin-top: 30px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  th, td {
+    padding: 12px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #1976d2;
+    color: white;
+    font-weight: bold;
+  }
+  
+  td {
+    background-color: #f9f9f9;
+  }
+  
+  tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  button {
+    background-color: #f44336;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #d32f2f;
+  }
+  
+  /* Estilo para las modales */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal app-resumen, .modal app-agregar {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Estilo responsivo para pantallas pequeñas */
+  @media (max-width: 768px) {
+    .main-container {
+      flex-direction: column;
+      padding-left: 0;
+    }
+  
+    .content {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  
+    .form-container {
+      flex-direction: column;
+    }
+  
+    .button-group button {
+      width: 100%;
+    }
+  }
+
+
+  /* Estilo general para el layout */
+mat-select {
+    font-size: 1rem;
+    border-radius: 5px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 100%;
+    max-width: 400px; /* Ajusta el tamaño máximo */
+  }
+  
+  /* Mejorar la apariencia del mat-option */
+  .mat-option {
+    padding: 10px;
+    font-size: 1rem;
+  }
+  
+  .mat-option:hover {
+    background-color: #e0e0e0; /* Hover suave */
+  }
+  
+  /* Estilo cuando una opción está seleccionada */
+  .mat-select-value {
+    font-weight: 500;
+  }
+  
+  /* Opcional: Estilo para los botones */
+  .button-group button {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .button-group button:hover {
+    background-color: #1565c0;
+  }
+  
+  
+  /* Estilo para el modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.modal-content h4 {
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.input-container {
+  margin-bottom: 20px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-group input {
+  width: 70%;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+}
+
+.input-group .search-btn {
+  background-color: #1976d2;
+  color: white;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.input-group .search-btn:hover {
+  background-color: #1565c0;
+}
+
+.close-btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  background-color: #d32f2f;
+}
+
+pagination-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+pagination-controls > ul {
+  list-style: none;
+  display: flex;
+  padding: 0;
+}
+
+pagination-controls > ul > li {
+  margin: 0 5px;
+}

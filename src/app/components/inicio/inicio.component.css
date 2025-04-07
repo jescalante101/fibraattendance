@@ -1,0 +1,88 @@
+/* Estilo para la tabla */
+table {
+  width: 100%; /* Ocupa todo el ancho del contenedor */
+  border-collapse: collapse; /* Elimina el espacio entre celdas */
+  border-spacing: 0; /* Elimina el espaciado entre celdas */
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+thead {
+  background-color: #28a745; /* Fondo verde */
+  color: white;
+}
+
+th {
+  border-bottom: 2px solid #ffffff; /* Borde blanco en las cabeceras */
+  font-weight: bold; /* Negrita para las cabeceras */
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f2f2f2; /* Fondo gris claro para las filas pares */
+}
+
+tbody tr:last-child {
+  background-color: #e0e0e0; /* Fondo más destacado para la fila de subtotal */
+  color: #000; /* Asegura que el texto sea visible */
+}
+
+tbody td {
+  border-top: 1px solid #ccc; /* Aumenta el contraste */
+}
+
+tbody td.font-semibold {
+  font-weight: 600; /* Resalta las celdas de "Subtotal" */
+}
+
+/* Estilo general de los márgenes y espaciados */
+.container-fluid {
+  padding: 0; /* Elimina el padding extra del contenedor */
+  margin-bottom: 2rem; /* Agregar espacio entre tablas */
+}
+
+.bg-white {
+  background-color: #fff;
+}
+
+.shadow-lg {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.bg-gray-100 {
+  background-color: #f8f9fa;
+}
+
+.text-gray-800 {
+  color: #212529;
+}
+
+.text-gray-500 {
+  color: #6c757d;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.table-responsive {
+  overflow-x: auto; /* Permite desplazamiento en pantallas pequeñas */
+}
+
+.espaciado {
+  flex: 0.1;
+  margin-right: 15rem; /* Espaciado inicial */
+}
+
+@media (max-width: 992px) {
+  .espaciado {
+    flex: 0; /* Elimina el espacio que ocupaba */
+    margin-right: 0; /* Elimina el margen derecho */
+  }
+}

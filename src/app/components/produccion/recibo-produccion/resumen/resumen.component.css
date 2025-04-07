@@ -1,0 +1,221 @@
+/* Reducir el espacio en los márgenes y padding */
+#responsive-table {
+    min-width: 100%;
+    width: 100%;
+    border-collapse: collapse; /* Asegura que los bordes estén unidos */
+    margin-top: 10px;           /* Reduce el margen superior */
+    margin-bottom: 20px;        /* Reduce el margen inferior */
+    overflow-x: auto;           /* Hace que la tabla sea desplazable en pantallas pequeñas */
+    
+  }
+  
+  thead {
+    background-color: #ffffff; /* Color de fondo para el encabezado */
+    color: black;              /* Texto blanco para el encabezado */
+  }
+  
+  thead th {
+    padding: 8px 12px;         /* Reduce el padding para el encabezado */
+    text-align: center;        /* Centra el texto del encabezado */
+    font-size: 0.85rem;           /* Ajusta el tamaño de la fuente */
+    white-space: nowrap; /* Evita que las celdas se dividan en varias líneas */
+  }
+  
+  tbody td {
+    padding: 6px 12px;         /* Reduce el padding para las celdas */
+    text-align: center;        /* Centra el texto de las celdas */
+    font-size: 0.80rem;        /* Ajusta el tamaño de la fuente */
+    border-top: 1px solid #ddd; /* Borde superior suave entre filas */
+    white-space: nowrap; /* Evita que las celdas se dividan en varias líneas */
+  }
+
+  .button-style{
+    padding: 6px 12px;         /* Reduce el padding para las celdas */
+    text-align: center;        /* Centra el texto de las celdas */
+    font-size: 0.80rem;        /* Ajusta el tamaño de la fuente */
+    border-top: 1px solid #ddd; /* Borde superior suave entre filas */
+    white-space: nowrap; /* Evita que las celdas se dividan en varias líneas */
+    border: 1px solid #ddd;
+    border-radius: 10px;
+  }
+  tfoot td {
+    font-weight: bold;         /* Hace el texto en el pie de la tabla más fuerte */
+  }
+  
+  
+  
+  /* Estilo adicional para filas alternas */
+  tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Color de fondo alterno para filas */
+  }
+  
+  /* Estilo al pasar el mouse sobre una fila */
+  tbody tr:hover {
+    background-color: #f1f1f1; /* Efecto de hover sobre filas */
+  }
+  
+  /* Contenedor de la tabla con menos margen */
+  .card-body {
+    padding: 0.5rem 1rem;      /* Reduce el padding dentro de la tarjeta */
+  }
+  
+
+
+  
+
+  .status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+}
+
+.status.pendiente {
+    background-color: #ffa904;
+}
+
+
+
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.modal-contentResumen {
+  width: 70%;
+  height: 70%;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+
+.modal-tableResumen{
+  min-width: 100%;
+    width: 100%;
+    margin-top: 10px;           /* Reduce el margen superior */
+    margin-bottom: 20px;        /* Reduce el margen inferior */
+    overflow-x: auto; 
+}
+
+.modal-tableResumen th{
+  background-color:#9b9b9b;
+  color: white;
+  text-align: left;
+}
+.modal-tableResumen td{
+  
+  text-align: left;
+}
+
+.modal-table2Resumen{
+    width: 30%;
+    margin-top: 10px;           /* Reduce el margen superior */
+    margin-bottom: 20px;        /* Reduce el margen inferior */
+    overflow-x: auto; 
+}
+
+.modal-table2Resumen th{
+  background-color:#9b9b9b;
+  color: white;
+  text-align: left;
+}
+.modal-table2Resumen td{
+  
+  text-align: left;
+}
+
+.modal-contentAgregar{
+  width: 70%;
+  height: 70%;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+
+.buttonOpciones{
+  background: none;border: none; outline: none;margin: 0;width: 100%;padding: 0;
+}
+
+.buttonOpciones:hover {
+  background: rgba(0, 0, 0, 0.1); /* Un leve fondo al pasar el mouse */
+  color: #333; /* Cambia el color del texto */
+  width: 100%;
+  padding: 0;
+}
+
+
+.buttonOrange{
+  color:white;
+  background-color: #ffa904;
+  border-radius: 5px;
+  text-align: center;
+  padding: 0px 10px 0px 10px;
+  
+
+}
+
+
+@media (max-width: 992px) {
+  #responsive-table {
+      display: block;
+      width: 100%;
+      overflow-x: auto; /* Permitir desplazamiento horizontal si es necesario */
+  }
+
+  #responsive-table thead {
+      display: none; /* Ocultar encabezados en móviles */
+  }
+
+  #responsive-table tbody, 
+  #responsive-table tr, 
+  #responsive-table td {
+      display: block;
+      width: 100%;
+  }
+
+  #responsive-table tr {
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background: #f9f9f9;
+      padding: 10px;
+  }
+
+  #responsive-table td {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+      position: relative;
+      text-align: right;
+  }
+
+  #responsive-table td:last-child {
+      border-bottom: none;
+  }
+
+  #responsive-table td::before {
+      content: attr(data-label);
+      font-weight: bold;
+      text-transform: uppercase;
+      text-align: left;
+      flex: 1;
+  }
+
+  #responsive-table td span {
+      flex: 2;
+  }
+}
+

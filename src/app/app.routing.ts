@@ -22,6 +22,7 @@ import { TipoCambioComponent } from "./components/gestion/tipo-cambio/tipo-cambi
 import { LecturaCodebarComponent } from "./components/inventario/despacho-ventas/lectura-codebar/lectura-codebar.component";
 import { GanttProduccionComponent } from "./components/produccion/gantt-produccion/gantt-produccion.component";
 import { RegistroComprasComponent } from "./components/compras/registro-compras/registro-compras.component";
+import { RegistroReqComprasComponent } from "./components/socios-negocios/registro-req-compras/registro-req-compras.component";
 
 
 
@@ -46,7 +47,7 @@ const appRoutes: Routes = [
         {path : 'gestion/seleccionar-socidad', component:SeleccionarSocidadComponent,},
         {path : 'gestion/tipo-cambio', component:TipoCambioComponent,},
         {path : 'inventario/despacho-ventas/lectura', component:LecturaCodebarComponent},
-        {path : 'compras/registro-compras', component: RegistroComprasComponent}
+        {path : 'socios-negocios/registro-req-compras', component:RegistroReqComprasComponent}
 
     ]},
     {path: 'login', component:LoginComponent}

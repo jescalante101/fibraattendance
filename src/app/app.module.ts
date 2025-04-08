@@ -46,7 +46,8 @@ import { MatButtonModule } from '@angular/material/button'; // Para botones
 import { MatFormFieldModule } from '@angular/material/form-field'; // Para formularios
 import { MatSelectModule } from '@angular/material/select';
 import { RegistroComprasComponent } from './components/compras/registro-compras/registro-compras.component';
-import { InvLecturaComponent } from './components/modal/inv-lectura/inv-lectura.component'; // Para selects
+import { InvLecturaComponent } from './components/modal/inv-lectura/inv-lectura.component';
+import { RegistroReqComprasComponent } from './components/socios-negocios/registro-req-compras/registro-req-compras.component'; // Para selects
 
 
 @NgModule({
@@ -83,6 +84,7 @@ import { InvLecturaComponent } from './components/modal/inv-lectura/inv-lectura.
     GanttProduccionComponent,
     RegistroComprasComponent,
     InvLecturaComponent,
+    RegistroReqComprasComponent,
 
 
 

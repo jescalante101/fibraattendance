@@ -47,7 +47,8 @@ import { MatFormFieldModule } from '@angular/material/form-field'; // Para formu
 import { MatSelectModule } from '@angular/material/select';
 import { RegistroComprasComponent } from './components/compras/registro-compras/registro-compras.component';
 import { InvLecturaComponent } from './components/modal/inv-lectura/inv-lectura.component';
-import { RegistroReqComprasComponent } from './components/socios-negocios/registro-req-compras/registro-req-compras.component'; // Para selects
+import { RegistroReqComprasComponent } from './components/socios-negocios/registro-req-compras/registro-req-compras.component';
+import { ModalComponent } from './shared/modal/modal.component'; // Para selects
 
 
 @NgModule({
@@ -85,6 +86,7 @@ import { RegistroReqComprasComponent } from './components/socios-negocios/regist
     RegistroComprasComponent,
     InvLecturaComponent,
     RegistroReqComprasComponent,
+    ModalComponent,
 
 
 

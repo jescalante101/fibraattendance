@@ -1,0 +1,18 @@
+<!-- <div class="modal-backdrop" *ngIf="visible">
+    <div class="modal-content">
+      <span class="close-btn" (click)="cerrar()">×</span>
+      <ng-content></ng-content>  👈 aquí va el contenido dinámico 
+    </div>
+  </div>
+   -->
+
+   <div class="modal-backdrop" *ngIf="visible">
+    <div class="modal-content {{ sizeClass }} animate-fade-in">
+      <span class="close-btn" (click)="cerrar()">×</span>
+  
+      <h2 *ngIf="title">{{ title }}</h2>
+  
+      <ng-content></ng-content>
+    </div>
+  </div>
+  

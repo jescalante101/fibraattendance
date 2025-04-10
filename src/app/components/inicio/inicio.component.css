@@ -86,3 +86,93 @@ tbody td.font-semibold {
     margin-right: 0; /* Elimina el margen derecho */
   }
 }
+
+.tile {
+  width: 150px;
+  height: 150px;
+  background-color: #e0f3ff;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  text-align: center;
+  padding: 20px;
+  margin: 10px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  align-items: center !important;
+}
+.tile:hover {
+  transform: scale(1.05);
+}
+.tile-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+.tile-title {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.etiquetas{
+  display: grid;
+  grid-template-columns: repeat(6,1fr);
+  align-items: center;
+  
+}
+
+/* TILE */
+.tile {
+  width: 150px;
+  height: 150px;
+  background-color: #e0f3ff;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  text-align: center;
+  padding: 20px;
+  margin: 10px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.tile:hover {
+  transform: scale(1.05);
+}
+.tile-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+.tile-title {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* MODAL */
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex; justify-content: flex-start; align-items: center;
+  z-index: 1000;
+  padding-left: 400px;
+}
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 80%;
+  
+  position: relative;
+}
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  cursor: pointer;
+  font-size: 24px;
+}
+/* Estilos para elementos responsivos */
+@media (max-width: 1024px) {
+  .modal-backdrop {
+    padding:0;
+    justify-content: center;
+  }
+}

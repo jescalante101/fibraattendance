@@ -11,120 +11,201 @@
         <div class="p-4 bg-gray-100 border-b">
           <div class="text-gray-800 text-xl font-semibold">Tabla de Ventas por Líneas (USD) - Abril 2025</div>
         </div>
-    
-        <table class="min-w-full table-auto border-separate border-spacing-0">
-          <thead>
-            <tr class="bg-green-500 text-white">
-              <th class="px-4 py-2 text-left border-b border-white">Producto/Servicio</th>
-              <th class="px-4 py-2 text-left border-b border-white">Factura (USD)</th>
-              <th class="px-4 py-2 text-left border-b border-white">Nota de Crédito (USD)</th>
-              <th class="px-4 py-2 text-left border-b border-white">Otros</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="border-t">
-              <td class="px-4 py-2">ETIQUETAS-EXPOR</td>
-              <td class="px-4 py-2">3,353.14</td>
-              <td class="px-4 py-2">0.00</td>
-              <td class="px-4 py-2">0.00</td>
-            </tr>
-            <tr class="border-t">
-              <td class="px-4 py-2">ETIQUETAS-NACIONAL</td>
-              <td class="px-4 py-2">3,719.04</td>
-              <td class="px-4 py-2">0.00</td>
-              <td class="px-4 py-2">0.00</td>
-            </tr>
-            <tr class="border-t">
-              <td class="px-4 py-2">SERVICIOS</td>
-              <td class="px-4 py-2">197.01</td>
-              <td class="px-4 py-2">0.00</td>
-              <td class="px-4 py-2">0.00</td>
-            </tr>
-            <tr class="border-t">
-              <td class="px-4 py-2">GRUPO MP</td>
-              <td class="px-4 py-2">0.00</td>
-              <td class="px-4 py-2">0.00</td>
-              <td class="px-4 py-2">0.00</td>
-            </tr>
-            <tr class="border-t bg-gray-100">
-              <td class="px-4 py-2 font-semibold">Subtotal</td>
-              <td class="px-4 py-2 font-semibold">7,269.19</td>
-              <td class="px-4 py-2 font-semibold">0.00</td>
-              <td class="px-4 py-2 font-semibold">0.00</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-  </div>
-  <div class="container-fluid p-4">
-      <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-        <div class="p-4 bg-gray-100 border-b">
-          <div class="text-gray-800 text-xl font-semibold">Tabla de Ventas por Líneas (USD) - Marzo 2025</div>
+        <div class="etiquetas">
+          <div class="tile" (click)="openModalventas()">
+            <div class="tile-icon">🛒</div>
+            <div class="tile-title">Ventas</div>
+          </div>
+            <!-- Modal -->
+          <div class="modal-backdrop" *ngIf="modalVisibleventas" (click)="closeModalventas()">
+            <div class="modal-content" (click)="$event.stopPropagation()">
+              <span class="close-btn" (click)="closeModalventas()">&times;</span>
+              <h2>Detalle de Ventas</h2>
+              <table class="min-w-full table-auto border-separate border-spacing-0">
+                <thead>
+                  <tr class=" ">
+                    <th class="px-4 py-2 text-left border-b border-white">Producto/Servicio</th>
+                    <th class="px-4 py-2 text-left border-b border-white">Factura (USD)</th>
+                    <th class="px-4 py-2 text-left border-b border-white">Nota de Crédito (USD)</th>
+                    <th class="px-4 py-2 text-left border-b border-white">Otros</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-t">
+                    <td class="px-4 py-2">ETIQUETAS-EXPOR</td>
+                    <td class="px-4 py-2">3,353.14</td>
+                    <td class="px-4 py-2">0.00</td>
+                    <td class="px-4 py-2">0.00</td>
+                  </tr>
+                  <tr class="border-t">
+                    <td class="px-4 py-2">ETIQUETAS-NACIONAL</td>
+                    <td class="px-4 py-2">3,719.04</td>
+                    <td class="px-4 py-2">0.00</td>
+                    <td class="px-4 py-2">0.00</td>
+                  </tr>
+                  <tr class="border-t">
+                    <td class="px-4 py-2">SERVICIOS</td>
+                    <td class="px-4 py-2">197.01</td>
+                    <td class="px-4 py-2">0.00</td>
+                    <td class="px-4 py-2">0.00</td>
+                  </tr>
+                  <tr class="border-t">
+                    <td class="px-4 py-2">GRUPO MP</td>
+                    <td class="px-4 py-2">0.00</td>
+                    <td class="px-4 py-2">0.00</td>
+                    <td class="px-4 py-2">0.00</td>
+                  </tr>
+                  <tr class="border-t bg-gray-100">
+                    <td class="px-4 py-2 font-semibold">Subtotal</td>
+                    <td class="px-4 py-2 font-semibold">7,269.19</td>
+                    <td class="px-4 py-2 font-semibold">0.00</td>
+                    <td class="px-4 py-2 font-semibold">0.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div> <!--hasta acá es el cierre del modal ventas-->
+          <div class="tile" (click)="openModalproduccion()">
+            <div class="tile-icon">📊</div>
+            <div class="tile-title">Producción</div>
+            <br>
+            <div>10 toneladas</div>
+          </div>
+           <!-- Modal -->
+        <div class="modal-backdrop" *ngIf="modalVisibleproduccion" (click)="closeModalproduccion()">
+          <div class="modal-content" (click)="$event.stopPropagation()">
+            <span class="close-btn" (click)="closeModalproduccion()">&times;</span>
+            <h2>Detalle de Producción</h2>
+            <table class="min-w-full table-auto border-separate border-spacing-0">
+              <thead>
+                <tr class=" ">
+                  <th class="px-4 py-2 text-left border-b border-white">Producto/Servicio</th>
+                  <th class="px-4 py-2 text-left border-b border-white">Factura (USD)</th>
+                  <th class="px-4 py-2 text-left border-b border-white">Nota de Crédito (USD)</th>
+                  <th class="px-4 py-2 text-left border-b border-white">Otros</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-t">
+                  <td class="px-4 py-2">ETIQUETAS-EXPOR</td>
+                  <td class="px-4 py-2">3,353.14</td>
+                  <td class="px-4 py-2">0.00</td>
+                  <td class="px-4 py-2">0.00</td>
+                </tr>
+                <tr class="border-t">
+                  <td class="px-4 py-2">ETIQUETAS-NACIONAL</td>
+                  <td class="px-4 py-2">3,719.04</td>
+                  <td class="px-4 py-2">0.00</td>
+                  <td class="px-4 py-2">0.00</td>
+                </tr>
+                <tr class="border-t">
+                  <td class="px-4 py-2">SERVICIOS</td>
+                  <td class="px-4 py-2">197.01</td>
+                  <td class="px-4 py-2">0.00</td>
+                  <td class="px-4 py-2">0.00</td>
+                </tr>
+                <tr class="border-t">
+                  <td class="px-4 py-2">GRUPO MP</td>
+                  <td class="px-4 py-2">0.00</td>
+                  <td class="px-4 py-2">0.00</td>
+                  <td class="px-4 py-2">0.00</td>
+                </tr>
+                <tr class="border-t bg-gray-100">
+                  <td class="px-4 py-2 font-semibold">Subtotal</td>
+                  <td class="px-4 py-2 font-semibold">7,269.19</td>
+                  <td class="px-4 py-2 font-semibold">0.00</td>
+                  <td class="px-4 py-2 font-semibold">0.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div> <!--hasta acá es el cierre del modal produccion-->
+          <div class="tile"(click)="openModalcronograma()">
+            <div class="tile-icon">📆</div>
+            <div class="tile-title">Cronograma</div>
+            <br>
+            <div>16</div>
+          </div>
+                     <!-- Modal -->
+        <div class="modal-backdrop" *ngIf="modalVisiblecronograma" (click)="closeModalcronograma()">
+          <div class="modal-content" (click)="$event.stopPropagation()">
+            <span class="close-btn" (click)="closeModalcronograma()">&times;</span>
+            <h2>Detalle de Producción</h2>
+            <table class="min-w-full table-auto border-separate border-spacing-0">
+              <thead>
+                <tr class=" ">
+                  <th class="px-4 py-2 text-left border-b border-white">Producto/Servicio</th>
+                  <th class="px-4 py-2 text-left border-b border-white">Factura (USD)</th>
+                  <th class="px-4 py-2 text-left border-b border-white">Nota de Crédito (USD)</th>
+                  <th class="px-4 py-2 text-left border-b border-white">Otros</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-t">
+                  <td class="px-4 py-2">ETIQUETAS-EXPOR</td>
+                  <td class="px-4 py-2">3,353.14</td>
+                  <td class="px-4 py-2">0.00</td>
+                  <td class="px-4 py-2">0.00</td>
+                </tr>
+                <tr class="border-t">
+                  <td class="px-4 py-2">ETIQUETAS-NACIONAL</td>
+                  <td class="px-4 py-2">3,719.04</td>
+                  <td class="px-4 py-2">0.00</td>
+                  <td class="px-4 py-2">0.00</td>
+                </tr>
+                <tr class="border-t">
+                  <td class="px-4 py-2">SERVICIOS</td>
+                  <td class="px-4 py-2">197.01</td>
+                  <td class="px-4 py-2">0.00</td>
+                  <td class="px-4 py-2">0.00</td>
+                </tr>
+                <tr class="border-t">
+                  <td class="px-4 py-2">GRUPO MP</td>
+                  <td class="px-4 py-2">0.00</td>
+                  <td class="px-4 py-2">0.00</td>
+                  <td class="px-4 py-2">0.00</td>
+                </tr>
+                <tr class="border-t bg-gray-100">
+                  <td class="px-4 py-2 font-semibold">Subtotal</td>
+                  <td class="px-4 py-2 font-semibold">7,269.19</td>
+                  <td class="px-4 py-2 font-semibold">0.00</td>
+                  <td class="px-4 py-2 font-semibold">0.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div> <!--hasta acá es el cierre del modal cronograma-->
+        <div class="tile"(click)="openModalcronograma()">
+          <div class="tile-icon">🚚</div>
+          <div class="tile-title">Despachos en el día</div>
+          <br>
+          <div>16</div>
         </div>
-    
-        <table class="min-w-full table-auto border-separate border-spacing-0">
-          <thead>
-            <tr class="bg-blue-500 text-white">
-              <th class="px-4 py-2 text-left border-b border-white">Producto/Servicio</th>
-              <th class="px-4 py-2 text-left border-b border-white">Factura (USD)</th>
-              <th class="px-4 py-2 text-left border-b border-white">Nota de Crédito (USD)</th>
-              <th class="px-4 py-2 text-left border-b border-white">Otros</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="border-t">
-              <td class="px-4 py-2">ETIQUETAS-EXPOR</td>
-              <td class="px-4 py-2">541,386.02</td>
-              <td class="px-4 py-2">-8,465.19</td>
-              <td class="px-4 py-2">0.00</td>
-            </tr>
-            <tr class="border-t">
-              <td class="px-4 py-2">ETIQUETAS-NACIONAL</td>
-              <td class="px-4 py-2">841,318.16</td>
-              <td class="px-4 py-2">-30,095.89</td>
-              <td class="px-4 py-2">0.00</td>
-            </tr>
-            <tr class="border-t">
-              <td class="px-4 py-2">MERMA Y DESMEDRO</td>
-              <td class="px-4 py-2">3,125.21</td>
-              <td class="px-4 py-2">0.00</td>
-              <td class="px-4 py-2">0.00</td>
-            </tr>
-            <tr class="border-t">
-              <td class="px-4 py-2">POLIMEROS CLISSE</td>
-              <td class="px-4 py-2">18,304.00</td>
-              <td class="px-4 py-2">0.00</td>
-              <td class="px-4 py-2">0.00</td>
-            </tr>
-            <tr class="border-t">
-              <td class="px-4 py-2">SERVICIOS</td>
-              <td class="px-4 py-2">6,712.41</td>
-              <td class="px-4 py-2">-4,514.48</td>
-              <td class="px-4 py-2">0.00</td>
-            </tr>
-            <tr class="border-t">
-              <td class="px-4 py-2">GRUPO MP</td>
-              <td class="px-4 py-2">32,350.94</td>
-              <td class="px-4 py-2">0.00</td>
-              <td class="px-4 py-2">0.00</td>
-            </tr>
-            <tr class="border-t bg-gray-100">
-              <td class="px-4 py-2 font-semibold">Subtotal</td>
-              <td class="px-4 py-2 font-semibold">1,443,196.74</td>
-              <td class="px-4 py-2 font-semibold">-43,075.56</td>
-              <td class="px-4 py-2 font-semibold">0.00</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="tile"(click)="openModalcronograma()">
+          <div class="tile-icon">📦</div>
+          <div class="tile-title">devoluciones en el mes</div>
+          <br>
+          <div>16</div>
+        </div>
+        <div class="tile"(click)="openModalcronograma()">
+          <div class="tile-icon">🌎</div>
+          <div class="tile-title">Exportaciones</div>
+          <br>
+          <div>16</div>
+        </div>
+        </div>
       </div>
-    </div>
   </div>
+  </div> <!--fin de style-->
 
 </div>
 
 
-
-  
-
-  
-  
+<!-- crear modales -->
+<!-- Modal -->
+<!-- <div class="modal-backdrop" *ngIf="modalVisiblecronograma" (click)="closeModalcronograma()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <span class="close-btn" (click)="closeModalcronograma()">&times;</span>
+  </div>
+</div>  -->
+<!--hasta acá es el cierre del modal-->

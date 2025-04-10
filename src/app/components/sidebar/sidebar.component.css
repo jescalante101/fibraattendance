@@ -6,14 +6,18 @@
 
 /* Estilo general del sidebar */
 .sidebar {
-  width: 250px;              /* Ancho del sidebar */
+  width: 220px;              /* Ancho del sidebar */
   font-size: 0.85rem;        /* Tamaño de fuente más pequeño */
   background-color: #093045; /* Color de fondo azul oscuro */
   color: #fff !important;    /* Asegura que el texto sea blanco */
   min-height: 100vh;         /* Altura completa */
   position: fixed;           /* Fijo en el lateral */
-  top: 50px;
+  top: 52px;
   left: 0;
+  transition: all 0.3s ease;
+  display: block; /* o sin display, porque por defecto es block */
+
+  
 }
 
 .navbar-nav{
@@ -91,20 +95,18 @@
   background-color: #f8f9fa;    /* Fondo del contenido */
 }
 
-/* Estilos para elementos responsivos */
-@media (max-width: 768px) {
-  .sidebar {
-    position: relative;
-    width: 100%;                 /* Sidebar ocupa el 100% en pantallas pequeñas */
-    min-height: auto;
-  }
-  .content-wrapper {
-    margin-left: 0;
-  }
+.mobile-header {
+  display: none; /* Oculto por defecto */
 }
 
+.mobile-row {
+  height: 52px;
+  padding: 0 16px;
+}
 
-
+.bg-blue {
+  background-color: #154c6a;
+}
 
 
 /* NUEVO */
@@ -133,4 +135,60 @@
     align-items: center;
     margin-left: 20px;
     margin-top: 25px;
+}
+
+
+.user-image {
+  float: left;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  margin-right: 10px;
+  margin-top: -2px;
+}
+
+
+
+
+
+
+
+
+
+@media (max-width: 992px) {
+  .sidebar {
+    width: 220px;             /* Asegúrate de que el sidebar tenga un ancho definido */
+    display: block !important; /* Asegura que el sidebar esté visible */
+  }
+  .content-wrapper {
+    margin-left: 0;  /* Asegura que el contenido se acomode cuando el sidebar está oculto */
+  }
+  /* Hacer visible el sidebar si isSidebar es true */
+  .cs-offcanvas {
+    display: block !important;
+  }
+}
+@media (min-width: 769px) and (max-width: 991px) {
+  /* Aquí van los estilos que quieras aplicar para este rango de tamaños de pantalla */
+  .sidebar {
+    width: 220px;  /* Puedes ajustar el ancho si es necesario */
+    display: block !important;  /* Asegura que el sidebar se muestre */
+  }
+
+  .content-wrapper {
+    margin-left: 220px; /* Ajusta el margen izquierdo si es necesario */
+  }
+}
+/* Media query para pantallas más pequeñas (menor a 768px) */
+@media (max-width: 768px) {
+  .content-wrapper {
+    margin-left: 0;
+  }
+
+  .desktop-header {
+    display: none !important;
+  }
+  #divSpace{
+    display: none !important;  
+  }
 }

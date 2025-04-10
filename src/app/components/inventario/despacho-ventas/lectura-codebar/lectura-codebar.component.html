@@ -19,7 +19,7 @@
           <input type="text" [(ngModel)]="searchClient" placeholder="Buscar Cliente" 
                  style="border: 1px solid #ccc; border-radius: 2px; padding: 10px 35px 10px 10px; width: 100%;" />
           <!-- Ícono de búsqueda dentro del input -->
-          <button mat-icon-button (click)="openSearchModal()" style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%);">
+          <button mat-icon-button (click)="openSearchModal()" style="position: absolute;max-width:100px; right: 0px; top: 50%; transform: translateY(-50%);">
             <i class="fas fa-search"></i> <!-- Ícono de búsqueda -->
           </button>
         </div>
@@ -120,4 +120,30 @@
   <button class="close-btn" (click)="closeModal()">Cerrar</button>
 </div>
 </div>
+
+
+
+<!-- Modal para cliente -->
+<div class="modal" *ngIf="isVentanaCliente">
+  <div class="modal-content cliente-modal">
+    <h4>Buscar Cliente</h4>
+    <div class="input-container">
+      <label for="searchCliente">Cliente:</label>
+      <div class="input-group">
+        <input type="text" id="searchCliente" [(ngModel)]="searchClient" (input)="filterClients()" placeholder="Buscar cliente..." />
+      </div>
+    </div>
+
+    <div *ngIf="filteredClients.length > 0">
+      <ul>
+        <li *ngFor="let cliente of filteredClients" (click)="selectClient(cliente)">
+          {{ cliente }}
+        </li>
+      </ul>
+    </div>
+
+    <button class="close-btn" (click)="closeSearchModal()">Cerrar</button>
+  </div>
+</div>
+
 

@@ -22,7 +22,11 @@ import { TipoCambioComponent } from "./components/gestion/tipo-cambio/tipo-cambi
 import { LecturaCodebarComponent } from "./components/inventario/despacho-ventas/lectura-codebar/lectura-codebar.component";
 import { GanttProduccionComponent } from "./components/produccion/gantt-produccion/gantt-produccion.component";
 import { RegistroComprasComponent } from "./components/compras/registro-compras/registro-compras.component";
+<<<<<<< HEAD
 import { DataMaestroComponent } from "./components/inventario/data-maestro/data-maestro.component";
+=======
+import { RegistroReqComprasComponent } from "./components/socios-negocios/registro-req-compras/registro-req-compras.component";
+>>>>>>> 685210553dd1e5a8d9648e88b8924dc27075b184
 
 
 
@@ -47,9 +51,13 @@ const appRoutes: Routes = [
         {path : 'gestion/seleccionar-socidad', component:SeleccionarSocidadComponent,},
         {path : 'gestion/tipo-cambio', component:TipoCambioComponent,},
         {path : 'inventario/despacho-ventas/lectura', component:LecturaCodebarComponent},
+<<<<<<< HEAD
         {path : 'inventario/data-maestro/maestro', component:DataMaestroComponent},
 
         {path : 'compras/registro-compras', component: RegistroComprasComponent}
+=======
+        {path : 'socios-negocios/registro-req-compras', component:RegistroReqComprasComponent}
+>>>>>>> 685210553dd1e5a8d9648e88b8924dc27075b184
 
     ]},
     {path: 'login', component:LoginComponent}

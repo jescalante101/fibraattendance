@@ -47,11 +47,16 @@ import { MatFormFieldModule } from '@angular/material/form-field'; // Para formu
 import { MatSelectModule } from '@angular/material/select';
 import { RegistroComprasComponent } from './components/compras/registro-compras/registro-compras.component';
 import { InvLecturaComponent } from './components/modal/inv-lectura/inv-lectura.component';
+<<<<<<< HEAD
 import { DataMaestroComponent } from './components/inventario/data-maestro/data-maestro.component';
 import { ModalComponent } from './components/inventario/modal/modal.component';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
+=======
+import { RegistroReqComprasComponent } from './components/socios-negocios/registro-req-compras/registro-req-compras.component'; // Para selects
+
+>>>>>>> 685210553dd1e5a8d9648e88b8924dc27075b184
 
 @NgModule({
   declarations: [
@@ -87,8 +92,13 @@ import { MatRadioModule } from '@angular/material/radio';
     GanttProduccionComponent,
     RegistroComprasComponent,
     InvLecturaComponent,
+<<<<<<< HEAD
     DataMaestroComponent,
     ModalComponent,
+=======
+    RegistroReqComprasComponent,
+
+>>>>>>> 685210553dd1e5a8d9648e88b8924dc27075b184
 
 
     

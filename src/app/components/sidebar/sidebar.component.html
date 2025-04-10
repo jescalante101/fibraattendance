@@ -65,11 +65,11 @@
       <ul class="nav flex-column">
         <!-- Menú principal "Gestión" -->
         <li class="nav-item">
-          <a class="nav-link px-4" href="#" (click)="toggleGestion()">
+          <a class="nav-link px-4" href="#" (click)="toggleMenu(1, 'gestion')">
             <i class="fas fa-cogs mr-2"></i> Gestión
-            <i class="fas" [ngClass]="{'fa-chevron-down': isGestionOpen, 'fa-chevron-right': !isGestionOpen}" style="margin-left:auto;"></i>
+            <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(1, 'gestion'), 'fa-chevron-right': !isOpen(1, 'gestion')}" style="margin-left:auto;"></i>
           </a>
-          <ul *ngIf="isGestionOpen" class="nav flex-column pl-4">
+          <ul *ngIf="isOpen(1, 'gestion')" class="nav flex-column pl-4">
 
             <!-- Seleccionar Sociedad -->
 
@@ -84,18 +84,18 @@
 
             <!-- Submenú de "Definicion" -->
             <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleDefinicion()">
+              <a class="nav-link" href="#" (click)="toggleMenu(2,'definiciones')">
                 Definiciones
-                <i class="fas" [ngClass]="{'fa-chevron-down': isDefinicionOpen, 'fa-chevron-right': !isDefinicionOpen}" style="margin-left:auto;"></i>
+                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2, 'definiciones'), 'fa-chevron-right': !isOpen(2, 'definiciones')}" style="margin-left:auto;"></i>
               </a>
-              <ul *ngIf="isDefinicionOpen" class="nav flex-column pl-4">
+              <ul *ngIf="isOpen(2, 'definiciones')" class="nav flex-column pl-4">
                 <!-- Nuevo submenú dentro de "Definiciones" -->
                 <li class="nav-item">
-                  <a class="nav-link" href="#" (click)="toggleSubDefinicion()">
+                  <a class="nav-link" href="#" (click)="toggleMenu(3,'general')">
                     General
-                    <i class="fas" [ngClass]="{'fa-chevron-down': isSubDefinicionOpen, 'fa-chevron-right': !isSubDefinicionOpen}" style="margin-left:auto;"></i>
+                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'general'), 'fa-chevron-right': !isOpen(3,'general')}" style="margin-left:auto;"></i>
                   </a>
-                  <ul *ngIf="isSubDefinicionOpen" class="nav flex-column pl-4">
+                  <ul *ngIf="isOpen(3,'general')" class="nav flex-column pl-4">
                     <li class="nav-item">
                       <a class="nav-link" href="#">Usuarios</a>
                     </li>
@@ -159,11 +159,11 @@
 
                 <!-- Nuevo submenú dentro de "Produccion" -->
                 <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="toggleSubProduccion()">
+                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'produccion')">
                                     Producción
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isSubProduccionOpen, 'fa-chevron-right': !isSubProduccionOpen}" style="margin-left:auto;"></i>
+                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'produccion'), 'fa-chevron-right': !isOpen(3,'produccion')}" style="margin-left:auto;"></i>
                                   </a>
-                                  <ul *ngIf="isSubProduccionOpen" class="nav flex-column pl-4">
+                                  <ul *ngIf="isOpen(3,'produccion')" class="nav flex-column pl-4">
                                     <li class="nav-item">
                                       <a class="nav-link" href="#">Ruta</a>
                                     </li>
@@ -177,11 +177,11 @@
 
                 <!-- Nuevo submenú dentro de "Mantenimiento" -->
                 <li class="nav-item">
-                      <a class="nav-link" href="#" (click)="toggleSubMantenimiento()">
+                      <a class="nav-link" href="#" (click)="toggleMenu(3,'mantenimiento')">
                         Mantenimiento
-                        <i class="fas" [ngClass]="{'fa-chevron-down': isSubMantenimientoOpen, 'fa-chevron-right': !isSubMantenimientoOpen}" style="margin-left:auto;"></i>
+                        <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'mantenimiento'), 'fa-chevron-right': !isOpen(3,'mantenimiento')}" style="margin-left:auto;"></i>
                       </a>
-                      <ul *ngIf="isSubMantenimientoOpen" class="nav flex-column pl-4">
+                      <ul *ngIf="isOpen(3,'mantenimiento')" class="nav flex-column pl-4">
                               <li class="nav-item">
                                       <a class="nav-link" href="#">Grupo de Recursos</a>
                               </li>
@@ -195,11 +195,11 @@
 
                 <!-- Nuevo submenú dentro de "Finanzas" -->
                 <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="toggleSubFinanzas()">
+                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'finanzas')">
                                     Finanzas
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isSubFinanzasOpen, 'fa-chevron-right': !isSubFinanzasOpen}" style="margin-left:auto;"></i>
+                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'finanzas'), 'fa-chevron-right': !isOpen(3,'finanzas')}" style="margin-left:auto;"></i>
                                   </a>
-                                  <ul *ngIf="isSubFinanzasOpen" class="nav flex-column pl-4">
+                                  <ul *ngIf="isOpen(3,'finanzas')" class="nav flex-column pl-4">
                                     <li class="nav-item">
                                       <a class="nav-link" href="#">Plan de Cuentas</a>
                                     </li>
@@ -251,13 +251,13 @@
 
 
 
-                <!-- Nuevo submenú dentro de "Finanzas" -->
+                <!-- Submenú de "oportunidades" -->
                 <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="toggleOportunidades()">
+                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'oportunidades')">
                                     Oportunidades
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isSubOportunidadesOpen, 'fa-chevron-right': !isSubOportunidadesOpen}" style="margin-left:auto;"></i>
+                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'oportunidades'), 'fa-chevron-right': !isOpen(3,'oportunidades')}" style="margin-left:auto;"></i>
                                   </a>
-                                  <ul *ngIf="isSubOportunidadesOpen" class="nav flex-column pl-4">
+                                  <ul *ngIf="isOpen(3,'oportunidades')" class="nav flex-column pl-4">
                                     <li class="nav-item">
                                       <a class="nav-link" href="#">Plan de Cuentas</a>
                                     </li>
@@ -311,11 +311,11 @@
 
                 <!-- Nuevo submenú dentro de "Ventas" -->
                 <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="togglesubVentas()">
+                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'ventas')">
                                     Ventas
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isSubVentasOpen, 'fa-chevron-right': !isSubVentasOpen}" style="margin-left:auto;"></i>
+                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'ventas'), 'fa-chevron-right': !isOpen(3,'ventas')}" style="margin-left:auto;"></i>
                                   </a>
-                                  <ul *ngIf="isSubVentasOpen" class="nav flex-column pl-4">
+                                  <ul *ngIf="isOpen(3,'ventas')" class="nav flex-column pl-4">
                                     <li class="nav-item">
                                       <a class="nav-link" href="#">Plan de Cuentas</a>
                                     </li>
@@ -369,11 +369,11 @@
 
                 <!-- Nuevo submenú dentro de "Compras" -->
                 <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="togglesubCompras()">
+                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'compras')">
                                     Compras
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isSubComprasOpen, 'fa-chevron-right': !isSubComprasOpen}" style="margin-left:auto;"></i>
+                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'compras'), 'fa-chevron-right': !isOpen(3,'compras')}" style="margin-left:auto;"></i>
                                   </a>
-                                  <ul *ngIf="isSubComprasOpen" class="nav flex-column pl-4">
+                                  <ul *ngIf="isOpen(3,'compras')" class="nav flex-column pl-4">
                                     <li class="nav-item">
                                       <a class="nav-link" href="#">Plan de Cuentas</a>
                                     </li>
@@ -426,11 +426,11 @@
 
                 <!-- Nuevo submenú dentro de "Socio de Negocios" -->
                 <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="togglesubSocioNegocios()">
+                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'socionegocio')">
                                     Socio de Negocios
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isSubSocioNegociosOpen, 'fa-chevron-right': !isSubSocioNegociosOpen}" style="margin-left:auto;"></i>
+                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'socionegocio'), 'fa-chevron-right': !isOpen(3,'socionegocio')}" style="margin-left:auto;"></i>
                                   </a>
-                                  <ul *ngIf="isSubSocioNegociosOpen" class="nav flex-column pl-4">
+                                  <ul *ngIf="isOpen(3,'socionegocio')" class="nav flex-column pl-4">
                                     <li class="nav-item">
                                       <a class="nav-link" href="#">Plan de Cuentas</a>
                                     </li>
@@ -484,11 +484,11 @@
 
                 <!-- Nuevo submenú dentro de "Socio de Negocios" -->
                 <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="togglesubGestionBancos()">
+                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'gestionbancos')">
                                     Gestion de Bancos
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isSubGestionBancosOpen, 'fa-chevron-right': !isSubGestionBancosOpen}" style="margin-left:auto;"></i>
+                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'gestionbancos'), 'fa-chevron-right': !isOpen(3,'gestionbancos')}" style="margin-left:auto;"></i>
                                   </a>
-                                  <ul *ngIf="isSubGestionBancosOpen" class="nav flex-column pl-4">
+                                  <ul *ngIf="isOpen(3,'gestionbancos')" class="nav flex-column pl-4">
                                     <li class="nav-item">
                                       <a class="nav-link" href="#">Plan de Cuentas</a>
                                     </li>
@@ -541,11 +541,11 @@
                 <!-- Nuevo submenú dentro de "Inventario" -->
 
                 <li class="nav-item">
-                  <a class="nav-link" href="#" (click)="togglesubInventario()">
+                  <a class="nav-link" href="#" (click)="toggleMenu(3,'inventario')">
                     Inventario
-                    <i class="fas" [ngClass]="{'fa-chevron-down': isSubInventarioOpen, 'fa-chevron-right': !isSubInventarioOpen}" style="margin-left:auto;"></i>
+                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'inventario'), 'fa-chevron-right': !isOpen(3,'inventario')}" style="margin-left:auto;"></i>
                   </a>
-                  <ul *ngIf="isSubInventarioOpen" class="nav flex-column pl-4">
+                  <ul *ngIf="isOpen(3,'inventario')" class="nav flex-column pl-4">
                     <li class="nav-item">
                       <a class="nav-link" href="#">Plan de Cuentas</a>
                     </li>
@@ -656,11 +656,11 @@
 
                 <!-- Nuevo submenú dentro de "Servicio" -->
                 <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="togglesubServicio()">
+                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'servicio')">
                                     Servicio
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isSubServicioOpen, 'fa-chevron-right': !isSubServicioOpen}" style="margin-left:auto;"></i>
+                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'servicio'), 'fa-chevron-right': !isOpen(3,'servicio')}" style="margin-left:auto;"></i>
                                   </a>
-                                  <ul *ngIf="isSubServicioOpen" class="nav flex-column pl-4">
+                                  <ul *ngIf="isOpen(3,'servicio')" class="nav flex-column pl-4">
                                     <li class="nav-item">
                                       <a class="nav-link" href="#">Plan de Cuentas</a>
                                     </li>
@@ -716,11 +716,11 @@
 
             <!-- Submenú de "Inicializacion Sistema" -->
             <li class="nav-item">
-                          <a class="nav-link" href="#" (click)="togglesubInicializaSistema()">
-                            Inicializacion Sistema
-                            <i class="fas" [ngClass]="{'fa-chevron-down': issubInicializaSistema, 'fa-chevron-right': !issubInicializaSistema}" style="margin-left:auto;"></i>
+                          <a class="nav-link" href="#" (click)="toggleMenu(2,'inicializacionsistema')">
+                            Inicialización Sistema
+                            <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'inicializacionsistema'), 'fa-chevron-right': !isOpen(2,'inicializacionsistema')}" style="margin-left:auto;"></i>
                           </a>
-                          <ul *ngIf="issubInicializaSistema" class="nav flex-column pl-4">
+                          <ul *ngIf="isOpen(2,'inicializacionsistema')" class="nav flex-column pl-4">
                             <!-- Nuevo submenú dentro de "Detalles Sociedad" -->
                               <li class="nav-item">
                                 <a class="nav-link" href="#">Detalles Sociedad</a>
@@ -741,11 +741,11 @@
             
                             <!-- Nuevo submenú dentro de "Autorizaciones" -->
                             <li class="nav-item">
-                                              <a class="nav-link" href="#" (click)="toggleSubAutorizaciones()">
+                                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones')">
                                                 Autorizaciones
-                                                <i class="fas" [ngClass]="{'fa-chevron-down': isSubAutorizacionesOpen, 'fa-chevron-right': !isSubAutorizacionesOpen}" style="margin-left:auto;"></i>
+                                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones'), 'fa-chevron-right': !isOpen(3,'autorizaciones')}" style="margin-left:auto;"></i>
                                               </a>
-                                              <ul *ngIf="isSubAutorizacionesOpen" class="nav flex-column pl-4">
+                                              <ul *ngIf="isOpen(3,'autorizaciones')" class="nav flex-column pl-4">
                                                 <li class="nav-item">
                                                   <a class="nav-link" href="#">Autorizaciones Generales</a>
                                                 </li>
@@ -758,11 +758,11 @@
 
                                                 <!-- Nuevo submenú dentro de "Propietario de Datos" -->
                                                 <li class="nav-item">
-                                                                  <a class="nav-link" href="#" (click)="toggleSubPropietarioDatos()">
+                                                                  <a class="nav-link" href="#" (click)="toggleMenu(4,'titularidaddatos')">
                                                                       Titularidad de datos
-                                                                      <i class="fas" [ngClass]="{'fa-chevron-down': isSubPropietarioDatosOpen, 'fa-chevron-right': !isSubPropietarioDatosOpen}" style="margin-left:auto;"></i>
+                                                                      <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(4,'titularidaddatos'), 'fa-chevron-right': !isOpen(4,'titularidaddatos')}" style="margin-left:auto;"></i>
                                                                     </a>
-                                                                    <ul *ngIf="isSubPropietarioDatosOpen" class="nav flex-column pl-4">
+                                                                    <ul *ngIf="isOpen(4,'titularidaddatos')" class="nav flex-column pl-4">
                                                                       <li class="nav-item">
                                                                         <a class="nav-link" href="#">Autorizaciones de propiedad de datos</a>
                                                                       </li>
@@ -814,11 +814,11 @@
             
                             <!-- Nuevo submenú dentro de "Finanzas" -->
                             <li class="nav-item">
-                                              <a class="nav-link" href="#" (click)="toggleOportunidades()">
+                                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones-oportunidades')">
                                                 Oportunidades
-                                                <i class="fas" [ngClass]="{'fa-chevron-down': isSubOportunidadesOpen, 'fa-chevron-right': !isSubOportunidadesOpen}" style="margin-left:auto;"></i>
+                                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones-oportunidades'), 'fa-chevron-right': !isOpen(3,'autorizaciones-oportunidades')}" style="margin-left:auto;"></i>
                                               </a>
-                                              <ul *ngIf="isSubOportunidadesOpen" class="nav flex-column pl-4">
+                                              <ul *ngIf="isOpen(3,'autorizaciones-oportunidades')" class="nav flex-column pl-4">
                                                 <li class="nav-item">
                                                   <a class="nav-link" href="#">Plan de Cuentas</a>
                                                 </li>
@@ -872,11 +872,11 @@
             
                             <!-- Nuevo submenú dentro de "Ventas" -->
                             <li class="nav-item">
-                                              <a class="nav-link" href="#" (click)="togglesubVentas()">
+                                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones-ventas')">
                                                 Ventas
-                                                <i class="fas" [ngClass]="{'fa-chevron-down': isSubVentasOpen, 'fa-chevron-right': !isSubVentasOpen}" style="margin-left:auto;"></i>
+                                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones-ventas'), 'fa-chevron-right': !isOpen(3,'autorizaciones-ventas')}" style="margin-left:auto;"></i>
                                               </a>
-                                              <ul *ngIf="isSubVentasOpen" class="nav flex-column pl-4">
+                                              <ul *ngIf="isOpen(3,'autorizaciones-ventas')" class="nav flex-column pl-4">
                                                 <li class="nav-item">
                                                   <a class="nav-link" href="#">Plan de Cuentas</a>
                                                 </li>
@@ -930,11 +930,11 @@
             
                             <!-- Nuevo submenú dentro de "Compras" -->
                             <li class="nav-item">
-                                              <a class="nav-link" href="#" (click)="togglesubCompras()">
+                                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones-compras')">
                                                 Compras
-                                                <i class="fas" [ngClass]="{'fa-chevron-down': isSubComprasOpen, 'fa-chevron-right': !isSubComprasOpen}" style="margin-left:auto;"></i>
+                                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones-compras'), 'fa-chevron-right': !isOpen(3,'autorizaciones-compras')}" style="margin-left:auto;"></i>
                                               </a>
-                                              <ul *ngIf="isSubComprasOpen" class="nav flex-column pl-4">
+                                              <ul *ngIf="isOpen(3,'autorizaciones-compras')" class="nav flex-column pl-4">
                                                 <li class="nav-item">
                                                   <a class="nav-link" href="#">Plan de Cuentas</a>
                                                 </li>
@@ -987,11 +987,11 @@
             
                             <!-- Nuevo submenú dentro de "Socio de Negocios" -->
                             <li class="nav-item">
-                                              <a class="nav-link" href="#" (click)="togglesubSocioNegocios()">
+                                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones-sociosnegocios')">
                                                 Socio de Negocios
-                                                <i class="fas" [ngClass]="{'fa-chevron-down': isSubSocioNegociosOpen, 'fa-chevron-right': !isSubSocioNegociosOpen}" style="margin-left:auto;"></i>
+                                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones-sociosnegocios'), 'fa-chevron-right': !isOpen(3,'autorizaciones-sociosnegocios')}" style="margin-left:auto;"></i>
                                               </a>
-                                              <ul *ngIf="isSubSocioNegociosOpen" class="nav flex-column pl-4">
+                                              <ul *ngIf="isOpen(3,'autorizaciones-sociosnegocios')" class="nav flex-column pl-4">
                                                 <li class="nav-item">
                                                   <a class="nav-link" href="#">Plan de Cuentas</a>
                                                 </li>
@@ -1043,13 +1043,13 @@
             
             
             
-                            <!-- Nuevo submenú dentro de "Socio de Negocios" -->
+                            <!-- Nuevo submenú dentro de "Gestión de Bancos" -->
                             <li class="nav-item">
-                                              <a class="nav-link" href="#" (click)="togglesubGestionBancos()">
+                                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones-gestionbancos')">
                                                 Gestion de Bancos
-                                                <i class="fas" [ngClass]="{'fa-chevron-down': isSubGestionBancosOpen, 'fa-chevron-right': !isSubGestionBancosOpen}" style="margin-left:auto;"></i>
+                                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones-gestionbancos'), 'fa-chevron-right': !isOpen(3,'autorizaciones-gestionbancos')}" style="margin-left:auto;"></i>
                                               </a>
-                                              <ul *ngIf="isSubGestionBancosOpen" class="nav flex-column pl-4">
+                                              <ul *ngIf="isOpen(3,'autorizaciones-gestionbancos')" class="nav flex-column pl-4">
                                                 <li class="nav-item">
                                                   <a class="nav-link" href="#">Plan de Cuentas</a>
                                                 </li>
@@ -1102,11 +1102,11 @@
                             <!-- Nuevo submenú dentro de "Inventario" -->
             
                             <li class="nav-item">
-                              <a class="nav-link" href="#" (click)="togglesubInventario()">
+                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones-subinventario')">
                                 Inventario
-                                <i class="fas" [ngClass]="{'fa-chevron-down': isSubInventarioOpen, 'fa-chevron-right': !isSubInventarioOpen}" style="margin-left:auto;"></i>
+                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones-subinventario'), 'fa-chevron-right': !isOpen(3,'autorizaciones-subinventario')}" style="margin-left:auto;"></i>
                               </a>
-                              <ul *ngIf="isSubInventarioOpen" class="nav flex-column pl-4">
+                              <ul *ngIf="isOpen(3,'autorizaciones-subinventario')" class="nav flex-column pl-4">
                                 <li class="nav-item">
                                   <a class="nav-link" href="#">Plan de Cuentas</a>
                                 </li>
@@ -1162,11 +1162,11 @@
             
                             <!-- Nuevo submenú dentro de "Servicio" -->
                             <li class="nav-item">
-                                              <a class="nav-link" href="#" (click)="togglesubServicio()">
+                                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones-servicio')">
                                                 Servicio
-                                                <i class="fas" [ngClass]="{'fa-chevron-down': isSubServicioOpen, 'fa-chevron-right': !isSubServicioOpen}" style="margin-left:auto;"></i>
+                                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones-servicio'), 'fa-chevron-right': !isOpen(3,'autorizaciones-servicio')}" style="margin-left:auto;"></i>
                                               </a>
-                                              <ul *ngIf="isSubServicioOpen" class="nav flex-column pl-4">
+                                              <ul *ngIf="isOpen(3,'autorizaciones-servicio')" class="nav flex-column pl-4">
                                                 <li class="nav-item">
                                                   <a class="nav-link" href="#">Plan de Cuentas</a>
                                                 </li>
@@ -1221,19 +1221,19 @@
 
 
             <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleImportacion()">
+              <a class="nav-link" href="#" (click)="toggleMenu(2,'importacionexportacion')">
                 Importacion/Exportacion de Datos
-                <i class="fas" [ngClass]="{'fa-chevron-down': isImportacionOpen, 'fa-chevron-right': !isImportacionOpen}" style="margin-left:auto;"></i>
+                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'importacionexportacion'), 'fa-chevron-right': !isOpen(2,'importacionexportacion')}" style="margin-left:auto;"></i>
               </a>
-              <ul *ngIf="isImportacionOpen" class="nav flex-column pl-4">
+              <ul *ngIf="isOpen(2,'importacionexportacion')" class="nav flex-column pl-4">
                 <!-- Sub-submenú de "Definiciones" -->
                 <!-- Sub-submenú de "Importacion datos" -->
                 <li class="nav-item">
-                  <a class="nav-link" href="#" (click)="togglesubServicio()">
+                  <a class="nav-link" href="#" (click)="toggleMenu(3,'importaciondatos')">
                     Importacion datos
-                    <i class="fas" [ngClass]="{'fa-chevron-down': isSubServicioOpen, 'fa-chevron-right': !isSubServicioOpen}" style="margin-left:auto;"></i>
+                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'importaciondatos'), 'fa-chevron-right': !isOpen(3,'importaciondatos')}" style="margin-left:auto;"></i>
                   </a>
-                  <ul *ngIf="isSubServicioOpen" class="nav flex-column pl-4">
+                  <ul *ngIf="isOpen(3,'importaciondatos')" class="nav flex-column pl-4">
                     <li class="nav-item">
                       <a class="nav-link" href="#">Importar de Excel</a>
                     </li>
@@ -1251,18 +1251,18 @@
 
 
             <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleImportacion()">
+              <a class="nav-link" href="#" (click)="toggleMenu(2,'exportaciondatos')">
                 Exportación de Datos
-                <i class="fas" [ngClass]="{'fa-chevron-down': isImportacionOpen, 'fa-chevron-right': !isImportacionOpen}" style="margin-left:auto;"></i>
+                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'exportaciondatos'), 'fa-chevron-right': !isOpen(2,'exportaciondatos')}" style="margin-left:auto;"></i>
               </a>
-              <ul *ngIf="isImportacionOpen" class="nav flex-column pl-4">
+              <ul *ngIf="isOpen(2,'exportaciondatos')" class="nav flex-column pl-4">
                 <!-- Sub-submenú de "Importacion datos" -->
                 <li class="nav-item">
-                  <a class="nav-link" href="#" (click)="togglesubServicio()">
+                  <a class="nav-link" href="#" (click)="toggleMenu(3,'exportacion-importaciondatos')">
                     Importacion datos
-                    <i class="fas" [ngClass]="{'fa-chevron-down': isSubServicioOpen, 'fa-chevron-right': !isSubServicioOpen}" style="margin-left:auto;"></i>
+                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'exportacion-importaciondatos'), 'fa-chevron-right': !isOpen(3,'exportacion-importaciondatos')}" style="margin-left:auto;"></i>
                   </a>
-                  <ul *ngIf="isSubServicioOpen" class="nav flex-column pl-4">
+                  <ul *ngIf="isOpen(3,'exportacion-importaciondatos')" class="nav flex-column pl-4">
                     <li class="nav-item">
                       <a class="nav-link" href="#">Importar de Excel</a>
                     </li>
@@ -1293,11 +1293,11 @@
 
 
             <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleDefinicion()">
+              <a class="nav-link" href="#" (click)="toggleMenu(2,'Utilidades')">
                 Utilidades
-                <i class="fas" [ngClass]="{'fa-chevron-down': isDefinicionOpen, 'fa-chevron-right': !isDefinicionOpen}" style="margin-left:auto;"></i>
+                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'Utilidades'), 'fa-chevron-right': !isOpen(2,'Utilidades')}" style="margin-left:auto;"></i>
               </a>
-              <ul *ngIf="isDefinicionOpen" class="nav flex-column pl-4">
+              <ul *ngIf="isOpen(2,'Utilidades')" class="nav flex-column pl-4">
 
 
               </ul>
@@ -1305,11 +1305,11 @@
 
 
             <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleDefinicion()">
+              <a class="nav-link" href="#" (click)="toggleMenu(2,'procedimientoautorizacion')">
                 Procedimiento de Autorizacion
-                <i class="fas" [ngClass]="{'fa-chevron-down': isDefinicionOpen, 'fa-chevron-right': !isDefinicionOpen}" style="margin-left:auto;"></i>
+                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'procedimientoautorizacion'), 'fa-chevron-right': !isOpen(2,'procedimientoautorizacion')}" style="margin-left:auto;"></i>
               </a>
-              <ul *ngIf="isDefinicionOpen" class="nav flex-column pl-4">
+              <ul *ngIf="isOpen(2,'procedimientoautorizacion')" class="nav flex-column pl-4">
                 <!-- Sub-submenú de "Definiciones" -->
                 <li class="nav-item">
                   <a class="nav-link" href="#">Importación/Exportación de datos</a>
@@ -1340,11 +1340,11 @@
 
 
             <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleDefinicion()">
+              <a class="nav-link" href="#" (click)="toggleMenu(2,'licencia')">
                 Licencia
-                <i class="fas" [ngClass]="{'fa-chevron-down': isDefinicionOpen, 'fa-chevron-right': !isDefinicionOpen}" style="margin-left:auto;"></i>
+                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'licencia'), 'fa-chevron-right': !isOpen(2,'licencia')}" style="margin-left:auto;"></i>
               </a>
-              <ul *ngIf="isDefinicionOpen" class="nav flex-column pl-4">
+              <ul *ngIf="isOpen(2,'licencia')" class="nav flex-column pl-4">
                 <!-- Sub-submenú de "Definiciones" -->
                 <li class="nav-item">
                   <a class="nav-link" href="#">Importación/Exportación de datos</a>
@@ -1358,11 +1358,11 @@
 
 
             <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleDefinicion()">
+              <a class="nav-link" href="#" (click)="toggleMenu(2,'serviciointegracion')">
                 Servicio de Integración
-                <i class="fas" [ngClass]="{'fa-chevron-down': isDefinicionOpen, 'fa-chevron-right': !isDefinicionOpen}" style="margin-left:auto;"></i>
+                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'serviciointegracion'), 'fa-chevron-right': !isOpen(2,'serviciointegracion')}" style="margin-left:auto;"></i>
               </a>
-              <ul *ngIf="isDefinicionOpen" class="nav flex-column pl-4">
+              <ul *ngIf="isOpen(2,'serviciointegracion')" class="nav flex-column pl-4">
                 <!-- Sub-submenú de "Definiciones" -->
                 <li class="nav-item">
                   <a class="nav-link" href="#">Importación/Exportación de datos</a>
@@ -1375,11 +1375,11 @@
 
 
             <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleDefinicion()">
+              <a class="nav-link" href="#" (click)="toggleMenu(2,'Add-ons')">
                 Add-ons
-                <i class="fas" [ngClass]="{'fa-chevron-down': isDefinicionOpen, 'fa-chevron-right': !isDefinicionOpen}" style="margin-left:auto;"></i>
+                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'Add-ons'), 'fa-chevron-right': !isOpen(2,'Add-ons')}" style="margin-left:auto;"></i>
               </a>
-              <ul *ngIf="isDefinicionOpen" class="nav flex-column pl-4">
+              <ul *ngIf="isOpen(2,'Add-ons')" class="nav flex-column pl-4">
                 <!-- Sub-submenú de "Definiciones" -->
                 <li class="nav-item">
                   <a class="nav-link" href="#">Importación/Exportación de datos</a>
@@ -1393,11 +1393,11 @@
 
 
             <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleDefinicion()">
+              <a class="nav-link" href="#" (click)="toggleMenu(2,'Workflow')">
                 Workflow
-                <i class="fas" [ngClass]="{'fa-chevron-down': isDefinicionOpen, 'fa-chevron-right': !isDefinicionOpen}" style="margin-left:auto;"></i>
+                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'Workflow'), 'fa-chevron-right': !isOpen(2,'Workflow')}" style="margin-left:auto;"></i>
               </a>
-              <ul *ngIf="isDefinicionOpen" class="nav flex-column pl-4">
+              <ul *ngIf="isOpen(2,'Workflow')" class="nav flex-column pl-4">
                 <!-- Sub-submenú de "Definiciones" -->
                 <li class="nav-item">
                   <a class="nav-link" href="#">Importación/Exportación de datos</a>
@@ -1424,14 +1424,14 @@
 
       <!-- CRM -->
       <li class="nav-item">
-        <a class="nav-link px-4" href="#" (click)="toggleSubCRM()">
+        <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'crm')">
           <i class="fas fas fa-user mr-2"></i> <!-- Ícono de ventas -->
           CRM
           <i class="fas"
-             [ngClass]="{'fa-chevron-down': isSubCRMOpen, 'fa-chevron-right': !isSubCRMOpen}"
+             [ngClass]="{'fa-chevron-down': isOpen(1,'crm'), 'fa-chevron-right': !isOpen(1,'crm')}"
              style="margin-left:auto;"></i>
         </a>
-        <ul class="submenu" *ngIf="isSubCRMOpen">
+        <ul class="submenu" *ngIf="isOpen(1,'crm')">
           <li><a class="nav-link" [routerLink]="['/panel/clientes/list']">Datos maestros interlocutor comercial</a></li>
           <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Actividad</a></li>
           <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Asistente de Generación de Campaña</a></li>
@@ -1448,28 +1448,28 @@
 
       <!--VENTAS -->
       <li class="nav-item">
-        <a class="nav-link px-4" href="#" (click)="toggleSubMenu()">
+        <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'principal-ventas')">
           <i class="fas fa-dollar-sign mr-2"></i> <!-- Ícono de ventas -->
           Ventas
           <i class="fas"
-             [ngClass]="{'fa-chevron-down': isSubMenuOpen, 'fa-chevron-right': !isSubMenuOpen}"
+             [ngClass]="{'fa-chevron-down': isOpen(1,'principal-ventas'), 'fa-chevron-right': !isOpen(1,'principal-ventas')}"
              style="margin-left:auto;"></i>
         </a>
-        <ul class="submenu" *ngIf="isSubMenuOpen">
+        <ul class="submenu" *ngIf="isOpen(1,'principal-ventas')">
           <li><a class="nav-link" [routerLink]="['/panel/clientes/list']">Pedidos de Cliente</a></li>
           <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Cotización</a></li>
           <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Lista Cotización</a></li>
           <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Factura de Retención</a></li>
 <!-- Reportes -->
 <li class="nav-item">
-  <a class="nav-link px-4" href="#" (click)="toggleReportes()">
+  <a class="nav-link px-4" href="#" (click)="toggleMenu(2,'reportes')">
     <i class="fas fa-chart-line mr-2"></i> <!-- Ícono de reportes -->
     Reportes
     <i class="fas"
-       [ngClass]="{'fa-chevron-down': isReportesOpen, 'fa-chevron-right': !isReportesOpen}"
+       [ngClass]="{'fa-chevron-down': isOpen(2,'reportes'), 'fa-chevron-right': !isOpen(2,'reportes')}"
        style="margin-left:auto;"></i>
   </a>
-  <ul class="submenu" *ngIf="isReportesOpen">
+  <ul class="submenu" *ngIf="isOpen(2,'reportes')">
     <li><a class="nav-link" [routerLink]="['/panel/reportes/graficos']">Consulta Gráficos</a></li>
     <li><a class="nav-link" [routerLink]="['/panel/reportes/despacho']">Consulta de Despacho</a></li>
     <li><a class="nav-link" [routerLink]="['/panel/reportes/ventas']">Consulta de Ventas</a></li>
@@ -1485,24 +1485,24 @@
 
       <!-- Gestion de Compras-->
       <li class="nav-item">
-              <a class="nav-link px-4" href="#" (click)="toggleCompras()">
+              <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'principal-compras')">
                 <i class="fas fa-shopping-cart mr-2"></i> <!-- Ícono de auditoría -->
                 Compras
                 <i class="fas"
-                  [ngClass]="{'fa-chevron-down': isCompras, 'fa-chevron-right': !isCompras}"
+                  [ngClass]="{'fa-chevron-down': isOpen(1,'principal-compras'), 'fa-chevron-right': !isOpen(1,'principal-compras')}"
                   style="margin-left:auto;"></i>
               </a>
-              <ul class="submenu" *ngIf="isCompras">
+              <ul class="submenu" *ngIf="isOpen(1,'principal-compras')">
                 <!-- Submenú de Reportes -->
                 <li class="nav-item">
-                  <a class="nav-link px-4" href="#" (click)="toggleRequeCompras()">
+                  <a class="nav-link px-4" href="#" (click)="toggleMenu(2,'reqcompras')">
                     <i class="fas fa-file-alt mr-2"></i> <!-- Ícono de reportes -->
                     Req. de Compras 
                     <i class="fas"
-                      [ngClass]="{'fa-chevron-down': isReqCompras, 'fa-chevron-right': !isReqCompras}"
+                      [ngClass]="{'fa-chevron-down': isOpen(2,'reqcompras'), 'fa-chevron-right': !isOpen(2,'reqcompras')}"
                       style="margin-left:auto;"></i>
                   </a>
-                  <ul class="submenu" *ngIf="isReqCompras">
+                  <ul class="submenu" *ngIf="isOpen(2,'reqcompras')">
                     <li><a class="nav-link" [routerLink]="['/panel/compras/registro-compras']"><i class="fas fa-clipboard-list mr-2"></i>Reque. Pendientes</a></li>
       
                   </ul>
@@ -1513,24 +1513,24 @@
 
       <!-- Interlocutores Comerciales-->
       <li class="nav-item">
-              <a class="nav-link px-4" href="#" (click)="toggleSociosNegocio()">
+              <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'sociosnegocio')">
                 <i class="fas fas fa-user mr-2"></i> <!-- Ícono de auditoría -->
                 Socios de Negocio
                 <i class="fas"
-                  [ngClass]="{'fa-chevron-down': isSociosNegocio, 'fa-chevron-right': !isSociosNegocio}"
+                  [ngClass]="{'fa-chevron-down': isOpen(1,'sociosnegocio'), 'fa-chevron-right': !isOpen(1,'sociosnegocio')}"
                   style="margin-left:auto;"></i>
               </a>
-                  <ul class="submenu" *ngIf="isSociosNegocio">
+                  <ul class="submenu" *ngIf="isOpen(1,'sociosnegocio')">
                     <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Registro Req. Compras</a></li>
                     <li><a class="nav-link" [routerLink]="['/panel/produccion/auditoria']">Reque. Pendientes</a></li>
                     <li><a class="nav-link" [routerLink]="['/panel/produccion/control-guias']">Requer.Pendientes Usuario</a></li>
                     <li><a class="nav-link" [routerLink]="['/panel/produccion/control-guias']">Campaña</a></li>
                     <li class="nav-item">
-                      <a class="nav-link" href="#" (click)="toggleReconciliacionInterna()">
+                      <a class="nav-link" href="#" (click)="toggleMenu(2,'reconciliacioninterna')">
                         Reconciliación Interna
-                        <i class="fas" [ngClass]="{'fa-chevron-down': isReconciliacion, 'fa-chevron-right': !isReconciliacion}" style="margin-left:auto;"></i>
+                        <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'reconciliacioninterna'), 'fa-chevron-right': !isOpen(2,'reconciliacioninterna')}" style="margin-left:auto;"></i>
                       </a>
-                      <ul *ngIf="isReconciliacion" class="nav flex-column pl-4">
+                      <ul *ngIf="isOpen(2,'reconciliacioninterna')" class="nav flex-column pl-4">
                         <!-- Nuevo submenú dentro de "Reconciliación interna" -->
                         <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Reconciliación</a></li>
                         <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Gestionar reconciliaciones precedentes</a></li>
@@ -1538,11 +1538,11 @@
 
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" href="#" (click)="toggleInformesSociosNegocios()">
+                      <a class="nav-link" href="#" (click)="toggleMenu(2,'informessocionegocio')">
                         Informes de Socio de Negocios
-                        <i class="fas" [ngClass]="{'fa-chevron-down': isInformesSocios, 'fa-chevron-right': !isInformesSocios}" style="margin-left:auto;"></i>
+                        <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'informessocionegocio'), 'fa-chevron-right': !isOpen(2,'informessocionegocio')}" style="margin-left:auto;"></i>
                       </a>
-                      <ul *ngIf="isInformesSocios" class="nav flex-column pl-4">
+                      <ul *ngIf="isOpen(2,'informessocionegocio')" class="nav flex-column pl-4">
                         <!-- Nuevo submenú dentro de "Reconciliación interna" -->
                         <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Mis actividades</a></li>
                         <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Resumen de actividades</a></li>
@@ -1551,11 +1551,11 @@
                         <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Créditos de cliente p. todas secciones cliente</a></li>
                         <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Desviación límite crédito clientes</a></li>
                         <li class="nav-item">
-                          <a class="nav-link" href="#" (click)="toggleAntiguedad()">
+                          <a class="nav-link" href="#" (click)="toggleMenu(3,'antiguedad')">
                             Antigüedad
-                            <i class="fas" [ngClass]="{'fa-chevron-down': isAntiguedad, 'fa-chevron-right': !isAntiguedad}" style="margin-left:auto;"></i>
+                            <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'antiguedad'), 'fa-chevron-right': !isOpen(3,'antiguedad')}" style="margin-left:auto;"></i>
                           </a>
-                          <ul *ngIf="isAntiguedad" class="nav flex-column pl-4">
+                          <ul *ngIf="isOpen(3,'antiguedad')" class="nav flex-column pl-4">
                             <!-- Nuevo submenú dentro de "Reconciliación interna" -->
                             <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Antigüedad de saldos de clientes</a></li>
                             <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Antigüedad de saldos de proveedores</a></li>
@@ -1563,11 +1563,11 @@
     
                         </li>
                         <li class="nav-item">
-                          <a class="nav-link" href="#" (click)="toggleReconciliacion2()">
+                          <a class="nav-link" href="#" (click)="toggleMenu(3,'reconciliacioninterna2')">
                             Reconciliación Interna
-                            <i class="fas" [ngClass]="{'fa-chevron-down': isReconciliacion2, 'fa-chevron-right': !isReconciliacion2}" style="margin-left:auto;"></i>
+                            <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'reconciliacioninterna2'), 'fa-chevron-right': !isOpen(3,'reconciliacioninterna2')}" style="margin-left:auto;"></i>
                           </a>
-                          <ul *ngIf="isReconciliacion2" class="nav flex-column pl-4">
+                          <ul *ngIf="isOpen(3,'reconciliacioninterna2')" class="nav flex-column pl-4">
                             <!-- Nuevo submenú dentro de "Reconciliación interna" -->
                             <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Reconciliación interna por fecha de vencimiento</a></li>
                             <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Reconciliación interna por importe exacto</a></li>
@@ -1583,23 +1583,27 @@
 
       <!-- Inventario-->
       <li class="nav-item">
-        <a class="nav-link px-4" href="#" (click)="toggleInventarioB2()">
+        <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'principal-inventario')">
           <i class="fas fa-clipboard-list mr-2"></i> <!-- Ícono de auditoría -->
           Inventario
           <i class="fas"
-            [ngClass]="{'fa-chevron-down': isInventarioB2, 'fa-chevron-right': !isInventarioB2}"
+            [ngClass]="{'fa-chevron-down': isOpen(1,'principal-inventario'), 'fa-chevron-right': !isOpen(1,'principal-inventario')}"
             style="margin-left:auto;"></i>
         </a>
+<<<<<<< HEAD
         <ul class="submenu" *ngIf="isInventarioB2">
           <li><a class="nav-link" [routerLink]="['/panel/inventario/data-maestro/maestro']">Data Maestro Árticulo</a></li>
+=======
+        <ul class="submenu" *ngIf="isOpen(1,'principal-inventario')">
+>>>>>>> 685210553dd1e5a8d9648e88b8924dc27075b184
           <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Lista de Activos</a></li>
 
           <li class="nav-item">
-            <a class="nav-link" href="#" (click)="toggleImportacion()">
+            <a class="nav-link" href="#" (click)="toggleMenu(2,'depachoventas')">
               Despacho Ventas
-              <i class="fas" [ngClass]="{'fa-chevron-down': isImportacionOpen, 'fa-chevron-right': !isImportacionOpen}" style="margin-left:auto;"></i>
+              <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'depachoventas'), 'fa-chevron-right': !isOpen(2,'depachoventas')}" style="margin-left:auto;"></i>
             </a>
-            <ul *ngIf="isImportacionOpen" class="nav flex-column pl-4">
+            <ul *ngIf="isOpen(2,'depachoventas')" class="nav flex-column pl-4">
               <!-- Sub-submenú de "Definiciones" -->
               <!-- Sub-submenú de "Importacion datos" -->
               <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Generar Preguia</a></li>
@@ -1629,14 +1633,14 @@
 
       <!-- Producción -->
       <li class="nav-item">
-        <a class="nav-link px-4" href="#" (click)="toggleProduccion()">
+        <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'principal-produccion')">
           <i class="fas fa-tools mr-2"></i> <!-- Ícono de producción -->
           Producción
           <i class="fas"
-            [ngClass]="{'fa-chevron-down': isProduccionOpen, 'fa-chevron-right': !isProduccionOpen}"
+            [ngClass]="{'fa-chevron-down': isOpen(1,'principal-produccion'), 'fa-chevron-right': !isOpen(1,'principal-produccion')}"
             style="margin-left:auto;"></i>
         </a>
-        <ul class="submenu" *ngIf="isProduccionOpen">
+        <ul class="submenu" *ngIf="isOpen(1,'principal-produccion')">
           <li><a class="nav-link" [routerLink]="['/panel/produccion/plan']">Plan de Producción</a></li>
           <li><a class="nav-link" [routerLink]="['/panel/produccion/gantt-produccion']">Gantt-Produccion</a></li>
 
@@ -1650,14 +1654,14 @@
 
           <!-- Submenú de Reportes -->
           <li class="nav-item">
-            <a class="nav-link px-4" href="#" (click)="toggleReportes()">
+            <a class="nav-link px-4" href="#" (click)="toggleMenu(2,'produccion-reportes')">
               <i class="fas fa-file-alt mr-2"></i> <!-- Ícono de reportes -->
               Reportes
               <i class="fas"
-                [ngClass]="{'fa-chevron-down': isReportesOpen, 'fa-chevron-right': !isReportesOpen}"
+                [ngClass]="{'fa-chevron-down': isOpen(2,'produccion-reportes'), 'fa-chevron-right': !isOpen(2,'produccion-reportes')}"
                 style="margin-left:auto;"></i>
             </a>
-            <ul class="submenu" *ngIf="isReportesOpen">
+            <ul class="submenu" *ngIf="isOpen(2,'produccion-reportes')">
               <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']"><i class="fas fa-cogs mr-2"></i> Consumos de Stock</a></li>
               <li><a class="nav-link" [routerLink]="['/panel/produccion/auditoria']"><i class="fas fa-clipboard-list mr-2"></i> Listar Auditoria de Stock</a></li>
               <li><a class="nav-link" [routerLink]="['/panel/produccion/control-guias']"><i class="fas fa-clipboard-check mr-2"></i> Reporte de Control Guias</a></li>
@@ -1668,14 +1672,14 @@
 
       <!-- Recibo de Producción -->
         <li class="nav-item">
-          <a class="nav-link px-4" href="#" (click)="toggleReciboProduccion()">
+          <a class="nav-link px-4" href="#" (click)="toggleMenu(2,'reciboproduccion')">
             <i class="fas fa-clipboard mr-2"></i> <!-- Ícono de recibo de producción -->
             Recibo de Producción
             <i class="fas"
-              [ngClass]="{'fa-chevron-down': isReciboProduccionOpen, 'fa-chevron-right': !isReciboProduccionOpen}"
+              [ngClass]="{'fa-chevron-down': isOpen(2,'reciboproduccion'), 'fa-chevron-right': !isOpen(2,'reciboproduccion')}"
               style="margin-left:auto;"></i>
           </a>
-          <ul class="submenu" *ngIf="isReciboProduccionOpen">
+          <ul class="submenu" *ngIf="isOpen(2,'reciboproduccion')">
             <li><a class="nav-link" [routerLink]="['/panel/produccion/orden-produccion']"><i class="fas fa-box mr-2"></i> Orden de Producción</a></li>
             <li><a class="nav-link" [routerLink]="['/panel/produccion/reimpresion']"><i class="fas fa-print mr-2"></i> Reimpresión de Etiqueta</a></li>
           </ul>
@@ -1685,48 +1689,44 @@
 
       <!-- Planificacion de necesidades-->
       <li class="nav-item">
-                                                                        <a class="nav-link px-4" href="#" (click)="toggleInventario()">
-                                                                          <i class="fas fa-wrench mr-2"></i> 
-                                                                          Mantenimiento
-                                                                          <i class="fas"
-                                                                            [ngClass]="{'fa-chevron-down': isInventario, 'fa-chevron-right': !isInventario}"
-                                                                            style="margin-left:auto;"></i>
-                                                                        </a>
-                                                                        <ul class="submenu" *ngIf="isInventario">
-                                                                          <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Lista de Activos</a></li>
-                                                                        </ul>
+        <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'principal-mantenimiento')">
+          <i class="fas fa-wrench mr-2"></i> 
+          Mantenimiento
+          <i class="fas"
+            [ngClass]="{'fa-chevron-down': isOpen(1,'principal-mantenimiento'), 'fa-chevron-right': !isOpen(1,'principal-mantenimiento')}"
+            style="margin-left:auto;"></i>
+        </a>
+        <ul class="submenu" *ngIf="isOpen(1,'principal-mantenimiento')">
+          <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Lista de Activos</a></li>
+        </ul>
       </li>
 
             <!-- Planificacion de necesidades-->
             <li class="nav-item">
-              <a class="nav-link px-4" href="#" (click)="toggleInventario()">
+              <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'mrp')">
                 <i class="fas fa-calendar-check mr-2"></i> 
                 MRP
                 <i class="fas"
-                  [ngClass]="{'fa-chevron-down': isInventario, 'fa-chevron-right': !isInventario}"
+                  [ngClass]="{'fa-chevron-down': isOpen(1,'mrp'), 'fa-chevron-right': !isOpen(1,'mrp')}"
                   style="margin-left:auto;"></i>
               </a>
-              <ul class="submenu" *ngIf="isInventario">
+              <ul class="submenu" *ngIf="isOpen(1,'mrp')">
                 <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Lista de Activos</a></li>
               </ul>
             </li>
-
-
-
-
-                                                <!-- Planificacion de necesidades-->
-                                                <li class="nav-item">
-                                                  <a class="nav-link px-4" href="#" (click)="toggleInventario()">
-                                                    <i class="fas fa-file-alt mr-2"></i> 
-                                                    Informes
-                                                    <i class="fas"
-                                                      [ngClass]="{'fa-chevron-down': isInventario, 'fa-chevron-right': !isInventario}"
-                                                      style="margin-left:auto;"></i>
-                                                  </a>
-                                                  <ul class="submenu" *ngIf="isInventario">
-                                                    <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Lista de Activos</a></li>
-                                                  </ul>
-                                                </li>
+            <!-- Planificacion de necesidades-->
+            <li class="nav-item">
+              <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'informes')">
+                <i class="fas fa-file-alt mr-2"></i> 
+                Informes
+                <i class="fas"
+                  [ngClass]="{'fa-chevron-down': isOpen(1,'informes'), 'fa-chevron-right': !isOpen(1,'informes')}"
+                  style="margin-left:auto;"></i>
+              </a>
+              <ul class="submenu" *ngIf="isOpen(1,'informes')">
+                <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Lista de Activos</a></li>
+              </ul>
+            </li>
 
 
 

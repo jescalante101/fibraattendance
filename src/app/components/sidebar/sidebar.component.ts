@@ -7,65 +7,31 @@ import { Component } from '@angular/core';
     standalone: false,
 
 })
+
 export class SidebarComponent {
-  isClientesOpen = false;
-  isClientesOpen2 = false;
-  isVentasOpen = false; // Controlar si el submenú de Ventas está abierto
-  isConsultasClientesOpen = false; // Controlar si el submenú de Consultas Clientes está abierto
-  isAlmacenOpen = false; // Controlar si el submenú de Almacen está abierto
-  isAuditoriaOpen = false; // Controlar si el submenú de Auditoria de Stock está abierto
-  isProduccionOpen = false;
-  isReportesOpen = false;  // Controla si el submenú de reportes está abierto
-  isReciboProduccionOpen = false;  // Controla si el submenú de Recibo de Producción está abierto
-  isGestionAlmacenamiento = false;  // Controla si el submenú de Recibo de Producción está abierto
-  isDespachoVentas = false;  // Controla si el submenú de Recibo de Producción está abierto
-  isPackingList = false;  // Controla si el submenú de Recibo de Producción está abierto
-  isMercancia =  false;  // Controla si el submenú de reportes está abierto
-  // Método para alternar la visibilidad del submenú
-  isTrasladoInterno = false;  // Controla si el submenú de Recibo de Producción está abierto
-  isPermisos = false;  // Controla si el submenú de Recibo de Producción está abierto
-  isAutorizaciones = false;  // Controla si el submenú de Recibo de Producción está abierto
-  isDashboard = false;  // Controla si el submenú de Recibo de Producción está abierto  
-  isInventario = false;  // Controla si el submenú de Recibo de Producción está abierto
-  isCompras = false;  // Controla si el submenú de Recibo de Producción está abierto
-  isgestion = false;  // Controla si el submenú de Recibo de Producción está abierto
-  isInicializaSistema = false;  // Controla si el submenú de Recibo de Producción está abierto
-  isSubDefinicionOpen=  false; // Controlar si el submenú de Definición está abierto
-  isSubFinanzasOpen = false; // Controlar si el submenú de Finanzas está abierto
-  isSubOportunidadesOpen = false; // Controlar si el submenú de Oportunidades está abierto
-  isSubVentasOpen=  false; // Controlar si el submenú de Ventas está abierto
-  isSubComprasOpen =  false; // Controlar si el submenú de Compras está abierto
-  isSubSocioNegociosOpen = false; // Controlar si el submenú de Socio de Negocios está abierto
-  isSubGestionBancosOpen = false; // Controlar si el submenú de Gestión de Bancos está abierto
-  isSubInventarioOpen = false; // Controlar si el submenú de Inventario está abierto
-  isSubRecursosOpen = false; // Controlar si el submenú de Recursos está abierto
-  isSubServicioOpen  = false; // Controlar si el submenú de Servicio está abierto
-  isInicializacionOpen  = false; // Controlar si el submenú de Inicialización del Sistema está abierto
-  issubInicializaSistema = false; // Controlar si el submenú de Inicializa Sistema está abierto  
-  isSubProduccionOpen = false; // Controlar si el submenú de Producción está abierto
-  isSubMantenimientoOpen  = false; // Controlar si el submenú de Mantenimiento está abierto
-  isSubAutorizacionesOpen = false; // Controlar si el submenú de Autorizaciones está abierto
-  isSubPropietarioDatosOpen = false; // Controlar si el submenú de Propietario de Datos está abierto
-  isImportacionOpen = false; // Controlar si el submenú de Importación está abierto
-  isSubCRMOpen = false; // Controlar si el submenú de CRM está abierto
-  isInventarioB2 = false; // Controlar si el submenú de Inventario B2 está abierto
-  isReqCompras = false; // Controlar si el submenú de Requerimiento de Compras está abierto
-  isSociosNegocio = false;
-  isReconciliacion = false;
-  isSubReconciliacion = false;
-  isInformesSocios = false;
-  isAntiguedad = false;
-  isReconciliacion2 = false;
-  
-  toggleClientes(): void {
-    this.isClientesOpen = !this.isClientesOpen;
-    
+  // Guarda qué menú está abierto en cada nivel
+  openMenus: { [level: number]: string | null } = {};
+
+  toggleMenu(level: number, menuName: string): void {
+    if (this.openMenus[level] === menuName) {
+      this.openMenus[level] = null; // Cierra el menú si ya está abierto
+    } else {
+      this.openMenus[level] = menuName; // Abre el nuevo menú
+    }
+
+    // Cierra todos los submenús por debajo de este nivel
+    Object.keys(this.openMenus).forEach((key) => {
+      const keyNum = +key;
+      if (keyNum > level) {
+        this.openMenus[keyNum] = null;
+      }
+    });
   }
 
-  toggleClientes2(): void {
-    this.isClientesOpen2 = !this.isClientesOpen2;
-    
+  isOpen(level: number, menuName: string): boolean {
+    return this.openMenus[level] === menuName;
   }
+<<<<<<< HEAD
 
   isSubMenuOpen = false; // Controlar si el submenú está abierto o cerrado
 
@@ -276,4 +242,6 @@ export class SidebarComponent {
       this.isReconciliacion2 = !this.isReconciliacion2;
     }
 
+=======
+>>>>>>> 685210553dd1e5a8d9648e88b8924dc27075b184
 }

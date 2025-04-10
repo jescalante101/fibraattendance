@@ -1591,7 +1591,9 @@
             style="margin-left:auto;"></i>
         </a>
         <ul class="submenu" *ngIf="isInventarioB2">
+          <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Data Maestro Árticulo</a></li>
           <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Lista de Activos</a></li>
+
           <li class="nav-item">
             <a class="nav-link" href="#" (click)="toggleImportacion()">
               Despacho Ventas

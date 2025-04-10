@@ -174,6 +174,7 @@ export class SidebarComponent {
     }
   
     toggleDefinicion() {
+      
       this.isDefinicionOpen = !this.isDefinicionOpen;
     }
 

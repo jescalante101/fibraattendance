@@ -292,3 +292,136 @@ pagination-controls > ul {
 pagination-controls > ul > li {
   margin: 0 5px;
 }
+
+
+
+/* Estilos para el modal de cliente */
+.modal-content.cliente-modal {
+  background-color: white;
+  padding: 50px;
+  border-radius: 8px;
+  width: 800px; /* Aumentar el tamaño del modal */
+  max-width: 90%; /* Asegura que el modal se ajuste bien en pantallas pequeñas */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.modal-content.cliente-modal h4 {
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.input-container {
+  margin-bottom: 20px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-group input {
+  width: 70%;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+}
+
+/* Estilos para la tabla */
+.client-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.client-table th, .client-table td {
+  padding: 12px;
+  text-align: left;
+}
+
+.client-table th {
+  background-color: #1976d2;
+  color: white;
+  font-weight: bold;
+}
+
+.client-table td {
+  background-color: #f9f9f9;
+}
+
+.client-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Estilo para los botones */
+.close-btn {
+  margin-top: 15px;
+  padding: 12px 25px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  background-color: #d32f2f;
+}
+
+
+/* Estilos para el input */
+.search-input {
+  border: 1px solid #ccc;
+  border-radius: 30px; /* Borde redondeado para un diseño más suave */
+  padding: 10px 35px 10px 15px;
+  width: 100%;
+  font-size: 1rem;
+  transition: all 0.3s ease; /* Transición suave para el input */
+}
+
+.search-input:focus {
+  border-color: #1976d2; /* Color de borde al enfocarse */
+  outline: none;
+  box-shadow: 0 0 5px rgba(25, 118, 210, 0.5); /* Efecto de resplandor suave */
+}
+
+/* Estilos para el botón de búsqueda más pequeño */
+.search-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #1976d2; /* Fondo azul */
+  color: white;
+  padding: 5px 10px; /* Reducir el padding */
+  font-size: 1rem; /* Reducir el tamaño de la fuente */
+  border-radius: 50%; /* Botón redondeado */
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Transición suave */
+}
+
+.search-button:hover {
+  background-color: #1565c0; /* Fondo más oscuro al pasar el cursor */
+  transform: scale(1.1); /* Efecto de aumentar el tamaño al pasar el cursor */
+}
+
+.search-button:focus {
+  outline: none;
+}
+
+/* Efecto de foco y hover suave para el icono */
+.search-button i {
+  transition: transform 0.3s ease;
+}
+
+.search-button:hover i {
+  transform: scale(1.2); /* Aumenta el tamaño del ícono al pasar el cursor */
+}
+
+

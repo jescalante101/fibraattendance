@@ -23,7 +23,7 @@ import { LecturaCodebarComponent } from "./components/inventario/despacho-ventas
 import { GanttProduccionComponent } from "./components/produccion/gantt-produccion/gantt-produccion.component";
 import { RegistroComprasComponent } from "./components/compras/registro-compras/registro-compras.component";
 import { RegistroReqComprasComponent } from "./components/socios-negocios/registro-req-compras/registro-req-compras.component";
-
+import { DataMaestroComponent } from "./components/inventario/data-maestro/data-maestro.component";
 
 
 const appRoutes: Routes = [
@@ -47,7 +47,8 @@ const appRoutes: Routes = [
         {path : 'gestion/seleccionar-socidad', component:SeleccionarSocidadComponent,},
         {path : 'gestion/tipo-cambio', component:TipoCambioComponent,},
         {path : 'inventario/despacho-ventas/lectura', component:LecturaCodebarComponent},
-        {path : 'socios-negocios/registro-req-compras', component:RegistroReqComprasComponent}
+        {path : 'socios-negocios/registro-req-compras', component:RegistroReqComprasComponent},
+        {path : 'inventario/data-maestra/maestra', component:DataMaestroComponent},
 
     ]},
     {path: 'login', component:LoginComponent}

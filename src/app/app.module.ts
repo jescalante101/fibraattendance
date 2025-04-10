@@ -49,6 +49,7 @@ import { RegistroComprasComponent } from './components/compras/registro-compras/
 import { InvLecturaComponent } from './components/modal/inv-lectura/inv-lectura.component';
 import { RegistroReqComprasComponent } from './components/socios-negocios/registro-req-compras/registro-req-compras.component';
 import { ModalComponent } from './shared/modal/modal.component'; // Para selects
+import { DataMaestroComponent } from './components/inventario/data-maestro/data-maestro.component';
 
 
 @NgModule({
@@ -87,7 +88,7 @@ import { ModalComponent } from './shared/modal/modal.component'; // Para selects
     InvLecturaComponent,
     RegistroReqComprasComponent,
     ModalComponent,
-
+    DataMaestroComponent
 
 
     

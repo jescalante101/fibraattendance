@@ -46,8 +46,12 @@ import { MatButtonModule } from '@angular/material/button'; // Para botones
 import { MatFormFieldModule } from '@angular/material/form-field'; // Para formularios
 import { MatSelectModule } from '@angular/material/select';
 import { RegistroComprasComponent } from './components/compras/registro-compras/registro-compras.component';
-import { InvLecturaComponent } from './components/modal/inv-lectura/inv-lectura.component'; // Para selects
-
+import { InvLecturaComponent } from './components/modal/inv-lectura/inv-lectura.component';
+import { DataMaestroComponent } from './components/inventario/data-maestro/data-maestro.component';
+import { ModalComponent } from './components/inventario/modal/modal.component';
+import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
   declarations: [
@@ -83,7 +87,8 @@ import { InvLecturaComponent } from './components/modal/inv-lectura/inv-lectura.
     GanttProduccionComponent,
     RegistroComprasComponent,
     InvLecturaComponent,
-
+    DataMaestroComponent,
+    ModalComponent,
 
 
     
@@ -96,10 +101,10 @@ import { InvLecturaComponent } from './components/modal/inv-lectura/inv-lectura.
     routing,
     NgxPaginationModule,
     GanttModule,
-    MatTabsModule,    MatTabsModule,
+    MatTabsModule,    MatTabsModule,MatInputModule,MatRadioModule,
     MatButtonModule,
     MatFormFieldModule,
-    MatSelectModule,
+    MatSelectModule,MatCheckboxModule,
     FormsModule,
     NgxTinymceModule.forRoot({
       baseURL : '../../../assets/tinymce/'

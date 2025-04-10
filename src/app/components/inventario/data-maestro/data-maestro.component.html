@@ -1,0 +1,161 @@
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+  </head>
+  <app-sidebar></app-sidebar>
+  <br>
+  <br>
+  <br>
+  <div class="main-container">
+    <div class="content">
+      <h3 class="title">Datos Maestros artículo</h3>
+      <div class="content">
+        <div class="example-container">
+          <mat-form-field >
+            <input matInput #input maxlength="10" placeholder="Número de artículo" (input)="onInput($event)" />
+            <mat-hint align="end"></mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="example-container">
+          <mat-form-field >
+            <input matInput #input placeholder="Descripción" (input)="onInput($event)" />
+            <mat-hint align="end"></mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="example-container">
+          <mat-form-field >
+            <input matInput #input placeholder="Nombre extranjero" (input)="onInput($event)" />
+            <mat-hint align="end"></mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="example-container">
+          <mat-form-field >
+            <input matInput #input  placeholder="Clase de artículo" (input)="onInput($event)" />
+            <mat-hint align="end"></mat-hint>
+          </mat-form-field>
+        </div>
+
+      </div>
+
+
+      
+
+
+
+
+      
+      <!-- Control de pestañas -->
+      <mat-tab-group>
+        <!-- Pestaña 1:  -->
+        <mat-tab label="General">
+          <div class="form-container">
+    
+            <div class="form-item">
+              <mat-checkbox>Sujetos a impuesto</mat-checkbox>
+            </div>
+
+            <div class="form-item">
+              <mat-checkbox>Impuestos Indirectos</mat-checkbox>
+            </div>
+
+            <div class="form-item">
+              <mat-checkbox>No aplicar grupos de descuento</mat-checkbox>
+            </div>
+
+            <div class="form-item">
+              <mat-checkbox>No aplicar descuento</mat-checkbox>
+            </div>
+
+
+            <div class="form-item">
+
+            </div>
+
+            <div class="form-item">
+
+            </div>
+
+            <div class="form-item">
+
+            </div>
+
+            <section class="example-section">
+              <mat-radio-group>
+                <mat-radio-button class="example-margin" value="after">Activa</mat-radio-button>
+              </mat-radio-group>
+            </section>
+
+            <section class="example-section">
+              <mat-radio-group>
+                <mat-radio-button class="example-margin" value="after">Inactivo</mat-radio-button>
+              </mat-radio-group>
+            </section>
+            <section class="example-section">
+              <mat-radio-group>
+                <mat-radio-button class="example-margin" value="after">Avanzado</mat-radio-button>
+              </mat-radio-group>
+            </section>
+          </div>
+        </mat-tab>
+    
+        <!-- Pestaña 2: -->
+        <mat-tab label="Datos de Compras">
+          <div class="scan-results">
+
+    
+          </div>
+        </mat-tab>
+    
+        <!-- Pestaña 3: -->
+        <mat-tab label="Datos de ventas">
+          <div>
+          </div>
+        </mat-tab>
+
+        <!-- Pestaña 4: -->
+        <mat-tab label="Datos de Inventario">
+          <div class="">
+    
+
+          </div>
+        </mat-tab>
+        <!-- Pestaña 5: -->
+        <mat-tab label="Datos de Planificacion">
+          <div class="">
+    
+
+          </div>
+        </mat-tab>
+
+        <!-- Pestaña 6: -->
+        <mat-tab label="Datos de Producción">
+            <div class="">
+            
+            </div>
+        </mat-tab>
+
+        <!-- Pestaña 7: -->
+        <mat-tab label="Propiedades">
+              <div class="">
+                  
+              </div>
+        </mat-tab>
+        <!-- Pestaña 8: -->
+        <mat-tab label="Comentarios">
+          <div class="">
+              
+          </div>
+        </mat-tab>
+
+        <!-- Pestaña 9: -->
+        <mat-tab label="Anexos">
+          <div class="">
+              
+          </div>
+        </mat-tab>
+
+      </mat-tab-group>
+    </div>
+    </div>

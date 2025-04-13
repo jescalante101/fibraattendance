@@ -9,6 +9,15 @@ import { Component } from '@angular/core';
 })
 
 export class SidebarComponent {
+  isCollapsed = false;
+  isCollapsedtext = false;
+
+  toggleSidebar() {
+    this.isCollapsed = !this.isCollapsed;
+    this.isCollapsedtext = !this.isCollapsedtext;
+  }
+  
+
   // Guarda qué menú está abierto en cada nivel
   openMenus: { [level: number]: string | null } = {};
 
@@ -32,3 +41,5 @@ export class SidebarComponent {
     return this.openMenus[level] === menuName;
   }
 }
+
+

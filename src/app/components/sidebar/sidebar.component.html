@@ -4,6 +4,10 @@
   data-fixed-element
 >
   <a class="navbar-brand d-lg-none" href="dev-setup.html"></a>
+  <a class="navbar-brand" routerLink="/">FIBRAWEB 2.0</a>
+  <button (click)="toggleSidebar()" class="hamburger-btn">
+    &#9776;
+  </button>
   <button
     class="navbar-toggler d-block d-lg-none mr-3 ml-auto"
     type="button"
@@ -23,12 +27,13 @@
 </header>
 
 <aside
-  class="cs-offcanvas cs-offcanvas-expand aside-blue sidebar"
+  class="hamburguesa sidebar-propio cs-offcanvas cs-offcanvas-expand aside-blue sidebar"
   id="componentsNav"
+  [class.collapsed]="isCollapsed"
 >
-  <div class="cs-offcanvas-cap d-none d-lg-block py-4">
-    <a class="navbar-brand" routerLink="/">FIBRAWEB 2.0</a>
-  </div>
+
+
+ 
   <div class="cs-offcanvas-cap d-flex d-lg-none">
     <div class="d-flex align-items-center mt-1">
       <h5 class="text-light mb-0 mr-3">Menu</h5>
@@ -56,7 +61,6 @@
     data-simplebar
     data-simplebar-inverse
   >
-    <hr class="hr-gradient hr-light mb-2 opacity-25" />
     <nav class="nav nav-light">
 
 

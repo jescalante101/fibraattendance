@@ -90,18 +90,24 @@ tbody td.font-semibold {
 .tile {
   width: 150px;
   height: 150px;
-  background-color: #e0f3ff;
+  background-color: white;
   border-radius: 12px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   text-align: center;
   padding: 20px;
   margin: 10px;
   cursor: pointer;
-  transition: transform 0.2s;
-  align-items: center !important;
+  transition: transform 0.9s;
+  /* align-items: center !important; */
 }
 .tile:hover {
-  transform: scale(1.05);
+  /* transform: scale(1.05); */
+  background-color: rgba(0,0,0,0.1);
+  border: 0.5px solid rgba(0,0,0,0.4);
+  box-shadow: 0 2px 35px rgba(0,0,0,0.4);
+}
+.tile:active{
+  background-color: rgba(0, 0, 255, 0.3); /*para cambiar el color cuando se da clic*/
 }
 .tile-icon {
   font-size: 40px;
@@ -119,30 +125,7 @@ tbody td.font-semibold {
   
 }
 
-/* TILE */
-.tile {
-  width: 150px;
-  height: 150px;
-  background-color: #e0f3ff;
-  border-radius: 12px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  text-align: center;
-  padding: 20px;
-  margin: 10px;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-.tile:hover {
-  transform: scale(1.05);
-}
-.tile-icon {
-  font-size: 40px;
-  margin-bottom: 10px;
-}
-.tile-title {
-  font-weight: bold;
-  font-size: 16px;
-}
+
 
 /* MODAL */
 .modal-backdrop {
@@ -176,3 +159,119 @@ tbody td.font-semibold {
     justify-content: center;
   }
 }
+
+.pedidocliente{
+  background-color: white;
+  padding: 10px;
+}
+.pedidocliente a{
+  padding: 10px;
+  color: #424551;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+/* scrool */
+
+.contenedor-principal {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  margin: 0 auto;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.pedidocliente {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+
+
+
+/* dddd */
+
+/* formularios */
+.formulario-horizontal {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 25px;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.formulario-horizontal h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.campo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.campo label {
+  flex: 0 0 150px;
+  font-weight: 600;
+  color: #34495e;
+}
+
+.campo input,
+.campo textarea {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.acciones {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.acciones button {
+  padding: 12px 20px;
+  background-color: #3498db;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.acciones button:hover {
+  background-color: #21618c;
+}
+
+
+/* scrool acitvo y boniyto*/
+
+
+
+.pedidocliente a.active {
+  color:blue;
+  border-bottom:2px solid blue;
+}
+
+.contenido-pedido {
+  max-height:550px; /* Ajusta según tu diseño */
+  overflow-y: auto;
+  padding: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  scroll-behavior: smooth;
+  background-color: #fafafa;
+}
+.contenido-pedido section {
+  margin-bottom: 60px;
+}
+

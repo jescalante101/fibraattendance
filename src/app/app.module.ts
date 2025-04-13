@@ -51,7 +51,6 @@ import { RegistroReqComprasComponent } from './components/socios-negocios/regist
 import { ModalComponent } from './shared/modal/modal.component'; // Para selects
 import { DataMaestroComponent } from './components/inventario/data-maestro/data-maestro.component';
 
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -88,7 +87,7 @@ import { DataMaestroComponent } from './components/inventario/data-maestro/data-
     InvLecturaComponent,
     RegistroReqComprasComponent,
     ModalComponent,
-    DataMaestroComponent
+    DataMaestroComponent,
 
 
     

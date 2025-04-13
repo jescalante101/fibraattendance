@@ -30,6 +30,7 @@
 /* Asegurarse de que el texto en el logo sea blanco */
 .navbar-brand {
   color: #fff !important;
+  padding:0 100px 0 10px;
   font-size: 1em;  /* Cambia el color del texto a blanco */
 }
 
@@ -191,4 +192,50 @@
   #divSpace{
     display: none !important;  
   }
+}
+
+/* hamburguesa */
+.hamburguesa {
+  width: 250px;
+  height: 100vh;
+  color: white;
+  transition: width 0.3s ease;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.hamburguesa.collapsed {
+  width: 0;
+}
+.text{
+  width: 250px;
+  height: 100vh;
+  color: white;
+  transition: width 0.3s ease;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+}
+.text.collapsedtext {
+  width: 0;
+}
+
+.hamburger-btn {
+  padding-left:0;
+  top: 15px;
+  left: 15px;
+  z-index: 1000;
+  font-size: 24px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+/* ajustar sidebar */
+
+.sidebar-propio{
+  margin-top: 40px;
 }

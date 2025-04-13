@@ -24,7 +24,7 @@ import { CreateDescuentoComponent } from './components/descuento/create-descuent
 import { EditDescuentoComponent } from './components/descuento/edit-descuento/edit-descuento.component';
 import { IndexDescuentoComponent } from './components/descuento/index-descuento/index-descuento.component';
 import { TableComponent } from './components/table/table.component';
-import { OrdenProduccionComponent } from './components/produccion/recibo-produccion/orden-produccion/orden-produccion.component';
+
 import { PrefichaComponent } from './components/produccion/preficha/preficha.component';
 import { SeleccionarSocidadComponent } from './components/gestion/seleccionar-socidad/seleccionar-socidad.component';
 import { TipoCambioComponent } from './components/gestion/tipo-cambio/tipo-cambio.component';
@@ -52,10 +52,12 @@ import { ModalComponent } from './shared/modal/modal.component'; // Para selects
 import { DataMaestroComponent } from './components/inventario/data-maestro/data-maestro.component';
 
 
+
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatIconModule } from '@angular/material/icon';
+import { OrdenProduccionComponent } from './components/produccion/recibo-produccion/orden-produccion/orden-produccion.component';
 
 
 @NgModule({
@@ -75,8 +77,8 @@ import { MatIconModule } from '@angular/material/icon';
     CreateDescuentoComponent,
     EditDescuentoComponent,
     IndexDescuentoComponent,
-    TableComponent,
     OrdenProduccionComponent,
+    TableComponent,
     PrefichaComponent,
     SeleccionarSocidadComponent,
     TipoCambioComponent,

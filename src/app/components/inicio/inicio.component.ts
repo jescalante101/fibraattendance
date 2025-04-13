@@ -1,4 +1,3 @@
-import { query } from '@angular/animations';
 import { Component } from '@angular/core';
 document.addEventListener('DOMContentLoaded',function(){
   resaltarEnlace();
@@ -43,25 +42,26 @@ export class InicioComponent {
     
 }
 
-function resaltarEnlace() {
-  const contenedor = document.querySelector('.contenido-pedido');
+function resaltarEnlace(): void {
+  const contenedor = document.querySelector('.contenido-pedido') as HTMLElement | null;
+
   if (!contenedor) {
     console.error('No se encontró el contenedor .contenido-pedido');
     return;
   }
 
-  const sections = contenedor.querySelectorAll('section');
-  const navLinks = document.querySelectorAll('.pedidocliente a');
+  const sections = contenedor.querySelectorAll<HTMLElement>('section');
+  const navLinks = document.querySelectorAll<HTMLAnchorElement>('.pedidocliente a');
 
   contenedor.addEventListener('scroll', () => {
-    let activo = '';
-    let minDistancia = Infinity;
+    let activo: string = '';
+    let minDistancia: number = Infinity;
 
-    sections.forEach(section => {
+    sections.forEach((section) => {
       const rect = section.getBoundingClientRect();
       const contRect = contenedor.getBoundingClientRect();
 
-      const distancia = Math.abs(rect.top - contRect.top); // qué tan cerca está del top del contenedor
+      const distancia = Math.abs(rect.top - contRect.top);
 
       if (distancia < minDistancia) {
         minDistancia = distancia;
@@ -69,12 +69,13 @@ function resaltarEnlace() {
       }
     });
 
-    navLinks.forEach(link => {
+    navLinks.forEach((link) => {
       link.classList.remove('active');
-      if (link.getAttribute('href') === '#' + activo) {
+      if (link.getAttribute('href') === `#${activo}`) {
         link.classList.add('active');
       }
     });
   });
 }
+
 

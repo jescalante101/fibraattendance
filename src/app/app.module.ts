@@ -53,6 +53,8 @@ import { DataMaestroComponent } from './components/inventario/data-maestro/data-
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatIconModule } from '@angular/material/icon';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -102,7 +104,7 @@ import { MatRadioModule } from '@angular/material/radio';
     routing,
     NgxPaginationModule,
     GanttModule,
-    MatTabsModule,    MatTabsModule,
+    MatTabsModule,    MatTabsModule,MatIconModule,
     MatButtonModule,
     MatInputModule,
     MatFormFieldModule,

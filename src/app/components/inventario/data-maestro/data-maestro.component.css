@@ -2,10 +2,9 @@
 .main-container {
   display: flex;
   flex-direction: row;
-  height: 100vh; /* Asegura que ocupe toda la altura */
-  padding-left: 250px; /* Ajusta el contenido para que no se solape con el sidebar */
+  height: 100vh; /* Ocupa toda la altura de la ventana */
+  padding-left: 250px; /* Espacio para el sidebar */
 }
-
 
 .content {
   flex: 1;
@@ -64,9 +63,105 @@
   background-color: #1565c0;
 }
 
-
 .example-container mat-form-field + mat-form-field {
   margin-left: 8px;
 }
 
+/* ------------------------------------------------- */
+/* Media Queries para adaptar a dispositivos móviles */
+/* ------------------------------------------------- */
+@media (max-width: 768px) {
+  /* En pantallas medianas y pequeñas: el contenedor principal se ajusta a columna */
+  .main-container {
+    flex-direction: column;
+    padding-left: 0; /* Se elimina el padding izquierdo para que no se desperdicie espacio */
+    height: auto;
+  }
 
+  /* Ajustar el padding del contenido */
+  .content {
+    padding: 1rem;
+  }
+
+  /* Si tienes un sidebar y se muestra de otra forma (por ejemplo, en la parte superior), podrías agregar estilos específicos
+     para el componente del sidebar si se aplica una clase o selector en específico */
+
+  /* Ajustar márgenes entre campos de Angular Material */
+  .example-container mat-form-field + mat-form-field {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  /* Agrupar los botones en columna en vez de fila para mayor comodidad */
+  .button-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* Media Query para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .form-item input {
+    font-size: 0.9rem;
+  }
+
+  .button-group button {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+  }
+}
+
+
+
+/* Contenedor de los dos botones */
+.button-group {
+  display: flex;         /* Los coloca en línea */
+  gap: 16px;             /* Espacio horizontal entre botones */
+  margin-top: 20px;      /* Separación superior (ajusta según tu layout) */
+}
+
+.btn-crear, .btn-cancelar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;               /* Espacio entre el ícono y el texto */
+  font-weight: 600;       /* Resalta el texto */
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+/* -------- Estilo para el botón "Crear" -------- */
+.btn-crear {
+  background: linear-gradient(90deg, #1976d2 0%, #2196F3 100%);
+  color: #fff;
+  border-radius: 6px;      /* Borde ligeramente redondeado */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.btn-crear:hover {
+  background: linear-gradient(90deg, #1565c0 0%, #1E88E5 100%);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+.btn-crear:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* -------- Estilo para el botón "Cancelar" -------- */
+.btn-cancelar {
+  background: linear-gradient(90deg, #e53935 0%, #f44336 100%);
+  color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.btn-cancelar:hover {
+  background: linear-gradient(90deg, #d32f2f 0%, #e57373 100%);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+.btn-cancelar:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}

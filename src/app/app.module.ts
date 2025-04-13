@@ -51,6 +51,11 @@ import { RegistroReqComprasComponent } from './components/socios-negocios/regist
 import { ModalComponent } from './shared/modal/modal.component'; // Para selects
 import { DataMaestroComponent } from './components/inventario/data-maestro/data-maestro.component';
 
+
+import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatRadioModule } from '@angular/material/radio';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -102,8 +107,11 @@ import { DataMaestroComponent } from './components/inventario/data-maestro/data-
     GanttModule,
     MatTabsModule,    MatTabsModule,
     MatButtonModule,
+    MatInputModule,
     MatFormFieldModule,
+    MatCheckboxModule,
     MatSelectModule,
+    MatRadioModule,
     FormsModule,
     NgxTinymceModule.forRoot({
       baseURL : '../../../assets/tinymce/'

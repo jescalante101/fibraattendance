@@ -209,18 +209,6 @@
 .hamburguesa.collapsed {
   width: 0;
 }
-.text{
-  width: 250px;
-  height: 100vh;
-  color: white;
-  transition: width 0.3s ease;
-  overflow: hidden;
-  top: 0;
-  left: 0;
-}
-.text.collapsedtext {
-  width: 0;
-}
 
 .hamburger-btn {
   padding-left:0;
@@ -233,7 +221,9 @@
   color: white;
   cursor: pointer;
 }
-
+.main-content.expanded {
+  margin-left: 0; /* Cuando la barra lateral se contrae, ocupa todo el espacio */
+}
 /* ajustar sidebar */
 
 .sidebar-propio{

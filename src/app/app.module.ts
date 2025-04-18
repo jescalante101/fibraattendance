@@ -24,7 +24,8 @@ import { CreateDescuentoComponent } from './components/descuento/create-descuent
 import { EditDescuentoComponent } from './components/descuento/edit-descuento/edit-descuento.component';
 import { IndexDescuentoComponent } from './components/descuento/index-descuento/index-descuento.component';
 import { TableComponent } from './components/table/table.component';
-
+import { OrdenProduccionComponent } from './components/produccion/recibo-produccion/orden-produccion/orden-produccion.component';
+import {TablaNivelComponent} from './components/produccion/recibo-produccion/orden-produccion/tabla-nivel/tabla-nivel.component';
 import { PrefichaComponent } from './components/produccion/preficha/preficha.component';
 import { SeleccionarSocidadComponent } from './components/gestion/seleccionar-socidad/seleccionar-socidad.component';
 import { TipoCambioComponent } from './components/gestion/tipo-cambio/tipo-cambio.component';
@@ -52,14 +53,6 @@ import { ModalComponent } from './shared/modal/modal.component'; // Para selects
 import { DataMaestroComponent } from './components/inventario/data-maestro/data-maestro.component';
 
 
-
-import { MatInputModule } from '@angular/material/input';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatRadioModule } from '@angular/material/radio';
-import { MatIconModule } from '@angular/material/icon';
-import { OrdenProduccionComponent } from './components/produccion/recibo-produccion/orden-produccion/orden-produccion.component';
-
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -77,8 +70,8 @@ import { OrdenProduccionComponent } from './components/produccion/recibo-producc
     CreateDescuentoComponent,
     EditDescuentoComponent,
     IndexDescuentoComponent,
-    OrdenProduccionComponent,
     TableComponent,
+    OrdenProduccionComponent,
     PrefichaComponent,
     SeleccionarSocidadComponent,
     TipoCambioComponent,
@@ -97,6 +90,7 @@ import { OrdenProduccionComponent } from './components/produccion/recibo-producc
     RegistroReqComprasComponent,
     ModalComponent,
     DataMaestroComponent,
+    TablaNivelComponent,
 
 
     
@@ -109,13 +103,10 @@ import { OrdenProduccionComponent } from './components/produccion/recibo-producc
     routing,
     NgxPaginationModule,
     GanttModule,
-    MatTabsModule,    MatTabsModule,MatIconModule,
+    MatTabsModule,    MatTabsModule,
     MatButtonModule,
-    MatInputModule,
     MatFormFieldModule,
-    MatCheckboxModule,
     MatSelectModule,
-    MatRadioModule,
     FormsModule,
     NgxTinymceModule.forRoot({
       baseURL : '../../../assets/tinymce/'

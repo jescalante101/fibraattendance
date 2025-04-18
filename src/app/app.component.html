@@ -1,1 +1,5 @@
-<router-outlet></router-outlet>
+<app-sidebar (collapsedChange)="onSidebarToggled($event)"></app-sidebar>
+
+<div class="main-content" [class.expanded]="sidebarCollapsed">
+  <router-outlet></router-outlet>
+</div>

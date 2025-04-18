@@ -1,16 +1,27 @@
 
-<app-sidebar></app-sidebar>
-<br>
-<br>
-<br>
-<br>
-<div class="espaciado">
-    
-    <div class="title" >
-       Lista Órdenes de trabajo
-    </div>
-    <div>
-        
-        
-    </div>
+<br><br><br><br>
+<div class="">
+  <div class=" title">
+    Lista Órdenes de Trabajo
+  </div>
+  
+  <div class="espaciado-tabla">
+    <app-tabla-nivel 
+        class="cabecera" 
+        style="font-weight:600;" 
+        [datos]="cabecera" 
+        [nivel]="1">
+      </app-tabla-nivel>
+    <ng-container *ngFor="let orden of ordenesTrabajo">
+      <!-- 1) Cabecera fija -->
+      
+  
+      <!-- 2) Sólo esta madre (en un array de un solo elemento) -->
+      <app-tabla-nivel 
+        [datos]="[orden]" 
+        [nivel]="1">
+      </app-tabla-nivel>
+    </ng-container>
+  </div>
 </div>
+

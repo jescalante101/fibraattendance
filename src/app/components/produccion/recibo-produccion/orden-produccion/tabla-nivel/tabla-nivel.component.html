@@ -1,0 +1,45 @@
+<table class="tabla-nivel nivel-{{ nivel }}">
+  <tbody>
+    <ng-container *ngFor="let item of datos; let i = index">
+      <tr
+        [ngStyle]="item.styleRow || {}"
+        (click)="item.subitems?.length ? toggleExpand(item, 'nivel' + nivel + '-item' + i) : null"
+      >
+        <!-- 1ª Columna -->
+        <td
+          [style.paddingLeft.px]="(nivel - 1) * 40"
+          [ngStyle]="item.styleCol1 || {}"
+        >
+          <span *ngIf="item.subitems?.length" class="expand-icon">
+            <i class="fa" [ngClass]="item.expandido ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
+          </span>
+          {{ item.col1 }}
+        </td>
+
+        <!-- 2ª, 3ª y 4ª Columnas -->
+        <td [ngStyle]="item.styleCol2 || {}">{{ item.col2 || '' }}</td>
+        <td [ngStyle]="item.styleCol3 || {}">{{ item.col3 || '' }}</td>
+        <td [ngStyle]="item.styleCol4 || {}">{{ item.col4 || '' }}</td>
+
+        <!-- 5ª Columna: progreso sólo en nivel 1; en hijos queda vacía pero con clase -->
+        <td class="progreso-col" *ngIf="nivel === 1">
+          <div class="barra-container">
+            <div
+              class="barra"
+              [ngStyle]="{ width: item.porcentaje + '%', backgroundColor: getColor(item.porcentaje) }"
+            ></div>
+            <span class="porcentaje-texto">{{ item.porcentaje }}%</span>
+          </div>
+        </td>
+        <td class="progreso-col" *ngIf="nivel !== 1"></td>
+      </tr>
+
+      <!-- Fila de subtabla -->
+      <tr *ngIf="item.expandido && item.subitems?.length">
+        <td colspan="5" style="padding: 0; border: none;">
+          <app-tabla-nivel [datos]="item.subitems" [nivel]="nivel + 1"></app-tabla-nivel>
+        </td>
+      </tr>
+    </ng-container>
+  </tbody>
+</table>

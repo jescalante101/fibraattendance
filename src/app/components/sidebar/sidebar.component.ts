@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component,Output,EventEmitter } from '@angular/core';
 
 @Component({
     selector: 'app-sidebar',
@@ -10,13 +10,13 @@ import { Component } from '@angular/core';
 
 export class SidebarComponent {
   isCollapsed = false;
-  isCollapsedtext = false;
+
+  @Output() collapsedChange = new EventEmitter<boolean>();
 
   toggleSidebar() {
     this.isCollapsed = !this.isCollapsed;
-    this.isCollapsedtext = !this.isCollapsedtext;
+    this.collapsedChange.emit(this.isCollapsed);
   }
-  
 
   // Guarda qué menú está abierto en cada nivel
   openMenus: { [level: number]: string | null } = {};

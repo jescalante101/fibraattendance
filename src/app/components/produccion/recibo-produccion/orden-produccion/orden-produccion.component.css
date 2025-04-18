@@ -1,25 +1,11 @@
 .espaciado {
-
-  padding-left: 18rem; /* Espaciado inicial */
+  padding-left: 17rem; /* Espaciado inicial */
+}
+.espaciado-tabla {
+  padding:1rem 1rem 0 0; /* Espaciado inicial */
 }
 .title{
-  font-family: Roboto, sans-serif;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
   font-weight: 600;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-th, td {
-  padding: 10px;
-  border: 1px solid #ccc;
-  vertical-align: top;
-}
-
-ul {
-  margin: 5px 0 5px 20px;
-  padding-left: 10px;
-  list-style-type: disc;
+  padding-left: 1rem;
 }

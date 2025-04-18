@@ -1,0 +1,9 @@
+.main-content {
+    margin-left: 250px;            /* ancho normal del sidebar */
+    transition: margin-left 0.3s ease;
+  }
+  
+  .main-content.expanded {
+    margin-left: 0;                /* cuando el sidebar está colapsado */
+  }
+  

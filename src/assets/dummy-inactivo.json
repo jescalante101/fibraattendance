@@ -1,0 +1,18 @@
+[
+    {
+      "item": "B1",
+      "propietario": "Pedro",
+      "fechaCreacion": "2025-04-20",
+      "razonInactividad": "Mantenimiento",
+      "duracionDias": 2
+    },
+    {
+      "item": "B2",
+      "propietario": "Lucía",
+      "fechaCreacion": "2025-04-18",
+      "razonInactividad": "Avería",
+      "duracionDias": 5
+   
+    }
+  ]
+  

@@ -1,0 +1,27 @@
+<div class="alert-header">
+    <span class="alert-icon">  
+        <svg xmlns="http://www.w3.org/2000/svg"
+        width="24" height="24" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="12" fill="#f44336"/>
+            <line x1="8" y1="8" x2="16" y2="16"
+           stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            <line x1="16" y1="8" x2="8" y2="16"
+           stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    </span>
+    <span class="alert-title">Error</span>
+  </div>
+  <div class="alert-divider"></div>
+  <div class="alert-body">
+    <!-- Si data.field está definido, mostramos “Valor que falta: X” -->
+    <ng-container *ngIf="data.field; else showMsg">
+      Valor que falta: <strong>{{ data.field }}</strong>
+    </ng-container>
+    <ng-template #showMsg>
+      {{ data.mensaje }}
+    </ng-template>
+  </div>
+  <div class="alert-footer">
+    <button mat-button (click)="close()">Cerrar</button>
+  </div>
+  

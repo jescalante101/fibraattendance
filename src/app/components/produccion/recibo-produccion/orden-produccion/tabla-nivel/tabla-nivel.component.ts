@@ -6,6 +6,19 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./tabla-nivel.component.css']
 })
 export class TablaNivelComponent {
+  getEstiloFila(item: any): any {//para darle estilo a cada nivel
+    switch (item.proceso) {
+      case 'orden':
+        return { backgroundColor: '#eaf6ff', color: '#424551', fontWeight: '400'};
+      case 'material':
+        return { backgroundColor: '#f3fcff',color :'blue' };
+      case 'semi':
+        return { backgroundColor: 'purple',color :'purple'  };
+      case 'proceso':
+        return { backgroundColor: 'green',color :'green'  };
+    }
+  }
+  
   @Input() datos: any[] = [];
   @Input() nivel: number = 1;
 
@@ -34,9 +47,11 @@ export class TablaNivelComponent {
 
   // color de barra según porcentaje
   getColor(p: number): string {
-    if (p < 30) return '#2196F3';
-    if (p < 70) return '#FF9800';
-    return '#4CAF50';
+    if (p < 20) return '#e02d2b';
+    if (p < 40) return '#ff7300';
+    if (p < 60) return '#ffbe00';
+    if (p < 80) return '#8fd501';
+    return '#2cb55b';
   }
 
   // cuenta todos los nodos hijos para rowspan

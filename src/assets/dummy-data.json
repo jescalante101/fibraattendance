@@ -1,0 +1,23 @@
+[
+    {
+      "item": "X1",
+      "propietario": "Ana",
+      "numTelar": "T01",
+      "supervisor": "Juan",
+      "eficiencia": "95%",
+      "roturaUrdido": 2,
+      "roturaTrama": 1,
+      "metrosProducidos": 500
+    },
+    {
+      "item": "X2",
+      "propietario": "Luis",
+      "numTelar": "T02",
+      "supervisor": "María",
+      "eficiencia": "90%",
+      "roturaUrdido": 3,
+      "roturaTrama": 0,
+      "metrosProducidos": 450
+    }
+  ]
+  

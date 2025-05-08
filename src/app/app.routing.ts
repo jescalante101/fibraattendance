@@ -23,7 +23,10 @@ import { LecturaCodebarComponent } from "./components/inventario/despacho-ventas
 import { GanttProduccionComponent } from "./components/produccion/gantt-produccion/gantt-produccion.component";
 import { RegistroComprasComponent } from "./components/compras/registro-compras/registro-compras.component";
 import { RegistroReqComprasComponent } from "./components/socios-negocios/registro-req-compras/registro-req-compras.component";
-import { DataMaestroComponent } from "./components/inventario/data-maestro/data-maestro.component";
+import { IndexComponent } from "./components/inventario/data-maestro/index/index.component";
+import { ReporteTurnoComponent } from "./components/produccion/reporte-turno/reporte-turno.component";
+import { CrearReporteTurnoComponent } from "./components/produccion/crear-reporte-turno/crear-reporte-turno.component";
+
 
 
 const appRoutes: Routes = [
@@ -48,7 +51,9 @@ const appRoutes: Routes = [
         {path : 'gestion/tipo-cambio', component:TipoCambioComponent,},
         {path : 'inventario/despacho-ventas/lectura', component:LecturaCodebarComponent},
         {path : 'socios-negocios/registro-req-compras', component:RegistroReqComprasComponent},
-        {path : 'inventario/data-maestra/maestra', component:DataMaestroComponent},
+        {path : 'inventario/data-maestro/index', component:IndexComponent},
+        {path : 'produccion/reporte-turno', component:ReporteTurnoComponent},
+        {path : 'produccion/crear-reporte-turno', component:CrearReporteTurnoComponent},
 
     ]},
     {path: 'login', component:LoginComponent}

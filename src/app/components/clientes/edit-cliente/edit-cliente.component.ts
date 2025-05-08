@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from 'src/app/service/admin.service';
 import { ClienteService } from 'src/app/service/cliente.service';
+
 declare var iziToast:any;
 @Component({
   selector: 'app-edit-cliente',
@@ -10,6 +11,7 @@ declare var iziToast:any;
   styleUrls: ['./edit-cliente.component.css']
 })
 export class EditClienteComponent {
+  
   public cliente:any = {}
   public id:any;
   public token:any;
@@ -67,4 +69,5 @@ actualizar(updateForm: NgForm){
       });
     }
 }
+
 }

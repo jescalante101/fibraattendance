@@ -1,0 +1,263 @@
+/* CONTENEDOR GENERAL */
+.contenedor-principal {
+    font-family: "Segoe UI", sans-serif;
+    background-color: #f5f6f7;
+    padding: 1.5rem;
+    color: #2b2b2b;
+  }
+  
+  /* BUSCADOR Y BOTÓN AÑADIR */
+  .busqueda-accion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .buscador-contenedor {
+    position: relative;
+    width: 250px;
+  }
+  
+  .buscador-input {
+    width: 100%;
+    padding: 6px 28px 6px 10px;
+    border: 1px solid #cfd4db;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-style: italic;
+    outline: none;
+    transition: border 0.2s ease;
+  }
+  
+  .buscador-input:focus {
+    border-color: #0064d9;
+  }
+  
+  .icono-lupa {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #333;
+    font-size: 0.9rem;
+    pointer-events: none;
+  }
+  
+  .btn-anadir {
+    background-color: #0064d9;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  
+  .btn-anadir:hover {
+    background-color: #004c9a;
+  }
+  
+  /* TABLA */
+  .tabla {
+    border: 1px solid #0064d9;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin-top: 1rem;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+  }
+  
+  thead {
+    background-color: #f5f6f7;
+  }
+  
+  thead th {
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 0.82rem;
+    color: #2b2b2b;
+    padding: 0.7rem 0.6rem;
+    border: 1px solid #d3d3d3;
+    white-space: nowrap;
+  }
+  
+  td {
+    padding: 0.6rem;
+    font-size: 0.85rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .sin-datos {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+  }
+  
+  /* MODAL */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modal-contenido {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    width: 450px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .modal-contenido h3 {
+    margin-bottom: 1rem;
+    color: #0064d9;
+  }
+  
+  .modal-contenido form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .modal-contenido label {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .modal-contenido input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    margin-top: 0.2rem;
+  }
+  
+  .modal-botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .modal-botones button {
+    background-color: #0064d9;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  
+  .modal-botones button[type="button"] {
+    background-color: #ccc;
+    color: #333;
+  }
+  
+  /* VISTA ACTIVO / INACTIVO */
+  .vista-dropdown-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .vista-boton {
+    background-color: #f3f4f6;
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #2c3e50;
+    cursor: pointer;
+    min-width: 220px;
+    text-align: left;
+  }
+  
+  .vista-boton .flecha {
+    float: right;
+    font-size: 0.75rem;
+    margin-top: 3px;
+  }
+  
+  .vista-dropdown {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    background: white;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+    width: 350px;
+    z-index: 999;
+    font-size: 0.85rem;
+  }
+  
+  .vista-busqueda {
+    position: relative;
+    padding: 8px;
+  }
+  
+  .vista-busqueda input {
+    width: 100%;
+    padding: 6px 8px 6px 28px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.85rem;
+  }
+  
+  .vista-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .vista-lista li {
+    padding: 10px 14px;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .vista-lista li:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .vista-lista li.activa {
+    background-color: #ebf3ff;
+    font-weight: 600;
+  }
+  
+  .check {
+    position: absolute;
+    left: 6px;
+    color: #2c3e50;
+    font-size: 0.9rem;
+  }
+  
+  .etiqueta {
+    font-size: 0.75rem;
+    color: #888;
+    float: right;
+    font-weight: normal;
+  }
+  
+  .vista-admin {
+    border-top: 1px solid #eee;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: #555;
+    cursor: pointer;
+  }
+  

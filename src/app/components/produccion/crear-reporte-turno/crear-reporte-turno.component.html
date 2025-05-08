@@ -1,0 +1,149 @@
+<div class="contenedor-principal">
+  <div class="title">
+    <h1>Crear reporte de turno</h1>
+  </div>
+
+  <nav class="pedidocliente">
+    <a href="#activo" (click)="desplazar('activo',$event)">Activo</a>
+    <a href="#inactivo" (click)="desplazar('inactivo',$event)">Inactivo</a>
+  </nav>
+
+  <div class="contenido-pedido">
+    <!-- ACTIVO -->
+    <section id="activo" class="general">
+      <h2 class="activo">Activo</h2>
+      <form #activoForm="ngForm" (ngSubmit)="guardarActivo()" class="card-formulario" novalidate>
+        <div class="form-section">
+          <!-- Item -->
+          <div class="form-group">
+            <label for="itemActivo">Item:</label>
+            <input id="itemActivo" name="itemActivo" type="text"
+                   [(ngModel)]="itemActivo" required>
+          </div>
+          <!-- Propietario -->
+          <div class="form-group">
+            <label for="propietarioActivo">Propietario:</label>
+            <input id="propietarioActivo" name="propietarioActivo" type="text"
+                   [(ngModel)]="propietarioActivo" required>
+          </div>
+          <!-- Telar -->
+          <div class="form-group">
+            <label for="telarActivo">N° Telar:</label>
+            <select id="telarActivo" name="telarActivo"
+                    [(ngModel)]="telarActivo" required>
+              <option *ngFor="let t of listaTelaresActivo" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+
+          <!-- Supervisor -->
+          <div class="form-group">
+            <label for="supervisorActivo">Supervisor:</label>
+            <select id="supervisorActivo" name="supervisorActivo"
+                    [(ngModel)]="supervisorActivo" required>
+              <option *ngFor="let s of listaSupervisoresActivo" [value]="s">{{ s }}</option>
+            </select>
+          </div>
+          <!-- Eficiencia -->
+          <div class="form-group">
+            <label for="eficienciaActivo">Eficiencia Máquina:</label>
+            <input id="eficienciaActivo" name="eficienciaActivo" type="text"
+                   [(ngModel)]="eficienciaActivo" required>
+          </div>
+          <!-- Rotura Urido -->
+          <div class="form-group">
+            <label for="roturaUridoActivo">Rotura Urido:</label>
+            <input id="roturaUridoActivo" name="roturaUridoActivo" type="number"
+                   [(ngModel)]="roturaUridoActivo" required>
+          </div>
+          <!-- Rotura Trama -->
+          <div class="form-group">
+            <label for="roturaTramaActivo">Rotura Trama:</label>
+            <input id="roturaTramaActivo" name="roturaTramaActivo" type="number"
+                   [(ngModel)]="roturaTramaActivo" required>
+          </div>
+          <!-- Metros Producidos -->
+          <div class="form-group">
+            <label for="metrosProducidosActivo">Metros Producidos:</label>
+            <input id="metrosProducidosActivo" name="metrosProducidosActivo" type="number"
+                   [(ngModel)]="metrosProducidosActivo" required>
+          </div>
+          <!-- Comentarios -->
+          <div class="form-group" style="grid-column: span 1;">
+            <label for="comentariosActivo">Comentarios:</label>
+            <textarea id="comentariosActivo" name="comentariosActivo"
+                      [(ngModel)]="comentariosActivo" rows="1"></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit">Guardar Activo</button>
+      </form>
+    </section>
+
+    <!-- INACTIVO -->
+    <section id="inactivo" class="general">
+      <h2>Inactivo</h2>
+      <form #inactivoForm="ngForm" (ngSubmit)="guardarInactivo()" class="card-formulario" novalidate>
+        <div class="form-section">
+          <!-- Item -->
+          <div class="form-group">
+            <label for="itemInactivo">Item</label>
+            <input id="itemInactivo" name="itemInactivo" type="text"
+                   [(ngModel)]="itemInactivo" required>
+          </div>
+          <!-- Propietario -->
+          <div class="form-group">
+            <label for="propietarioInactivo">Propietario</label>
+            <input id="propietarioInactivo" name="propietarioInactivo" type="text"
+                   [(ngModel)]="propietarioInactivo" required>
+          </div>
+          <!-- Telar -->
+          <div class="form-group">
+            <label for="telarInactivo">N° Telar</label>
+            <select id="telarInactivo" name="telarInactivo"
+                    [(ngModel)]="telarInactivo" required>
+              <option *ngFor="let t of listaTelaresInactivo" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+          <!-- Supervisor -->
+          <div class="form-group">
+            <label for="supervisorInactivo">Supervisor</label>
+            <select id="supervisorInactivo" name="supervisorInactivo"
+                    [(ngModel)]="supervisorInactivo" required>
+              <option *ngFor="let s of listaSupervisoresInactivo" [value]="s">{{ s }}</option>
+            </select>
+          </div>
+          <!-- Eficiencia -->
+          <div class="form-group">
+            <label for="eficienciaInactivo">Eficiencia Máquina</label>
+            <input id="eficienciaInactivo" name="eficienciaInactivo" type="text"
+                   [(ngModel)]="eficienciaInactivo" required>
+          </div>
+          <!-- Rotura Urido -->
+          <div class="form-group">
+            <label for="roturaUridoInactivo">Rotura Urido</label>
+            <input id="roturaUridoInactivo" name="roturaUridoInactivo" type="number"
+                   [(ngModel)]="roturaUridoInactivo" required>
+          </div>
+          <!-- Rotura Trama -->
+          <div class="form-group">
+            <label for="roturaTramaInactivo">Rotura Trama</label>
+            <input id="roturaTramaInactivo" name="roturaTramaInactivo" type="number"
+                   [(ngModel)]="roturaTramaInactivo" required>
+          </div>
+          <!-- Metros Producidos -->
+          <div class="form-group">
+            <label for="metrosProducidosInactivo">Metros Producidos</label>
+            <input id="metrosProducidosInactivo" name="metrosProducidosInactivo" type="number"
+                   [(ngModel)]="metrosProducidosInactivo" required>
+          </div>
+          <!-- Comentarios -->
+          <div class="form-group" style="grid-column: span 1;">
+            <label for="comentariosInactivo">Comentarios</label>
+            <textarea id="comentariosInactivo" name="comentariosInactivo"
+                      [(ngModel)]="comentariosInactivo" rows="4"></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit">Guardar Inactivo</button>
+      </form>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,93 @@
+[
+    {
+      "col1": "OT 001",
+      "col2": "AJEPER S.A.",
+      "col3": "1000005894",
+      "col4": "PTN-ETIQ003544",
+      "col5": "56 186 ETIQ. VOLT PINK 300ML REA",
+      "col6": "28/04/2025",
+      "porcentaje": 35,
+      "proceso": "orden",  
+      "subitems": [
+        {
+          "col1":"Material 1",
+          "proceso": "material"
+        },
+        {
+          "col1": "Producto Semi-elaborado 1",
+          "proceso": "semi",  
+          "subitems": [
+            {
+              "col1": "Submaterial 1",
+              "proceso": "material"
+            },
+            {
+              "col1": "Submaterial 1",
+              "proceso": "material"
+            }
+          ]
+        },
+        {
+          "col1":"CORTE BOBINA",
+          "proceso": "proceso"
+        },
+        {
+          "col1":"CORTE FUNDA",
+          "proceso": "proceso"
+        },
+        {
+          "col1":"IMPRESIÓN",
+          "proceso": "proceso"
+        },
+        {
+          "col1":"SELLADO BOLSA",
+          "proceso": "proceso"
+        }
+      ]
+    },
+    {
+      "col1": "OT 002",
+      "col2": "LINDLEY",
+      "col3": "P-002",
+      "col4": "01/05/2025",
+      "porcentaje": 60,
+      "proceso": "orden",
+      "subitems": [
+        {
+          "col1":"Material 3",
+          "proceso":"material"
+        },
+        {
+          "col1": "Producto Semi-elaborado 2",
+          "proceso": "semi",  
+          "subitems": [
+            {
+              "col1": "Semi B1",
+              "proceso": "material",  
+              "subitems": []
+            },
+            {
+              "col1": "Semi B2",
+              "proceso": "material",  
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "col1": "OT 003",
+      "col2": "PEPSICO",
+      "col3": "P-003",
+      "col4": "03/05/2025",
+      "porcentaje": 85,
+      "proceso": "nivel1",
+      "subitems": [
+        {
+          "col1":"Material 4",
+          "proceso":"material"
+        }
+      ]
+    }
+  ]
+  

@@ -1,0 +1,42 @@
+/* modal-alerta.component.scss */
+.mat-mdc-dialog-container {
+  --mdc-dialog-container-color: transparent !important;
+  --mdc-dialog-subhead-color: rgba(0,0,0,0.87);
+  --mdc-dialog-supporting-text-color: rgba(0,0,0,0.6);
+}
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  /* Anula cualquier box-shadow */
+  box-shadow: none !important;
+  border: none !important;
+}
+.cdk-overlay-dark-backdrop{
+  background:rgba(255,255,255,0.4);
+}
+.dots-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px; /* o el alto que necesites */
+  }
+  
+  .dot {
+    width: 16px;
+    height: 16px;
+    margin: 0 6px;
+    border-radius: 50%;
+    background-color: #1976d2; /* mismo color de Material primary */
+    animation: bounce 1s infinite ease-in-out both;
+  }
+  
+  .dot1 { animation-delay: 0s; }
+  .dot2 { animation-delay: 0.2s; }
+  .dot3 { animation-delay: 0.4s; }
+  
+  @keyframes bounce {
+    0%, 80%, 100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-20px);
+    }
+  }

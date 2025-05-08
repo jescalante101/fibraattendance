@@ -1,4 +1,6 @@
+// src/app/components/produccion/orden-produccion/orden-produccion.component.ts
 import { Component, OnInit } from '@angular/core';
+import { DataService } from '../../../../services/data.service';
 
 @Component({
   selector: 'app-orden-produccion',
@@ -6,14 +8,17 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./orden-produccion.component.css']
 })
 export class OrdenProduccionComponent implements OnInit {
+  // Cabecera estática (se renderiza con tabla-nivel)
   cabecera = [
     {
       col1: 'N° Orden de trabajo',
       col2: 'Cliente',
       col3: 'N° Pedido',
       col4: 'Fecha de entrega',
-      col5: 'Progreso',
-      styleCol1: { 'padding-left': '1rem' },
+      col5: 'Código Producto',
+      col6: 'Nombre Producto',
+      col7: 'Progreso',
+      styleCol1: { 'padding-left': '1rem', 'font-weight': '600' },
       expandido: false,
       subitems: []
     }
@@ -21,173 +26,22 @@ export class OrdenProduccionComponent implements OnInit {
 
   ordenesTrabajo: any[] = [];
 
+  constructor(private dataService: DataService) {}
+
   ngOnInit() {
-    this.cargarDatos();
+    this.dataService.getOrdenesTrabajoDummy()
+      .subscribe(data => {
+        this.ordenesTrabajo = data;
+        this.addExpandFlag(this.ordenesTrabajo);
+      }, err => console.error(err));
   }
 
-  cargarDatos() {
-    // <-- aquí simulas tu JSON del backend
-    this.ordenesTrabajo = [
-      {
-        col1: 'OT 001',
-        col2: 'CBC PERUANA S.A.C.',
-        col3: 'P-001',
-        col4: '28/04/2025',
-        porcentaje: 10,
-        estado: 'progreso',
-        styleRow: { backgroundColor: '#eaf6ff' },
-        styleCol1: { color: 'blue' },
-        styleCol2: {},
-        styleCol3: {},
-        styleCol4: {},
-        subitems: [
-          {
-            col1: 'Material 1',
-            styleRow: { backgroundColor: '#f3fcff' },
-            styleCol1: {},
-            styleCol2: {},
-            styleCol3: {},
-            styleCol4: {},
-            subitems: [
-              {
-                col1: 'Semi-elaborado 1',
-                styleRow: { backgroundColor: '#eef9fe' },
-                styleCol1: {},
-                styleCol2: {},
-                styleCol3: {},
-                styleCol4: {},
-                subitems: [
-                  {
-                    col1: 'Submaterial 1',
-                    styleRow: { backgroundColor: '#fffaf0' },
-                    styleCol1: {},
-                    styleCol2: {},
-                    styleCol3: {},
-                    styleCol4: {},
-                    subitems: []
-                  },
-                  {
-                    col1: 'Submaterial 2',
-                    styleRow: { backgroundColor: '#fffaf0' },
-                    styleCol1: {},
-                    styleCol2: {},
-                    styleCol3: {},
-                    styleCol4: {},
-                    subitems: []
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        col1: 'OT 001',
-        col2: 'CBC PERUANA S.A.C.',
-        col3: 'P-001',
-        col4: '28/04/2025',
-        porcentaje: 50,
-        estado: 'progreso',
-        styleRow: { backgroundColor: '#eaf6ff' },
-        styleCol1: { color: 'blue' },
-        styleCol2: {},
-        styleCol3: {},
-        styleCol4: {},
-        subitems: [
-          {
-            col1: 'Material 1',
-            styleRow: { backgroundColor: '#f3fcff' },
-            styleCol1: {'color':'#5e2129','font-size':600},
-            styleCol2: {},
-            styleCol3: {},
-            styleCol4: {},
-            subitems: [
-              {
-                col1: 'Semi-elaborado 1',
-                styleRow: { backgroundColor: '#eef9fe' },
-                styleCol1: {},
-                styleCol2: {},
-                styleCol3: {},
-                styleCol4: {},
-                subitems: [
-                  {
-                    col1: 'Submaterial 1',
-                    styleRow: { backgroundColor: '#fffaf0' },
-                    styleCol1: {},
-                    styleCol2: {},
-                    styleCol3: {},
-                    styleCol4: {},
-                    subitems: []
-                  },
-                  {
-                    col1: 'Submaterial 2',
-                    styleRow: { backgroundColor: '#fffaf0' },
-                    styleCol1: {},
-                    styleCol2: {},
-                    styleCol3: {},
-                    styleCol4: {},
-                    subitems: []
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        col1: 'OT 001',
-        col2: 'CBC PERUANA S.A.C.',
-        col3: 'P-001',
-        col4: '28/04/2025',
-        porcentaje: 100,
-        estado: 'progreso',
-        styleRow: { backgroundColor: '#eaf6ff' },
-        styleCol1: { color: 'blue' },
-        styleCol2: {},
-        styleCol3: {},
-        styleCol4: {},
-        subitems: [
-          {
-            col1: 'Material 1',
-            styleRow: { backgroundColor: '#f3fcff' },
-            styleCol1: {},
-            styleCol2: {},
-            styleCol3: {},
-            styleCol4: {},
-            subitems: [
-              {
-                col1: 'Semi-elaborado 1',
-                styleRow: { backgroundColor: '#eef9fe' },
-                styleCol1: {},
-                styleCol2: {},
-                styleCol3: {},
-                styleCol4: {},
-                subitems: [
-                  {
-                    col1: 'Submaterial 1',
-                    styleRow: { backgroundColor: '#fffaf0' },
-                    styleCol1: {},
-                    styleCol2: {},
-                    styleCol3: {},
-                    styleCol4: {},
-                    subitems: []
-                  },
-                  {
-                    col1: 'Submaterial 2',
-                    styleRow: { backgroundColor: '#fffaf0' },
-                    styleCol1: {},
-                    styleCol2: {},
-                    styleCol3: {},
-                    styleCol4: {},
-                    subitems: []
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      // puedes agregar más madres aquí
-    ];
+  private addExpandFlag(items: any[]) {
+    items.forEach(item => {
+      item.expandido = false;
+      if (item.subitems?.length) {
+        this.addExpandFlag(item.subitems);
+      }
+    });
   }
 }

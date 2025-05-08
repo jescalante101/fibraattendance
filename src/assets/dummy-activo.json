@@ -1,0 +1,44 @@
+[
+  {
+    "item": "A1",
+    "fechaCreacion": "2025-04-28",
+    "numTelar": "T01",
+    "supervisor": "Javier Purihuaman",
+    "eficiencia": "75%",
+    "roturaUrdido": 2,
+    "roturaTrama": 1,
+    "metrosProducidos": 500
+  },
+  {
+    "item": "A2",
+    "fechaCreacion": "2025-04-28",
+    "numTelar": "T03",
+    "supervisor": "Edgar Montaban",
+    "eficiencia": "95%",
+    "roturaUrdido": 2,
+    "roturaTrama": 1,
+    "metrosProducidos": 500
+  },
+  {
+    "item": "A3",
+    "fechaCreacion": "2025-04-28",
+    "numTelar": "T08",
+    "supervisor": "Javier Purihuaman",
+    "eficiencia": "45%",
+    "roturaUrdido": 2,
+    "roturaTrama": 1,
+    "metrosProducidos": 500
+  },
+  {
+    "item": "A4",
+    "fechaCreacion": "2025-04-28",
+    "numTelar": "T15",
+    "supervisor": "Edgar Montaban",
+    "eficiencia": "85%",
+    "roturaUrdido": 2,
+    "roturaTrama": 1,
+    "metrosProducidos": 500
+  }
+]
+  
+

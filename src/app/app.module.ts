@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule }  from '@angular/forms';
+import { FormsModule, ReactiveFormsModule }  from '@angular/forms';
 import { HttpClient,HttpClientModule }  from '@angular/common/http';
+import { IndexComponent } from './components/inventario/data-maestro/index/index.component'
 
 
 
@@ -51,11 +52,22 @@ import { InvLecturaComponent } from './components/modal/inv-lectura/inv-lectura.
 import { RegistroReqComprasComponent } from './components/socios-negocios/registro-req-compras/registro-req-compras.component';
 import { ModalComponent } from './shared/modal/modal.component'; // Para selects
 import { DataMaestroComponent } from './components/inventario/data-maestro/data-maestro.component';
+import { ReporteTurnoComponent } from './components/produccion/reporte-turno/reporte-turno.component';
+import { CrearReporteTurnoComponent } from './components/produccion/crear-reporte-turno/crear-reporte-turno.component';
+import { SharedModule } from './shared/shared.module';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatMenuModule } from '@angular/material/menu';
+
 
 
 @NgModule({
   declarations: [
+
     AppComponent,
+
     InicioComponent,
     SidebarComponent,
     LoginComponent,
@@ -91,23 +103,29 @@ import { DataMaestroComponent } from './components/inventario/data-maestro/data-
     ModalComponent,
     DataMaestroComponent,
     TablaNivelComponent,
-
-
-    
+    ReporteTurnoComponent,
+    IndexComponent,
+    CrearReporteTurnoComponent
+    // 🔥 Aquí ya NO pongas ModalAlertaComponent
   ],
   imports: [
+    SharedModule, // 🔥 Aquí sí, aquí se importa todo lo de shared
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
+    MatMenuModule,
     routing,
+    MatCheckboxModule,
+    MatIconModule,
+    MatInputModule,
+    MatCardModule,
     NgxPaginationModule,
     GanttModule,
-    MatTabsModule,    MatTabsModule,
+    MatTabsModule,
     MatButtonModule,
     MatFormFieldModule,
     MatSelectModule,
-    FormsModule,
     NgxTinymceModule.forRoot({
       baseURL : '../../../assets/tinymce/'
     }),

@@ -3,7 +3,10 @@
   background-color: #093045; /* Fondo azul oscuro */
   color: #fff;               /* Texto blanco */
 }
-
+header{
+  padding: 0.8rem 1rem;
+  display: flex;
+}
 /* Estilo general del sidebar */
 .sidebar {
   width: 250px;              /* Ancho del sidebar */
@@ -16,7 +19,7 @@
   left: 0;
   transition: all 0.3s ease;
   display: block; /* o sin display, porque por defecto es block */
-
+  padding-left: 0.2rem;
   
 }
 
@@ -46,14 +49,27 @@
   background-color: #052731; /* Fondo más oscuro al pasar el ratón */
   color: #fff;               /* Cambia el texto a blanco al hacer hover */
   text-decoration: none;
+  border: 0.5px solid #093030;
 }
+
+
 
 /* Cambiar color de los enlaces del menú */
 .nav-link {
-  padding: 0.5rem 0.75rem;     /* Ajusta el padding dentro de los enlaces */
+  text-align: left;
+  padding: 0.2rem 0rem;
+  padding-left: 0.2rem;
+  
+  margin: 0.1rem; 
+  border: 0.5px solid transparent;
+  border-top-left-radius: 5px;  /* Esquina superior izquierda */
+  border-top-right-radius: 5px; /* Esquina superior derecha */
+  border-bottom-left-radius: 5px; /* Esquina inferior izquierda */
+  border-bottom-right-radius: 5px; /* Esquina inferior derecha */
   display: flex;
   justify-content: space-between; /* Separa el texto y las flechas */
-  width: 100%;                 /* Hace que el ancho ocupe todo el contenedor */
+  width: 220px;                 /* Hace que el ancho ocupe todo el contenedor */
+  height: 40px;
   color: #fff;                 /* Asegura que el texto sea blanco */
   align-items: center;
 }
@@ -62,17 +78,31 @@
 .nav-link i.fas {
   margin-left: 10px;            /* Espaciado entre el texto y la flecha */
   font-size: 1.2rem;            /* Ajusta el tamaño de la flecha */
+  padding: 0.5rem 0;
 }
-
+.submenu .nav-link{
+  width: 200px;
+}
+.submenu .a .nav-link{
+  width: 180px ;
+  height: 60px;
+}
+.a .nav-link{
+ padding-left: 0.5rem;
+ width: 180px ;
+}
 /* Estilo para los submenús */
 .submenu {
   list-style-type: none;        /* Elimina los puntos del submenú */
   margin-left: 0;               /* Elimina margen extra a la izquierda */
+   
   padding-left: 0;              /* Elimina padding extra */
 }
 
 .submenu li {
-  padding-left: 20px;           /* Alineación de los elementos del submenú */
+  width: 20px;
+  padding:0.1rem 0;
+  padding-left: 6px;           /* Alineación de los elementos del submenú */
 }
 
 /* Estilo para los enlaces del submenú */
@@ -197,7 +227,7 @@
 /* hamburguesa */
 .hamburguesa {
   width: 250px;
-  height: 100vh;
+  height: 1000vh;
   color: white;
   transition: width 0.3s ease;
   overflow: hidden;
@@ -210,16 +240,19 @@
   width: 0;
 }
 
-.hamburger-btn {
-  padding-left:0;
-  top: 15px;
-  left: 15px;
+.hamburger-btn{
+  padding: 0.4rem 0.3rem;
+  margin-left: 2rem;
+  border: 0.5px solid transparent;
+  border-radius: 15%;
   z-index: 1000;
   font-size: 24px;
   background: none;
-  border: none;
   color: white;
   cursor: pointer;
+}
+.hamburger-btn:hover{
+  border: 0.5px solid white;
 }
 .main-content.expanded {
   margin-left: 0; /* Cuando la barra lateral se contrae, ocupa todo el espacio */
@@ -227,5 +260,82 @@
 /* ajustar sidebar */
 
 .sidebar-propio{
-  margin-top: 40px;
+  margin-top: 60px;
+  overflow-y: auto;
 }
+
+ul li ul{
+  padding-left: 0.7rem !important;
+}
+
+/* scrool sidebar */
+
+.simplebar-content-wrapper{
+    max-height: 100vh !important; /* o lo que necesites */
+    overflow-y: auto !important; /* Scroll vertical */
+    overflow-x: hidden !important; /* Oculta el scroll horizontal si no lo necesitás */
+  }
+
+
+  .nav-item {
+    padding: 0.1rem 0;
+    margin: 0.2rem;
+
+  }
+
+  /*buscador*/
+  input.form-control {
+    background-color: #052731;
+    border: 1px solid #0c394f;
+    color: white;
+    font-size: 0.85rem;
+  }
+  input.form-control::placeholder {
+    color: #ccc;
+  }
+  
+  /* usuario */
+
+  .sidebar-user-wrapper {
+    position: relative;
+    z-index: 1050; /* más alto que sidebar y main */
+    padding: 0;
+    margin-left: auto;
+  }
+  
+  .user-trigger {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .user-initial {
+    width: 32px;
+    height: 32px;
+    background-color: #0d6efd;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+  }
+  
+  .user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #fff;
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 0;
+    border-radius: 0.5rem;
+    min-width: 220px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+  }
+  /*darle color al usuario logueado*/
+
+  .fw-bold{
+    color:black;
+    font-weight: 600;
+  }

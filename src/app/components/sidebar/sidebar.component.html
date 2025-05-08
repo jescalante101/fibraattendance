@@ -3,27 +3,30 @@
   data-scroll-header
   data-fixed-element
 >
-  <a class="navbar-brand d-lg-none" href="dev-setup.html"></a>
-  <a class="navbar-brand" routerLink="/">FIBRAWEB 2.0</a>
   <button (click)="toggleSidebar()" class="hamburger-btn">
     &#9776;
   </button>
-  <button
-    class="navbar-toggler d-block d-lg-none mr-3 ml-auto"
-    type="button"
-    data-toggle="offcanvas"
-    data-target="componentsNav"
-  >
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <ul class="navbar-nav ml-auto d-none d-lg-flex align-items-center">
-    <li class="nav-item">
-      <a class="nav-link py-0" href="../components/typography.html">
-        <i class="cxi-profile align-middle mt-n1 mr-2"></i>
-        Cuenta
-      </a>
-    </li>
-  </ul>
+  <a class="navbar-brand" routerLink="/">FIBRAWEB 2.0</a>
+
+
+  <div class="sidebar-user-wrapper">
+    <div class="user-trigger" (click)="toggleUserMenu()">
+      <span class="rounded-circle user-initial">m</span>
+      <i class="bi bi-caret-down-fill ms-1"></i>
+    </div>
+  
+    <ul *ngIf="showUserMenu" class="user-dropdown shadow">
+      <li class="fw-bold px-3 py-2">manager</li>
+      <li><a class="dropdown-item" href="#"><i class="bi bi-clock-history me-2"></i>Actividades recientes</a></li>
+      <li><a class="dropdown-item" href="#"><i class="bi bi-clipboard-check me-2"></i>Utilizado con frecuencia</a></li>
+      <li><a class="dropdown-item" href="#"><i class="bi bi-search me-2"></i>Busc.Aplic.</a></li>
+      <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Opciones</a></li>
+      <li><a class="dropdown-item" href="#"><i class="bi bi-envelope me-2"></i>Comunicarse con soporte</a></li>
+      <li><a class="dropdown-item" href="#"><i class="bi bi-info-circle me-2"></i>Acerca de</a></li>
+      <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-power me-2"></i>Salir</a></li>
+    </ul>
+  </div>
+  
 </header>
 
 <aside
@@ -48,7 +51,7 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class="d-flex d-lg-none align-items-center py-4 px-3 border-bottom border-light">
+  <div  class="d-flex d-lg-none align-items-center py-4 px-3 border-bottom border-light">
     <a class="btn btn-primary btn-block mr-3 px-4" href="index.html">
       <i class="cxi-eye mt-n1 mr-2"></i>Preview
     </a>
@@ -61,1374 +64,112 @@
     data-simplebar
     data-simplebar-inverse
   >
-    <nav class="nav nav-light">
 
+  
+    <nav  class="nav nav-light">
+      <div class="px-3 pb-2">
+        <input type="text"
+       class="form-control"
+       placeholder="Buscar..."
+       #buscador
+       (input)="filtrarSidebar(buscador.value)">
 
+      </div>
 
-      <!-- Gestion -->
-      <ul class="nav flex-column">
-        <!-- Menú principal "Gestión" -->
-        <li class="nav-item">
-          <a class="nav-link px-4" href="#" (click)="toggleMenu(1, 'gestion')">
-            <i class="fas fa-cogs mr-2"></i> Gestión
-            <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(1, 'gestion'), 'fa-chevron-right': !isOpen(1, 'gestion')}" style="margin-left:auto;"></i>
-          </a>
-          <ul *ngIf="isOpen(1, 'gestion')" class="nav flex-column pl-4">
 
-            <!-- Seleccionar Sociedad -->
-
-            <li class="nav-item">
-              <a class="nav-link" [routerLink]="['/panel/gestion/seleccionar-socidad']" >Seleccionar Sociedad</a>
-            </li>
-
-            <!-- Otras opciones de "Gestión" -->
-            <li class="nav-item">
-              <a class="nav-link" [routerLink]="['/panel/gestion/tipo-cambio']">Tipos de cambio e índices</a>
-            </li>
-
-            <!-- Submenú de "Definicion" -->
-            <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleMenu(2,'definiciones')">
-                Definiciones
-                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2, 'definiciones'), 'fa-chevron-right': !isOpen(2, 'definiciones')}" style="margin-left:auto;"></i>
-              </a>
-              <ul *ngIf="isOpen(2, 'definiciones')" class="nav flex-column pl-4">
-                <!-- Nuevo submenú dentro de "Definiciones" -->
-                <li class="nav-item">
-                  <a class="nav-link" href="#" (click)="toggleMenu(3,'general')">
-                    General
-                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'general'), 'fa-chevron-right': !isOpen(3,'general')}" style="margin-left:auto;"></i>
-                  </a>
-                  <ul *ngIf="isOpen(3,'general')" class="nav flex-column pl-4">
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Usuarios</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Opciones de Usuario</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Permisos de Usuario Almacen</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Empleados del deto. de ventas y encargados de compras</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Territorios</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Grupo de comisiones</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Texto predefinido</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Enlaces de campos de referencia</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Gastos adicionales</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Preferencias de mensajes</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Gestion de Informes y de Layout</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Server Print Configuration</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Gestor de Panel</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">KPI de panel</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Electronic File Manager</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Enlaces de SAP</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Modelo de lista de verificacion de procesos</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Seguridad</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Gestion de Alarma SAP HANA</a>
-                    </li>
-                  </ul>
-                </li>
-
-
-                <!-- Nuevo submenú dentro de "Produccion" -->
-                <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'produccion')">
-                                    Producción
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'produccion'), 'fa-chevron-right': !isOpen(3,'produccion')}" style="margin-left:auto;"></i>
-                                  </a>
-                                  <ul *ngIf="isOpen(3,'produccion')" class="nav flex-column pl-4">
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Ruta</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Etapa</a>
-                                    </li>
-                                  </ul>
-                </li>
-
-
-
-                <!-- Nuevo submenú dentro de "Mantenimiento" -->
-                <li class="nav-item">
-                      <a class="nav-link" href="#" (click)="toggleMenu(3,'mantenimiento')">
-                        Mantenimiento
-                        <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'mantenimiento'), 'fa-chevron-right': !isOpen(3,'mantenimiento')}" style="margin-left:auto;"></i>
-                      </a>
-                      <ul *ngIf="isOpen(3,'mantenimiento')" class="nav flex-column pl-4">
-                              <li class="nav-item">
-                                      <a class="nav-link" href="#">Grupo de Recursos</a>
-                              </li>
-                              <li class="nav-item">
-                                        <a class="nav-link" href="#">Recursos</a>
-                              </li>
-                        </ul>
-                </li>
-
-
-
-                <!-- Nuevo submenú dentro de "Finanzas" -->
-                <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'finanzas')">
-                                    Finanzas
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'finanzas'), 'fa-chevron-right': !isOpen(3,'finanzas')}" style="margin-left:auto;"></i>
-                                  </a>
-                                  <ul *ngIf="isOpen(3,'finanzas')" class="nav flex-column pl-4">
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Generar código cuenta</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Documentos Preliminares</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Anular transacciones</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de Conversion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Modelos informe financiero</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Impresion documento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Informe de documento preliminar</a>
-                                    </li>
-
-                                  </ul>
-                </li>
-
-
-
-                <!-- Submenú de "oportunidades" -->
-                <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'oportunidades')">
-                                    Oportunidades
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'oportunidades'), 'fa-chevron-right': !isOpen(3,'oportunidades')}" style="margin-left:auto;"></i>
-                                  </a>
-                                  <ul *ngIf="isOpen(3,'oportunidades')" class="nav flex-column pl-4">
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Generar código cuenta</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Documentos Preliminares</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Anular transacciones</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de Conversion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Modelos informe financiero</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Impresion documento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Informe de documento preliminar</a>
-                                    </li>
-
-                                  </ul>
-                </li>
-
-
-
-                <!-- Nuevo submenú dentro de "Ventas" -->
-                <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'ventas')">
-                                    Ventas
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'ventas'), 'fa-chevron-right': !isOpen(3,'ventas')}" style="margin-left:auto;"></i>
-                                  </a>
-                                  <ul *ngIf="isOpen(3,'ventas')" class="nav flex-column pl-4">
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Generar código cuenta</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Documentos Preliminares</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Anular transacciones</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de Conversion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Modelos informe financiero</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Impresion documento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Informe de documento preliminar</a>
-                                    </li>
-
-                                  </ul>
-                </li>
-
-
-
-                <!-- Nuevo submenú dentro de "Compras" -->
-                <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'compras')">
-                                    Compras
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'compras'), 'fa-chevron-right': !isOpen(3,'compras')}" style="margin-left:auto;"></i>
-                                  </a>
-                                  <ul *ngIf="isOpen(3,'compras')" class="nav flex-column pl-4">
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Generar código cuenta</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Documentos Preliminares</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Anular transacciones</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de Conversion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Modelos informe financiero</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Impresion documento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Informe de documento preliminar</a>
-                                    </li>
-
-                                  </ul>
-                </li>
-
-
-                <!-- Nuevo submenú dentro de "Socio de Negocios" -->
-                <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'socionegocio')">
-                                    Socio de Negocios
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'socionegocio'), 'fa-chevron-right': !isOpen(3,'socionegocio')}" style="margin-left:auto;"></i>
-                                  </a>
-                                  <ul *ngIf="isOpen(3,'socionegocio')" class="nav flex-column pl-4">
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Generar código cuenta</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Documentos Preliminares</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Anular transacciones</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de Conversion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Modelos informe financiero</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Impresion documento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Informe de documento preliminar</a>
-                                    </li>
-
-                                  </ul>
-                </li>
-
-
-
-                <!-- Nuevo submenú dentro de "Socio de Negocios" -->
-                <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'gestionbancos')">
-                                    Gestion de Bancos
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'gestionbancos'), 'fa-chevron-right': !isOpen(3,'gestionbancos')}" style="margin-left:auto;"></i>
-                                  </a>
-                                  <ul *ngIf="isOpen(3,'gestionbancos')" class="nav flex-column pl-4">
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Generar código cuenta</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Documentos Preliminares</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Anular transacciones</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de Conversion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Modelos informe financiero</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Impresion documento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Informe de documento preliminar</a>
-                                    </li>
-
-                                  </ul>
-                </li>
-
-                <!-- Nuevo submenú dentro de "Inventario" -->
-
-                <li class="nav-item">
-                  <a class="nav-link" href="#" (click)="toggleMenu(3,'inventario')">
-                    Inventario
-                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'inventario'), 'fa-chevron-right': !isOpen(3,'inventario')}" style="margin-left:auto;"></i>
-                  </a>
-                  <ul *ngIf="isOpen(3,'inventario')" class="nav flex-column pl-4">
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Plan de Cuentas</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Generar código cuenta</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Asiento</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Documentos Preliminares</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Anular transacciones</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Diferencias de Conversion</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Modelos informe financiero</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Impresion documento</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Informe de documento preliminar</a>
-                    </li>
-
-                  </ul>
-                </li>
-
-
-
-                <!-- Nuevo submenú dentro de "Recursos" -->
-                <!-- <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="togglesubRecursos()">
-                                    Recursos
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isSubRecursosOpen, 'fa-chevron-right': !isSubRecursosOpen}" style="margin-left:auto;"></i>
-                                  </a>
-                                  <ul *ngIf="isSubRecursosOpen" class="nav flex-column pl-4">
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Generar código cuenta</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Documentos Preliminares</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Anular transacciones</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de Conversion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Modelos informe financiero</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Impresion documento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Informe de documento preliminar</a>
-                                    </li>
-                
-                                  </ul>
-                </li> -->
-
-
-                <!-- Nuevo submenú dentro de "Servicio" -->
-                <li class="nav-item">
-                                  <a class="nav-link" href="#" (click)="toggleMenu(3,'servicio')">
-                                    Servicio
-                                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'servicio'), 'fa-chevron-right': !isOpen(3,'servicio')}" style="margin-left:auto;"></i>
-                                  </a>
-                                  <ul *ngIf="isOpen(3,'servicio')" class="nav flex-column pl-4">
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Generar código cuenta</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Documentos Preliminares</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Anular transacciones</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Diferencias de Conversion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Modelos informe financiero</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Impresion documento</a>
-                                    </li>
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="#">Informe de documento preliminar</a>
-                                    </li>
-                
-                                  </ul>
-                </li>
-              </ul>
-            </li>
-
-
-
-            <!-- Submenú de "Inicializacion Sistema" -->
-            <li class="nav-item">
-                          <a class="nav-link" href="#" (click)="toggleMenu(2,'inicializacionsistema')">
-                            Inicialización Sistema
-                            <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'inicializacionsistema'), 'fa-chevron-right': !isOpen(2,'inicializacionsistema')}" style="margin-left:auto;"></i>
-                          </a>
-                          <ul *ngIf="isOpen(2,'inicializacionsistema')" class="nav flex-column pl-4">
-                            <!-- Nuevo submenú dentro de "Detalles Sociedad" -->
-                              <li class="nav-item">
-                                <a class="nav-link" href="#">Detalles Sociedad</a>
-                              </li>
-
-                            <!-- Nuevo submenú dentro de "Parametrizaciones Generales" -->
-                              <li class="nav-item">
-                                <a class="nav-link" href="#">Parametrizaciones Generales</a>
-                              </li>
-
-
-                            <!-- Nuevo submenú dentro de "Periodos Contables" -->
-                            <li class="nav-item">
-                              <a class="nav-link" href="#">Periodos Contables</a>
-                            </li>
-
-
-            
-                            <!-- Nuevo submenú dentro de "Autorizaciones" -->
-                            <li class="nav-item">
-                                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones')">
-                                                Autorizaciones
-                                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones'), 'fa-chevron-right': !isOpen(3,'autorizaciones')}" style="margin-left:auto;"></i>
-                                              </a>
-                                              <ul *ngIf="isOpen(3,'autorizaciones')" class="nav flex-column pl-4">
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Autorizaciones Generales</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Creador de autorizacion adicional</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Log de modificaciones de autorizaciones</a>
-                                                </li>
-
-                                                <!-- Nuevo submenú dentro de "Propietario de Datos" -->
-                                                <li class="nav-item">
-                                                                  <a class="nav-link" href="#" (click)="toggleMenu(4,'titularidaddatos')">
-                                                                      Titularidad de datos
-                                                                      <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(4,'titularidaddatos'), 'fa-chevron-right': !isOpen(4,'titularidaddatos')}" style="margin-left:auto;"></i>
-                                                                    </a>
-                                                                    <ul *ngIf="isOpen(4,'titularidaddatos')" class="nav flex-column pl-4">
-                                                                      <li class="nav-item">
-                                                                        <a class="nav-link" href="#">Autorizaciones de propiedad de datos</a>
-                                                                      </li>
-                                                                      <li class="nav-item">
-                                                                        <a class="nav-link" href="#">Opciones para Compartir la titularidad de los datos</a>
-                                                                      </li>
-
-                                                  
-
-                                                                    </ul>
-                                                </li>
-                                              </ul>
-                            </li>
-
-
-                            <!-- Nuevo submenú dentro de "Numeracion de documentos" -->
-
-                            <li class="nav-item">
-                              <a class="nav-link" href="#">Numeracion de Documentos</a>
-                            </li>
-
-
-
-                            <!-- Nuevo submenú dentro de "Parametrizaciones de documento" -->
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Parametrizaciones de documento</a>
-                            </li>
-
-
-                            <!-- Nuevo submenú dentro de "Parametrizaciones de documento" -->
-                            <li class="nav-item">
-                              <a class="nav-link" href="#">Parametrizaciones de impresion</a>
-                            </li>  
-                            <!-- Nuevo submenú dentro de "Parametrizaciones de documento" -->
-                            <li class="nav-item">
-                              <a class="nav-link" href="#">Estruct.menu</a>
-                            </li>   
-                            <!-- Nuevo submenú dentro de "Parametrizaciones de documento" -->
-                            <li class="nav-item">
-                              <a class="nav-link" href="#">Alias de menú para búsqueda</a>
-                            </li> 
-                            <!-- Nuevo submenú dentro de "Parametrizaciones de documento" -->
-                            <li class="nav-item">
-                              <a class="nav-link" href="#">Opciones de correo electronico</a>
-                            </li>     
-                         
-            
-            
-            
-                            <!-- Nuevo submenú dentro de "Finanzas" -->
-                            <li class="nav-item">
-                                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones-oportunidades')">
-                                                Oportunidades
-                                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones-oportunidades'), 'fa-chevron-right': !isOpen(3,'autorizaciones-oportunidades')}" style="margin-left:auto;"></i>
-                                              </a>
-                                              <ul *ngIf="isOpen(3,'autorizaciones-oportunidades')" class="nav flex-column pl-4">
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Plan de Cuentas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Generar código cuenta</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Asiento</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Documentos Preliminares</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Anular transacciones</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Diferencias de Conversion</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Modelos informe financiero</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Impresion documento</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Informe de documento preliminar</a>
-                                                </li>
-            
-                                              </ul>
-                            </li>
-            
-            
-            
-                            <!-- Nuevo submenú dentro de "Ventas" -->
-                            <li class="nav-item">
-                                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones-ventas')">
-                                                Ventas
-                                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones-ventas'), 'fa-chevron-right': !isOpen(3,'autorizaciones-ventas')}" style="margin-left:auto;"></i>
-                                              </a>
-                                              <ul *ngIf="isOpen(3,'autorizaciones-ventas')" class="nav flex-column pl-4">
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Plan de Cuentas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Generar código cuenta</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Asiento</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Documentos Preliminares</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Anular transacciones</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Diferencias de Conversion</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Modelos informe financiero</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Impresion documento</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Informe de documento preliminar</a>
-                                                </li>
-            
-                                              </ul>
-                            </li>
-            
-            
-            
-                            <!-- Nuevo submenú dentro de "Compras" -->
-                            <li class="nav-item">
-                                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones-compras')">
-                                                Compras
-                                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones-compras'), 'fa-chevron-right': !isOpen(3,'autorizaciones-compras')}" style="margin-left:auto;"></i>
-                                              </a>
-                                              <ul *ngIf="isOpen(3,'autorizaciones-compras')" class="nav flex-column pl-4">
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Plan de Cuentas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Generar código cuenta</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Asiento</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Documentos Preliminares</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Anular transacciones</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Diferencias de Conversion</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Modelos informe financiero</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Impresion documento</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Informe de documento preliminar</a>
-                                                </li>
-            
-                                              </ul>
-                            </li>
-            
-            
-                            <!-- Nuevo submenú dentro de "Socio de Negocios" -->
-                            <li class="nav-item">
-                                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones-sociosnegocios')">
-                                                Socio de Negocios
-                                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones-sociosnegocios'), 'fa-chevron-right': !isOpen(3,'autorizaciones-sociosnegocios')}" style="margin-left:auto;"></i>
-                                              </a>
-                                              <ul *ngIf="isOpen(3,'autorizaciones-sociosnegocios')" class="nav flex-column pl-4">
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Plan de Cuentas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Generar código cuenta</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Asiento</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Documentos Preliminares</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Anular transacciones</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Diferencias de Conversion</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Modelos informe financiero</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Impresion documento</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Informe de documento preliminar</a>
-                                                </li>
-            
-                                              </ul>
-                            </li>
-            
-            
-            
-                            <!-- Nuevo submenú dentro de "Gestión de Bancos" -->
-                            <li class="nav-item">
-                                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones-gestionbancos')">
-                                                Gestion de Bancos
-                                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones-gestionbancos'), 'fa-chevron-right': !isOpen(3,'autorizaciones-gestionbancos')}" style="margin-left:auto;"></i>
-                                              </a>
-                                              <ul *ngIf="isOpen(3,'autorizaciones-gestionbancos')" class="nav flex-column pl-4">
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Plan de Cuentas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Generar código cuenta</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Asiento</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Documentos Preliminares</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Anular transacciones</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Diferencias de Conversion</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Modelos informe financiero</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Impresion documento</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Informe de documento preliminar</a>
-                                                </li>
-            
-                                              </ul>
-                            </li>
-            
-                            <!-- Nuevo submenú dentro de "Inventario" -->
-            
-                            <li class="nav-item">
-                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones-subinventario')">
-                                Inventario
-                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones-subinventario'), 'fa-chevron-right': !isOpen(3,'autorizaciones-subinventario')}" style="margin-left:auto;"></i>
-                              </a>
-                              <ul *ngIf="isOpen(3,'autorizaciones-subinventario')" class="nav flex-column pl-4">
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Plan de Cuentas</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Generar código cuenta</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Asiento</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Documentos Preliminares</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Anular transacciones</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Diferencias de Conversion</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Modelos informe financiero</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Impresion documento</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Informe de documento preliminar</a>
-                                </li>
-            
-                              </ul>
-                            </li>
-            
-            
-            
-
-            
-                            <!-- Nuevo submenú dentro de "Servicio" -->
-                            <li class="nav-item">
-                                              <a class="nav-link" href="#" (click)="toggleMenu(3,'autorizaciones-servicio')">
-                                                Servicio
-                                                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'autorizaciones-servicio'), 'fa-chevron-right': !isOpen(3,'autorizaciones-servicio')}" style="margin-left:auto;"></i>
-                                              </a>
-                                              <ul *ngIf="isOpen(3,'autorizaciones-servicio')" class="nav flex-column pl-4">
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Plan de Cuentas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Tratar plan de Cuentas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Generar código cuenta</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Asiento</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Documentos Preliminares</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Plantillas de Contabilizacion</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Contabilizacion Periodicas</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Anular transacciones</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Diferencias de tipo de cambio</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Diferencias de Conversion</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Modelos informe financiero</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Asiento de la cuenta destino</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Lista de verificacion de procesos</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Impresion documento</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                  <a class="nav-link" href="#">Informe de documento preliminar</a>
-                                                </li>
-                            
-                                              </ul>
-                            </li>
-                          </ul>
-            </li>
-
-
-
-            <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleMenu(2,'importacionexportacion')">
-                Importacion/Exportacion de Datos
-                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'importacionexportacion'), 'fa-chevron-right': !isOpen(2,'importacionexportacion')}" style="margin-left:auto;"></i>
-              </a>
-              <ul *ngIf="isOpen(2,'importacionexportacion')" class="nav flex-column pl-4">
-                <!-- Sub-submenú de "Definiciones" -->
-                <!-- Sub-submenú de "Importacion datos" -->
-                <li class="nav-item">
-                  <a class="nav-link" href="#" (click)="toggleMenu(3,'importaciondatos')">
-                    Importacion datos
-                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'importaciondatos'), 'fa-chevron-right': !isOpen(3,'importaciondatos')}" style="margin-left:auto;"></i>
-                  </a>
-                  <ul *ngIf="isOpen(3,'importaciondatos')" class="nav flex-column pl-4">
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Importar de Excel</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Importar transacciones de SAP Business One</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Asistente de importacion de plantilla financiera</a>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-
-
-
-            <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleMenu(2,'exportaciondatos')">
-                Exportación de Datos
-                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'exportaciondatos'), 'fa-chevron-right': !isOpen(2,'exportaciondatos')}" style="margin-left:auto;"></i>
-              </a>
-              <ul *ngIf="isOpen(2,'exportaciondatos')" class="nav flex-column pl-4">
-                <!-- Sub-submenú de "Importacion datos" -->
-                <li class="nav-item">
-                  <a class="nav-link" href="#" (click)="toggleMenu(3,'exportacion-importaciondatos')">
-                    Importacion datos
-                    <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'exportacion-importaciondatos'), 'fa-chevron-right': !isOpen(3,'exportacion-importaciondatos')}" style="margin-left:auto;"></i>
-                  </a>
-                  <ul *ngIf="isOpen(3,'exportacion-importaciondatos')" class="nav flex-column pl-4">
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Importar de Excel</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Importar transacciones de SAP Business One</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Asistente de importacion de plantilla financiera</a>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleMenu(2,'Utilidades')">
-                Utilidades
-                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'Utilidades'), 'fa-chevron-right': !isOpen(2,'Utilidades')}" style="margin-left:auto;"></i>
-              </a>
-              <ul *ngIf="isOpen(2,'Utilidades')" class="nav flex-column pl-4">
-
-
-              </ul>
-            </li>
-
-
-            <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleMenu(2,'procedimientoautorizacion')">
-                Procedimiento de Autorizacion
-                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'procedimientoautorizacion'), 'fa-chevron-right': !isOpen(2,'procedimientoautorizacion')}" style="margin-left:auto;"></i>
-              </a>
-              <ul *ngIf="isOpen(2,'procedimientoautorizacion')" class="nav flex-column pl-4">
-                <!-- Sub-submenú de "Definiciones" -->
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Importación/Exportación de datos</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Utilidades</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Procedimiento de autorización</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Licencia</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Servicio de integración</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Add-ons</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Workflow</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Gestión de alarma</a>
-                </li>
-              </ul>
-            </li>
-
-
-            <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleMenu(2,'licencia')">
-                Licencia
-                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'licencia'), 'fa-chevron-right': !isOpen(2,'licencia')}" style="margin-left:auto;"></i>
-              </a>
-              <ul *ngIf="isOpen(2,'licencia')" class="nav flex-column pl-4">
-                <!-- Sub-submenú de "Definiciones" -->
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Importación/Exportación de datos</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Utilidades</a>
-                </li>
-              </ul>
-            </li>
-
-
-
-            <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleMenu(2,'serviciointegracion')">
-                Servicio de Integración
-                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'serviciointegracion'), 'fa-chevron-right': !isOpen(2,'serviciointegracion')}" style="margin-left:auto;"></i>
-              </a>
-              <ul *ngIf="isOpen(2,'serviciointegracion')" class="nav flex-column pl-4">
-                <!-- Sub-submenú de "Definiciones" -->
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Importación/Exportación de datos</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Utilidades</a>
-                </li>
-              </ul>
-            </li>
-
-
-            <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleMenu(2,'Add-ons')">
-                Add-ons
-                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'Add-ons'), 'fa-chevron-right': !isOpen(2,'Add-ons')}" style="margin-left:auto;"></i>
-              </a>
-              <ul *ngIf="isOpen(2,'Add-ons')" class="nav flex-column pl-4">
-                <!-- Sub-submenú de "Definiciones" -->
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Importación/Exportación de datos</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Utilidades</a>
-                </li>
-              </ul>
-            </li>
-
-
-
-            <li class="nav-item">
-              <a class="nav-link" href="#" (click)="toggleMenu(2,'Workflow')">
-                Workflow
-                <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'Workflow'), 'fa-chevron-right': !isOpen(2,'Workflow')}" style="margin-left:auto;"></i>
-              </a>
-              <ul *ngIf="isOpen(2,'Workflow')" class="nav flex-column pl-4">
-                <!-- Sub-submenú de "Definiciones" -->
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Importación/Exportación de datos</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Utilidades</a>
-                </li>
-              </ul>
-            </li> 
-
-
-            <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Gestion de Alarma</a></li>
-
-
-
-
-
-          </ul>
-        </li>
       
-      </ul>
+<!-- Menú "Gestión" corregido con etiquetas data-level y data-menu-name -->
+
+  <li class="nav-item" data-level="1" data-menu-name="gestion">
+    <a class="nav-link" href="#" (click)="toggleMenu(1, 'gestion')">
+      <i class="fas fa-cogs mr-2"></i> Gestión
+      <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(1, 'gestion'), 'fa-chevron-right': !isOpen(1, 'gestion')}" style="margin-left:auto;"></i>
+    </a>
+    <ul *ngIf="isOpen(1, 'gestion')" class="nav flex-column pl-4-test">
+
+      <!-- Seleccionar Sociedad -->
+      <li class="nav-item" data-level="2" data-menu-name="seleccionar-sociedad">
+        <a class="nav-link" [routerLink]="['/panel/gestion/seleccionar-sociedad']">Seleccionar Sociedad</a>
+      </li>
+
+      <!-- Tipos de cambio -->
+      <li class="nav-item" data-level="2" data-menu-name="tipo-cambio">
+        <a class="nav-link" [routerLink]="['/panel/gestion/tipo-cambio']">Tipos de cambio e índices</a>
+      </li>
+
+      <!-- Submenú: Definiciones -->
+      <li class="nav-item" data-level="2" data-menu-name="definiciones">
+        <a class="nav-link" href="#" (click)="toggleMenu(2, 'definiciones')">
+          Definiciones
+          <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2, 'definiciones'), 'fa-chevron-right': !isOpen(2, 'definiciones')}" style="margin-left:auto;"></i>
+        </a>
+        <ul *ngIf="isOpen(2, 'definiciones')" class="submenu nav flex-column pl-4">
+
+          <!-- Sub-submenú: General -->
+          <li class="nav-item" data-level="3" data-menu-name="general">
+            <a class="nav-link" href="#" (click)="toggleMenu(3, 'general')">
+              General
+              <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3, 'general'), 'fa-chevron-right': !isOpen(3, 'general')}" style="margin-left:auto;"></i>
+            </a>
+            <ul *ngIf="isOpen(3, 'general')" class="nav flex-column pl-4">
+              <li class="nav-item" data-level="4" data-menu-name="usuarios"><a class="nav-link" href="#">Usuarios</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="opciones-usuario"><a class="nav-link" href="#">Opciones de Usuario</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="permisos-usuario-almacen"><a class="nav-link" href="#">Permisos de Usuario Almacén</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="empleados-ventas-compras"><a class="nav-link" href="#">Empleados de ventas y compras</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="territorios"><a class="nav-link" href="#">Territorios</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="grupo-comisiones"><a class="nav-link" href="#">Grupo de comisiones</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="texto-predefinido"><a class="nav-link" href="#">Texto predefinido</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="enlaces-campos"><a class="nav-link" href="#">Enlaces de campos de referencia</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="gastos-adicionales"><a class="nav-link" href="#">Gastos adicionales</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="preferencias-mensajes"><a class="nav-link" href="#">Preferencias de mensajes</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="gestion-informes"><a class="nav-link" href="#">Gestión de Informes y Layout</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="impresion-servidor"><a class="nav-link" href="#">Configuración de impresión del servidor</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="gestor-panel"><a class="nav-link" href="#">Gestor de Panel</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="kpi-panel"><a class="nav-link" href="#">KPI de Panel</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="electronic-file-manager"><a class="nav-link" href="#">Electronic File Manager</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="enlaces-sap"><a class="nav-link" href="#">Enlaces SAP</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="lista-verificacion"><a class="nav-link" href="#">Modelo de lista de verificación de procesos</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="seguridad"><a class="nav-link" href="#">Seguridad</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="alarmas-hana"><a class="nav-link" href="#">Gestión de Alarmas SAP HANA</a></li>
+            </ul>
+          </li>
+
+          <!-- Sub-submenú: Producción -->
+          <li class="nav-item" data-level="3" data-menu-name="produccion">
+            <a class="nav-link" href="#" (click)="toggleMenu(3, 'produccion')">
+              Producción
+              <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3, 'produccion'), 'fa-chevron-right': !isOpen(3, 'produccion')}" style="margin-left:auto;"></i>
+            </a>
+            <ul *ngIf="isOpen(3, 'produccion')" class="nav flex-column pl-4">
+              <li class="nav-item" data-level="4" data-menu-name="ruta"><a class="nav-link" href="#">Ruta</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="etapa"><a class="nav-link" href="#">Etapa</a></li>
+            </ul>
+          </li>
+
+          <!-- Sub-submenú: Mantenimiento -->
+          <li class="nav-item" data-level="3" data-menu-name="mantenimiento">
+            <a class="nav-link" href="#" (click)="toggleMenu(3, 'mantenimiento')">
+              Mantenimiento
+              <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3, 'mantenimiento'), 'fa-chevron-right': !isOpen(3, 'mantenimiento')}" style="margin-left:auto;"></i>
+            </a>
+            <ul *ngIf="isOpen(3, 'mantenimiento')" class="nav flex-column pl-4">
+              <li class="nav-item" data-level="4" data-menu-name="grupo-recursos"><a class="nav-link" href="#">Grupo de Recursos</a></li>
+              <li class="nav-item" data-level="4" data-menu-name="recursos"><a class="nav-link" href="#">Recursos</a></li>
+            </ul>
+          </li>
+
+        </ul>
+      </li>
+    </ul>
+  </li>
+
+
       
 
 
       <!-- CRM -->
-      <li class="nav-item">
-        <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'crm')">
+      <li class="nav-item" data-level="1" data-menu-name="crm">
+        <a class="nav-link" href="#" (click)="toggleMenu(1,'crm')">
           <i class="fas fas fa-user mr-2"></i> <!-- Ícono de ventas -->
           CRM
           <i class="fas"
@@ -1436,7 +177,7 @@
              style="margin-left:auto;"></i>
         </a>
         <ul class="submenu" *ngIf="isOpen(1,'crm')">
-          <li><a class="nav-link" [routerLink]="['/panel/clientes/list']">Datos maestros interlocutor comercial</a></li>
+          <li><a class="nav-link" [routerLink]="['/panel/cmr/dato-maestro-comercial']">Datos maestros interlocutor comercial</a></li>
           <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Actividad</a></li>
           <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Asistente de Generación de Campaña</a></li>
           <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Campaña</a></li>
@@ -1451,8 +192,8 @@
       </li>      
 
       <!--VENTAS -->
-      <li class="nav-item">
-        <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'principal-ventas')">
+      <li class="nav-item" data-level="1" data-menu-name="principal-ventas">
+        <a class="nav-link" href="#" (click)="toggleMenu(1,'principal-ventas')">
           <i class="fas fa-dollar-sign mr-2"></i> <!-- Ícono de ventas -->
           Ventas
           <i class="fas"
@@ -1465,9 +206,8 @@
           <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Lista Cotización</a></li>
           <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Factura de Retención</a></li>
 <!-- Reportes -->
-<li class="nav-item">
+<li class="nav-item" data-level="2" data-menu-name="reportes">
   <a class="nav-link px-4" href="#" (click)="toggleMenu(2,'reportes')">
-    <i class="fas fa-chart-line mr-2"></i> <!-- Ícono de reportes -->
     Reportes
     <i class="fas"
        [ngClass]="{'fa-chevron-down': isOpen(2,'reportes'), 'fa-chevron-right': !isOpen(2,'reportes')}"
@@ -1488,8 +228,8 @@
       </li>
 
       <!-- Gestion de Compras-->
-      <li class="nav-item">
-              <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'principal-compras')">
+      <li class="nav-item" data-level="1" data-menu-name="principal-compras">
+              <a class="nav-link" href="#" (click)="toggleMenu(1,'principal-compras')">
                 <i class="fas fa-shopping-cart mr-2"></i> <!-- Ícono de auditoría -->
                 Compras
                 <i class="fas"
@@ -1498,16 +238,16 @@
               </a>
               <ul class="submenu" *ngIf="isOpen(1,'principal-compras')">
                 <!-- Submenú de Reportes -->
-                <li class="nav-item">
+                <li class="nav-item" data-level="2" data-menu-name="reqcompras">
                   <a class="nav-link px-4" href="#" (click)="toggleMenu(2,'reqcompras')">
-                    <i class="fas fa-file-alt mr-2"></i> <!-- Ícono de reportes -->
+                  
                     Req. de Compras 
                     <i class="fas"
                       [ngClass]="{'fa-chevron-down': isOpen(2,'reqcompras'), 'fa-chevron-right': !isOpen(2,'reqcompras')}"
                       style="margin-left:auto;"></i>
                   </a>
                   <ul class="submenu" *ngIf="isOpen(2,'reqcompras')">
-                    <li><a class="nav-link" [routerLink]="['/panel/compras/registro-compras']"><i class="fas fa-clipboard-list mr-2"></i>Reque. Pendientes</a></li>
+                    <li><a class="nav-link" [routerLink]="['/panel/compras/registro-compras']">Reque. Pendientes</a></li>
       
                   </ul>
                 </li>
@@ -1516,8 +256,8 @@
       </li>
 
       <!-- Interlocutores Comerciales-->
-      <li class="nav-item">
-              <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'sociosnegocio')">
+      <li class="nav-item" data-level="1" data-menu-name="sociosnegocio">
+              <a class="nav-link" href="#" (click)="toggleMenu(1,'sociosnegocio')">
                 <i class="fas fas fa-user mr-2"></i> <!-- Ícono de auditoría -->
                 Socios de Negocio
                 <i class="fas"
@@ -1529,7 +269,7 @@
                     <li><a class="nav-link" [routerLink]="['/panel/produccion/auditoria']">Reque. Pendientes</a></li>
                     <li><a class="nav-link" [routerLink]="['/panel/produccion/control-guias']">Requer.Pendientes Usuario</a></li>
                     <li><a class="nav-link" [routerLink]="['/panel/produccion/control-guias']">Campaña</a></li>
-                    <li class="nav-item">
+                    <li class="nav-item" data-level="2" data-menu-name="reconciliacioninterna">
                       <a class="nav-link" href="#" (click)="toggleMenu(2,'reconciliacioninterna')">
                         Reconciliación Interna
                         <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'reconciliacioninterna'), 'fa-chevron-right': !isOpen(2,'reconciliacioninterna')}" style="margin-left:auto;"></i>
@@ -1541,7 +281,7 @@
                       </ul>
 
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" data-level="2" data-menu-name="informessocionegocio">
                       <a class="nav-link" href="#" (click)="toggleMenu(2,'informessocionegocio')">
                         Informes de Socio de Negocios
                         <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'informessocionegocio'), 'fa-chevron-right': !isOpen(2,'informessocionegocio')}" style="margin-left:auto;"></i>
@@ -1554,24 +294,24 @@
                         <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Historial de reclamaciones</a></li>
                         <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Créditos de cliente p. todas secciones cliente</a></li>
                         <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Desviación límite crédito clientes</a></li>
-                        <li class="nav-item">
+                        <li class="nav-item" data-level="3" data-menu-name="antiguedad">
                           <a class="nav-link" href="#" (click)="toggleMenu(3,'antiguedad')">
                             Antigüedad
                             <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'antiguedad'), 'fa-chevron-right': !isOpen(3,'antiguedad')}" style="margin-left:auto;"></i>
                           </a>
-                          <ul *ngIf="isOpen(3,'antiguedad')" class="nav flex-column pl-4">
+                          <ul *ngIf="isOpen(3,'antiguedad')" class="a nav flex-column pl-4">
                             <!-- Nuevo submenú dentro de "Reconciliación interna" -->
                             <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Antigüedad de saldos de clientes</a></li>
                             <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Antigüedad de saldos de proveedores</a></li>
                           </ul>
     
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" data-level="3" data-menu-name="reconciliacioninterna2">
                           <a class="nav-link" href="#" (click)="toggleMenu(3,'reconciliacioninterna2')">
                             Reconciliación Interna
                             <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'reconciliacioninterna2'), 'fa-chevron-right': !isOpen(3,'reconciliacioninterna2')}" style="margin-left:auto;"></i>
                           </a>
-                          <ul *ngIf="isOpen(3,'reconciliacioninterna2')" class="nav flex-column pl-4">
+                          <ul *ngIf="isOpen(3,'reconciliacioninterna2')" class="a nav flex-column pl-4">
                             <!-- Nuevo submenú dentro de "Reconciliación interna" -->
                             <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Reconciliación interna por fecha de vencimiento</a></li>
                             <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Reconciliación interna por importe exacto</a></li>
@@ -1586,8 +326,8 @@
       </li>
 
       <!-- Inventario-->
-      <li class="nav-item">
-        <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'principal-inventario')">
+      <li class="nav-item" data-level="1" data-menu-name="principal-inventario">
+        <a class="nav-link" href="#" (click)="toggleMenu(1,'principal-inventario')">
           <i class="fas fa-clipboard-list mr-2"></i> <!-- Ícono de auditoría -->
           Inventario
           <i class="fas"
@@ -1596,8 +336,8 @@
         </a>
         <ul class="submenu" *ngIf="isOpen(1,'principal-inventario')">
           <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Lista de Activos</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/inventario/data-maestra/maestra']">Data Maestra</a></li>
-          <li class="nav-item">
+          <li><a class="nav-link" [routerLink]="['/panel/inventario/data-maestro/index']">Data Maestra</a></li>
+          <li class="nav-item" data-level="2" data-menu-name="depachoventas">
             <a class="nav-link" href="#" (click)="toggleMenu(2,'depachoventas')">
               Despacho Ventas
               <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'depachoventas'), 'fa-chevron-right': !isOpen(2,'depachoventas')}" style="margin-left:auto;"></i>
@@ -1630,79 +370,282 @@
 
 
 
-      <!-- Producción -->
-      <li class="nav-item">
-        <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'principal-produccion')">
-          <i class="fas fa-tools mr-2"></i> <!-- Ícono de producción -->
-          Producción
-          <i class="fas"
-            [ngClass]="{'fa-chevron-down': isOpen(1,'principal-produccion'), 'fa-chevron-right': !isOpen(1,'principal-produccion')}"
-            style="margin-left:auto;"></i>
-        </a>
-        <ul class="submenu" *ngIf="isOpen(1,'principal-produccion')">
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/plan']">Plan de Producción</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/gantt-produccion']">Gantt-Produccion</a></li>
+<!-- Producción -->
+<li class="nav-item" data-level="1" data-menu-name="principal-produccion">
+  <a
+    class="nav-link d-flex align-items-center"
+    role="button"
+    href="javascript:void(0)"
+    (click)="toggleMenu(1,'principal-produccion')"
+  >
+    <i class="fas fa-tools mr-2"></i>
+    Producción
+    <i
+      class="fas"
+      [ngClass]="{
+        'fa-chevron-down': isOpen(1,'principal-produccion'),
+        'fa-chevron-right': !isOpen(1,'principal-produccion')
+      }"
+      style="margin-left:auto;"
+    ></i>
+  </a>
 
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/graficos']">Graficos Producción</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/ficha']">Ficha Técnica</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/pre-ficha']">Préficha</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/pesaje']">Listado de Pesaje Balanzas</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/emision']">Emisión de Producción</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/lista-emision']">Lista Emisión Producción</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/listar-of']">Listar OF Producción</a></li>
+  <ul class="submenu" *ngIf="isOpen(1,'principal-produccion')">
+    <li class="nav-item" data-level="2" data-menu-name="reporte-turno">
+      <a
+        class="nav-link"
+        [routerLink]="['/panel/produccion/reporte-turno']"
+        routerLinkActive="active"
+      >
+        Reporte fin de turno
+      </a>
+    </li>
 
-          <!-- Submenú de Reportes -->
-          <li class="nav-item">
-            <a class="nav-link px-4" href="#" (click)="toggleMenu(2,'produccion-reportes')">
-              <i class="fas fa-file-alt mr-2"></i> <!-- Ícono de reportes -->
-              Reportes
-              <i class="fas"
-                [ngClass]="{'fa-chevron-down': isOpen(2,'produccion-reportes'), 'fa-chevron-right': !isOpen(2,'produccion-reportes')}"
-                style="margin-left:auto;"></i>
-            </a>
-            <ul class="submenu" *ngIf="isOpen(2,'produccion-reportes')">
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']"><i class="fas fa-cogs mr-2"></i> Consumos de Stock</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/auditoria']"><i class="fas fa-clipboard-list mr-2"></i> Listar Auditoria de Stock</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/control-guias']"><i class="fas fa-clipboard-check mr-2"></i> Reporte de Control Guias</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/pesos-pl']"><i class="fas fa-weight mr-2"></i> Reporte de Pesos PL</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/stock-almacen']"><i class="fas fa-box mr-2"></i> Stock x Almacen</a></li>
-            </ul>
-          </li>
+    <li class="nav-item" data-level="2" data-menu-name="crear-reporte-turno">
+      <a
+        class="nav-link"
+        [routerLink]="['/panel/produccion/crear-reporte-turno']"
+        routerLinkActive="active"
+      >
+        Crear reporte de turno
+      </a>
+    </li>
 
-      <!-- Recibo de Producción -->
-        <li class="nav-item">
-          <a class="nav-link px-4" href="#" (click)="toggleMenu(2,'reciboproduccion')">
-            <i class="fas fa-clipboard mr-2"></i> <!-- Ícono de recibo de producción -->
-            Recibo de Producción
-            <i class="fas"
-              [ngClass]="{'fa-chevron-down': isOpen(2,'reciboproduccion'), 'fa-chevron-right': !isOpen(2,'reciboproduccion')}"
-              style="margin-left:auto;"></i>
+    <li class="nav-item" data-level="2" data-menu-name="plan-produccion">
+      <a
+        class="nav-link"
+        [routerLink]="['/panel/produccion/plan']"
+        routerLinkActive="active"
+      >
+        Plan de Producción
+      </a>
+    </li>
+
+    <li class="nav-item" data-level="2" data-menu-name="gantt-produccion">
+      <a
+        class="nav-link"
+        [routerLink]="['/panel/produccion/gantt-produccion']"
+        routerLinkActive="active"
+      >
+        Gantt-Producción
+      </a>
+    </li>
+
+    <li class="nav-item" data-level="2" data-menu-name="graficos-produccion">
+      <a
+        class="nav-link"
+        [routerLink]="['/panel/produccion/graficos']"
+        routerLinkActive="active"
+      >
+        Gráficos Producción
+      </a>
+    </li>
+
+    <li class="nav-item" data-level="2" data-menu-name="ficha-tecnica">
+      <a
+        class="nav-link"
+        [routerLink]="['/panel/produccion/ficha']"
+        routerLinkActive="active"
+      >
+        Ficha Técnica
+      </a>
+    </li>
+
+    <li class="nav-item" data-level="2" data-menu-name="preficha">
+      <a
+        class="nav-link"
+        [routerLink]="['/panel/produccion/pre-ficha']"
+        routerLinkActive="active"
+      >
+        Pré-ficha
+      </a>
+    </li>
+
+    <li class="nav-item" data-level="2" data-menu-name="listado-pesaje">
+      <a
+        class="nav-link"
+        [routerLink]="['/panel/produccion/pesaje']"
+        routerLinkActive="active"
+      >
+        Listado de Pesaje Balanzas
+      </a>
+    </li>
+
+    <li class="nav-item" data-level="2" data-menu-name="emision-produccion">
+      <a
+        class="nav-link"
+        [routerLink]="['/panel/produccion/emision']"
+        routerLinkActive="active"
+      >
+        Emisión de Producción
+      </a>
+    </li>
+
+    <li class="nav-item" data-level="2" data-menu-name="lista-emision">
+      <a
+        class="nav-link"
+        [routerLink]="['/panel/produccion/lista-emision']"
+        routerLinkActive="active"
+      >
+        Lista Emisión Producción
+      </a>
+    </li>
+
+    <li class="nav-item" data-level="2" data-menu-name="listar-of">
+      <a
+        class="nav-link"
+        [routerLink]="['/panel/produccion/listar-of']"
+        routerLinkActive="active"
+      >
+        Listar OF Producción
+      </a>
+    </li>
+
+    <!-- Reportes -->
+    <li class="nav-item" data-level="2" data-menu-name="produccion-reportes">
+      <a
+        class="nav-link px-4 d-flex align-items-center"
+        role="button"
+        href="javascript:void(0)"
+        (click)="toggleMenu(2,'produccion-reportes')"
+      >
+        Reportes
+        <i
+          class="fas"
+          [ngClass]="{
+            'fa-chevron-down': isOpen(2,'produccion-reportes'),
+            'fa-chevron-right': !isOpen(2,'produccion-reportes')
+          }"
+          style="margin-left:auto;"
+        ></i>
+      </a>
+      <ul class="submenu" *ngIf="isOpen(2,'produccion-reportes')">
+        <li class="nav-item" data-level="3" data-menu-name="consumo-stock">
+          <a
+            class="nav-link"
+            [routerLink]="['/panel/produccion/consumo-stock']"
+            routerLinkActive="active"
+          >
+            Consumos de Stock
           </a>
-          <ul class="submenu" *ngIf="isOpen(2,'reciboproduccion')">
-            <li><a class="nav-link" [routerLink]="['/panel/produccion/orden-produccion']"><i class="fas fa-box mr-2"></i> Orden de Producción</a></li>
-            <li><a class="nav-link" [routerLink]="['/panel/produccion/reimpresion']"><i class="fas fa-print mr-2"></i> Reimpresión de Etiqueta</a></li>
-          </ul>
         </li>
-        </ul>
-      </li>
+        <li class="nav-item" data-level="3" data-menu-name="auditoria-stock">
+          <a
+            class="nav-link"
+            [routerLink]="['/panel/produccion/auditoria']"
+            routerLinkActive="active"
+          >
+            Listar Auditoría de Stock
+          </a>
+        </li>
+        <li class="nav-item" data-level="3" data-menu-name="control-guias">
+          <a
+            class="nav-link"
+            [routerLink]="['/panel/produccion/control-guias']"
+            routerLinkActive="active"
+          >
+            Reporte de Control Guías
+          </a>
+        </li>
+        <li class="nav-item" data-level="3" data-menu-name="pesos-pl">
+          <a
+            class="nav-link"
+            [routerLink]="['/panel/produccion/pesos-pl']"
+            routerLinkActive="active"
+          >
+            Reporte de Pesos PL
+          </a>
+        </li>
+        <li class="nav-item" data-level="3" data-menu-name="stock-almacen">
+          <a
+            class="nav-link"
+            [routerLink]="['/panel/produccion/stock-almacen']"
+            routerLinkActive="active"
+          >
+            Stock x Almacén
+          </a>
+        </li>
+      </ul>
+    </li>
 
-      <!-- Planificacion de necesidades-->
-      <li class="nav-item">
-        <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'principal-mantenimiento')">
+    <!-- Recibo de Producción -->
+    <li class="nav-item" data-level="2" data-menu-name="recibo-produccion">
+      <a
+        class="nav-link px-4 d-flex align-items-center"
+        role="button"
+        href="javascript:void(0)"
+        (click)="toggleMenu(2,'recibo-produccion')"
+      >
+        Recibo de Producción
+        <i
+          class="fas"
+          [ngClass]="{
+            'fa-chevron-down': isOpen(2,'recibo-produccion'),
+            'fa-chevron-right': !isOpen(2,'recibo-produccion')
+          }"
+          style="margin-left:auto;"
+        ></i>
+      </a>
+      <ul class="submenu" *ngIf="isOpen(2,'recibo-produccion')">
+        <li class="nav-item" data-level="3" data-menu-name="orden-produccion">
+          <a
+            class="nav-link"
+            [routerLink]="['/panel/produccion/orden-produccion']"
+            routerLinkActive="active"
+          >
+            Orden de Producción
+          </a>
+        </li>
+        <li class="nav-item" data-level="3" data-menu-name="reimpresion-etiqueta">
+          <a
+            class="nav-link"
+            [routerLink]="['/panel/produccion/reimpresion']"
+            routerLinkActive="active"
+          >
+            Reimpresión de Etiqueta
+          </a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</li>
+
+
+      <!-- Mantenimiento-->
+      <li class="nav-item" data-level="1" data-menu-name="principal-mantenimiento">
+        <a
+          class="nav-link"
+          role="button"
+          href="javascript:void(0)"
+          (click)="toggleMenu(1,'principal-mantenimiento')"
+        >
           <i class="fas fa-wrench mr-2"></i> 
           Mantenimiento
           <i class="fas"
             [ngClass]="{'fa-chevron-down': isOpen(1,'principal-mantenimiento'), 'fa-chevron-right': !isOpen(1,'principal-mantenimiento')}"
-            style="margin-left:auto;"></i>
+            style="margin-left:auto;"
+          ></i>
         </a>
         <ul class="submenu" *ngIf="isOpen(1,'principal-mantenimiento')">
-          <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Lista de Activos</a></li>
+          <li>
+            <a 
+              class="nav-link" 
+              [routerLink]="['/panel/descuentos/nuevo']"
+              routerLinkActive="active"
+            >
+              Lista de Activos
+            </a>
+          </li>
         </ul>
       </li>
 
-            <!-- Planificacion de necesidades-->
-            <li class="nav-item">
-              <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'mrp')">
+            <!-- MRP-->
+            <li class="nav-item" data-level="1" data-menu-name="mrp">
+              <a 
+                class="nav-link" 
+                role="button"
+                href="javascript:void(0)"
+                (click)="toggleMenu(1,'mrp')">
                 <i class="fas fa-calendar-check mr-2"></i> 
                 MRP
                 <i class="fas"
@@ -1710,12 +653,21 @@
                   style="margin-left:auto;"></i>
               </a>
               <ul class="submenu" *ngIf="isOpen(1,'mrp')">
-                <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Lista de Activos</a></li>
+                <li>
+                  <a 
+                    class="nav-link" 
+                    routerLinkActive="active"
+                    [routerLink]="['/panel/descuentos/nuevo']">Lista de </a></li>
               </ul>
             </li>
-            <!-- Planificacion de necesidades-->
-            <li class="nav-item">
-              <a class="nav-link px-4" href="#" (click)="toggleMenu(1,'informes')">
+            <!-- INFORMES-->
+            <li class="nav-item" data-level="1" data-menu-name="informes">
+              <a 
+                class="nav-link" 
+                role="button"
+                href="javascript:void(0)"
+                (click)="toggleMenu(1,'informes')"
+              >
                 <i class="fas fa-file-alt mr-2"></i> 
                 Informes
                 <i class="fas"
@@ -1723,135 +675,13 @@
                   style="margin-left:auto;"></i>
               </a>
               <ul class="submenu" *ngIf="isOpen(1,'informes')">
-                <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Lista de Activos</a></li>
+                <li>
+                  <a 
+                    class="nav-link"
+                    routerLinkActive="active"
+                    [routerLink]="['/panel/produccion/reporte-turno']">Lista de Activos</a></li>
               </ul>
             </li>
-
-
-
-
-
-      <!-- Gestion de Almacenamiento -->
-      <!-- <li class="nav-item">
-        <a class="nav-link px-4" href="#" (click)="toggleGestionAlmacenamiento()">
-          <i class="fas fa-cogs mr-2"></i> 
-          Gestion de Almacenamiento
-          <i class="fas"
-            [ngClass]="{'fa-chevron-down': isGestionAlmacenamiento, 'fa-chevron-right': !isGestionAlmacenamiento}"
-            style="margin-left:auto;"></i>
-        </a>
-        <ul class="submenu" *ngIf="isGestionAlmacenamiento">
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/plan']">Transferencias</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/graficos']">Impresión de Etiqueta</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/ficha']">Reimp Etiq Almacén</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/pre-ficha']">Lectura Temporal</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/pesaje']">Pesaje de Productos</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/emision']">Guias Sunat</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/lista-emision']">Registrar Guia</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/listar-of']">Auditoria Transferencia</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/listar-of']">Despacho Ventas</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/produccion/listar-of']">Packing List</a></li>
-          <li class="nav-item">
-            <a class="nav-link px-4" href="#" (click)="toggleDespachoVentas()">
-              <i class="fas fa-file-alt mr-2"></i> 
-              Despacho Ventas 
-              <i class="fas"
-                [ngClass]="{'fa-chevron-down': isDespachoVentas, 'fa-chevron-right': !isDespachoVentas}"
-                style="margin-left:auto;"></i>
-            </a>
-            <ul class="submenu" *ngIf="isDespachoVentas">
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']"><i class="fas fa-cogs mr-2"></i>Generar Preguia</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/auditoria']"><i class="fas fa-clipboard-list mr-2"></i>Guias Electronicas</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/control-guias']"><i class="fas fa-clipboard-check mr-2"></i>Guias Emitidas</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/pesos-pl']"><i class="fas fa-weight mr-2"></i>Lectura Codebar</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/stock-almacen']"><i class="fas fa-box mr-2"></i>Lectura Factura de Reserva</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/stock-almacen']"><i class="fas fa-box mr-2"></i>Liberación Codebar</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/stock-almacen']"><i class="fas fa-box mr-2"></i>Reporte Packing</a></li>
-
-            </ul>
-          </li>
-
-              <li class="nav-item">
-                <a class="nav-link px-4" href="#" (click)="togglePackingList()">
-                  <i class="fas fa-file-alt mr-2"></i> 
-                  Packing List
-                  <i class="fas"
-                    [ngClass]="{'fa-chevron-down': isPackingList, 'fa-chevron-right': !isPackingList}"
-                    style="margin-left:auto;"></i>
-                </a>
-                <ul class="submenu" *ngIf="isPackingList">
-                  <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']"><i class="fas fa-cogs mr-2"></i>Generar Packing List</a></li>
-                </ul>
-              </li>
-
-
-              
-              <li class="nav-item">
-                <a class="nav-link px-4" href="#" (click)="toggleMercancia()">
-                  <i class="fas fa-file-alt mr-2"></i>
-                  Salida de Mercancia
-                  <i class="fas"
-                    [ngClass]="{'fa-chevron-down': isReportesOpen, 'fa-chevron-right': !isMercancia}"
-                    style="margin-left:auto;"></i>
-                </a>
-                <ul class="submenu" *ngIf="isMercancia">
-                  <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']"><i class="fas fa-cogs mr-2"></i>Lista Salida Mercancia</a></li>
-                  <li><a class="nav-link" [routerLink]="['/panel/produccion/auditoria']"><i class="fas fa-clipboard-list mr-2"></i>Lista Solicitudes de Consumo</a></li>
-                  <li><a class="nav-link" [routerLink]="['/panel/produccion/control-guias']"><i class="fas fa-clipboard-check mr-2"></i>Salida de Mercancia</a></li>
-                  <li><a class="nav-link" [routerLink]="['/panel/produccion/pesos-pl']"><i class="fas fa-weight mr-2"></i>Sol. de consumo Pendiente</a></li>
-                  <li><a class="nav-link" [routerLink]="['/panel/produccion/stock-almacen']"><i class="fas fa-box mr-2"></i>Solicitud de Consumo</a></li>
-          
-                </ul>
-              </li>
-
-
-
-          <li class="nav-item">
-            <a class="nav-link px-4" href="#" (click)="toggleTrasladoInterno()">
-              <i class="fas fa-file-alt mr-2"></i> 
-              Traslado Interno 
-              <i class="fas"
-                [ngClass]="{'fa-chevron-down': isTrasladoInterno, 'fa-chevron-right': !isTrasladoInterno}"
-                style="margin-left:auto;"></i>
-            </a>
-            <ul class="submenu" *ngIf="isTrasladoInterno">
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']"><i class="fas fa-cogs mr-2"></i>Generar Preguia Interna</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/auditoria']"><i class="fas fa-clipboard-list mr-2"></i>Guias Emitidas Interna</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/control-guias']"><i class="fas fa-clipboard-check mr-2"></i>Lectura Code Bar Interno</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/pesos-pl']"><i class="fas fa-weight mr-2"></i>Listado de SLT</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/stock-almacen']"><i class="fas fa-box mr-2"></i>Solicitud Traslado</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/produccion/stock-almacen']"><i class="fas fa-box mr-2"></i>Solicitud Traslado x Devol</a></li>
-            </ul>
-          </li>
-        </ul>
-      </li> -->
-
-
-      
-
-
-      <!-- Permisos -->
-      <!-- <li class="nav-item">
-        <a class="nav-link px-4" href="#" (click)="togglePermisos()">
-          <i class="fas fa-clipboard-list mr-2"></i> 
-          Permisos
-          <i class="fas"
-            [ngClass]="{'fa-chevron-down': isPermisos, 'fa-chevron-right': !isPermisos}"
-            style="margin-left:auto;"></i>
-        </a>
-        <ul class="submenu" *ngIf="isPermisos">
-          <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Asignar Permisos</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Usuarios</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Rutas</a></li>
-
-        </ul>
-      </li> -->
-
-      <!-- Permisos -->
-
-
-
-
     </nav>
   </div>
 </aside>

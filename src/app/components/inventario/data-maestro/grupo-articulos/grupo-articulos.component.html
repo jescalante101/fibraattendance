@@ -1,0 +1,197 @@
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+  </head>
+  
+  <div style="display: flex;">
+    <app-sidebar></app-sidebar>
+    <div class="content">
+      <br>
+      <br>
+      <div class="article-header mat-elevation-z2">
+        <!-- bloque izquierdo: título + subtítulo -->
+        <div class="title-block">
+          <span class="code">Grupo de artículos</span>
+          <span class="subtitle">Grupo de unidades de medida predeterminado</span>
+        </div>
+      
+        <!-- bloque derecho: icono para colapsar/expandir -->
+        <div class="actions">
+          <button mat-icon-button (click)="toggleSection()">
+            <mat-icon>{{ isCollapsed ? 'expand_more' : 'expand_less' }}</mat-icon>
+          </button>
+        </div>
+      </div>
+      
+      <mat-tab-group class="sticky-tabs" (selectedTabChange)="scrollToSection($event)">
+        <mat-tab label="General"></mat-tab>
+        <mat-tab label="Contabilidad"></mat-tab>
+      </mat-tab-group>
+      <br>
+  
+      <div id="generalSection" class="section-content">
+        <mat-card class="main-card">
+          <mat-card-content>
+                  <!-- ► BLOQUE NUEVO: Información básica en dos columnas -->
+        <div class="general-grid">
+  
+          <!-- Columna izquierda -->
+          <div class="general-column">
+            <h3 class="section-title">Información básica</h3>
+          
+            <!-- Nombre de grupo de artículos -->
+            <div class="field-row">
+              <div class="label">Nombre de grupo de artículos:</div>
+              <mat-form-field appearance="fill" class="full-width">
+                <input matInput [(ngModel)]="n_grupo_articulo" />
+              </mat-form-field>
+            </div>
+          
+            <!-- Grupo de unidades de medida -->
+            <div class="field-row">
+              <div class="label">Grupo de unidades de medida:</div>
+              <mat-form-field appearance="fill" class="full-width">
+                <input matInput [(ngModel)]="n_grupo_unidad" />
+              </mat-form-field>
+            </div>
+          
+            <!-- Método de valoración predeterminado (combo) -->
+            <div class="field-row">
+              <div class="label">Método de valoración predeterminado:</div>
+              <mat-form-field appearance="outline" class="combo-box">
+                <mat-select [(ngModel)]="selectedGroup6">
+                  <mat-option [value]="null" disabled>Promedio ponderado</mat-option>
+                  <mat-option *ngFor="let g of articleGroups6" [value]="g">
+                    {{ g }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          
+            <!-- Método de planificación (radio buttons) -->
+            <div class="field-row">
+              <div class="label">Método de planificación:</div>
+              <mat-radio-group [(ngModel)]="metodoPlanificacion" class="radio-group">
+                <mat-radio-button value="MPS">Planificación de necesidad de material</mat-radio-button>
+                <mat-radio-button value="NINGUNO">Ninguno</mat-radio-button>
+              </mat-radio-group>
+            </div>
+          
+            <!-- Método de aprovisionamiento (radio buttons) -->
+            <div class="field-row">
+              <div class="label">Método de aprovisionamiento:</div>
+              <mat-radio-group [(ngModel)]="metodoAprovisionamiento" class="radio-group">
+                <mat-radio-button value="COMPRAR">Comprar</mat-radio-button>
+                <mat-radio-button value="EFECTUAR">Efectuar</mat-radio-button>
+              </mat-radio-group>
+            </div>
+          </div>
+          
+  
+          <!-- Columna derecha -->
+          <div class="general-column">
+            <h3 class="section-title"></h3>
+
+            <div class="field-row">
+              <div class="label">Tipo de artículo</div>
+
+              <mat-form-field appearance="outline" class="combo-box">            
+                <mat-select [(ngModel)]="selectedGroup2">
+                  <!-- tus grupos dinámicamente -->
+                  <mat-option *ngFor="let g of articleGroups2" [value]="g">
+                    {{ g }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>          
+            </div>
+
+
+
+
+            <div class="field-row">
+                <div class="label">Pedido múltiple</div>
+                <mat-form-field appearance="fill" class="full-width">
+                  <input matInput [(ngModel)]="pedido_multiple" />
+                </mat-form-field>
+              </div>
+            
+              <div class="field-row">
+                <div class="label">Cantidad de pedido mínima (UM de inventario)</div>
+                <mat-form-field appearance="fill" class="full-width">
+                  <input matInput [(ngModel)]="cantidad_pedido_minima" />
+                </mat-form-field>
+              </div>
+              <div class="field-row">
+                <div class="label">Tiempo de entrega (días)</div>
+                <mat-form-field appearance="fill" class="full-width">
+                  <input matInput [(ngModel)]="tiempo_entrega" />
+                </mat-form-field>
+              </div>
+
+              <div class="field-row">
+                <div class="label">Tolerancia (días)</div>
+                <mat-form-field appearance="fill" class="full-width">
+                  <input matInput [(ngModel)]="tolerancia_dias" />
+                </mat-form-field>
+              </div>
+          </div>
+  
+        </div>
+        <!-- ◄ FIN BLOQUE NUEVO -->
+  
+        
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <br>
+  
+          <!-- Sección Contabilidad -->
+          <div id="contabilidadSection" class="section-content">
+            <mat-card class="main-card section-card">
+              <mat-card-content>
+      
+      
+              </mat-card-content>
+            </mat-card>
+          </div>
+
+      <ng-container *ngIf="loading2">
+        <div class="spinner-overlay2">
+          <div class="dots-loader2">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </ng-container>
+  
+  
+  
+  
+
+  
+  
+    </div>
+
+
+
+
+    
+
+    <div class="floating-container">
+      <button mat-flat-button color="primary"  class="btn-accion">
+        {{ 'Agregar' }}
+      </button>
+      <button
+    mat-flat-button
+    color="warn"
+    (click)="onCancel()"
+    class="btn-cancelar"
+  >
+    <mat-icon>close</mat-icon>
+    Cancelar
+  </button>
+
+    </div>
+    
+  </div>
+  

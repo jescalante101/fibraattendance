@@ -1,0 +1,75 @@
+<br>
+<br>
+<br>
+<!-- CONTENEDOR PRINCIPAL -->
+<div class="contenedor-principal">
+    <!-- Buscador y botón Añadir -->
+    <div class="busqueda-accion">
+      <div class="buscador-contenedor">
+        <input
+          type="text"
+          [(ngModel)]="busquedaGeneral"
+          placeholder="Buscar"
+          class="buscador-input"
+        />
+        <span class="icono-lupa"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="21" height="21" stroke-width="2">
+          <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path>
+          <path d="M21 21l-6 -6"></path>
+        </svg></span>
+      </div>
+  
+      <!-- Selector de vista -->
+      <div style="padding-right: 15rem;" class="vista-dropdown-container">
+        <button class="vista-boton" (click)="toggleDropdown()">
+          {{ vistaSeleccionada }}
+          <span class="flecha">&#9662;</span>
+        </button>
+        <div class="vista-dropdown" *ngIf="dropdownAbierto">
+          <div class="vista-busqueda">
+            <span class="icono-lupa">🔍</span>
+            <input type="text" [(ngModel)]="busquedaVista" placeholder="Buscar en vistas" />
+          </div>
+          <ul class="vista-lista">
+            <li *ngFor="let vista of vistasFiltradas()" [class.activa]="vista === vistaSeleccionada" (click)="seleccionarVista(vista)">
+              <span *ngIf="vista === vistaSeleccionada" class="check">&#10003;</span>
+              {{ vista }}
+              <span *ngIf="vista === 'Production Report activo'" class="etiqueta">Predetermidnada</span>
+            </li>
+        </ul>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Tabla dinamica segun la vista seleccionada -->
+    <div class="tabla">
+      <table>
+        <thead>
+          <tr>
+            <th>ITEM</th>
+            <th>Fecha de creación</th>
+            <th *ngIf="vistaSeleccionada === 'Production Report activo'">Nº TELAR</th>
+            <th *ngIf="vistaSeleccionada === 'Production Report activo'">SUPERVISOR</th>
+            <th *ngIf="vistaSeleccionada === 'Production Report activo'">EFICIENCIA MÁQUINA</th>
+            <th *ngIf="vistaSeleccionada === 'Production Report activo'">TOTAL DE ROTURA DE URDIDO</th>
+            <th *ngIf="vistaSeleccionada === 'Production Report activo'">TOTAL DE ROTURA DE TRAMA</th>
+            <th *ngIf="vistaSeleccionada === 'Production Report activo'">TOTAL DE METROS PRODUCIDOS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="datosFiltrados.length === 0">
+            <td [attr.colspan]="vistaSeleccionada === 'Production Report activo' ? 8 : 2" class="sin-datos">Sin datos</td>
+          </tr>
+          <tr *ngFor="let d of datosFiltrados">
+            <td>{{ d.item }}</td>
+            <td>{{ d.fechaCreacion }}</td>
+            <td *ngIf="vistaSeleccionada === 'Production Report activo'">{{ d.numTelar }}</td>
+            <td *ngIf="vistaSeleccionada === 'Production Report activo'">{{ d.supervisor }}</td>
+            <td *ngIf="vistaSeleccionada === 'Production Report activo'">{{ d.eficiencia }}</td>
+            <td *ngIf="vistaSeleccionada === 'Production Report activo'">{{ d.roturaUrdido }}</td>
+            <td *ngIf="vistaSeleccionada === 'Production Report activo'">{{ d.roturaTrama }}</td>
+            <td *ngIf="vistaSeleccionada === 'Production Report activo'">{{ d.metrosProducidos }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>

@@ -1,0 +1,532 @@
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+  </head>
+  
+  <div style="display: flex;">
+    <div class="content">
+      <br>
+      <br>
+      <div class="article-header mat-elevation-z2">
+  
+        <div class="code-nav">
+          <button mat-icon-button><mat-icon>first_page</mat-icon></button>
+          <button mat-icon-button><mat-icon>keyboard_arrow_up</mat-icon></button>
+          <span class="code">A0001</span>
+          <button mat-icon-button><mat-icon>keyboard_arrow_down</mat-icon></button>
+          <button mat-icon-button><mat-icon>last_page</mat-icon></button>
+        </div>
+      
+        <div class="metrics">
+          <div class="metric">
+            <div class="label">En stock</div>
+            <div class="value">0.0000</div>
+          </div>
+          <div class="metric">
+            <div class="label">Comprometido</div>
+            <div class="value">0.0000</div>
+          </div>
+          <div class="metric">
+            <div class="label">Pedido</div>
+            <div class="value">0.0000</div>
+          </div>
+          <div class="metric">
+            <div class="label">Disponible</div>
+            <div class="value available">0.0000</div>
+          </div>
+        </div>
+      
+        <div class="actions">
+          <button
+          mat-flat-button
+          color="primary"
+          (click)="onEdit()"
+          [disabled]="loading"
+        >
+          Editar
+      </button>          <button mat-flat-button>Nuevo</button>
+          <button mat-flat-button>Borrar</button>
+          <button mat-flat-button>Duplicar</button>
+          <button mat-flat-button>Crear actividad</button>
+        </div>
+      
+      </div>
+      
+      <mat-tab-group class="sticky-tabs" (selectedTabChange)="scrollToSection($event)">
+        <mat-tab label="General"></mat-tab>
+        <mat-tab label="Compras"></mat-tab>
+        <mat-tab label="Ventas"></mat-tab>
+        <mat-tab label="Inventario"></mat-tab>
+        <mat-tab label="Planificacion"></mat-tab>
+        <mat-tab label="Datos de Producción"></mat-tab>
+        <mat-tab label="Propiedades"></mat-tab>
+        <mat-tab label="Comentarios"></mat-tab>
+        <mat-tab label="Anexos"></mat-tab>
+      </mat-tab-group>
+      <br>
+  
+      <div id="generalSection" class="section-content">
+        <mat-card class="main-card">
+          <mat-card-content>
+                  <!-- ► BLOQUE NUEVO: Información básica en dos columnas -->
+        <div class="general-grid">
+  
+          <!-- Columna izquierda -->
+          <div class="general-column">
+            <h3 class="section-title">Información básica</h3>
+            <div class="field-row">
+              <div class="label">Serie:</div>
+              <div class="value">Manual</div>
+            </div>
+            <div class="field-row">
+              <div class="label">Número de artículo:</div>
+              <div class="value">A0001</div>
+            </div>
+            <div class="field-row">
+              <div class="label">Descripción:</div>
+              <div class="value">Artículo de prueba</div>
+            </div>
+            <div class="field-row">
+              <div class="label">Nombre extranjero:</div>
+              <div class="value"></div>
+            </div>
+            <div class="field-row">
+              <div class="label">Grupo de artículos:</div>
+              <div class="value">Artículos</div>
+            </div>
+            <div class="field-row">
+              <div class="label">Grupo de unidades de medida:</div>
+              <div class="value">Manual</div>
+            </div>
+  
+            <h3 class="section-title">Preferencias</h3>
+            <div class="field-row">
+              <div class="label">Fabricante:</div>
+              <div class="value">- Ningún fabricante -</div>
+            </div>
+            <div class="field-row">
+              <div class="label">Identificador adicional:</div>
+              <div class="value"></div>
+            </div>
+            <div class="field-row">
+              <div class="label">Tipo de expedición:</div>
+              <div class="value"></div>
+            </div>
+            <div class="field-row">
+              <div class="label">País/Región de origen:</div>
+              <div class="value"></div>
+            </div>
+            <div class="field-row">
+              <div class="label">Activo:</div>
+              <mat-checkbox disabled [checked]="true"></mat-checkbox>
+            </div>
+            <div class="field-row">
+              <div class="label">Comentarios:</div>
+              <div class="value"></div>
+            </div>
+            <div class="field-row">
+              <div class="label">Inactivo:</div>
+              <mat-checkbox disabled></mat-checkbox>
+            </div>
+            <div class="field-row">
+              <div class="label">Comentarios:</div>
+              <div class="value"></div>
+            </div>
+          </div>
+  
+          <!-- Columna derecha -->
+          <div class="general-column">
+            <h3 class="section-title">Tipo de artículo</h3>
+            <div class="field-row">
+              <div class="label">Tipo de artículo:</div>
+              <div class="value">Artículos</div>
+            </div>
+            <div class="field-row">
+              <div class="label">Artículo de inventario:</div>
+              <div class="value">Sí</div>
+            </div>
+            <div class="field-row">
+              <div class="label">Artículo de venta:</div>
+              <div class="value">Sí</div>
+            </div>
+            <div class="field-row">
+              <div class="label">Artículo de compra:</div>
+              <div class="value">Sí</div>
+            </div>
+  
+            <h3 class="section-title">Información adicional</h3>
+            <div class="field-row">
+              <div class="label">Imagen:</div>
+              <div class="value"><!-- uploader o vista previa --></div>
+            </div>
+            <div class="field-row">
+              <div class="label">Comentarios:</div>
+              <div class="value"></div>
+            </div>
+          </div>
+  
+        </div>
+        <!-- ◄ FIN BLOQUE NUEVO -->
+  
+        
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <br>
+  
+          <!-- Sección Compras -->
+          <div id="comprasSection" class="section-content">
+            <mat-card class="main-card section-card">
+              <mat-card-title>Compras</mat-card-title>
+              <mat-card-content>
+      
+                <!-- UM y embalaje -->
+                <h3 class="sub-section-title">UM y embalaje</h3>
+                <div class="form-row">
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Número de catálogo</mat-label>
+                    <input matInput />
+                  </mat-form-field>
+                </div>
+      
+                <div class="form-row">
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Nombre de unidad</mat-label>
+                    <input matInput />
+                  </mat-form-field>
+                </div>
+      
+                <div class="form-row">
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Cantidad por paquete</mat-label>
+                    <input matInput type="number" />
+                  </mat-form-field>
+                </div>
+      
+                <!-- Volumen y peso -->
+                <h3 class="sub-section-title">Volumen y peso</h3>
+                <div class="form-row">
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Longitud</mat-label>
+                    <input matInput type="number" />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Ancho</mat-label>
+                    <input matInput type="number" />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Altura</mat-label>
+                    <input matInput type="number" />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Unidad (ej. cm)</mat-label>
+                    <input matInput />
+                  </mat-form-field>
+                </div>
+                <div class="form-row">
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Volumen</mat-label>
+                    <input matInput type="number" />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Peso</mat-label>
+                    <input matInput type="number" />
+                  </mat-form-field>
+                </div>
+      
+                <!-- Factores -->
+                <h3 class="sub-section-title">Factores</h3>
+                <div class="form-row">
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Factor 1</mat-label>
+                    <input matInput type="number" />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Factor 2</mat-label>
+                    <input matInput type="number" />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Factor 3</mat-label>
+                    <input matInput type="number" />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Factor 4</mat-label>
+                    <input matInput type="number" />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Factor 5</mat-label>
+                    <input matInput type="number" />
+                  </mat-form-field>
+                </div>
+      
+                <!-- Números de serie y lote -->
+                <h3 class="sub-section-title">Números de serie y lote</h3>
+                <div class="form-row">
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Artículo gestionado por</mat-label>
+                    <mat-select>
+                      <mat-option value="ninguno">Ninguno</mat-option>
+                      <mat-option value="lote">Lote</mat-option>
+                      <mat-option value="serie">Serie</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+      
+                <!-- Códigos de barras -->
+                <h3 class="sub-section-title">Códigos de barras</h3>
+                <div class="form-row">
+                  <mat-form-field appearance="fill" class="form-field">
+                    <mat-label>Código de barras principal</mat-label>
+                    <input matInput />
+                  </mat-form-field>
+                </div>
+      
+              </mat-card-content>
+            </mat-card>
+          </div>
+      
+      
+      <br>
+  
+      <div id="ventasSection" class="section-content">
+        <mat-card class="main-card section-card">
+          <mat-card-title>Ventas</mat-card-title>
+          <mat-card-content>
+      
+            <!-- UM y embalaje -->
+            <h3 class="sub-section-title">UM y embalaje</h3>
+            <div class="form-row">
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Nombre de unidad de medida de ventas</mat-label>
+                <input matInput />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Artículos por unidad de ventas</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+            </div>
+      
+            <div class="form-row">
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Nombre de unidad de medida de embalaje</mat-label>
+                <input matInput />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Cantidad por paquete</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+            </div>
+      
+            <!-- Volumen y peso -->
+            <h3 class="sub-section-title">Volumen y peso</h3>
+            <div class="form-row">
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Longitud</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Ancho</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Altura</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Unidad (ej. cm)</mat-label>
+                <input matInput />
+              </mat-form-field>
+            </div>
+            <div class="form-row">
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Volumen</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Peso</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+            </div>
+      
+            <!-- Factores -->
+            <h3 class="sub-section-title">Factores</h3>
+            <div class="form-row">
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Factor 1</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Factor 2</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Factor 3</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Factor 4</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Factor 5</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+            </div>
+      
+            <!-- Código QR / Barcode -->
+            <h3 class="sub-section-title">Crear código QR / Barcode</h3>
+            <div class="form-row">
+              <mat-form-field appearance="fill" class="form-field" floatLabel="always">
+                <mat-label>Código QR / Barras</mat-label>
+                <textarea matInput rows="3" placeholder="Ingresa el contenido del código..."></textarea>
+              </mat-form-field>
+            </div>
+      
+          </mat-card-content>
+        </mat-card>
+      </div>
+  
+      <br>
+  
+  
+      <div id="impuestoSection" class="section-content">
+        <mat-card class="main-card section-card">
+          <mat-card-title>Ventas</mat-card-title>
+          <mat-card-content>
+      
+            <!-- UM y embalaje -->
+            <h3 class="sub-section-title">UM y embalaje</h3>
+            <div class="form-row">
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Nombre de unidad de medida de ventas</mat-label>
+                <input matInput />
+              </mat-form-field> 
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Artículos por unidad de ventas</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+            </div>
+      
+            <div class="form-row">
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Nombre de unidad de medida de embalaje</mat-label>
+                <input matInput />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Cantidad por paquete</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+            </div>
+      
+            <!-- Volumen y peso -->
+            <h3 class="sub-section-title">Volumen y peso</h3>
+            <div class="form-row">
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Longitud</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Ancho</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Altura</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Unidad (ej. cm)</mat-label>
+                <input matInput />
+              </mat-form-field>
+            </div>
+            <div class="form-row">
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Volumen</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Peso</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+            </div>
+      
+            <!-- Factores -->
+            <h3 class="sub-section-title">Factores</h3>
+            <div class="form-row">
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Factor 1</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Factor 2</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Factor 3</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Factor 4</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Factor 5</mat-label>
+                <input matInput type="number" />
+              </mat-form-field>
+            </div>
+      
+            <!-- Código QR / Barcode -->
+            <h3 class="sub-section-title">Crear código QR / Barcode</h3>
+            <div class="form-row">
+              <mat-form-field appearance="fill" class="form-field" floatLabel="always">
+                <mat-label>Código QR / Barras</mat-label>
+                <textarea matInput rows="3" placeholder="Ingresa el contenido del código..."></textarea>
+              </mat-form-field>
+            </div>
+      
+          </mat-card-content>
+        </mat-card>
+      </div>
+      
+  
+  
+  
+  
+
+      <ng-container *ngIf="loading">
+        <div class="spinner-overlay">
+          <div class="dots-loader">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </ng-container>
+  
+    </div>
+
+
+    
+    <div class="floating-container">
+      <button mat-flat-button color="primary" [matMenuTriggerFor]="actionMenu" class="btn-accion">
+        {{ selectedLabel || 'Agregar y ver' }}
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <button
+    mat-flat-button
+    color="warn"
+    (click)="onCancel()"
+    class="btn-cancelar"
+  >
+    <mat-icon>close</mat-icon>
+    Cancelar
+  </button>
+      <mat-menu #actionMenu="matMenu">
+        <button mat-menu-item (click)="setAction('ver')">Agregar y ver</button>
+        <button mat-menu-item (click)="setAction('nuevo')">Agregar y nuevo</button>
+        <button mat-menu-item (click)="setAction('volver')">Agregar y volver</button>
+      </mat-menu>
+    </div>
+
+
+
+  </div>
+  

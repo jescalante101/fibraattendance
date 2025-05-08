@@ -6,7 +6,34 @@
   <button (click)="toggleSidebar()" class="hamburger-btn">
     &#9776;
   </button>
-  <a class="navbar-brand" routerLink="/">FIBRAWEB 2.0</a>
+  <a class="navbar-brand" routerLink="/">ASISTENCIA FB</a>
+
+  <ul class="navbar-nav d-flex">
+        <li class="nav-item">
+          <a class="nav-link py-0" aria-current="page" href="#">Personal</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['./panel/dispositivo']">Dispositivo</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Asistencia</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#">Acceso</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#">Temperatura</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#">Sistema</a>
+        </li>
+        <!-- <li class="nav-item">
+          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+        </li> -->
+      </ul>
 
 
   <div class="sidebar-user-wrapper">

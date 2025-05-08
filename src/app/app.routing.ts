@@ -26,6 +26,7 @@ import { RegistroReqComprasComponent } from "./components/socios-negocios/regist
 import { IndexComponent } from "./components/inventario/data-maestro/index/index.component";
 import { ReporteTurnoComponent } from "./components/produccion/reporte-turno/reporte-turno.component";
 import { CrearReporteTurnoComponent } from "./components/produccion/crear-reporte-turno/crear-reporte-turno.component";
+import { DispositivoComponent } from "./components/dispositivo/dispositivo.component";
 
 
 
@@ -54,6 +55,7 @@ const appRoutes: Routes = [
         {path : 'inventario/data-maestro/index', component:IndexComponent},
         {path : 'produccion/reporte-turno', component:ReporteTurnoComponent},
         {path : 'produccion/crear-reporte-turno', component:CrearReporteTurnoComponent},
+        {path: 'dispositivo',component: DispositivoComponent}
 
     ]},
     {path: 'login', component:LoginComponent}

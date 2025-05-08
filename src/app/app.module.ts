@@ -60,6 +60,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatMenuModule } from '@angular/material/menu';
+import { DispositivoComponent } from './components/dispositivo/dispositivo.component';
 
 
 
@@ -105,8 +106,10 @@ import { MatMenuModule } from '@angular/material/menu';
     TablaNivelComponent,
     ReporteTurnoComponent,
     IndexComponent,
-    CrearReporteTurnoComponent
+    CrearReporteTurnoComponent,
     // 🔥 Aquí ya NO pongas ModalAlertaComponent
+
+    DispositivoComponent
   ],
   imports: [
     SharedModule, // 🔥 Aquí sí, aquí se importa todo lo de shared

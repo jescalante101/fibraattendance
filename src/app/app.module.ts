@@ -61,6 +61,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatMenuModule } from '@angular/material/menu';
 import { DispositivoComponent } from './components/dispositivo/dispositivo.component';
+import { PersonalComponent } from './components/personal/empresa/personal.component';
+import { AsistenciaComponent } from './components/asistencia/asistencia/asistencia.component';
+import { DepartamentoComponent } from './components/personal/departamento/departamento.component';
+import { MarcacionesComponent } from './components/dispositivo/marcaciones/marcaciones.component';
 
 
 
@@ -109,7 +113,16 @@ import { DispositivoComponent } from './components/dispositivo/dispositivo.compo
     CrearReporteTurnoComponent,
     // 🔥 Aquí ya NO pongas ModalAlertaComponent
 
-    DispositivoComponent
+    PersonalComponent,
+    DepartamentoComponent,
+
+
+    DispositivoComponent,
+    MarcacionesComponent,
+
+    AsistenciaComponent,
+  
+
   ],
   imports: [
     SharedModule, // 🔥 Aquí sí, aquí se importa todo lo de shared

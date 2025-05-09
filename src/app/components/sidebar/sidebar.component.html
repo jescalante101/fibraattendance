@@ -3,57 +3,93 @@
   data-scroll-header
   data-fixed-element
 >
-  <button (click)="toggleSidebar()" class="hamburger-btn">
-    &#9776;
-  </button>
+  <button (click)="toggleSidebar()" class="hamburger-btn">&#9776;</button>
   <a class="navbar-brand" routerLink="/">ASISTENCIA FB</a>
 
-  <ul class="navbar-nav d-flex">
-        <li class="nav-item">
-          <a class="nav-link py-0" aria-current="page" href="#">Personal</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" [routerLink]="['./panel/dispositivo']">Dispositivo</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Asistencia</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="#">Acceso</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="#">Temperatura</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="#">Sistema</a>
-        </li>
-        <!-- <li class="nav-item">
-          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-        </li> -->
-      </ul>
-
+  <ul class="navbar-nav me-auto active">
+    <li class="nav-item" [ngClass]="{ active: activeItem === 'personal' }">
+      <a
+        class="nav-link py-0"
+        aria-current="page"
+        [routerLink]="['./panel/personal']"
+        (click)="selectItem('personal'); toggleMenu(1,'organizacion')"
+        >Personal</a
+      >
+    </li>
+    <li class="nav-item" [ngClass]="{ active: activeItem === 'dispositivo' }">
+      <a
+        class="nav-link"
+        [routerLink]="['./panel/dispositivo']"
+        (click)="selectItem('dispositivo');toggleMenu(1,'dispositivo')"
+        >Dispositivo</a
+      >
+    </li>
+    <li class="nav-item" [ngClass]="{ active: activeItem === 'asistencia' }">
+      <a 
+        class="nav-link" 
+        (click)="selectItem('asistencia');toggleMenu(1,'regla')"
+        [routerLink]="['./panel/asistencia']"
+        >Asistencia</a
+      >
+    </li>
+    <li class="nav-item" [ngClass]="{ active: activeItem === 'acceso' }">
+      <a class="nav-link" href="#" (click)="selectItem('acceso')">Acceso</a>
+    </li>
+    <li class="nav-item" [ngClass]="{ active: activeItem === 'temperatura' }">
+      <a class="nav-link" href="#" (click)="selectItem('temperatura')"
+        >Temperatura</a
+      >
+    </li>
+    <li class="nav-item" [ngClass]="{ active: activeItem === 'sistema' }">
+      <a class="nav-link" href="#" (click)="selectItem('sistema')">Sistema</a>
+    </li>
+  </ul>
 
   <div class="sidebar-user-wrapper">
     <div class="user-trigger" (click)="toggleUserMenu()">
       <span class="rounded-circle user-initial">m</span>
       <i class="bi bi-caret-down-fill ms-1"></i>
     </div>
-  
+
     <ul *ngIf="showUserMenu" class="user-dropdown shadow">
       <li class="fw-bold px-3 py-2">manager</li>
-      <li><a class="dropdown-item" href="#"><i class="bi bi-clock-history me-2"></i>Actividades recientes</a></li>
-      <li><a class="dropdown-item" href="#"><i class="bi bi-clipboard-check me-2"></i>Utilizado con frecuencia</a></li>
-      <li><a class="dropdown-item" href="#"><i class="bi bi-search me-2"></i>Busc.Aplic.</a></li>
-      <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Opciones</a></li>
-      <li><a class="dropdown-item" href="#"><i class="bi bi-envelope me-2"></i>Comunicarse con soporte</a></li>
-      <li><a class="dropdown-item" href="#"><i class="bi bi-info-circle me-2"></i>Acerca de</a></li>
-      <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-power me-2"></i>Salir</a></li>
+      <li>
+        <a class="dropdown-item" href="#"
+          ><i class="bi bi-clock-history me-2"></i>Actividades recientes</a
+        >
+      </li>
+      <li>
+        <a class="dropdown-item" href="#"
+          ><i class="bi bi-clipboard-check me-2"></i>Utilizado con frecuencia</a
+        >
+      </li>
+      <li>
+        <a class="dropdown-item" href="#"
+          ><i class="bi bi-search me-2"></i>Busc.Aplic.</a
+        >
+      </li>
+      <li>
+        <a class="dropdown-item" href="#"
+          ><i class="bi bi-gear me-2"></i>Opciones</a
+        >
+      </li>
+      <li>
+        <a class="dropdown-item" href="#"
+          ><i class="bi bi-envelope me-2"></i>Comunicarse con soporte</a
+        >
+      </li>
+      <li>
+        <a class="dropdown-item" href="#"
+          ><i class="bi bi-info-circle me-2"></i>Acerca de</a
+        >
+      </li>
+      <li>
+        <a class="dropdown-item text-danger" href="#"
+          ><i class="bi bi-power me-2"></i>Salir</a
+        >
+      </li>
     </ul>
   </div>
-  
 </header>
 
 <aside
@@ -61,9 +97,6 @@
   id="componentsNav"
   [class.collapsed]="isCollapsed"
 >
-
-
- 
   <div class="cs-offcanvas-cap d-flex d-lg-none">
     <div class="d-flex align-items-center mt-1">
       <h5 class="text-light mb-0 mr-3">Menu</h5>
@@ -78,11 +111,16 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div  class="d-flex d-lg-none align-items-center py-4 px-3 border-bottom border-light">
+  <div
+    class="d-flex d-lg-none align-items-center py-4 px-3 border-bottom border-light"
+  >
     <a class="btn btn-primary btn-block mr-3 px-4" href="index.html">
       <i class="cxi-eye mt-n1 mr-2"></i>Preview
     </a>
-    <a class="btn btn-success btn-block mt-0 px-4" href="../components/typography.html">
+    <a
+      class="btn btn-success btn-block mt-0 px-4"
+      href="../components/typography.html"
+    >
       <i class="cxi-layouts mt-n1 mr-2"></i>Components
     </a>
   </div>
@@ -91,631 +129,750 @@
     data-simplebar
     data-simplebar-inverse
   >
-
-  
-    <nav  class="nav nav-light">
+    <nav class="nav nav-light">
       <div class="px-3 pb-2">
-        <input type="text"
-       class="form-control"
-       placeholder="Buscar..."
-       #buscador
-       (input)="filtrarSidebar(buscador.value)">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Buscar..."
+          #buscador
+          (input)="filtrarSidebar(buscador.value)"
+        />
+      </div>
+
+      <!-- Menu del Personal -->
+      <div *ngIf="activeItem==='personal' ">
+        
+         <!-- Organización menu -->
+
+        <li class="nav-item" data-level="1" data-menu-name="organizacion">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'organizacion')"
+          >
+            <i class="fa-solid fa-sitemap mr-2"></i>
+            Organización
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'organizacion'),
+                'fa-angle-right': !isOpen(1, 'organizacion')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+          <ul class="submenu" *ngIf="isOpen(1, 'organizacion')">
+            <li>
+              <a class="nav-link" [routerLink]="['panel/personal']"  >Empresa </a>
+            </li>
+            <!-- [routerLink]="['/panel/descuentos/nuevo']" -->
+            <li>
+              <a class="nav-link" [routerLink]="['panel/personal/departamento']">Departamentos </a>
+            </li>
+            <li>
+              <a class="nav-link">Cargo </a>
+            </li>
+            <li>
+              <a class="nav-link">Area </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Empleados menu -->
+
+        <li class="nav-item" data-level="1" data-menu-name="empleado">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'empleado')"
+          >
+            <i class="fa-solid fa-users-line mr-2"></i>
+            Empleado
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'empleado'),
+                'fa-chevron-right': !isOpen(1, 'empleado')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+          <ul class="submenu" *ngIf="isOpen(1, 'empleado')">
+            <li>
+              <a class="nav-link" routerLinkActive="active">Empleados </a>
+            </li>
+           
+            <li>
+              <a class="nav-link">Cese </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Proceso y Aprobación menu -->
+
+        <li class="nav-item" data-level="1" data-menu-name="pamenu">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'pamenu')"
+          >
+            <i class="fa-solid fa-bars-progress mr-2"></i>
+            Proceso y Aprobación
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'pamenu'),
+                'fa-chevron-right': !isOpen(1, 'pamenu')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+          <ul class="submenu" *ngIf="isOpen(1, 'pamenu')">
+            <li>
+              <a class="nav-link" routerLinkActive="active">Rol Aprobadores </a>
+            </li>
+           
+            <li>
+              <a class="nav-link">Proceso de Permiso </a>
+            </li>
+
+            <li>
+              <a class="nav-link">Aprobaciones </a>
+            </li>
+
+          </ul>
+        </li>
+
+        <!-- Configuraciones menu -->
+
+
+        <li class="nav-item" data-level="1" data-menu-name="configuracion">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'configuracion')"
+          >
+            <i class="fa-solid fa-gear mr-2"></i>
+            configuración
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'configuracion'),
+                'fa-chevron-right': !isOpen(1, 'configuracion')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+          <ul class="submenu" *ngIf="isOpen(1, 'configuracion')">
+            <li>
+              <a class="nav-link" routerLinkActive="active">Documento </a>
+            </li>
+
+          </ul>
+        </li>
+
+
+      </div>
+      
+      <!-- Menu del Dispositivo -->
+      <div *ngIf="activeItem==='dispositivo'">
+
+        <!-- Items del dispositivo -->
+
+        <li class="nav-item" data-level="1" data-menu-name="dispositivo">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'dispositivo')"
+          >
+            <i class="fa-solid fa-mobile-retro mr-2"></i>
+            Dispositivo
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'dispositivo'),
+                'fa-angle-right': !isOpen(1, 'dispositivo')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+          <ul class="submenu" *ngIf="isOpen(1, 'dispositivo')">
+            <li>
+              <a class="nav-link" routerLinkActive="active">Dispositivos</a>
+            </li>
+            <!-- [routerLink]="['/panel/descuentos/nuevo']" -->
+            <li>
+              <a class="nav-link">Comandos de Dispositivo</a>
+            </li>
+            
+          </ul>
+        </li>
+
+        <!-- Menu items de mensajes         -->
+        <li class="nav-item" data-level="1" data-menu-name="mensaje">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'mensaje')"
+          >
+            <i class="fa-solid fa-comment mr-2"></i>
+            Mensajes
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'mensaje'),
+                'fa-angle-right': !isOpen(1, 'mensaje')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+          <ul class="submenu" *ngIf="isOpen(1, 'mensaje')">
+            <li>
+              <a class="nav-link" routerLinkActive="active">Público</a>
+            </li>
+            <!-- [routerLink]="['/panel/descuentos/nuevo']" -->
+            <li>
+              <a class="nav-link">Privado</a>
+            </li>
+            
+          </ul>
+        </li>
+
+        <!-- Menu items de Datos -->
+
+        <li class="nav-item" data-level="1" data-menu-name="menudato">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'menudato')"
+          >
+            <i class="fa-solid fa-database mr-2"></i>
+            Datos
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'menudado'),
+                'fa-angle-right': !isOpen(1, 'menudado')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+          <ul class="submenu" *ngIf="isOpen(1, 'menudato')">
+            <li>
+              <a class="nav-link" routerLinkActive="active">Incidencias</a>
+            </li>
+
+            <li>
+              <a class="nav-link">Plantilla Biométrica</a>
+            </li>
+
+             <li>
+              <a class="nav-link">Foto Biométrica</a>
+            </li>
+
+             <li>
+              <a class="nav-link" [routerLink]="['/panel/dispositivo/marcaciones']">Marcaciones</a>
+            </li>
+            
+          </ul>
+        </li>
+
+        <!-- Menu Items de Eventos -->
+        
+        <li class="nav-item" data-level="1" data-menu-name="eventos">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'eventos')"
+          >
+           <i class="fa-solid fa-clock-rotate-left mr-2"></i>
+            Eventos
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'eventos'),
+                'fa-angle-right': !isOpen(1, 'eventos')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+          <ul class="submenu" *ngIf="isOpen(1, 'eventos')">
+            <li>
+              <a class="nav-link" routerLinkActive="active">Evento de Operación</a>
+            </li>
+
+            <li>
+              <a class="nav-link">Evento de Errores</a>
+            </li>
+
+             <li>
+              <a class="nav-link">Cargar Registros</a>
+            </li>
+            
+          </ul>
+        </li>
+
+        <!-- Menu de Aplicacion Movil -->
+
+
+        <li class="nav-item" data-level="1" data-menu-name="apmovil">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'apmovil')"
+          >
+           <i class="fa-solid fa-mobile mr-2"></i>
+            Aplicación móvil
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'apmovil'),
+                'fa-angle-right': !isOpen(1, 'apmovil')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+          <ul class="submenu" *ngIf="isOpen(1, 'apmovil')">
+            <li>
+              <a class="nav-link" routerLinkActive="active">Límite GPS del empleado</a>
+            </li>
+
+            <li>
+              <a class="nav-link">Límite Gps de Departamento</a>
+            </li>
+
+             <li>
+              <a class="nav-link">Cuentas</a>
+            </li>
+
+             <li>
+              <a class="nav-link">Aviso</a>
+            </li>
+             <li>
+              <a class="nav-link">Notificación</a>
+            </li>
+             <li>
+              <a class="nav-link">Operación de registros</a>
+            </li>
+            
+            
+          </ul>
+        </li>
+
+        <!-- Menu item de Configuraciones -->
+
+        <li class="nav-item" data-level="1" data-menu-name="devicesetting">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'devicesetting')"
+          >
+           <i class="fa-solid fa-gear mr-2"></i>
+            Configuraciones
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'devicesetting'),
+                'fa-angle-right': !isOpen(1, 'devicesetting')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+          <ul class="submenu" *ngIf="isOpen(1, 'devicesetting')">
+            <li>
+              <a class="nav-link" routerLinkActive="active">configuracion</a>
+            </li>
+
+            
+          </ul>
+        </li>
 
       </div>
 
+      <!-- Menu de Asistencia -->
 
-      
-<!-- Menú "Gestión" corregido con etiquetas data-level y data-menu-name -->
+      <div *ngIf="activeItem==='asistencia'">
 
-  <li class="nav-item" data-level="1" data-menu-name="gestion">
-    <a class="nav-link" href="#" (click)="toggleMenu(1, 'gestion')">
-      <i class="fas fa-cogs mr-2"></i> Gestión
-      <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(1, 'gestion'), 'fa-chevron-right': !isOpen(1, 'gestion')}" style="margin-left:auto;"></i>
-    </a>
-    <ul *ngIf="isOpen(1, 'gestion')" class="nav flex-column pl-4-test">
+        <!-- Menu item regla -->
 
-      <!-- Seleccionar Sociedad -->
-      <li class="nav-item" data-level="2" data-menu-name="seleccionar-sociedad">
-        <a class="nav-link" [routerLink]="['/panel/gestion/seleccionar-sociedad']">Seleccionar Sociedad</a>
-      </li>
-
-      <!-- Tipos de cambio -->
-      <li class="nav-item" data-level="2" data-menu-name="tipo-cambio">
-        <a class="nav-link" [routerLink]="['/panel/gestion/tipo-cambio']">Tipos de cambio e índices</a>
-      </li>
-
-      <!-- Submenú: Definiciones -->
-      <li class="nav-item" data-level="2" data-menu-name="definiciones">
-        <a class="nav-link" href="#" (click)="toggleMenu(2, 'definiciones')">
-          Definiciones
-          <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2, 'definiciones'), 'fa-chevron-right': !isOpen(2, 'definiciones')}" style="margin-left:auto;"></i>
-        </a>
-        <ul *ngIf="isOpen(2, 'definiciones')" class="submenu nav flex-column pl-4">
-
-          <!-- Sub-submenú: General -->
-          <li class="nav-item" data-level="3" data-menu-name="general">
-            <a class="nav-link" href="#" (click)="toggleMenu(3, 'general')">
-              General
-              <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3, 'general'), 'fa-chevron-right': !isOpen(3, 'general')}" style="margin-left:auto;"></i>
-            </a>
-            <ul *ngIf="isOpen(3, 'general')" class="nav flex-column pl-4">
-              <li class="nav-item" data-level="4" data-menu-name="usuarios"><a class="nav-link" href="#">Usuarios</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="opciones-usuario"><a class="nav-link" href="#">Opciones de Usuario</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="permisos-usuario-almacen"><a class="nav-link" href="#">Permisos de Usuario Almacén</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="empleados-ventas-compras"><a class="nav-link" href="#">Empleados de ventas y compras</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="territorios"><a class="nav-link" href="#">Territorios</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="grupo-comisiones"><a class="nav-link" href="#">Grupo de comisiones</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="texto-predefinido"><a class="nav-link" href="#">Texto predefinido</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="enlaces-campos"><a class="nav-link" href="#">Enlaces de campos de referencia</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="gastos-adicionales"><a class="nav-link" href="#">Gastos adicionales</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="preferencias-mensajes"><a class="nav-link" href="#">Preferencias de mensajes</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="gestion-informes"><a class="nav-link" href="#">Gestión de Informes y Layout</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="impresion-servidor"><a class="nav-link" href="#">Configuración de impresión del servidor</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="gestor-panel"><a class="nav-link" href="#">Gestor de Panel</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="kpi-panel"><a class="nav-link" href="#">KPI de Panel</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="electronic-file-manager"><a class="nav-link" href="#">Electronic File Manager</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="enlaces-sap"><a class="nav-link" href="#">Enlaces SAP</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="lista-verificacion"><a class="nav-link" href="#">Modelo de lista de verificación de procesos</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="seguridad"><a class="nav-link" href="#">Seguridad</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="alarmas-hana"><a class="nav-link" href="#">Gestión de Alarmas SAP HANA</a></li>
-            </ul>
-          </li>
-
-          <!-- Sub-submenú: Producción -->
-          <li class="nav-item" data-level="3" data-menu-name="produccion">
-            <a class="nav-link" href="#" (click)="toggleMenu(3, 'produccion')">
-              Producción
-              <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3, 'produccion'), 'fa-chevron-right': !isOpen(3, 'produccion')}" style="margin-left:auto;"></i>
-            </a>
-            <ul *ngIf="isOpen(3, 'produccion')" class="nav flex-column pl-4">
-              <li class="nav-item" data-level="4" data-menu-name="ruta"><a class="nav-link" href="#">Ruta</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="etapa"><a class="nav-link" href="#">Etapa</a></li>
-            </ul>
-          </li>
-
-          <!-- Sub-submenú: Mantenimiento -->
-          <li class="nav-item" data-level="3" data-menu-name="mantenimiento">
-            <a class="nav-link" href="#" (click)="toggleMenu(3, 'mantenimiento')">
-              Mantenimiento
-              <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3, 'mantenimiento'), 'fa-chevron-right': !isOpen(3, 'mantenimiento')}" style="margin-left:auto;"></i>
-            </a>
-            <ul *ngIf="isOpen(3, 'mantenimiento')" class="nav flex-column pl-4">
-              <li class="nav-item" data-level="4" data-menu-name="grupo-recursos"><a class="nav-link" href="#">Grupo de Recursos</a></li>
-              <li class="nav-item" data-level="4" data-menu-name="recursos"><a class="nav-link" href="#">Recursos</a></li>
-            </ul>
-          </li>
-
-        </ul>
-      </li>
-    </ul>
-  </li>
-
-
-      
-
-
-      <!-- CRM -->
-      <li class="nav-item" data-level="1" data-menu-name="crm">
-        <a class="nav-link" href="#" (click)="toggleMenu(1,'crm')">
-          <i class="fas fas fa-user mr-2"></i> <!-- Ícono de ventas -->
-          CRM
-          <i class="fas"
-             [ngClass]="{'fa-chevron-down': isOpen(1,'crm'), 'fa-chevron-right': !isOpen(1,'crm')}"
-             style="margin-left:auto;"></i>
-        </a>
-        <ul class="submenu" *ngIf="isOpen(1,'crm')">
-          <li><a class="nav-link" [routerLink]="['/panel/cmr/dato-maestro-comercial']">Datos maestros interlocutor comercial</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Actividad</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Asistente de Generación de Campaña</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Campaña</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Oportunidad</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Oferta de ventas</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Pedido de cliente</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Informe CRM</a></li>
-
-
-
-        </ul>
-      </li>      
-
-      <!--VENTAS -->
-      <li class="nav-item" data-level="1" data-menu-name="principal-ventas">
-        <a class="nav-link" href="#" (click)="toggleMenu(1,'principal-ventas')">
-          <i class="fas fa-dollar-sign mr-2"></i> <!-- Ícono de ventas -->
-          Ventas
-          <i class="fas"
-             [ngClass]="{'fa-chevron-down': isOpen(1,'principal-ventas'), 'fa-chevron-right': !isOpen(1,'principal-ventas')}"
-             style="margin-left:auto;"></i>
-        </a>
-        <ul class="submenu" *ngIf="isOpen(1,'principal-ventas')">
-          <li><a class="nav-link" [routerLink]="['/panel/clientes/list']">Pedidos de Cliente</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Cotización</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Lista Cotización</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/clientes/nuevo']">Factura de Retención</a></li>
-<!-- Reportes -->
-<li class="nav-item" data-level="2" data-menu-name="reportes">
-  <a class="nav-link px-4" href="#" (click)="toggleMenu(2,'reportes')">
-    Reportes
-    <i class="fas"
-       [ngClass]="{'fa-chevron-down': isOpen(2,'reportes'), 'fa-chevron-right': !isOpen(2,'reportes')}"
-       style="margin-left:auto;"></i>
-  </a>
-  <ul class="submenu" *ngIf="isOpen(2,'reportes')">
-    <li><a class="nav-link" [routerLink]="['/panel/reportes/graficos']">Consulta Gráficos</a></li>
-    <li><a class="nav-link" [routerLink]="['/panel/reportes/despacho']">Consulta de Despacho</a></li>
-    <li><a class="nav-link" [routerLink]="['/panel/reportes/ventas']">Consulta de Ventas</a></li>
-    <li><a class="nav-link" [routerLink]="['/panel/reportes/despacho-detalle']">Consulta Despacho Detalle</a></li>
-    <li><a class="nav-link" [routerLink]="['/panel/reportes/pedidos']">Consulta Pedidos Pendientes</a></li>
-    <li><a class="nav-link" [routerLink]="['/panel/reportes/resumen']">Consulta Resumen Ventas</a></li>
-    <li><a class="nav-link" [routerLink]="['/panel/reportes/graficos-ventas']">Gráficos de Ventas</a></li>
-  </ul>
-</li>
-
-        </ul>
-      </li>
-
-      <!-- Gestion de Compras-->
-      <li class="nav-item" data-level="1" data-menu-name="principal-compras">
-              <a class="nav-link" href="#" (click)="toggleMenu(1,'principal-compras')">
-                <i class="fas fa-shopping-cart mr-2"></i> <!-- Ícono de auditoría -->
-                Compras
-                <i class="fas"
-                  [ngClass]="{'fa-chevron-down': isOpen(1,'principal-compras'), 'fa-chevron-right': !isOpen(1,'principal-compras')}"
-                  style="margin-left:auto;"></i>
-              </a>
-              <ul class="submenu" *ngIf="isOpen(1,'principal-compras')">
-                <!-- Submenú de Reportes -->
-                <li class="nav-item" data-level="2" data-menu-name="reqcompras">
-                  <a class="nav-link px-4" href="#" (click)="toggleMenu(2,'reqcompras')">
-                  
-                    Req. de Compras 
-                    <i class="fas"
-                      [ngClass]="{'fa-chevron-down': isOpen(2,'reqcompras'), 'fa-chevron-right': !isOpen(2,'reqcompras')}"
-                      style="margin-left:auto;"></i>
-                  </a>
-                  <ul class="submenu" *ngIf="isOpen(2,'reqcompras')">
-                    <li><a class="nav-link" [routerLink]="['/panel/compras/registro-compras']">Reque. Pendientes</a></li>
-      
-                  </ul>
-                </li>
-      
-              </ul>
-      </li>
-
-      <!-- Interlocutores Comerciales-->
-      <li class="nav-item" data-level="1" data-menu-name="sociosnegocio">
-              <a class="nav-link" href="#" (click)="toggleMenu(1,'sociosnegocio')">
-                <i class="fas fas fa-user mr-2"></i> <!-- Ícono de auditoría -->
-                Socios de Negocio
-                <i class="fas"
-                  [ngClass]="{'fa-chevron-down': isOpen(1,'sociosnegocio'), 'fa-chevron-right': !isOpen(1,'sociosnegocio')}"
-                  style="margin-left:auto;"></i>
-              </a>
-                  <ul class="submenu" *ngIf="isOpen(1,'sociosnegocio')">
-                    <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Registro Req. Compras</a></li>
-                    <li><a class="nav-link" [routerLink]="['/panel/produccion/auditoria']">Reque. Pendientes</a></li>
-                    <li><a class="nav-link" [routerLink]="['/panel/produccion/control-guias']">Requer.Pendientes Usuario</a></li>
-                    <li><a class="nav-link" [routerLink]="['/panel/produccion/control-guias']">Campaña</a></li>
-                    <li class="nav-item" data-level="2" data-menu-name="reconciliacioninterna">
-                      <a class="nav-link" href="#" (click)="toggleMenu(2,'reconciliacioninterna')">
-                        Reconciliación Interna
-                        <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'reconciliacioninterna'), 'fa-chevron-right': !isOpen(2,'reconciliacioninterna')}" style="margin-left:auto;"></i>
-                      </a>
-                      <ul *ngIf="isOpen(2,'reconciliacioninterna')" class="nav flex-column pl-4">
-                        <!-- Nuevo submenú dentro de "Reconciliación interna" -->
-                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Reconciliación</a></li>
-                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Gestionar reconciliaciones precedentes</a></li>
-                      </ul>
-
-                    </li>
-                    <li class="nav-item" data-level="2" data-menu-name="informessocionegocio">
-                      <a class="nav-link" href="#" (click)="toggleMenu(2,'informessocionegocio')">
-                        Informes de Socio de Negocios
-                        <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'informessocionegocio'), 'fa-chevron-right': !isOpen(2,'informessocionegocio')}" style="margin-left:auto;"></i>
-                      </a>
-                      <ul *ngIf="isOpen(2,'informessocionegocio')" class="nav flex-column pl-4">
-                        <!-- Nuevo submenú dentro de "Reconciliación interna" -->
-                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Mis actividades</a></li>
-                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Resumen de actividades</a></li>
-                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Clientes inactivos</a></li>
-                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Historial de reclamaciones</a></li>
-                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Créditos de cliente p. todas secciones cliente</a></li>
-                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Desviación límite crédito clientes</a></li>
-                        <li class="nav-item" data-level="3" data-menu-name="antiguedad">
-                          <a class="nav-link" href="#" (click)="toggleMenu(3,'antiguedad')">
-                            Antigüedad
-                            <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'antiguedad'), 'fa-chevron-right': !isOpen(3,'antiguedad')}" style="margin-left:auto;"></i>
-                          </a>
-                          <ul *ngIf="isOpen(3,'antiguedad')" class="a nav flex-column pl-4">
-                            <!-- Nuevo submenú dentro de "Reconciliación interna" -->
-                            <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Antigüedad de saldos de clientes</a></li>
-                            <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Antigüedad de saldos de proveedores</a></li>
-                          </ul>
-    
-                        </li>
-                        <li class="nav-item" data-level="3" data-menu-name="reconciliacioninterna2">
-                          <a class="nav-link" href="#" (click)="toggleMenu(3,'reconciliacioninterna2')">
-                            Reconciliación Interna
-                            <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(3,'reconciliacioninterna2'), 'fa-chevron-right': !isOpen(3,'reconciliacioninterna2')}" style="margin-left:auto;"></i>
-                          </a>
-                          <ul *ngIf="isOpen(3,'reconciliacioninterna2')" class="a nav flex-column pl-4">
-                            <!-- Nuevo submenú dentro de "Reconciliación interna" -->
-                            <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Reconciliación interna por fecha de vencimiento</a></li>
-                            <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Reconciliación interna por importe exacto</a></li>
-                            <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Reconciliación interna por número trans.</a></li>
-                          </ul>
-                        </li>
-                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Lista de Campañas</a></li>
-                        <li><a class="nav-link" [routerLink]="['/panel/produccion/consumo-stock']">Informe de correos electrónicos enviados</a></li>
-                      </ul>
-                    </li>
-                  </ul>
-      </li>
-
-      <!-- Inventario-->
-      <li class="nav-item" data-level="1" data-menu-name="principal-inventario">
-        <a class="nav-link" href="#" (click)="toggleMenu(1,'principal-inventario')">
-          <i class="fas fa-clipboard-list mr-2"></i> <!-- Ícono de auditoría -->
-          Inventario
-          <i class="fas"
-            [ngClass]="{'fa-chevron-down': isOpen(1,'principal-inventario'), 'fa-chevron-right': !isOpen(1,'principal-inventario')}"
-            style="margin-left:auto;"></i>
-        </a>
-        <ul class="submenu" *ngIf="isOpen(1,'principal-inventario')">
-          <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Lista de Activos</a></li>
-          <li><a class="nav-link" [routerLink]="['/panel/inventario/data-maestro/index']">Data Maestra</a></li>
-          <li class="nav-item" data-level="2" data-menu-name="depachoventas">
-            <a class="nav-link" href="#" (click)="toggleMenu(2,'depachoventas')">
-              Despacho Ventas
-              <i class="fas" [ngClass]="{'fa-chevron-down': isOpen(2,'depachoventas'), 'fa-chevron-right': !isOpen(2,'depachoventas')}" style="margin-left:auto;"></i>
-            </a>
-            <ul *ngIf="isOpen(2,'depachoventas')" class="nav flex-column pl-4">
-              <!-- Sub-submenú de "Definiciones" -->
-              <!-- Sub-submenú de "Importacion datos" -->
-              <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Generar Preguia</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Guias Emitidas</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/inventario/despacho-ventas/lectura']">Lectura Codebar</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Lectura Factura de Reserva</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Liberación Codebar</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/descuentos/nuevo']">Reporte Packing</a></li>
-
-            </ul>
-          </li>
-        </ul>
-
-
-        
-      </li>
-
-
-
-
-
-
-
-
-
-
-
-<!-- Producción -->
-<li class="nav-item" data-level="1" data-menu-name="principal-produccion">
-  <a
-    class="nav-link d-flex align-items-center"
-    role="button"
-    href="javascript:void(0)"
-    (click)="toggleMenu(1,'principal-produccion')"
-  >
-    <i class="fas fa-tools mr-2"></i>
-    Producción
-    <i
-      class="fas"
-      [ngClass]="{
-        'fa-chevron-down': isOpen(1,'principal-produccion'),
-        'fa-chevron-right': !isOpen(1,'principal-produccion')
-      }"
-      style="margin-left:auto;"
-    ></i>
-  </a>
-
-  <ul class="submenu" *ngIf="isOpen(1,'principal-produccion')">
-    <li class="nav-item" data-level="2" data-menu-name="reporte-turno">
-      <a
-        class="nav-link"
-        [routerLink]="['/panel/produccion/reporte-turno']"
-        routerLinkActive="active"
-      >
-        Reporte fin de turno
-      </a>
-    </li>
-
-    <li class="nav-item" data-level="2" data-menu-name="crear-reporte-turno">
-      <a
-        class="nav-link"
-        [routerLink]="['/panel/produccion/crear-reporte-turno']"
-        routerLinkActive="active"
-      >
-        Crear reporte de turno
-      </a>
-    </li>
-
-    <li class="nav-item" data-level="2" data-menu-name="plan-produccion">
-      <a
-        class="nav-link"
-        [routerLink]="['/panel/produccion/plan']"
-        routerLinkActive="active"
-      >
-        Plan de Producción
-      </a>
-    </li>
-
-    <li class="nav-item" data-level="2" data-menu-name="gantt-produccion">
-      <a
-        class="nav-link"
-        [routerLink]="['/panel/produccion/gantt-produccion']"
-        routerLinkActive="active"
-      >
-        Gantt-Producción
-      </a>
-    </li>
-
-    <li class="nav-item" data-level="2" data-menu-name="graficos-produccion">
-      <a
-        class="nav-link"
-        [routerLink]="['/panel/produccion/graficos']"
-        routerLinkActive="active"
-      >
-        Gráficos Producción
-      </a>
-    </li>
-
-    <li class="nav-item" data-level="2" data-menu-name="ficha-tecnica">
-      <a
-        class="nav-link"
-        [routerLink]="['/panel/produccion/ficha']"
-        routerLinkActive="active"
-      >
-        Ficha Técnica
-      </a>
-    </li>
-
-    <li class="nav-item" data-level="2" data-menu-name="preficha">
-      <a
-        class="nav-link"
-        [routerLink]="['/panel/produccion/pre-ficha']"
-        routerLinkActive="active"
-      >
-        Pré-ficha
-      </a>
-    </li>
-
-    <li class="nav-item" data-level="2" data-menu-name="listado-pesaje">
-      <a
-        class="nav-link"
-        [routerLink]="['/panel/produccion/pesaje']"
-        routerLinkActive="active"
-      >
-        Listado de Pesaje Balanzas
-      </a>
-    </li>
-
-    <li class="nav-item" data-level="2" data-menu-name="emision-produccion">
-      <a
-        class="nav-link"
-        [routerLink]="['/panel/produccion/emision']"
-        routerLinkActive="active"
-      >
-        Emisión de Producción
-      </a>
-    </li>
-
-    <li class="nav-item" data-level="2" data-menu-name="lista-emision">
-      <a
-        class="nav-link"
-        [routerLink]="['/panel/produccion/lista-emision']"
-        routerLinkActive="active"
-      >
-        Lista Emisión Producción
-      </a>
-    </li>
-
-    <li class="nav-item" data-level="2" data-menu-name="listar-of">
-      <a
-        class="nav-link"
-        [routerLink]="['/panel/produccion/listar-of']"
-        routerLinkActive="active"
-      >
-        Listar OF Producción
-      </a>
-    </li>
-
-    <!-- Reportes -->
-    <li class="nav-item" data-level="2" data-menu-name="produccion-reportes">
-      <a
-        class="nav-link px-4 d-flex align-items-center"
-        role="button"
-        href="javascript:void(0)"
-        (click)="toggleMenu(2,'produccion-reportes')"
-      >
-        Reportes
-        <i
-          class="fas"
-          [ngClass]="{
-            'fa-chevron-down': isOpen(2,'produccion-reportes'),
-            'fa-chevron-right': !isOpen(2,'produccion-reportes')
-          }"
-          style="margin-left:auto;"
-        ></i>
-      </a>
-      <ul class="submenu" *ngIf="isOpen(2,'produccion-reportes')">
-        <li class="nav-item" data-level="3" data-menu-name="consumo-stock">
+         <li class="nav-item" data-level="1" data-menu-name="regla">
           <a
             class="nav-link"
-            [routerLink]="['/panel/produccion/consumo-stock']"
-            routerLinkActive="active"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'regla')"
           >
-            Consumos de Stock
+           <i class="fa-solid fa-registered mr-2"></i>
+            Regla
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'regla'),
+                'fa-angle-right': !isOpen(1, 'regla')
+              }"
+              style="margin-left: auto"
+            ></i>
           </a>
-        </li>
-        <li class="nav-item" data-level="3" data-menu-name="auditoria-stock">
-          <a
-            class="nav-link"
-            [routerLink]="['/panel/produccion/auditoria']"
-            routerLinkActive="active"
-          >
-            Listar Auditoría de Stock
-          </a>
-        </li>
-        <li class="nav-item" data-level="3" data-menu-name="control-guias">
-          <a
-            class="nav-link"
-            [routerLink]="['/panel/produccion/control-guias']"
-            routerLinkActive="active"
-          >
-            Reporte de Control Guías
-          </a>
-        </li>
-        <li class="nav-item" data-level="3" data-menu-name="pesos-pl">
-          <a
-            class="nav-link"
-            [routerLink]="['/panel/produccion/pesos-pl']"
-            routerLinkActive="active"
-          >
-            Reporte de Pesos PL
-          </a>
-        </li>
-        <li class="nav-item" data-level="3" data-menu-name="stock-almacen">
-          <a
-            class="nav-link"
-            [routerLink]="['/panel/produccion/stock-almacen']"
-            routerLinkActive="active"
-          >
-            Stock x Almacén
-          </a>
-        </li>
-      </ul>
-    </li>
-
-    <!-- Recibo de Producción -->
-    <li class="nav-item" data-level="2" data-menu-name="recibo-produccion">
-      <a
-        class="nav-link px-4 d-flex align-items-center"
-        role="button"
-        href="javascript:void(0)"
-        (click)="toggleMenu(2,'recibo-produccion')"
-      >
-        Recibo de Producción
-        <i
-          class="fas"
-          [ngClass]="{
-            'fa-chevron-down': isOpen(2,'recibo-produccion'),
-            'fa-chevron-right': !isOpen(2,'recibo-produccion')
-          }"
-          style="margin-left:auto;"
-        ></i>
-      </a>
-      <ul class="submenu" *ngIf="isOpen(2,'recibo-produccion')">
-        <li class="nav-item" data-level="3" data-menu-name="orden-produccion">
-          <a
-            class="nav-link"
-            [routerLink]="['/panel/produccion/orden-produccion']"
-            routerLinkActive="active"
-          >
-            Orden de Producción
-          </a>
-        </li>
-        <li class="nav-item" data-level="3" data-menu-name="reimpresion-etiqueta">
-          <a
-            class="nav-link"
-            [routerLink]="['/panel/produccion/reimpresion']"
-            routerLinkActive="active"
-          >
-            Reimpresión de Etiqueta
-          </a>
-        </li>
-      </ul>
-    </li>
-  </ul>
-</li>
-
-
-      <!-- Mantenimiento-->
-      <li class="nav-item" data-level="1" data-menu-name="principal-mantenimiento">
-        <a
-          class="nav-link"
-          role="button"
-          href="javascript:void(0)"
-          (click)="toggleMenu(1,'principal-mantenimiento')"
-        >
-          <i class="fas fa-wrench mr-2"></i> 
-          Mantenimiento
-          <i class="fas"
-            [ngClass]="{'fa-chevron-down': isOpen(1,'principal-mantenimiento'), 'fa-chevron-right': !isOpen(1,'principal-mantenimiento')}"
-            style="margin-left:auto;"
-          ></i>
-        </a>
-        <ul class="submenu" *ngIf="isOpen(1,'principal-mantenimiento')">
-          <li>
-            <a 
-              class="nav-link" 
-              [routerLink]="['/panel/descuentos/nuevo']"
-              routerLinkActive="active"
-            >
-              Lista de Activos
-            </a>
-          </li>
-        </ul>
-      </li>
-
-            <!-- MRP-->
-            <li class="nav-item" data-level="1" data-menu-name="mrp">
-              <a 
-                class="nav-link" 
-                role="button"
-                href="javascript:void(0)"
-                (click)="toggleMenu(1,'mrp')">
-                <i class="fas fa-calendar-check mr-2"></i> 
-                MRP
-                <i class="fas"
-                  [ngClass]="{'fa-chevron-down': isOpen(1,'mrp'), 'fa-chevron-right': !isOpen(1,'mrp')}"
-                  style="margin-left:auto;"></i>
-              </a>
-              <ul class="submenu" *ngIf="isOpen(1,'mrp')">
-                <li>
-                  <a 
-                    class="nav-link" 
-                    routerLinkActive="active"
-                    [routerLink]="['/panel/descuentos/nuevo']">Lista de </a></li>
-              </ul>
+          <ul class="submenu" *ngIf="isOpen(1, 'regla')">
+            <li>
+              <a class="nav-link" routerLinkActive="active">Regla General</a>
             </li>
-            <!-- INFORMES-->
-            <li class="nav-item" data-level="1" data-menu-name="informes">
-              <a 
-                class="nav-link" 
-                role="button"
-                href="javascript:void(0)"
-                (click)="toggleMenu(1,'informes')"
-              >
-                <i class="fas fa-file-alt mr-2"></i> 
-                Informes
-                <i class="fas"
-                  [ngClass]="{'fa-chevron-down': isOpen(1,'informes'), 'fa-chevron-right': !isOpen(1,'informes')}"
-                  style="margin-left:auto;"></i>
-              </a>
-              <ul class="submenu" *ngIf="isOpen(1,'informes')">
-                <li>
-                  <a 
-                    class="nav-link"
-                    routerLinkActive="active"
-                    [routerLink]="['/panel/produccion/reporte-turno']">Lista de Activos</a></li>
-              </ul>
+            <li>
+              <a class="nav-link">Regla del Departamento</a>
             </li>
+            
+          </ul>
+        </li>
+
+        <!-- Menu item horario y turno -->
+
+        <li class="nav-item" data-level="1" data-menu-name="horarioturno">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'horarioturno')"
+          >
+          <i class="fa-solid fa-clock mr-2"></i>
+            Horario y Turno
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'horarioturno'),
+                'fa-angle-right': !isOpen(1, 'horarioturno')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+          <ul class="submenu" *ngIf="isOpen(1, 'horarioturno')">
+            <li>
+              <a class="nav-link" routerLinkActive="active">Descanso</a>
+            </li>
+            <li>
+              <a class="nav-link">Horario</a>
+            </li>
+             <li>
+              <a class="nav-link">Turno</a>
+            </li>
+            
+          </ul>
+        </li>
+
+        <!-- Menu item calendario  -->
+
+         <li class="nav-item" data-level="1" data-menu-name="calendario">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'calendario')"
+          >
+          <i class="fa-solid fa-calendar-days mr-2"></i>
+            Calendario
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'calendario'),
+                'fa-angle-right': !isOpen(1, 'calendario')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+          <ul class="submenu" *ngIf="isOpen(1, 'calendario')">
+            <li>
+              <a class="nav-link" routerLinkActive="active">Por Departamento</a>
+            </li>
+            <li>
+              <a class="nav-link">Por Empleado</a>
+            </li>
+             <li>
+              <a class="nav-link">Calendario Temporal </a>
+            </li>
+
+             <li>
+              <a class="nav-link">Ver Calendario </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        <!-- Menu item de Aprobaciones -->
+           <li class="nav-item" data-level="1" data-menu-name="maprobaciones">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'maprobaciones')"
+          >
+          <i class="fa-solid fa-check-to-slot mr-2"></i>
+            Aprobaciones
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'maprobaciones'),
+                'fa-angle-right': !isOpen(1, 'maprobaciones')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+          <ul class="submenu" *ngIf="isOpen(1, 'maprobaciones')">
+            <li>
+              <a class="nav-link" routerLinkActive="active">Marcación Manual</a>
+            </li>
+            <li>
+              <a class="nav-link">Permiso Papeleta</a>
+            </li>
+             <li>
+              <a class="nav-link">Horas Extras </a>
+            </li>
+
+             <li>
+              <a class="nav-link">Entrenamiento </a>
+            </li>
+
+             <li>
+              <a class="nav-link">Ajuste de Calendario </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        <!-- Menu item de Festivo -->
+        <li class="nav-item" data-level="1" data-menu-name="menufestivo">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'menufestivo')"
+          >
+         <i class="fa-solid fa-file-circle-plus mr-2"></i>
+            Festivo
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'menufestivo'),
+                'fa-angle-right': !isOpen(1, 'menufestivo')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+
+          <ul class="submenu" *ngIf="isOpen(1, 'menufestivo')">
+            <li>
+              <a class="nav-link">Festivo </a>
+            </li>
+          </ul>
+
+        </li>
+
+        <!-- Menu item Reporte de Marcaciones -->
+         <li class="nav-item" data-level="1" data-menu-name="menumarcaciones">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'menumarcaciones')"
+          >
+          <i class="fa-solid fa-file-pdf mr-2"></i>
+            Reporte Marcaciones
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'menumarcaciones'),
+                'fa-angle-right': !isOpen(1, 'menumarcaciones')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+
+          <ul class="submenu" *ngIf="isOpen(1, 'menumarcaciones')">
+            <li>
+              <a class="nav-link">Marcación </a>
+            </li>
+
+             <li>
+              <a class="nav-link">Cartilla de Tiempo </a>
+            </li>
+             <li>
+              <a class="nav-link">Primero & Último </a>
+            </li>
+             <li>
+              <a class="nav-link">Primera Entrada Última Entrada </a>
+            </li>
+
+          </ul>
+
+        </li>
+
+        <!-- Menu item Cálculo -->
+
+          <li class="nav-item" data-level="1" data-menu-name="menucalculo">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'menucalculo')"
+          >
+         <i class="fa-solid fa-calculator mr-2"></i>
+            Cálculo
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'menucalculo'),
+                'fa-angle-right': !isOpen(1, 'menucalculo')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+
+          <ul class="submenu" *ngIf="isOpen(1, 'menucalculo')">
+            <li>
+              <a class="nav-link">Cálculo </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Menu item reporte de calendario -->
+          <li class="nav-item" data-level="1" data-menu-name="repocalendario">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'repocalendario')"
+          >
+        <i class="fa-solid fa-file-pdf mr-2"></i>
+            Reporte Calendario
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'repocalendario'),
+                'fa-angle-right': !isOpen(1, 'repocalendario')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+
+          <ul class="submenu" *ngIf="isOpen(1, 'repocalendario')">
+            <li>
+              <a class="nav-link">Registros del Calendario </a>
+            </li>
+            <li>
+              <a class="nav-link">Asistencia Diaria </a>
+            </li>
+             <li>
+              <a class="nav-link">Asistencia Total </a>
+            </li>
+             <li>
+              <a class="nav-link">Excepciones </a>
+            </li>
+             <li>
+              <a class="nav-link">Tardanza </a>
+            </li>
+             <li>
+              <a class="nav-link">Salidas Temporales </a>
+            </li>
+             <li>
+              <a class="nav-link">Horas Extras </a>
+            </li>
+             <li>
+              <a class="nav-link">Ausencias </a>
+            </li>
+
+             <li>
+              <a class="nav-link">Marcaciones Múltiples </a>
+            </li>
+
+             <li>
+              <a class="nav-link">Descanso Múltiple </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Menu item Reporte resumen -->
+           <li class="nav-item" data-level="1" data-menu-name="reportresumen">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'reportresumen')"
+          >
+         <i class="fa-solid fa-file-pdf mr-2"></i>
+            Reporte Resumen
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'reportresumen'),
+                'fa-angle-right': !isOpen(1, 'reportresumen')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+
+          <ul class="submenu" *ngIf="isOpen(1, 'reportresumen')">
+            <li>
+              <a class="nav-link">Empleado </a>
+            </li>
+             <li>
+              <a class="nav-link">Permisos </a>
+            </li>
+             <li>
+              <a class="nav-link">Departamentos </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Menu item Configuracion de asistencia -->
+               <li class="nav-item" data-level="1" data-menu-name="settingasistencia">
+          <a
+            class="nav-link"
+            role="button"
+            href="javascript:void(0)"
+            (click)="toggleMenu(1, 'settingasistencia')"
+          >
+         <i class="fa-solid fa-gear mr-2"></i>
+            Configuraciones
+            <i
+              class="fas"
+              [ngClass]="{
+                'fa-chevron-down': isOpen(1, 'settingasistencia'),
+                'fa-angle-right': !isOpen(1, 'settingasistencia')
+              }"
+              style="margin-left: auto"
+            ></i>
+          </a>
+
+          <ul class="submenu" *ngIf="isOpen(1, 'settingasistencia')">
+            <li>
+              <a class="nav-link">Tipo de Permiso Papeleta </a>
+            </li>
+             <li>
+              <a class="nav-link">Tipo de Entrenamiento </a>
+            </li>
+             <li>
+              <a class="nav-link">Configuración Reporte </a>
+            </li>
+          </ul>
+        </li>
+
+      </div>
+
     </nav>
   </div>
 </aside>
 
-
 <!-- en index.html dentro del <head> -->
-  <link
+<link
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
 />

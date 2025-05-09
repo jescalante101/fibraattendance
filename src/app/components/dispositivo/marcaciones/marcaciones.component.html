@@ -1,15 +1,7 @@
-<!-- <app-sidebar></app-sidebar> -->
 <div class="border-bottom container pt-5 mt-2 mb-5">
-  <h1 class="mt-2 mt-md-4 mb-3 pt-5">Dispositivos</h1>
-
+ <h1 class="mt-2 mt-md-4 mb-3 pt-5">Marcaciones</h1>
   <div class="btn-group btn-group-sm border" role="group" aria-label="Acciones">
-    <button type="button" class="btn btn-light">Nuevo</button>
-    <button type="button" class="btn btn-danger ml-1">Borrar</button>
-    <button type="button" class="btn btn-dark ml-1">Nueva Área</button>
-    <button type="button" class="btn btn-dark ml-1">Borrar Comando Pendiente</button>
-    <button type="button" class="btn btn-dark ml-1">Borrar Datos</button>
-    <button type="button" class="btn btn-dark ml-1">Transferencia de Datos</button>
-    <button type="button" class="btn btn-dark ml-1">Menú Dispositivo</button>
+    <button type="button" class="btn btn-light">Cargar Marcaciones de USB</button>
   </div>
 
   <div class="mt-4">
@@ -17,18 +9,18 @@
       <thead>
         <tr>
           <th></th>
-          <th scope="col">Número de Serie</th>
+          <th scope="col">Id Empleado</th>
           <th scope="col">Nombre</th>
+          <th scope="col">Departamento</th>
+          <th scope="col">Fecha</th>
+          <th scope="col">Hora</th>
+          <th scope="col">Estado de marcación</th>
+          <th scope="col">Con Mascarilla</th>
+          <th scope="col">Temperatura</th>
           <th scope="col">Área</th>
-          <th scope="col">IP</th>
-          <th scope="col">Estado</th>
-          <th scope="col">Ultima Actividad</th>
-          <th scope="col">Usuario</th>
-          <th scope="col">Huella</th>
-          <th scope="col">Rostro</th>
-          <th scope="col">Palma</th>
-          <th scope="col">Marcaciones</th>
-          <th scope="col">Cmd</th>
+          <th scope="col">Número de serie</th>
+          <th scope="col">Nombre de dispositivo</th>
+          <th scope="col">Cargar hora</th>
         </tr>
       </thead>
       <tbody *ngIf="datosOriginales && datosOriginales.length > 0; else noData">
@@ -74,5 +66,5 @@
       </li>
     </ul>
   </div>
-  
+
 </div>

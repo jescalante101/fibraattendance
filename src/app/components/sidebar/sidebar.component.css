@@ -1,7 +1,7 @@
 /* Estilo general del header */
 .header-blue {
   background-color: #093045; /* Fondo azul oscuro */
-  color: #fff;               /* Texto blanco */
+  color: #fff;               
 }
 header{
   padding: 0.8rem 1rem;
@@ -21,6 +21,12 @@ header{
   display: block; /* o sin display, porque por defecto es block */
   padding-left: 0.2rem;
   
+}
+
+/* Estilos opcionales para indicar el item activo */
+.navbar-nav .nav-item.active .nav-link {
+  font-weight: bold;
+  color: #FFA955; 
 }
 
 .navbar-nav{

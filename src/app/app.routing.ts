@@ -27,12 +27,16 @@ import { IndexComponent } from "./components/inventario/data-maestro/index/index
 import { ReporteTurnoComponent } from "./components/produccion/reporte-turno/reporte-turno.component";
 import { CrearReporteTurnoComponent } from "./components/produccion/crear-reporte-turno/crear-reporte-turno.component";
 import { DispositivoComponent } from "./components/dispositivo/dispositivo.component";
+import { PersonalComponent } from "./components/personal/empresa/personal.component";
+import { AsistenciaComponent } from "./components/asistencia/asistencia/asistencia.component";
+import { DepartamentoComponent } from "./components/personal/departamento/departamento.component";
+import { MarcacionesComponent } from "./components/dispositivo/marcaciones/marcaciones.component";
 
 
 
 const appRoutes: Routes = [
     {path : '', redirectTo:'inicio', pathMatch : 'full'},
-    {path:'',component:InicioComponent,},
+    {path:'',component:PersonalComponent,},
     {path: 'panel', children:[
         {path:'clientes',component:IndexClienteComponent,},
         {path:'clientes/registro',component:CreateClienteComponent,},
@@ -55,7 +59,20 @@ const appRoutes: Routes = [
         {path : 'inventario/data-maestro/index', component:IndexComponent},
         {path : 'produccion/reporte-turno', component:ReporteTurnoComponent},
         {path : 'produccion/crear-reporte-turno', component:CrearReporteTurnoComponent},
-        {path: 'dispositivo',component: DispositivoComponent}
+
+        
+        //TODO: Agregar las vistas para el panel de personal
+        {path: 'personal',component:PersonalComponent},
+        {path:'personal/departamento',component:DepartamentoComponent},
+
+        //TODO:agregar las vistas para el panel de los dispositivos
+        {path: 'dispositivo',component: DispositivoComponent},
+        {path:'dispositivo/marcaciones',component:MarcacionesComponent},
+
+        //TODO: Agregar las vistas para el panel de asistencia
+        {path: 'asistencia', component:AsistenciaComponent}
+
+
 
     ]},
     {path: 'login', component:LoginComponent}

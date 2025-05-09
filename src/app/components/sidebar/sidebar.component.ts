@@ -12,6 +12,18 @@ import {
   styleUrls: ['./sidebar.component.css'],
 })
 export class SidebarComponent implements AfterViewInit {
+
+
+
+  activeItem: string | null = "personal";
+
+  selectItem(itemName: string) {
+    this.activeItem = itemName;
+    
+    // Aquí puedes agregar más lógica si es necesario, como guardar el estado en un servicio, etc.
+  }
+
+
   @Output() collapsedChange = new EventEmitter<boolean>();
   isCollapsed = false;
 

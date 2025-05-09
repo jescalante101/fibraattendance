@@ -28,22 +28,22 @@
           <td>
             <input
               type="checkbox"
-              [(ngModel)]="item.seleccionado"
+              [(ngModel)]="item.Seleccionado"
               (change)="actualizarSeleccionados()"
             />
           </td>
-          <th scope="row">{{ item["Numero de Serie"] }}</th>
+          <th scope="row">{{ item.IdEmpleado }}</th>
           <td>{{ item.Nombre }}</td>
+          <td>{{ item.Departamento }}</td>
+          <td>{{ item.Fecha }}</td>
+          <td>{{ item.Hora }}</td>
+          <td>{{ item.EstadoMarcacion }}</td>
+          <td>{{ item.ConMascarilla }}</td>
+          <td>{{ item.Temperatura }}</td>
           <td>{{ item.Area }}</td>
-          <td>{{ item.IP }}</td>
-          <td>{{ item.Estado }}</td>
-          <td>{{ item["Ultima Actividad"] | date : "yyyy-MM-dd HH:mm:ss" }}</td>
-          <td>{{ item.Usuario }}</td>
-          <td>{{ item.Huella }}</td>
-          <td>{{ item.Rostro }}</td>
-          <td>{{ item.Palma }}</td>
-          <td>{{ item.Marcaciones }}</td>
-          <td>{{ item.Cmd }}</td>
+          <td>{{ item.NSerie }}</td>
+          <td>{{ item.NombreDispositivo }}</td>
+          <td>{{ item.CargarHora }}</td>
         </tr>
       </tbody>
       <ng-template #noData>

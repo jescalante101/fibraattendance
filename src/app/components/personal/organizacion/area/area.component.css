@@ -1,0 +1,16 @@
+ .table th {
+            white-space: nowrap; /* Evita el salto de línea en los encabezados */
+        }
+        .actions {
+            white-space: nowrap; /* Evita el salto de línea en los botones de acción */
+        }
+        .sidebar {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 1px solid #dee2e6;
+            height: 100%; /* Ajusta según sea necesario */
+        }
+        .sidebar-item {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }

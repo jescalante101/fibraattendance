@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { AdminService } from 'src/app/service/admin.service';
-import { global } from 'src/app/service/global';
+// import { AdminService } from 'src/app/service/admin.service';
+// import { global } from 'src/app/service/global';
 declare var iziToast : any;
 import { v4 as uuidv4 } from 'uuid';
 declare var jQuery:any;
@@ -14,32 +14,30 @@ declare var $:any;
 }) 
 export class ConfigComponent implements OnInit{
 
-  public token;
+  // public token;
   public config : any = {};
-  public url;
+  // public url;
 
   public titulo_cat = '';
   public icono_cat = '';
   public file:any=undefined;
   public imgSelect : string|ArrayBuffer | any;
 
-  constructor(
-    private _adminService: AdminService
-    ) { 
-      this.token = localStorage.getItem('token');
-      this.url = global.url;
-      this._adminService.obtener_config_admin(this.token).subscribe(
-        response=>{
-          this.config = response.data;
-          this.imgSelect = this.url+'obtener_logo/'+this.config.logo;
-           console.log(this.config);
+  constructor( /*private _adminService: AdminService*/) { 
+      // this.token = localStorage.getItem('token');
+      // this.url = global.url;
+      // this._adminService.obtener_config_admin(this.token).subscribe(
+      //   response=>{
+      //     this.config = response.data;
+      //     this.imgSelect = this.url+'obtener_logo/'+this.config.logo;
+      //      console.log(this.config);
           
-        },
-        error=>{
-          console.log(error);
+      //   },
+      //   error=>{
+      //     console.log(error);
           
-        }
-      );
+      //   }
+      // );
     }
 
   ngOnInit(): void {
@@ -82,21 +80,21 @@ export class ConfigComponent implements OnInit{
 
       console.log(data);
 
-      this._adminService.actualiza_config_admin("64911ea6a72c1797b7ea926c",data,this.token).subscribe(
-        response=>{
+      // this._adminService.actualiza_config_admin("64911ea6a72c1797b7ea926c",data,this.token).subscribe(
+      //   response=>{
 
-          console.log(response); 
-          iziToast.show({
-              title: 'SUCCESS',
-              titleColor: '#1DC74C',
-              color: '#FFF',
-              class: 'text-success',
-              position: 'topRight',
-              message: 'Se actualizó correctamente la configuracion.'
-          });
+      //     console.log(response); 
+      //     iziToast.show({
+      //         title: 'SUCCESS',
+      //         titleColor: '#1DC74C',
+      //         color: '#FFF',
+      //         class: 'text-success',
+      //         position: 'topRight',
+      //         message: 'Se actualizó correctamente la configuracion.'
+      //     });
           
-        }
-      );
+      //   }
+      // );
       
     }else{
       iziToast.show({

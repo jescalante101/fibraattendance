@@ -1,21 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-interface Dispositivo {
-  'Numero de Serie': string;
-  Nombre: string;
-  Area: string;
-  IP: string;
-  Estado: string;
-  'Ultima Actividad': string;
-  Usuario: string;
-  Huella: string;
-  Rostro: string;
-  Palma: string;
-  Marcaciones: string;
-  Cmd: string;
-  seleccionado?: boolean;
-}
+import { DeviceService } from 'src/app/core/device.service';
+import { IclockTerminalModel } from 'src/app/core/models/iclock-terminal.model';
+
+
 
 @Component({
   selector: 'app-dispositivo',
@@ -24,23 +13,43 @@ interface Dispositivo {
 })
 export class DispositivoComponent implements OnInit {
 
- datosOriginales: Dispositivo[] = [ // Reemplaza esto con tus datos reales
-     { 'Numero de Serie': 'AEH2182760005', Nombre: 'LUR-ING', Area: 'LURIN', IP: '192.168.1.205', Estado: '✅', 'Ultima Actividad': '2025-05-08 16:32:56', Usuario: '777', Huella: '1472', Rostro: '8', Palma: '0', Marcaciones: '69689', Cmd: '0' },
-    { 'Numero de Serie': 'XYZ9876543210', Nombre: 'OFICINA-1', Area: 'CENTRAL', IP: '192.168.1.100', Estado: '✅', 'Ultima Actividad': '2025-05-09 08:00:00', Usuario: '123', Huella: '5678', Rostro: '2', Palma: '1', Marcaciones: '12345', Cmd: '1' },
-    { 'Numero de Serie': 'ABC1234567890', Nombre: 'ALMACEN-A', Area: 'NORTE', IP: '192.168.1.150', Estado: '❌', 'Ultima Actividad': '2025-05-07 19:45:30', Usuario: '456', Huella: '9012', Rostro: '5', Palma: '0', Marcaciones: '67890', Cmd: '0' },
-    // ... más datos ...
-  ];
+  devices: IclockTerminalModel[] = []; // Propiedad para almacenar los datos
+  errorMessage: string = '';
+  currentPage=1;
+
+  constructor(private deviceService: DeviceService){
+    
+  }
+
+//  datosOriginales: Dispositivo[] = [ // Reemplaza esto con tus datos reales
+//      { 'Numero de Serie': 'AEH2182760005', Nombre: 'LUR-ING', Area: 'LURIN', IP: '192.168.1.205', Estado: '✅', 'Ultima Actividad': '2025-05-08 16:32:56', Usuario: '777', Huella: '1472', Rostro: '8', Palma: '0', Marcaciones: '69689', Cmd: '0' },
+//     { 'Numero de Serie': 'XYZ9876543210', Nombre: 'OFICINA-1', Area: 'CENTRAL', IP: '192.168.1.100', Estado: '✅', 'Ultima Actividad': '2025-05-09 08:00:00', Usuario: '123', Huella: '5678', Rostro: '2', Palma: '1', Marcaciones: '12345', Cmd: '1' },
+//     { 'Numero de Serie': 'ABC1234567890', Nombre: 'ALMACEN-A', Area: 'NORTE', IP: '192.168.1.150', Estado: '❌', 'Ultima Actividad': '2025-05-07 19:45:30', Usuario: '456', Huella: '9012', Rostro: '5', Palma: '0', Marcaciones: '67890', Cmd: '0' },
+//     // ... más datos ...
+//   ];
   
-  datosFiltrados: Dispositivo[] = [];
+  datosFiltrados: IclockTerminalModel[] = [];
   filtros: string[] = ['', '', '', '', '', '', '', '', '', '', '', '']; // Un filtro por columna
   elementosSeleccionados: string[] = [];
   filtroFechaInicio: string | null = null;
   filtroFechaFin: string | null = null;
 
-  
+  loadDevices(): void {
+  this.deviceService.getDevicesByPage(this.currentPage).subscribe(
+    (data) => {
+      this.devices = data; // Asigna los datos recibidos a la propiedad del componente
+    },
+    (error) => {
+      this.errorMessage = 'Error al cargar los dispositivos.';
+      console.error(error);
+      // Manejar el error apropiadamente (mostrar mensaje al usuario)
+    }
+  );
+}
 
   ngOnInit(): void {
-    this.datosFiltrados = [...this.datosOriginales]; // Inicializa con todos los datos
+    this.loadDevices()
+    this.datosFiltrados = [...this.devices]; // Inicializa con todos los datos
   }
 
   filtrarTabla(event: any): void {
@@ -51,7 +60,7 @@ export class DispositivoComponent implements OnInit {
   }
 
   aplicarFiltros(): void {
-    this.datosFiltrados = this.datosOriginales.filter(item => {
+    this.datosFiltrados = this.devices.filter(item => {
       return this.filtros.every((filtro, index) => {
         if (!filtro) {
           return true; // Si el filtro está vacío, la fila siempre pasa
@@ -60,7 +69,7 @@ export class DispositivoComponent implements OnInit {
         return valorCelda.includes(filtro);
       });
     });
-    this.actualizarSeleccionadosLista(); // Mantener la lista de seleccionados al filtrar
+   // this.actualizarSeleccionadosLista(); // Mantener la lista de seleccionados al filtrar
   }
   filtrarPorFecha(): void {
     this.aplicarFiltros();
@@ -85,24 +94,24 @@ filtrarPorRangoFecha(fechaUltimaActividad: string): boolean {
     return true; // Caso por defecto si algo sale mal con los filtros de fecha
   }
 
-  seleccionarTodos(): void {
-    this.datosFiltrados.forEach(item => item.seleccionado = true);
-    this.actualizarSeleccionadosLista();
-  }
+  // seleccionarTodos(): void {
+  //   this.datosFiltrados.forEach(item => item.seleccionado = true);
+  //   this.actualizarSeleccionadosLista();
+  // }
 
-  deseleccionarTodos(): void {
-    this.datosFiltrados.forEach(item => item.seleccionado = false);
-    this.actualizarSeleccionadosLista();
-  }
+  // deseleccionarTodos(): void {
+  //   this.datosFiltrados.forEach(item => item.seleccionado = false);
+  //   this.actualizarSeleccionadosLista();
+  // }
 
-  actualizarSeleccionados(): void {
-    this.actualizarSeleccionadosLista();
-  }
+  // actualizarSeleccionados(): void {
+  //   this.actualizarSeleccionadosLista();
+  // }
 
-  actualizarSeleccionadosLista(): void {
-    this.elementosSeleccionados = this.datosFiltrados
-      .filter(item => item.seleccionado)
-      .map(item => item['Numero de Serie']);
-  }
+  // actualizarSeleccionadosLista(): void {
+  //   this.elementosSeleccionados = this.datosFiltrados
+  //     .filter(item => item.seleccionado)
+  //     .map(item => item['Numero de Serie']);
+  // }
 
 }

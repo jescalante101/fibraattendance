@@ -1,0 +1,217 @@
+[NX Daemon Server] - 2025-05-12T14:14:39.562Z - Started listening on: \\.\pipe\nx\C:\Users\JESCAL~1\AppData\Local\Temp\fa8314b03bcc30db8d09\d.sock
+[NX Daemon Server] - 2025-05-12T14:14:39.568Z - [WATCHER]: Subscribed to changes within: c:\fibrafil_attendance\cliente\FIBRAWEB2.0 (native)
+[NX Daemon Server] - 2025-05-12T14:14:39.580Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-05-12T14:14:39.583Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-05-12T14:14:39.617Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-05-12T14:14:39.618Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-05-12T14:14:39.619Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-05-12T14:14:39.622Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-05-12T14:14:39.726Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-05-12T14:14:39.728Z - Established a connection. Number of open connections: 3
+[NX Daemon Server] - 2025-05-12T14:14:39.729Z - Closed a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-05-12T14:14:39.729Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-05-12T14:14:39.820Z - [WATCHER]: nx.json was modified
+[NX Daemon Server] - 2025-05-12T14:14:39.821Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:14:40.118Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:14:40.170Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:14:40.221Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:14:40.274Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:14:40.329Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:14:40.395Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:14:40.655Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2025-05-12T14:14:40.655Z - [REQUEST]: nx.json
+[NX Daemon Server] - 2025-05-12T14:14:40.655Z - [REQUEST]: 
+[NX Daemon Server] - 2025-05-12T14:14:40.663Z - Time taken for 'loadNxPlugins' 722.6635000000001ms
+[NX Daemon Server] - 2025-05-12T14:14:40.664Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2025-05-12T14:14:40.665Z - [REQUEST]: nx.json
+[NX Daemon Server] - 2025-05-12T14:14:40.665Z - [REQUEST]: 
+[NX Daemon Server] - 2025-05-12T14:14:40.667Z - Time taken for 'loadNxPlugins' 733.8983000000001ms
+[NX Daemon Server] - 2025-05-12T14:14:40.714Z - Time taken for 'build-project-configs' 26.025200000000268ms
+[NX Daemon Server] - 2025-05-12T14:14:40.725Z - Time taken for 'build-project-configs' 52.95450000000005ms
+[NX Daemon Server] - 2025-05-12T14:14:40.846Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-05-12T14:14:40.846Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-05-12T14:14:41.259Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:14:41.359Z - [SYNC]: collect registered sync generators
+[NX Daemon Server] - 2025-05-12T14:14:41.361Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-05-12T14:14:41.362Z - Time taken for 'total for creating and serializing project graph' 1738.3007ms
+[NX Daemon Server] - 2025-05-12T14:14:41.363Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-05-12T14:14:41.364Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 1739. Response time: 3.
+[NX Daemon Server] - 2025-05-12T14:14:41.373Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-05-12T14:14:41.438Z - [SYNC]: collect registered sync generators
+[NX Daemon Server] - 2025-05-12T14:14:41.439Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX Daemon Server] - 2025-05-12T14:14:41.439Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX Daemon Server] - 2025-05-12T14:14:41.440Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-05-12T14:14:41.441Z - Time taken for 'total execution time for createProjectGraph()' 695.4096999999997ms
+[NX Daemon Server] - 2025-05-12T14:14:41.441Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:14:41.442Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-05-12T14:14:41.442Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 67. Response time: 2.
+[NX Daemon Server] - 2025-05-12T14:14:41.448Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-05-12T14:14:41.449Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-05-12T14:14:41.451Z - Time taken for 'total for creating and serializing project graph' 0.7382000000002336ms
+[NX Daemon Server] - 2025-05-12T14:14:41.451Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-05-12T14:14:41.451Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 1. Response time: 2.
+[NX Daemon Server] - 2025-05-12T14:14:41.458Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-05-12T14:14:41.458Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-05-12T14:14:41.460Z - Time taken for 'total for creating and serializing project graph' 0.6853000000000975ms
+[NX Daemon Server] - 2025-05-12T14:14:41.461Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-05-12T14:14:41.461Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 0. Response time: 3.
+[NX Daemon Server] - 2025-05-12T14:14:41.465Z - [REQUEST]: Responding to the client. handleContextFileData
+[NX Daemon Server] - 2025-05-12T14:14:41.466Z - Done responding to the client handleContextFileData
+[NX Daemon Server] - 2025-05-12T14:14:41.466Z - Handled GET_CONTEXT_FILE_DATA. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2025-05-12T14:14:41.470Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-05-12T14:14:41.492Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:13.800Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:13.800Z - [WATCHER]: Stopping the watcher for c:\fibrafil_attendance\cliente\FIBRAWEB2.0 (sources)
+[NX Daemon Server] - 2025-05-12T14:20:15.700Z - Started listening on: \\.\pipe\nx\C:\Users\JESCAL~1\AppData\Local\Temp\fa8314b03bcc30db8d09\d.sock
+[NX Daemon Server] - 2025-05-12T14:20:15.703Z - [WATCHER]: Subscribed to changes within: c:\fibrafil_attendance\cliente\FIBRAWEB2.0 (native)
+[NX Daemon Server] - 2025-05-12T14:20:15.715Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-05-12T14:20:15.717Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-05-12T14:20:15.740Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-05-12T14:20:15.740Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-05-12T14:20:15.741Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-05-12T14:20:15.742Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-05-12T14:20:15.964Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2025-05-12T14:20:15.965Z - [REQUEST]: 
+[NX Daemon Server] - 2025-05-12T14:20:15.965Z - [REQUEST]: 
+[NX Daemon Server] - 2025-05-12T14:20:15.970Z - Time taken for 'loadNxPlugins' 220.67920000000004ms
+[NX Daemon Server] - 2025-05-12T14:20:16.002Z - Time taken for 'build-project-configs' 18.878899999999987ms
+[NX Daemon Server] - 2025-05-12T14:20:16.063Z - [REQUEST]: Responding to the client with an error. Error when preparing serialized project graph. Failed to process project graph. Run "nx reset" to fix this. Please report the issue if you keep seeing it.
+Failed to process project graph. Run "nx reset" to fix this. Please report the issue if you keep seeing it.
+      MultipleProjectsWithSameNameError: The following projects are defined in multiple locations:
+  - admin: 
+    - 
+    - .
+  
+  To fix this, set a unique name for each project in a project.json inside the project's root. If the project does not currently have a project.json, you can create one that contains only a name.
+      at validateAndNormalizeProjectRootMap (c:\fibrafil_attendance\cliente\FIBRAWEB2.0\node_modules\nx\src\project-graph\utils\project-configuration-utils.js:439:15)
+      at mergeCreateNodesResults (c:\fibrafil_attendance\cliente\FIBRAWEB2.0\node_modules\nx\src\project-graph\utils\project-configuration-utils.js:325:9)
+      at c:\fibrafil_attendance\cliente\FIBRAWEB2.0\node_modules\nx\src\project-graph\utils\project-configuration-utils.js:270:85
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async processFilesAndCreateAndSerializeProjectGraph (c:\fibrafil_attendance\cliente\FIBRAWEB2.0\node_modules\nx\src\daemon\server\project-graph-incremental-recomputation.js:160:43)
+      at async getCachedSerializedProjectGraphPromise (c:\fibrafil_attendance\cliente\FIBRAWEB2.0\node_modules\nx\src\daemon\server\project-graph-incremental-recomputation.js:52:24)
+      at async handleRequestProjectGraph (c:\fibrafil_attendance\cliente\FIBRAWEB2.0\node_modules\nx\src\daemon\server\handle-request-project-graph.js:12:24)
+      at async handleResult (c:\fibrafil_attendance\cliente\FIBRAWEB2.0\node_modules\nx\src\daemon\server\server.js:172:16)
+      at async handleMessage (c:\fibrafil_attendance\cliente\FIBRAWEB2.0\node_modules\nx\src\daemon\server\server.js:107:9)
+      at async c:\fibrafil_attendance\cliente\FIBRAWEB2.0\node_modules\nx\src\daemon\server\server.js:72:9
+[NX Daemon Server] - 2025-05-12T14:20:16.066Z - Time taken for 'total execution time for createProjectGraph()' 64.93260000000004ms
+[NX Daemon Server] - 2025-05-12T14:20:16.066Z - Done responding to the client null
+[NX Daemon Server] - 2025-05-12T14:20:16.066Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 320. Response time: 4.
+[NX Daemon Server] - 2025-05-12T14:20:16.071Z - [REQUEST]: Responding to the client. handleContextFileData
+[NX Daemon Server] - 2025-05-12T14:20:16.072Z - Done responding to the client handleContextFileData
+[NX Daemon Server] - 2025-05-12T14:20:16.072Z - Handled GET_CONTEXT_FILE_DATA. Handling time: 1. Response time: 1.
+[NX Daemon Server] - 2025-05-12T14:20:16.073Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-05-12T14:20:46.989Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:47.060Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:47.117Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:47.177Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:47.237Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:47.295Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:47.349Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:47.410Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:47.469Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:47.524Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:47.593Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:47.790Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:48.844Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:48.906Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:48.977Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:49.385Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:49.472Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:49.523Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:49.592Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:49.660Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:49.866Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:49.920Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:49.988Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:50.059Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:50.130Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:50.193Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:51.380Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:52.076Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:52.188Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:52.285Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:52.349Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:52.427Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:52.507Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:52.585Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:52.657Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:52.785Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:52.839Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:52.906Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:53.090Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:53.172Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:53.322Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:53.518Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:53.708Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:53.790Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:53.870Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:53.981Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:54.061Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:54.124Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:54.188Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:54.238Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:54.773Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:55.024Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:55.123Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:56.032Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:56.087Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:56.146Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:56.200Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:56.250Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:56.308Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:56.358Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:56.426Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:56.479Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:56.541Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:56.622Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:58.375Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:58.425Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:58.482Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:58.532Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:58.585Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:58.639Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:58.694Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:58.772Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:58.842Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:58.904Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:59.012Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:59.068Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:59.652Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:59.789Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:59.859Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:59.909Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:20:59.963Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:00.016Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:00.084Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:01.063Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:01.189Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:01.266Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:01.402Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:01.532Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:01.895Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:02.395Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:02.741Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:03.181Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:03.719Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:03.801Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:04.981Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:05.583Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:06.266Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:06.451Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:07.366Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:08.216Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:08.385Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:08.530Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:08.848Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:09.148Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:09.281Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:09.363Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:09.495Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:09.581Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:09.914Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:18.117Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:21:18.465Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:28:02.490Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-05-12T14:28:02.493Z - [WATCHER]: Stopping the watcher for c:\fibrafil_attendance\cliente\FIBRAWEB2.0 (sources)
+[NX Daemon Server] - 2025-05-12T14:28:02.493Z - [WATCHER]: Stopping the watcher for c:\fibrafil_attendance\cliente\FIBRAWEB2.0 (outputs)
+[NX Daemon Server] - 2025-05-12T14:28:02.494Z - Server stopped because: "NX_VERSION_CHANGED"

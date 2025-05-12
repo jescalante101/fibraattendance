@@ -4,7 +4,9 @@ import {
   EventEmitter,
   ElementRef,
   AfterViewInit,
+  NgModule,
 } from '@angular/core';
+
 
 @Component({
   selector: 'app-sidebar',

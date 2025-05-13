@@ -21,7 +21,8 @@ import { ModalLoadingComponent } from './modal-loading/modal-loading.component';
   ],
   exports: [
     ModalAlertaComponent,
-    ModalConfirmComponent
+    ModalConfirmComponent,
+    ModalLoadingComponent
   ]
 })
 export class SharedModule { }

@@ -44,37 +44,37 @@ export class InicioComponent {
 }
 
 function resaltarEnlace() {
-  const contenedor = document.querySelector('.contenido-pedido');
-  if (!contenedor) {
-    console.error('No se encontró el contenedor .contenido-pedido');
-    return;
-  }
+  // const contenedor = document.querySelector('.contenido-pedido');
+  // if (!contenedor) {
+  //   console.error('No se encontró el contenedor .contenido-pedido');
+  //   return;
+  // }
 
-  const sections = contenedor.querySelectorAll('section');
-  const navLinks = document.querySelectorAll('.pedidocliente a');
+  // const sections = contenedor.querySelectorAll('section');
+  // const navLinks = document.querySelectorAll('.pedidocliente a');
 
-  contenedor.addEventListener('scroll', () => {
-    let activo = '';
-    let minDistancia = Infinity;
+  // contenedor.addEventListener('scroll', () => {
+  //   let activo = '';
+  //   let minDistancia = Infinity;
 
-    sections.forEach(section => {
-      const rect = section.getBoundingClientRect();
-      const contRect = contenedor.getBoundingClientRect();
+  //   sections.forEach(section => {
+  //     const rect = section.getBoundingClientRect();
+  //     const contRect = contenedor.getBoundingClientRect();
 
-      const distancia = Math.abs(rect.top - contRect.top); // qué tan cerca está del top del contenedor
+  //     const distancia = Math.abs(rect.top - contRect.top); // qué tan cerca está del top del contenedor
 
-      if (distancia < minDistancia) {
-        minDistancia = distancia;
-        activo = section.id;
-      }
-    });
+  //     if (distancia < minDistancia) {
+  //       minDistancia = distancia;
+  //       activo = section.id;
+  //     }
+  //   });
 
-    navLinks.forEach(link => {
-      link.classList.remove('active');
-      if (link.getAttribute('href') === '#' + activo) {
-        link.classList.add('active');
-      }
-    });
-  });
+  //   navLinks.forEach(link => {
+  //     link.classList.remove('active');
+  //     if (link.getAttribute('href') === '#' + activo) {
+  //       link.classList.add('active');
+  //     }
+  //   });
+  // });
 }
 

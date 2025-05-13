@@ -37,6 +37,9 @@ import { AsistenciaComponent } from './components/asistencia/asistencia/asistenc
 import { DepartamentoComponent } from './components/personal/organizacion/departamento/departamento.component';
 import { MarcacionesComponent } from './components/dispositivo/marcaciones/marcaciones.component';
 import { AreaComponent } from './components/personal/organizacion/area/area.component';
+import { TerminalSyncComponent } from './components/modal/terminal-sync/terminal-sync.component';
+import { LoadingComponent } from '@progress/kendo-angular-grid';
+import { ModalLoadingComponent } from './shared/modal-loading/modal-loading.component';
 
 
 
@@ -61,6 +64,7 @@ import { AreaComponent } from './components/personal/organizacion/area/area.comp
 
     DispositivoComponent,
     MarcacionesComponent,
+    TerminalSyncComponent,
 
     AsistenciaComponent,
   
@@ -87,7 +91,11 @@ import { AreaComponent } from './components/personal/organizacion/area/area.comp
     NgxTinymceModule.forRoot({
       baseURL : '../../../assets/tinymce/'
     }),
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+  ],
+  exports:[
+    TerminalSyncComponent,
+    ModalLoadingComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

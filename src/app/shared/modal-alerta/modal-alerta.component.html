@@ -1,22 +1,52 @@
 <div class="alert-header">
-    <span class="alert-icon">  
-        <svg xmlns="http://www.w3.org/2000/svg"
-        width="24" height="24" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="12" fill="#f44336"/>
-            <line x1="8" y1="8" x2="16" y2="16"
-           stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-            <line x1="16" y1="8" x2="8" y2="16"
-           stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-    </span>
-    <span class="alert-title">Error</span>
+    
+    <span class="alert-title">Marcaciones del Dia</span>
   </div>
   <div class="alert-divider"></div>
   <div class="alert-body">
     <!-- Si data.field está definido, mostramos “Valor que falta: X” -->
-    <ng-container *ngIf="data.field; else showMsg">
-      Valor que falta: <strong>{{ data.field }}</strong>
-    </ng-container>
+    <div class="container mt-2">
+  <table *ngIf="data.field!=null" class="table table-striped table-bordered">
+    <thead class="fix">
+      <tr>
+        <th scope="col">Usuario</th>
+        <th scope="col">Tipo</th>
+        <th scope="col">Fecha</th>
+        <th scope="col">Hora</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let registro of registrosPaginados">
+        <td>{{ registro.enrollNumber }}</td>
+        <td>{{ registro.recordType }}</td>
+        <td>{{ registro.timestamp | date:'yyyy-MM-dd' }}</td>
+        <td>{{ registro.timestamp | date:'HH:mm:ss' }}</td>
+      </tr>
+    </tbody>
+    <tfoot>
+
+      <tr>
+        <td colspan="4">
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="cambiarPagina(currentPage - 1)">Anterior</button>
+              </li>
+              <li class="page-item" *ngFor="let page of getPaginas()" [class.active]="currentPage === page">
+                <button class="page-link" (click)="cambiarPagina(page)">{{ page }}</button>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <button class="page-link" (click)="cambiarPagina(currentPage + 1)">Siguiente</button>
+              </li>
+            </ul>
+          </nav>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+  <div *ngIf="data?.field?.length === 0" class="alert alert-warning">No hay datos para mostrar.</div>
+</div>
+
     <ng-template #showMsg>
       {{ data.mensaje }}
     </ng-template>
@@ -24,4 +54,3 @@
   <div class="alert-footer">
     <button mat-button (click)="close()">Cerrar</button>
   </div>
-  

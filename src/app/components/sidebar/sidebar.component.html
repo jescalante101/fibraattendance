@@ -11,7 +11,7 @@
       <a
         class="nav-link py-0"
         aria-current="page"
-        [routerLink]="['./panel/personal']"
+        [routerLink]="['./panel/personal/organizacion']"
         (click)="selectItem('personal'); toggleMenu(1,'organizacion')"
         >Personal</a
       >
@@ -172,7 +172,7 @@
               <a class="nav-link" [routerLink]="['panel/personal/organizacion/departamento']">Departamentos </a>
             </li>
             <li>
-              <a class="nav-link">Cargo </a>
+              <a class="nav-link" [routerLink]="['panel/personal/organizacion/cargo']">Cargo </a>
             </li>
             <li>
               <a class="nav-link" [routerLink]="['panel/personal/organizacion/area']">Area </a>

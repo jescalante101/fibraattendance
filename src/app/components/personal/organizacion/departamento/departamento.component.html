@@ -2,39 +2,74 @@
   <h1 class="mt-2 mt-md-4 mb-3 pt-5">Dispositivos</h1>
 
   <div class="btn-group btn-group-sm border" role="group" aria-label="Acciones">
-    <button type="button" class="btn btn-light">Nuevo</button>
-    <button type="button" class="btn btn-danger ml-1">Borrar</button>
-    <button type="button" class="btn btn-dark ml-1">Importar</button>
-    <button type="button" class="btn btn-dark ml-1">Asignar Empleado a</button>
+    <button mat-stroked-button class="btn btn-light">
+      <small>Nuevo</small>
+    </button>
+    <button mat-stroked-button class="btn btn-outline-danger ml-1">
+      <small>Borrar</small>
+    </button>
+    <button mat-stroked-button class="btn btn-outline-info ml-1">
+      <small>Importar</small>
+    </button>
+    <button class="btn btn-outline-info ml-1"  mat-stroked-button>
+      <small>Asignar Empleado a</small>
+    </button>
   </div>
 
   <div class="mt-4">
-    <table class="table table-striped table-light table-hover">
+    <table class="table table-striped table-light table-hover"
+              style="width: 100%; table-layout: auto">
       <thead>
         <tr>
           <th></th>
-          <th scope="col">Código de Departamento</th>
-          <th scope="col">Nombre del Departamento</th>
-          <th scope="col">Departamento superior</th>
-          <th scope="col">Empresa</th>
-          <th scope="col">Cantidad de Empleado</th>
-          <th scope="col"></th>
+          <th scope="col" style="padding: 0.2rem">
+            <small>Código de Departamento</small>
+          </th>
+          <th scope="col" style="padding: 0.2rem">
+            <small>Nombre del Departamento</small>
+          </th>
+          <th scope="col" style="padding: 0.2rem">
+            <small>
+              Departamento superior
+            </small>
+          </th>
+          <th scope="col" style="padding: 0.2rem">
+            <small>Empresa</small>
+          </th>
+          <th scope="col" style="padding: 0.2rem">
+            <small>Cantidad de Empleado</small>
+          </th>
+          <th scope="col" style="padding: 0.2rem"></th>
         </tr>
       </thead>
-      <tbody *ngIf="datosorignales && datosorignales.length > 0; else noData">
-        <tr *ngFor="let item of datosorignales; let i = index">
-          <td>
+      <tbody *ngIf="dataDepartment && dataDepartment.length > 0; else noData">
+        <tr *ngFor="let item of dataDepartment; let i = index">
+          <td style="padding: 0.1rem">
             <input
               type="checkbox"
               [(ngModel)]="item.seleccionado"
               (change)="actualizarSeleccionados()"
             />
           </td>
-          <th scope="row">{{ item.Codigo }}</th>
-          <td>{{ item.Nombre }}</td>
-          <td>{{ item.DepartamentoSuperior }}</td>
-          <td>{{ item.Empresa }}</td>
-          <td>{{ item.CantidadEmp }}</td>
+          <th scope="row" style="padding: 0.1rem">
+            <small>{{ item.deptCode }}</small>
+          </th>
+          <td style="padding: 0.1rem">
+            <small>{{ item.companyName }}</small>
+          </td>
+          <td style="padding: 0.1rem">
+            <small>
+              {{ item.sup }}
+            </small>
+          </td>
+          <td style="padding: 0.1rem">
+            <small>{{ item.companyName }}</small>
+          </td>
+          <td style="padding: 0.1rem">
+            <small>
+              {{ item.totalEmpleados }}
+            </small>
+          </td>
 
           <td>
             
@@ -61,5 +96,7 @@
       </li>
     </ul>
   </div>
+
+  
 </div>
 

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
 import { DeviceService } from 'src/app/core/device.service';
-import { ModalAlertaComponent } from 'src/app/shared/modal-alerta/modal-alerta.component';
+import { AttendanceRecord, ModalAlertaComponent } from 'src/app/shared/modal-alerta/modal-alerta.component';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 import { ModalLoadingComponent } from 'src/app/shared/modal-loading/modal-loading.component';
 import { ModalComponent } from 'src/app/shared/modal/modal.component';
@@ -82,13 +82,16 @@ export class DispositivoComponent implements OnInit {
   }
   
   loadDataDevice(ipAddress:string){
-    const dialogRef=this.dialog.open(ModalLoadingComponent)
+    const dialogRef=this.dialog.open(ModalLoadingComponent,)
 
     this.deviceService.loadTransactionDevice(ipAddress,4370).subscribe(
       (data)=>{
        console.log(data);
+       const records=data as AttendanceRecord[]
        this.dialog.open(ModalAlertaComponent,{
-        data:{field:data}
+        width:'800px',
+        height:'600px',
+        data:{field:records}
        });
        dialogRef.close();
       },
@@ -105,7 +108,7 @@ export class DispositivoComponent implements OnInit {
  
   loadDevices(): void {
 
-    const dialogRef=this.dialog.open(ModalLoadingComponent);
+    const dialogRef=this.dialog.open(ModalLoadingComponent,);
     this.isLoading=true;
     this.deviceService.getDevicesByPage(this.currentPage).subscribe(
       (data) => {

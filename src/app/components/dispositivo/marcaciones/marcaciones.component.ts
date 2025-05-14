@@ -20,11 +20,17 @@ export class MarcacionesComponent implements OnInit {
   mostrarPuntosFinal: boolean = false;
   isLoading=false;
   errorMessage: string = '';
+  datosSeleccionado: any={};
 
   constructor(private deviceService: DeviceService,private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.cargarMarcaciones();
+  }
+
+  updateInfoUserSelect(select:any){
+    console.log(select.nombre);
+    this.datosSeleccionado=select;
   }
 
   cargarMarcaciones(): void {

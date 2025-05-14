@@ -1,14 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { PersonService } from 'src/app/core/services/person.service';
+import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
+import { ModalLoadingComponent } from 'src/app/shared/modal-loading/modal-loading.component';
 
 
-interface Departamentos {
-  Codigo: string;
-  Nombre: string;
-  DepartamentoSuperior: string;
-  Empresa: string;
-  CantidadEmp: string;
-  seleccionado?: boolean;
-}
 
 @Component({
   selector: 'app-departamento',
@@ -17,31 +13,36 @@ interface Departamentos {
 })
 export class DepartamentoComponent implements OnInit {
 
-  datosorignales:Departamentos[]=[
-    {
-      Codigo:"1",
-      Nombre:"FIBRAFIL",
-      DepartamentoSuperior:"-",
-      Empresa:"FIBRAFIL",
-      CantidadEmp:"772"
-    },
-    {
-      Codigo:"FP02",
-      Nombre:"FIBRAFIL",
-      DepartamentoSuperior:"-",
-      Empresa:"FIBRAFIL",
-      CantidadEmp:"772"
-    },
-    
-  ];
+  dataDepartment: any[] = [];
 
-  datosFiltrados: Departamentos[] = [];
+ 
+
+  datosFiltrados: any[] = [];
  elementosSeleccionados: string[] = [];
 
-
+  constructor(private personalService: PersonService,private dialog:MatDialog){}
 
   ngOnInit() {
-     this.datosFiltrados = [...this.datosorignales]; 
+    this.loadData()
+     this.datosFiltrados = [...this.dataDepartment]; 
+  }
+
+  loadData(){
+     const dialgoRef=this.dialog.open(ModalLoadingComponent);
+        
+            this.personalService.getListDepartment().subscribe(
+              (data)=>{
+                console.log(data);
+                this.dataDepartment=data;
+                dialgoRef.close();
+              },
+              (error)=>{
+                this.dialog.open(ModalConfirmComponent,{
+                  data:{mensaje:error,tipo:'error'}
+                });
+                 dialgoRef.close();
+              }
+            );
   }
 
   actualizarSeleccionados(): void {

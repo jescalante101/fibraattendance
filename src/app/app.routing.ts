@@ -9,6 +9,7 @@ import { AsistenciaComponent } from "./components/asistencia/asistencia/asistenc
 import { DepartamentoComponent } from "./components/personal/organizacion/departamento/departamento.component";
 import { MarcacionesComponent } from "./components/dispositivo/marcaciones/marcaciones.component";
 import { AreaComponent } from "./components/personal/organizacion/area/area.component";
+import { CargoComponent } from "./components/personal/organizacion/cargo/cargo.component";
 
 
 
@@ -23,6 +24,7 @@ const appRoutes: Routes = [
         {path: 'personal/organizacion',component:PersonalComponent},
         {path:'personal/organizacion/departamento',component:DepartamentoComponent},
         {path:"personal/organizacion/area",component:AreaComponent},
+        {path:"personal/organizacion/cargo",component:CargoComponent},
 
         //TODO:agregar las vistas para el panel de los dispositivos
         {path: 'dispositivo',component: DispositivoComponent},

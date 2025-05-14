@@ -40,6 +40,7 @@ import { AreaComponent } from './components/personal/organizacion/area/area.comp
 import { TerminalSyncComponent } from './components/modal/terminal-sync/terminal-sync.component';
 import { LoadingComponent } from '@progress/kendo-angular-grid';
 import { ModalLoadingComponent } from './shared/modal-loading/modal-loading.component';
+import { CargoComponent } from './components/personal/organizacion/cargo/cargo.component';
 
 
 
@@ -60,6 +61,7 @@ import { ModalLoadingComponent } from './shared/modal-loading/modal-loading.comp
     PersonalComponent,
     DepartamentoComponent,
     AreaComponent,
+    CargoComponent,
 
 
     DispositivoComponent,

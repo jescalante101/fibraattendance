@@ -10,6 +10,9 @@ import { DepartamentoComponent } from "./components/personal/organizacion/depart
 import { MarcacionesComponent } from "./components/dispositivo/marcaciones/marcaciones.component";
 import { AreaComponent } from "./components/personal/organizacion/area/area.component";
 import { CargoComponent } from "./components/personal/organizacion/cargo/cargo.component";
+import { EmpleadoComponent } from "./components/personal/empleado/empleado/empleado.component";
+import { CeseComponent } from "./components/personal/empleado/cese/cese.component";
+import { HorarioComponent } from "./components/asistencia/horarios/horario/horario.component";
 
 
 
@@ -26,12 +29,16 @@ const appRoutes: Routes = [
         {path:"personal/organizacion/area",component:AreaComponent},
         {path:"personal/organizacion/cargo",component:CargoComponent},
 
+        {path:'personal/empleado/empleado',component:EmpleadoComponent},
+        {path:'personal/empleado/cese',component:CeseComponent},   
+
         //TODO:agregar las vistas para el panel de los dispositivos
         {path: 'dispositivo',component: DispositivoComponent},
         {path:'dispositivo/marcaciones',component:MarcacionesComponent},
 
         //TODO: Agregar las vistas para el panel de asistencia
-        {path: 'asistencia', component:AsistenciaComponent}
+        {path: 'asistencia', component:AsistenciaComponent},
+        {path: 'asistencia/horarios', component:HorarioComponent}
 
 
 

@@ -41,16 +41,28 @@
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="" id="area1">
                                         <label class="form-check-label" for="area1">
-                                            <small>item.</small>
+                                            <small>{{item.codArea}}</small>
                                         </label>
                                     </div>
                                 </td>
-                                <td style="padding: 0.1rem">No autorizado</td>
-                                <td style="padding: 0.1rem">-</td>
-                                <td style="padding: 0.1rem">0</td>
+                                <td style="padding: 0.1rem">
+                                    <small>{{item.nombreArea}}</small>
+                                </td>
+                                <td style="padding: 0.1rem">
+                                   <small>
+                                     {{item.superior}}
+                                   </small>
+                                </td>
+                                <td style="padding: 0.1rem">
+                                    {{item.cantidadDispositivos}}
+                                </td>
                                 <td class="actions" style="padding: 0.1rem">
-                                    <button class="btn btn-success btn-sm mr-1"><i class="fas fa-check"></i></button>
-                                    <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                                    <button mat-button aria-label="Example icon button with a menu icon">
+                                        <mat-icon>edit</mat-icon>
+                                    </button>
+                                    <button mat-button aria-label="Example icon button with a menu icon">
+                                        <mat-icon style="color: red;">delete</mat-icon>
+                                    </button>
                                 </td>
                             </tr>
                            
@@ -59,13 +71,18 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="sidebar">
-                    <h5>No autorizado</h5>
-                    <p class="sidebar-item">LURIN</p>
-                    <p class="sidebar-item">CHILCA2</p>
-                    <p class="sidebar-item">CHILCA2</p>
-                    <p class="sidebar-item">F.CHILCA2</p>
-                </div>
+                
+                <mat-card appearance="outlined" class="mt-4">
+                    <mat-card-content *ngFor="let item of dataAreas" >
+                        <button mat-stroked-button class="mt-2" >
+                        <small>
+                            <strong>
+                                {{item.nombreArea}}
+                            </strong>
+                        </small>
+                    </button>
+                    </mat-card-content>
+                </mat-card>
             </div>
         </div>
 </div>

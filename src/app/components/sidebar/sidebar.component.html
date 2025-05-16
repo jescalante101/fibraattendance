@@ -152,7 +152,7 @@
             href="javascript:void(0)"
             (click)="toggleMenu(1, 'organizacion')"
           >
-            <i class="fa-solid fa-sitemap mr-2"></i>
+            <i class="fa-solid fa-sitemap mr-2" ></i>
             Organización
             <i
               class="fas"
@@ -165,17 +165,17 @@
           </a>
           <ul class="submenu" *ngIf="isOpen(1, 'organizacion')">
             <li>
-              <a class="nav-link" [routerLink]="['panel/personal/organizacion']"  >Empresa </a>
+              <a class="nav-link" [routerLink]="['panel/personal/organizacion']"  routerLinkActive="active">Empresa </a>
             </li>
             <!-- [routerLink]="['/panel/descuentos/nuevo']" -->
             <li>
-              <a class="nav-link" [routerLink]="['panel/personal/organizacion/departamento']">Departamentos </a>
+              <a class="nav-link" [routerLink]="['panel/personal/organizacion/departamento']" routerLinkActive="active">Departamentos </a>
             </li>
             <li>
-              <a class="nav-link" [routerLink]="['panel/personal/organizacion/cargo']">Cargo </a>
+              <a class="nav-link" [routerLink]="['panel/personal/organizacion/cargo']" routerLinkActive="active">Cargo </a>
             </li>
             <li>
-              <a class="nav-link" [routerLink]="['panel/personal/organizacion/area']">Area </a>
+              <a class="nav-link" [routerLink]="['panel/personal/organizacion/area']" routerLinkActive="active">Area </a>
             </li>
           </ul>
         </li>
@@ -189,7 +189,7 @@
             href="javascript:void(0)"
             (click)="toggleMenu(1, 'empleado')"
           >
-            <i class="fa-solid fa-users-line mr-2"></i>
+            <i class="fa-solid fa-users-line mr-2" ></i>
             Empleado
             <i
               class="fas"
@@ -202,11 +202,11 @@
           </a>
           <ul class="submenu" *ngIf="isOpen(1, 'empleado')">
             <li>
-              <a class="nav-link" routerLinkActive="active">Empleados </a>
+              <a class="nav-link" routerLinkActive="active" [routerLink]="['panel/personal/empleado/empleado']" >Empleados </a>
             </li>
            
             <li>
-              <a class="nav-link">Cese </a>
+              <a class="nav-link" routerLinkActive="active" [routerLink]="['panel/personal/empleado/cese']">Cese </a>
             </li>
           </ul>
         </li>
@@ -237,11 +237,11 @@
             </li>
            
             <li>
-              <a class="nav-link">Proceso de Permiso </a>
+              <a class="nav-link" routerLinkActive="active">Proceso de Permiso </a>
             </li>
 
             <li>
-              <a class="nav-link">Aprobaciones </a>
+              <a class="nav-link" routerLinkActive="active">Aprobaciones </a>
             </li>
 
           </ul>
@@ -304,11 +304,11 @@
           </a>
           <ul class="submenu" *ngIf="isOpen(1, 'dispositivo')">
             <li>
-              <a class="nav-link" [routerLink]="['./panel/dispositivo']" >Dispositivos</a>
+              <a class="nav-link" [routerLink]="['./panel/dispositivo']" routerLinkActive="active">Dispositivos</a>
             </li>
             <!-- [routerLink]="['/panel/descuentos/nuevo']" -->
             <li>
-              <a class="nav-link">Comandos de Dispositivo</a>
+              <a class="nav-link" routerLinkActive="active">Comandos de Dispositivo</a>
             </li>
             
           </ul>
@@ -335,11 +335,11 @@
           </a>
           <ul class="submenu" *ngIf="isOpen(1, 'mensaje')">
             <li>
-              <a class="nav-link" routerLinkActive="active">Público</a>
+              <a class="nav-link" routerLinkActive="active" routerLinkActive="active">Público</a>
             </li>
             <!-- [routerLink]="['/panel/descuentos/nuevo']" -->
             <li>
-              <a class="nav-link">Privado</a>
+              <a class="nav-link" routerLinkActive="active">Privado</a>
             </li>
             
           </ul>
@@ -371,15 +371,15 @@
             </li>
 
             <li>
-              <a class="nav-link">Plantilla Biométrica</a>
+              <a class="nav-link" routerLinkActive="active">Plantilla Biométrica</a>
             </li>
 
              <li>
-              <a class="nav-link">Foto Biométrica</a>
+              <a class="nav-link" routerLinkActive="active">Foto Biométrica</a>
             </li>
 
              <li>
-              <a class="nav-link" [routerLink]="['/panel/dispositivo/marcaciones']">Marcaciones</a>
+              <a class="nav-link" [routerLink]="['/panel/dispositivo/marcaciones']" routerLinkActive="active">Marcaciones</a>
             </li>
             
           </ul>
@@ -411,11 +411,11 @@
             </li>
 
             <li>
-              <a class="nav-link">Evento de Errores</a>
+              <a class="nav-link" routerLinkActive="active">Evento de Errores</a>
             </li>
 
              <li>
-              <a class="nav-link">Cargar Registros</a>
+              <a class="nav-link" routerLinkActive="active">Cargar Registros</a>
             </li>
             
           </ul>
@@ -529,7 +529,7 @@
               <a class="nav-link" routerLinkActive="active">Regla General</a>
             </li>
             <li>
-              <a class="nav-link">Regla del Departamento</a>
+              <a class="nav-link" routerLinkActive="active">Regla del Departamento</a>
             </li>
             
           </ul>
@@ -560,7 +560,7 @@
               <a class="nav-link" routerLinkActive="active">Descanso</a>
             </li>
             <li>
-              <a class="nav-link">Horario</a>
+              <a class="nav-link" routerLinkActive="active" [routerLink]="['/panel/asistencia/horarios']">Horario</a>
             </li>
              <li>
               <a class="nav-link">Turno</a>
@@ -821,13 +821,13 @@
 
           <ul class="submenu" *ngIf="isOpen(1, 'reportresumen')">
             <li>
-              <a class="nav-link">Empleado </a>
+              <a class="nav-link" routerLinkActive="active">Empleado </a>
             </li>
              <li>
-              <a class="nav-link">Permisos </a>
+              <a class="nav-link" routerLinkActive="active">Permisos </a>
             </li>
              <li>
-              <a class="nav-link">Departamentos </a>
+              <a class="nav-link" routerLinkActive="active">Departamentos </a>
             </li>
           </ul>
         </li>
@@ -854,13 +854,13 @@
 
           <ul class="submenu" *ngIf="isOpen(1, 'settingasistencia')">
             <li>
-              <a class="nav-link">Tipo de Permiso Papeleta </a>
+              <a class="nav-link" routerLinkActive="active">Tipo de Permiso Papeleta </a>
             </li>
              <li>
-              <a class="nav-link">Tipo de Entrenamiento </a>
+              <a class="nav-link" routerLinkActive="active">Tipo de Entrenamiento </a>
             </li>
              <li>
-              <a class="nav-link">Configuración Reporte </a>
+              <a class="nav-link" routerLinkActive="active">Configuración Reporte </a>
             </li>
           </ul>
         </li>
@@ -868,6 +868,7 @@
       </div>
 
     </nav>
+
   </div>
 </aside>
 

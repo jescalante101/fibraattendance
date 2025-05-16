@@ -18,6 +18,7 @@ export class SidebarComponent implements AfterViewInit {
 
 
   activeItem: string | null = "personal";
+  
 
   selectItem(itemName: string) {
     this.activeItem = itemName;

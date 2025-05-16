@@ -21,13 +21,14 @@ export class AreaComponent implements OnInit {
   constructor(private personalService: PersonService, private dialog:MatDialog) { }
 
   ngOnInit() {
+    this.loadAreas();
     this.datosFiltrados = [...this.dataAreas]; 
   }
 
-  loadPositions(){
+  loadAreas(){
        const dialgoRef=this.dialog.open(ModalLoadingComponent);
               
-                  this.personalService.getPositions().subscribe(
+                  this.personalService.getListAreas().subscribe(
                     (data)=>{
                       console.log(data);
                       this.dataAreas=data;

@@ -38,9 +38,15 @@ import { DepartamentoComponent } from './components/personal/organizacion/depart
 import { MarcacionesComponent } from './components/dispositivo/marcaciones/marcaciones.component';
 import { AreaComponent } from './components/personal/organizacion/area/area.component';
 import { TerminalSyncComponent } from './components/modal/terminal-sync/terminal-sync.component';
-import { LoadingComponent } from '@progress/kendo-angular-grid';
 import { ModalLoadingComponent } from './shared/modal-loading/modal-loading.component';
 import { CargoComponent } from './components/personal/organizacion/cargo/cargo.component';
+import { EmpleadoComponent } from './components/personal/empleado/empleado/empleado.component';
+
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { CeseComponent } from './components/personal/empleado/cese/cese.component';
+import { HorarioComponent } from './components/asistencia/horarios/horario/horario.component';
+
+
 
 
 
@@ -63,16 +69,21 @@ import { CargoComponent } from './components/personal/organizacion/cargo/cargo.c
     AreaComponent,
     CargoComponent,
 
+    EmpleadoComponent,
+    CeseComponent,
+
 
     DispositivoComponent,
     MarcacionesComponent,
     TerminalSyncComponent,
 
     AsistenciaComponent,
+    HorarioComponent
   
 
   ],
   imports: [
+    
     SharedModule, // 🔥 Aquí sí, aquí se importa todo lo de shared
     BrowserModule,
     AppRoutingModule,
@@ -88,6 +99,7 @@ import { CargoComponent } from './components/personal/organizacion/cargo/cargo.c
     GanttModule,
     MatTabsModule,
     MatButtonModule,
+    MatPaginatorModule,
     MatFormFieldModule,
     MatSelectModule,
     NgxTinymceModule.forRoot({

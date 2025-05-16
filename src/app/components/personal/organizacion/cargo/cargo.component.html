@@ -19,10 +19,10 @@
       class="table table-striped table-light table-hover"
       style="width: 100%; table-layout: auto"
     >
-      <thead class="thead-light">
+      <thead >
         <tr>
           <th></th>
-          <th><small>Código de cargo</small></th>
+          <th style="padding: 0.2rem"><small>Código de cargo</small></th>
           <th scope="col" style="padding: 0.2rem"><small>Nombre de cargo</small></th>
           <th scope="col" style="padding: 0.2rem"><small>Superior</small></th>
           <th scope="col" style="padding: 0.2rem"><small>Cantidad de empleados</small></th>
@@ -30,7 +30,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of dataPosition; let i = index">
+        <tr *ngFor="let item of dataPosition">
           <td style="padding: 0.1rem">
             <input
               type="checkbox"
@@ -38,21 +38,22 @@
               (change)="actualizarSeleccionados()"
             />
           </td>
-          <th scope="row" style="padding: 0.1rem">
+          <td scope="row" style="padding: 0.1rem">
             <small>{{ item.positionCode }}</small>
-          </th>
-          <th scope="row" style="padding: 0.1rem">
+          </td>
+          <td scope="row" style="padding: 0.1rem">
             <small>{{ item.positionName }}</small>
-          </th>
-           <th scope="row" style="padding: 0.1rem">
+          </td>
+           <td scope="row" style="padding: 0.1rem">
             <small>{{ item.superior }}</small>
-          </th>
-          <th scope="row" style="padding: 0.1rem">
+          </td>
+          <td scope="row" style="padding: 0.1rem">
             <small>{{ item.cantEmpleados }}</small>
-          </th>
-          <th scope="row" style="padding: 0.1rem">
+          </td>
+          <td scope="row" style="padding: 0.1rem">
             <small>{{ item.renuncias }}</small>
-          </th>
+          </td>
+        </tr>
       </tbody>
       <ng-template #noData>
         <tr>

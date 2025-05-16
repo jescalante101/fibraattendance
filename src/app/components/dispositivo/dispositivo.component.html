@@ -1,19 +1,6 @@
 <!-- <app-sidebar></app-sidebar> -->
 
 
-<app-terminal-sync
-  [isVisible]="isModalVisible"
-  [title]="modalTitle"
-  [message]="modalMessage"
-  (closed)="onModalClosed($event)"
-  (confirmed)="onModalConfirmed()"
->
-  <strong>Información adicional:</strong> {{ dataEspecifica }}
-</app-terminal-sync>
-
-  <app-modal-loading *ngIf="isLoading"></app-modal-loading>
-
-    <div *ngIf="errorMessage && !isLoading" class="alert alert-danger">{{ errorMessage }}</div>
 
 <div class="border-bottom container pt-5 mt-2 mb-5">
   <h3 class="mt-2 mt-md-4 mb-3 pt-5">Dispositivos</h3>
@@ -67,7 +54,14 @@
           <td><small>{{ item.nombre }}</small></td>
           <td><small>{{ item.area }}</small></td>
           <td><small>{{ item.ipDispositivo }}</small></td>
-          <td><small>{{ item.estado }}</small></td>
+          <td><small>
+            <div *ngIf="item.estado==1;else noEstado">
+              🟢
+            </div>
+            <ng-template #noEstado>
+              ⚪
+            </ng-template>
+          </small></td>
           <td><small>{{ item.ultimaActividad}}</small></td>
           <td><small>{{ item.usuarios }}</small></td>
           <td><small>{{ item.huella }}</small></td>
@@ -79,7 +73,7 @@
             <a (click)="verifyDevice(item.ipDispositivo,item.idTerminal)">
               <i class="fa-solid fa-rss " style="color: rgb(32, 202, 123);"></i>
             </a>
-            <a (click)="loadDataDevice(item.ipDispositivo)" >
+            <a (click)="loadDataDevice(item.ipDispositivo,item.idTerminal)" >
              <i class="fa-solid fa-cloud-arrow-down ml-2"></i>
             </a>
           </th>

@@ -25,8 +25,8 @@ export class DeviceService {
   verifyConnectionDevice(idDevice:number,ipAddress:string):Observable<any>{
    return this.http.put<any>(`${this.apiUrl}Device/verifyConnection`,{"ipAddress":ipAddress,"port":idDevice});
   }
-  loadTransactionDevice(ipAddress:string,port:number):Observable<any[]>{
-    return this.http.get<any[]>(`${this.apiUrl}Device/list_records_transaction_today`,{params:{"ipAddress":ipAddress,"port":port}});
+  loadTransactionDevice(ipAddress:string,port:number,idDevice:number):Observable<any[]>{
+    return this.http.get<any[]>(`${this.apiUrl}Device/list_records_transaction_today`,{params:{"IpAddress":ipAddress,"Port":port,"idDevice":idDevice}});
   }
 
 

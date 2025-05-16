@@ -1,0 +1,117 @@
+<div class="border-bottom container pt-5 mt-2 mb-5">
+  <div class="btn-group btn-group-sm border mt-3" role="group" aria-label="Acciones">
+    <button mat-stroked-button class="btn btn-light">
+      <small>Nuevo</small>
+    </button>
+    <button mat-stroked-button class="btn btn-outline-danger ml-1">
+      <small>Borrar</small>
+    </button>
+    <button mat-stroked-button class="btn btn-outline-info ml-1">
+      <small>Importar</small>
+    </button>
+    <button class="btn btn-outline-info ml-1" mat-stroked-button>
+      <small>Transferir Empleado</small>
+    </button>
+    <button class="btn btn-outline-info ml-1" mat-stroked-button>
+      <small>Modificar Contrato</small>
+    </button>
+    <button class="btn btn-outline-info ml-1" mat-stroked-button>
+      <small>App</small>
+    </button>
+  </div>
+
+  <div class="mt-2">
+      <table  class="table table-striped table-light table-hover table-bordered"
+      style="width: 100%; table-layout: auto">
+class="table table-striped table-light table-hover table-bordered"
+      style="width: 100%; table-layout: auto"
+      <thead class="thead-light">
+        <tr>
+          <th></th>
+          <th><small>ID Empleado</small></th>
+          <th scope="col" style="padding: 0.2rem"><small>Nombre</small></th>
+          <th scope="col" style="padding: 0.2rem"><small>Apellido</small></th>
+          <th scope="col" style="padding: 0.2rem"><small>Departamento</small></th>
+          <th scope="col" class="actions" style="padding: 0.2rem"><small>Cargo</small></th>
+          <th scope="col" class="actions" style="padding: 0.2rem"><small>Privilegio</small></th>
+          <th scope="col" class="actions" style="padding: 0.2rem"><small>Área</small></th>
+          <th scope="col" class="actions" style="padding: 0.2rem"><small>Estado APP</small></th>
+          <th scope="col" class="actions" style="padding: 0.2rem"><small>Huella</small></th>
+          <th scope="col" class="actions" style="padding: 0.2rem"><small>Rostro</small></th>
+          <th scope="col" class="actions" style="padding: 0.2rem"><small>Palma</small></th>
+          <th scope="col" class="actions" style="padding: 0.2rem"><small>BIO Foto</small></th>
+          <th scope="col" class="actions" style="padding: 0.2rem"><small></small></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let item of dataEmployees">
+          <td style="padding: 0.1rem">
+            <input
+              type="checkbox"
+              
+              (change)="actualizarSeleccionados()"
+            />
+          </td>
+          <td scope="row" style="padding: 0.1rem">
+            <small>{{ item.empCode}}</small>
+          </td>
+          <td scope="row" style="padding: 0.1rem">
+            <small>{{ item.firstName}}</small>
+          </td>
+          <td scope="row" style="padding: 0.1rem">
+            <small>{{ item.lastName}}</small>
+          </td>
+          <td scope="row" style="padding: 0.1rem">
+            <small>{{ item.deptName}}</small>
+          </td>
+           <td scope="row" style="padding: 0.1rem">
+            <small>{{ item.positionName}}</small>
+          </td>
+           <td scope="row" style="padding: 0.1rem">
+            <small>{{ item.positionName}}</small>
+          </td>
+          <td scope="row" style="padding: 0.1rem">
+            <small>{{ item.area.areaName}}</small>
+          </td>
+          <td scope="row" style="padding: 0.1rem">
+            <small>{{ item.estadoApp}}</small>
+          </td>
+           <td scope="row" style="padding: 0.1rem">
+            <small>ver 10:2</small>
+          </td>
+          <td scope="row" style="padding: 0.1rem">
+            <small>-</small>
+          </td>
+          <td scope="row" style="padding: 0.1rem">
+            <small>-</small>
+          </td>
+          <td scope="row" style="padding: 0.1rem">
+            <small>-</small>
+          </td>
+          <td class="actions" style="padding: 0.1rem">
+            <button mat-button aria-label="Example icon button with a menu icon">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-button aria-label="Example icon button with a menu icon" style="color: red;">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+      </table>
+
+<mat-paginator
+        [length]="totalRecords"
+        [pageSize]="pageSize"
+        [pageIndex]="pageNumber - 1" 
+        (page)="handlePageEvent($event)"
+        [pageSizeOptions]="[5, 10, 20, 50]"
+        showFirstLastButtons
+        aria-label="Seleccione la página">
+      </mat-paginator>
+      
+
+  </div>
+
+</div>

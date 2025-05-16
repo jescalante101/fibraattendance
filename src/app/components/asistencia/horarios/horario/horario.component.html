@@ -1,0 +1,85 @@
+<div class="mt-2">
+  <div class="btn-group btn-group-sm border mt-3" role="group" aria-label="Acciones">
+    <button mat-stroked-button class="btn btn-light btn-outline-danger">
+      <small>Borrar</small>
+    </button>
+    <button mat-stroked-button class="btn btn-outline-danger ml-1">
+      <small>Nuevo Horario Normal</small>
+    </button>
+    <button mat-stroked-button class="btn btn-outline-info ml-1">
+      <small>Nuevo Horario Flexible</small>
+    </button>
+  </div>
+
+  <table class="table table-striped table-light table-hover table-bordered" style="width: 100%; table-layout: auto">
+    <thead class="thead-light">
+      <tr>
+        <th>
+          <input type="checkbox" aria-label="Checkbox for following text input">
+        </th>
+        <th scope="col"><small>Nombre</small></th>
+        <th scope="col"><small>Tipo</small></th>
+        <th scope="col"><small>Entrada</small></th>
+        <th scope="col"><small>Salida</small></th>
+        <th scope="col"><small>Tiempo de Trabajo</small></th>
+        <th scope="col"><small>Descanso</small></th>
+        <th scope="col"><small>Diás laborales</small></th>
+        <!-- <th scope="col">Tipo de Trabajo</th> -->
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of dataHorarios">
+        <th scope="row" style="padding: 0.1rem">
+          <input type="checkbox" aria-label="Checkbox for following text input">
+        </th>
+        <td style="padding: 0.1rem">
+          <small>{{item.alias}}</small>
+        </td>
+        <td style="padding: 0.1rem">
+          <small>
+            <div *ngIf="item.useMode==1;else noEstado">Flexible</div>
+            <ng-template #noEstado>Normal</ng-template>
+          </small>
+        </td>
+        <td style="padding: 0.1rem">
+          <small>
+            {{item.inTime  | date : "HH:mm:ss" }}
+          </small>
+        </td>
+        <td style="padding: 0.1rem">
+          <small>
+            {{calcularHoraSalida(ExtraerHoraDeFecha(item.inTime)  ,item.workTimeDuration )}}
+          </small>
+        </td>
+        <td style="padding: 0.1rem">
+          <small>{{item.workTimeDuration}}</small>
+        </td>
+        <td style="padding: 0.1rem">
+          <small>
+            {{item.minEarlyIn}} 
+          </small>
+        </td>
+        <td style="padding: 0.1rem">
+          <small>
+            {{item.workDay}}
+          </small>
+        </td>
+        <!-- <td>
+          <small>
+            <div *ngIf="item.workType==1;else noEstado">Normal</div>
+            <ng-template #noEstado>Extra</ng-template>
+          </small>
+        </td> -->
+        <td style="padding: 0.1rem">
+          <button mat-button aria-label="Example icon button with a menu icon">
+              <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-button aria-label="Example icon button with a menu icon">
+              <mat-icon style="color: red;">delete</mat-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

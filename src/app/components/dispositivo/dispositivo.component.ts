@@ -17,44 +17,14 @@ import { ModalComponent } from 'src/app/shared/modal/modal.component';
 export class DispositivoComponent implements OnInit {
 
   devices: any[] = []; // Propiedad para almacenar los datos
-  errorMessage: string = '';
-  currentPage=1;
-  isLoading=false;
+  
 
-  isModalVisible: boolean = false;
-  modalTitle: string = 'Información';
-  modalMessage: string = '';
-  dataEspecifica: string = 'Algún valor importante.';
-  datosParaMostrar: any = { nombre: 'Juan', edad: 30 }; // Tus datos
-
-
-  mostrarModal(): void {
-    
-    console.log('Se ha llamado a mostrarModal()'); // Para depuración
-    this.modalTitle = 'Detalles del Usuario';
-    this.modalMessage = `Nombre: ${this.datosParaMostrar.nombre}, Edad: ${this.datosParaMostrar.edad}`;
-    this.isModalVisible = true; // <--- Aquí se hace visible el modal
-
-
-  }
-
-  onModalClosed(result: boolean): void {
-    console.log('Modal cerrado con resultado:', result);
-    this.isModalVisible = false; // <--- Aquí se oculta el modal
-  }
-
-  onModalConfirmed(): void {
-    console.log('Modal confirmado');
-    // Realizar acciones al confirmar
-  }
 
   constructor(private deviceService: DeviceService,private dialog:MatDialog){
     
   }
 
-
-
-  
+  currentPage:number=1;
   datosFiltrados: any[] = [];
   filtros: string[] = ['', '', '', '', '', '', '', '', '', '', '', '']; // Un filtro por columna
   elementosSeleccionados: string[] = [];
@@ -66,10 +36,12 @@ export class DispositivoComponent implements OnInit {
 
     this.deviceService.verifyConnectionDevice(idTerminal,ipAddress).subscribe(
       (data)=>{
-        this.dialog.open(ModalConfirmComponent,{
-          data:{mensaje:data.message,tipo:'success'}
-        });
+        console.log(data)
+        // this.dialog.open(ModalConfirmComponent,{
+        //   data:{mensaje:data.message,tipo:'success'}
+        // });
         dialgoRef.close();
+        this.loadDevices()
       },
       (error)=>{
         this.dialog.open(ModalConfirmComponent,{
@@ -81,10 +53,10 @@ export class DispositivoComponent implements OnInit {
 
   }
   
-  loadDataDevice(ipAddress:string){
+  loadDataDevice(ipAddress:string, idDevice:number){
     const dialogRef=this.dialog.open(ModalLoadingComponent,)
 
-    this.deviceService.loadTransactionDevice(ipAddress,4370).subscribe(
+    this.deviceService.loadTransactionDevice(ipAddress,4370,idDevice).subscribe(
       (data)=>{
        console.log(data);
        const records=data as AttendanceRecord[]
@@ -96,8 +68,8 @@ export class DispositivoComponent implements OnInit {
        dialogRef.close();
       },
       (error)=>{
-        this.dialog.open(ModalAlertaComponent,{
-          data:{mensaje:error}
+        this.dialog.open(ModalConfirmComponent,{
+          data:{mensaje:"Dispositivo no conectado", tipo:"error"}
         });
         dialogRef.close();
       }
@@ -109,15 +81,13 @@ export class DispositivoComponent implements OnInit {
   loadDevices(): void {
 
     const dialogRef=this.dialog.open(ModalLoadingComponent,);
-    this.isLoading=true;
     this.deviceService.getDevicesByPage(this.currentPage).subscribe(
       (data) => {
         this.devices = data;
-        console.log(data);
-        this.isLoading=false // Asigna los datos recibidos a la propiedad del componente
+        console.log(data); // Asigna los datos recibidos a la propiedad del componente
       },
       (error) => {
-        this.errorMessage = 'Error al cargar los dispositivos.';
+        
         console.error(error);
         // Manejar el error apropiadamente (mostrar mensaje al usuario)
       }

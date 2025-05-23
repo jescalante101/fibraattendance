@@ -1,3 +1,107 @@
-<p>
-  turno works!
-</p>
+<div class="mt-5 container">
+  <div class="conatiner-fluid">
+    <div class="row">
+      <div class="cold-md-9">
+        <div
+          class="btn-group btn-group-sm border mt-3"
+          role="group"
+          aria-label="Acciones"
+        >
+          <button mat-stroked-button class="btn btn-light btn-outline-success" (click)="openNuevoTurnoModal()">
+            <small>Nuevo</small>
+          </button>
+          <button mat-stroked-button class="btn btn-outline-danger ml-1">
+            <small>Borrar</small>
+          </button>
+        </div>
+
+        <table
+          class="mt-2 table table-striped table-light table-hover table-bordered"
+          style="width: 100%; table-layout: auto"
+        >
+          <thead class="thead-light">
+            <tr>
+              <th>
+                <input
+                  type="checkbox"
+                  aria-label="Checkbox for following text input"
+                />
+              </th>
+              <th scope="col"><small>Nombre de Turno</small></th>
+              <th scope="col"><small>Horario</small></th>
+              <th scope="col"><small>Unidad</small></th>
+              <th scope="col"><small>Ciclo</small></th>
+              <th scope="col"><small>Turno Automatico</small></th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of dataHorarios" (click) ="updateThorarioSelect(item.thoras)">
+              <th>
+                <small>
+                  <input
+                    type="checkbox"
+                    aria-label="Checkbox for following text input"
+                  />
+                </small>
+              </th>
+              <td style="padding: 0.1rem">
+                <small>{{ item.alias }}</small>
+              </td>
+              <td style="padding: 0.1rem">
+                <small>{{ getAreas(item.horario) }}</small>
+              </td>
+              <td style="padding: 0.1rem">
+                <small>
+                  <div *ngIf="item.cycleUnit == 1; else noUnidad">Semanal</div>
+                  <ng-template #noUnidad>Diario</ng-template>
+                </small>
+              </td>
+              <td style="padding: 0.1rem">
+                <small>{{ item.shiftCycle }}</small>
+              </td>
+              <td style="padding: 0.1rem" class="align-item-center text-center">
+                <small>
+                  <i class="fa-solid fa-circle-check" style="color: green;" *ngIf="item.autoShift; else noAutoShift"></i>
+                  <ng-template #noAutoShift>
+                    
+                    <i class="fa-solid fa-circle-minus" style="color: red;"></i>
+                  </ng-template>
+                </small>
+              </td>
+              <td style="padding: 0.1rem">
+                <small>
+                  <a mat-icon-button aria-label="Example icon button with a vertical three dot icon">
+                  <mat-icon >edit</mat-icon>
+                  </a>
+                <a mat-icon-button >
+                  <mat-icon style="color: red;">delete</mat-icon>
+                </a>
+                </small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <mat-paginator
+          [length]="totalRecords"
+          [pageSize]="pageSize"
+          [pageIndex]="pageNumber - 1"
+          (page)="handlePageEvent($event)"
+          [pageSizeOptions]="[5, 10, 20, 50]"
+          showFirstLastButtons
+          aria-label="Seleccione la página"
+        >
+        </mat-paginator>
+      </div>
+      <div class="cold-md-3 ml-5 mt-5">
+       <mat-card class="mt-5">
+         <mat-card-header>
+          <mat-card-title>Horario</mat-card-title>
+        </mat-card-header>
+         <app-thorassemanal [datos]="datosSeleccionado"></app-thorassemanal>
+       </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

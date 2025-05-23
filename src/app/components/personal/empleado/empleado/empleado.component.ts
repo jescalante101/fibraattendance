@@ -1,3 +1,4 @@
+import { HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
@@ -35,25 +36,32 @@ export class EmpleadoComponent implements OnInit {
 
   loadEmpleados() {
     const dialgoRef = this.dialog.open(ModalLoadingComponent);    
-    this.personalService.getEmpleados(this.pageNumber, this.pageSize).subscribe(
-      (data) => {
-        console.log(data.data);
-        this.dataEmployees = data.data;
+    this.personalService.getEmpleados(this.pageNumber, this.pageSize).subscribe( 
+      {
+        next:(response:HttpResponse<any>)=>{
+          console.log(response.body);
+        this.dataEmployees = response.body.data;
         this.datosFiltrados = [...this.dataEmployees];
-        this.totalRecords = data.totalRecords;
+        this.totalRecords = response.body.totalRecords;
         dialgoRef.close();
-      },
-      (error) => {
-        this.dialog.open(ModalConfirmComponent, {
+         
+           },
+        error:(error)=>{
+           this.dialog.open(ModalConfirmComponent, {
           data: {mensaje: error, tipo: 'error'}
         });
           dialgoRef.close();
+        }
       }
     );
   }
 
   actualizarSeleccionados(): void {
     this.actualizarSeleccionadosLista();
+  }
+
+  getEmplArea(lst:any[]):string{
+    return lst.map(item => item.areaName).join(', ');
   }
 
   actualizarSeleccionadosLista(): void {

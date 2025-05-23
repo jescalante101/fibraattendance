@@ -56,7 +56,7 @@ export class DispositivoComponent implements OnInit {
   loadDataDevice(ipAddress:string, idDevice:number){
     const dialogRef=this.dialog.open(ModalLoadingComponent,)
 
-    this.deviceService.loadTransactionDevice(ipAddress,4370,idDevice).subscribe(
+    this.deviceService.loadLasttransaction(ipAddress,4370,idDevice).subscribe(
       (data)=>{
        console.log(data);
        const records=data as AttendanceRecord[]
@@ -68,6 +68,7 @@ export class DispositivoComponent implements OnInit {
        dialogRef.close();
       },
       (error)=>{
+        console.log("Error en : "+error.message);
         this.dialog.open(ModalConfirmComponent,{
           data:{mensaje:"Dispositivo no conectado", tipo:"error"}
         });

@@ -1,0 +1,60 @@
+.modal-container {
+  padding: 20px;
+  width: 900px;
+  max-width: 100%;
+}
+
+.input-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.nombre-input {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.auto-toggle {
+  margin-left: auto;
+}
+
+.tables-container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.horarios-table, .semana-table {
+  flex: 1;
+  min-width: 0;
+}
+
+table {
+  width: 100%;
+}
+
+mat-paginator {
+  margin-top: 10px;
+}
+
+h3 {
+  margin-bottom: 10px;
+  color: #3f51b5;
+}
+
+.semana-table .mat-form-field {
+  width: 100%; /* Haz que ocupe todo el ancho de la celda */
+  box-sizing: border-box; /* Asegura que padding y border se incluyan en el 100% */
+}
+
+.semana-table .mat-select {
+  width: 100%; /* Asegúrate de que el select también ocupe el 100% */
+}
+
+/* Opcional: Si el texto del select es muy largo */
+.semana-table .mat-select-value {
+  white-space: nowrap; /* Evita que el texto salte de línea */
+  overflow: hidden; /* Oculta el texto que se desborda */
+  text-overflow: ellipsis; /* Añade puntos suspensivos si el texto se corta */
+}

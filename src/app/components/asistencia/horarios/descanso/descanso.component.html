@@ -1,3 +1,79 @@
-<p>
-  descanso works!
-</p>
+<div class="mt-5 container">
+  <div class="btn-group btn-group-sm border mt-3" role="group" aria-label="Acciones">
+    <button mat-stroked-button class="btn btn-light btn-outline-danger">
+      <small>Borrar</small>
+    </button>
+    <button mat-stroked-button class="btn btn-outline-info ml-1" (click)="openModalNuevoDescanso()">
+      <small>Nuevo Descanso</small>
+    </button>
+  </div>
+
+  <table class="table table-striped table-light table-hover table-bordered" style="width: 100%; table-layout: auto">
+    <thead class="thead-light">
+      <tr>
+        <th class="text-center">
+          <input type="checkbox" aria-label="Checkbox for following text input">
+        </th>
+        <th scope="col"><small>Nombre</small></th>
+        <th scope="col"><small>Hora Inicio</small></th>
+        <th scope="col"><small>Hora Final</small></th>
+        <th scope="col"><small>Duración</small></th>
+        <th scope="col"><small>Tiempo de Cálculo</small></th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of dataDescansos">
+        <th scope="row" style="padding: 0.1rem" class="text-center">
+          <input type="checkbox" aria-label="Checkbox for following text input">
+        </th>
+        <td style="padding: 0.1rem">
+          <small>{{item.alias}}</small>
+        </td>
+        <td style="padding: 0.1rem">
+          <small>{{item.periodStart | date : "HH:mm:ss"}}</small>
+        </td>
+        <td style="padding: 0.1rem">
+          <small>{{ calcularHoraFin(extraerHora(item.periodStart), item.duration) }}</small>
+        </td>
+        <td style="padding: 0.1rem">
+          <small>{{item.duration}}</small>
+        </td>
+        <td style="padding: 0.1rem">
+          <small>
+          <td style="padding: 0.1rem">
+            <small>
+              <ng-container *ngIf="item.calcType == 0; else manualTemplate">
+                Auto Deducir
+              </ng-container>
+              <ng-template #manualTemplate>
+                Manual
+              </ng-template>
+            </small>
+          </td>
+          </small>
+        </td>
+        <td style="padding: 0.1rem">
+          <button mat-button aria-label="Example icon button with a menu icon" 
+                  (click)="openModalEditarDescanso(item.id)">
+              <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-button aria-label="Example icon button with a menu icon" 
+                  (click)="openConfirmationDialog(item.id)">
+              <mat-icon style="color: red;">delete</mat-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <mat-paginator
+        [length]="totalRecords"
+        [pageSize]="pageSize"
+        [pageIndex]="pageNumber - 1" 
+        (page)="handlePageEvent($event)"
+        [pageSizeOptions]="[5, 10, 20, 50]"
+        showFirstLastButtons
+        aria-label="Seleccione la página">
+  </mat-paginator>
+</div>

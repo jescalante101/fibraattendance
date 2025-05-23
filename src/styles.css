@@ -1,4 +1,7 @@
-/* You can add global styles to this file, and also import other style files */
+/* Añade esto a tu archivo de estilos global */
+.backdrop-modal {
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo negro semi-transparente */
+}
 @media (min-width: 991.98px) {
     /* Asegúrate de que el selector esté definido */
     #bloque {
@@ -19,3 +22,4 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+

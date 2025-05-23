@@ -45,6 +45,15 @@ import { EmpleadoComponent } from './components/personal/empleado/empleado/emple
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { CeseComponent } from './components/personal/empleado/cese/cese.component';
 import { HorarioComponent } from './components/asistencia/horarios/horario/horario.component';
+import { TurnoComponent } from './components/asistencia/horarios/turno/turno.component';
+import { ThorassemanalComponent } from './components/asistencia/horarios/turno/thorassemanal/thorassemanal.component';
+import { ModalNuevoTurnoComponent } from './components/asistencia/horarios/turno/modal-nuevo-turno/modal-nuevo-turno.component';
+import { MatTableModule } from '@angular/material/table';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'; 
+import { DescansoComponent } from './components/asistencia/horarios/descanso/descanso.component';
+import { NuevoHorarioComponent } from './components/asistencia/horarios/horario/nuevo-horario/nuevo-horario.component';
+import { ModalConfirmComponent } from './shared/modal-confirm/modal-confirm.component';
+import { NuevoDescansoComponent } from './components/asistencia/horarios/descanso/nuevo-descanso/nuevo-descanso.component';
 
 
 
@@ -62,6 +71,7 @@ import { HorarioComponent } from './components/asistencia/horarios/horario/horar
     FilterOrdenesPipe,
     InvLecturaComponent,
     ModalComponent,
+    
     // 🔥 Aquí ya NO pongas ModalAlertaComponent
 
     PersonalComponent,
@@ -78,12 +88,21 @@ import { HorarioComponent } from './components/asistencia/horarios/horario/horar
     TerminalSyncComponent,
 
     AsistenciaComponent,
-    HorarioComponent
+    DescansoComponent,
+    HorarioComponent,
+    TurnoComponent,
+    NuevoHorarioComponent,
+
+    ThorassemanalComponent,
+    ModalNuevoTurnoComponent,
+    NuevoDescansoComponent
+    
+    
   
 
   ],
   imports: [
-    
+    MatTableModule,
     SharedModule, // 🔥 Aquí sí, aquí se importa todo lo de shared
     BrowserModule,
     AppRoutingModule,
@@ -106,12 +125,21 @@ import { HorarioComponent } from './components/asistencia/horarios/horario/horar
       baseURL : '../../../assets/tinymce/'
     }),
     BrowserAnimationsModule,
+    MatSlideToggleModule,
+    ReactiveFormsModule
   ],
   exports:[
     TerminalSyncComponent,
-    ModalLoadingComponent
+    ModalLoadingComponent,
+    ThorassemanalComponent,
+    ModalNuevoTurnoComponent,
+    NuevoHorarioComponent,
+    ModalConfirmComponent,
+    NuevoDescansoComponent
   ],
-  providers: [],
+  providers: [
+
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

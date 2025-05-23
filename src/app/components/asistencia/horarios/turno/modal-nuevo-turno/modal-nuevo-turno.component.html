@@ -1,0 +1,102 @@
+<mat-card>
+  <div class="modal-container">
+  <h2 mat-dialog-title>Nuevo Turno</h2>
+  
+  <div >
+    <mat-form-field appearance="outline" class="nombre-input" >
+      <mat-label>Nombre del Turno</mat-label>
+      <input matInput [(ngModel)]="nombreTurno" placeholder="Ingrese nombre del turno">
+    </mat-form-field>
+    <mat-slide-toggle class="text-success">Turno Automatico</mat-slide-toggle>
+   
+  </div>
+  
+  <div class="tables-container">
+    <!-- Tabla de Horarios -->
+    <div class="horarios-table">
+      <h3>Horarios Disponibles</h3>
+      
+      <table mat-table [dataSource]="dataHorarios" class="mat-elevation-z2">
+        <!-- Checkbox Column -->
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef style="padding: 0.5rem;"> <small>Seleccionar</small> </th>
+          <td mat-cell *matCellDef="let horario">
+            <small>
+                <mat-checkbox (click)="$event.stopPropagation()"
+                         (change)="toggleHorarioSelection(horario)"
+                         [checked]="isSelected(horario)">
+            </mat-checkbox>
+            </small>
+          </td>
+        </ng-container>
+        
+        <!-- Nombre Column -->
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef  style="padding: 0.5rem"> <small>Nombre</small> </th>
+          <td mat-cell *matCellDef="let horario"  style="padding: 0.5rem"> <small>{{horario.alias}} </small></td>
+        </ng-container>
+        
+        <!-- Entrada Column -->
+        <ng-container matColumnDef="entrada">
+          <th mat-header-cell *matHeaderCellDef  style="padding: 0.5rem"> <small>Entrada</small> </th>
+          <td mat-cell *matCellDef="let horario"  style="padding: 0.5rem"> <small>{{horario.inTime | date: 'HH:mm'}}</small> </td>
+        </ng-container>
+        
+        <!-- Salida Column -->
+        <ng-container matColumnDef="salida">
+          <th mat-header-cell *matHeaderCellDef style="padding: 0.5rem"> <small>Salida</small> </th>
+          <td mat-cell *matCellDef="let horario" style="padding: 0.5rem"> <small>{{horario.inTime | date: 'HH:mm'}} </small></td>
+        </ng-container>
+        
+        <!-- Descanso Column -->
+        <ng-container matColumnDef="descanso">
+          <th mat-header-cell *matHeaderCellDef style="padding: 0.5rem"> <small>Descanso</small> </th>
+          <td mat-cell *matCellDef="let horario" style="padding: 0.5rem"> <small>{{horario.minEarlyIn}}</small> </td>
+        </ng-container>
+        
+        <tr mat-header-row *matHeaderRowDef="['select', 'nombre', 'entrada', 'salida', 'descanso']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['select', 'nombre', 'entrada', 'salida', 'descanso']"></tr>
+      </table>
+      
+      <mat-paginator 
+        [length]="totalRecords"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 15]"
+        (page)="handlePageEvent($event)"
+        aria-label="Seleccionar página de horarios">
+      </mat-paginator>
+    </div>
+    
+    <!-- Tabla de Semana -->
+    <div class="semana-table">
+      <h3>Horario Semanal</h3>
+      
+      <mat-card>
+        <mat-form-field>
+          <mat-select ngModel="value" >
+            <mat-option [value]="['Dia']">Dia</mat-option>
+            <mat-option [value]="['Semana']">Semana</mat-option>
+            <mat-option [value]="['Mes']">Mes</mat-option>
+         </mat-select>
+        </mat-form-field>
+        <table mat-table [dataSource]="[horariosSemana]" class="mat-elevation-z2">
+        <ng-container *ngFor="let dia of diasSemana" [matColumnDef]="dia">
+          <th mat-header-cell *matHeaderCellDef> <small>{{dia}}</small> </th>
+          <td mat-cell *matCellDef="let semana">
+           
+          </td>
+        </ng-container>
+        
+        <tr mat-header-row *matHeaderRowDef="diasSemana"></tr>
+        <tr mat-row *matRowDef="let row; columns: diasSemana"></tr>
+      </table>
+      </mat-card>
+    </div>
+  </div>
+  
+  <div mat-dialog-actions align="end">
+    <button mat-button (click)="cancelar()">Cancelar</button>
+    <button mat-raised-button color="primary" (click)="guardarTurno()">Guardar</button>
+  </div>
+</div>
+</mat-card>

@@ -13,6 +13,8 @@ import { CargoComponent } from "./components/personal/organizacion/cargo/cargo.c
 import { EmpleadoComponent } from "./components/personal/empleado/empleado/empleado.component";
 import { CeseComponent } from "./components/personal/empleado/cese/cese.component";
 import { HorarioComponent } from "./components/asistencia/horarios/horario/horario.component";
+import { TurnoComponent } from "./components/asistencia/horarios/turno/turno.component";
+import { DescansoComponent } from "./components/asistencia/horarios/descanso/descanso.component";
 
 
 
@@ -38,7 +40,9 @@ const appRoutes: Routes = [
 
         //TODO: Agregar las vistas para el panel de asistencia
         {path: 'asistencia', component:AsistenciaComponent},
-        {path: 'asistencia/horarios', component:HorarioComponent}
+        {path: 'asistencia/descansos', component:DescansoComponent},
+        {path: 'asistencia/horarios', component:HorarioComponent},
+        {path: 'asistencia/turno', component:TurnoComponent}
 
 
 

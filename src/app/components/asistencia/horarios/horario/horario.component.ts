@@ -1,8 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { PageEvent } from '@angular/material/paginator';
 import { AttendanceService } from 'src/app/core/services/attendance.service';
 import { ModalLoadingComponent } from 'src/app/shared/modal-loading/modal-loading.component';
+import { NuevoHorarioComponent } from './nuevo-horario/nuevo-horario.component';
+import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 
 @Component({
   selector: 'app-horario',
@@ -13,6 +16,11 @@ export class HorarioComponent implements OnInit {
 
   dataHorarios: any[] = [];
 
+  totalRecords: number = 0;
+  pageSize: number = 15;
+  pageNumber: number = 1;
+
+
 
   constructor(private service: AttendanceService,private dialog:MatDialog,) { }
 
@@ -22,10 +30,11 @@ export class HorarioComponent implements OnInit {
 
   loadHoraiosData(){
     const loadinngRef=this.dialog.open(ModalLoadingComponent);
-    this.service.getHorarios().subscribe(
+    this.service.getHorarios(this.pageNumber,this.pageSize).subscribe(
       (data)=>{
         console.log(data);
-        this.dataHorarios=data;
+        this.dataHorarios=data.data;
+        this.totalRecords=data.totalRecords;
         loadinngRef.close();
       },
       (error)=>{
@@ -36,24 +45,22 @@ export class HorarioComponent implements OnInit {
       }
     )
   }
-
   
+    
 
 
   timeToMinutes(time: string): number {
-    //const ho=this.extraerHoraConPipe(time);
     const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
   }
 
-  minutesToTime(minutes: number): string {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+  minutesToTime(totalMinutes: number): string {
+    const hours = Math.floor(totalMinutes / 60) % 24; // Usamos el módulo 24 para manejar el cambio de día
+    const minutes = totalMinutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
 
   ExtraerHoraDeFecha(fechaHora: string ): string {
-    //extrar la hora de la fecha que tiene el formato 1900-01-01T09:00:00
     const fecha = new Date(fechaHora);
     const hora = fecha.getHours();
     const minutos = fecha.getMinutes();
@@ -62,20 +69,120 @@ export class HorarioComponent implements OnInit {
   }
 
   calcularHoraSalida(horaIngreso: string, tiempoTrabajoMinutos: number): string {
-  const horaIngresoCorta = horaIngreso.substring(0, 5);
-  const minutosIngreso = this.timeToMinutes(horaIngresoCorta);
-  const minutosSalida = minutosIngreso + tiempoTrabajoMinutos;
-  const horaSalida = this.minutesToTime(minutosSalida);
-  
-  if (horaIngreso.length > 5) {
-    const segundos = horaIngreso.substring(5);
-    return horaSalida + segundos;
+    const horaIngresoCorta = horaIngreso.substring(0, 5);
+    const minutosIngreso = this.timeToMinutes(horaIngresoCorta);
+    const minutosSalidaTotales = minutosIngreso + tiempoTrabajoMinutos;
+    const horaSalida = this.minutesToTime(minutosSalidaTotales);
+
+    if (horaIngreso.length > 5) {
+      const segundos = horaIngreso.substring(5);
+      return horaSalida + segundos;
+    }
+
+    return horaSalida;
   }
-  
-  return horaSalida;
-}
+
+   handlePageEvent(event: PageEvent): void {
+      this.pageSize = event.pageSize;
+      this.pageNumber = event.pageIndex + 1; // Sumamos 1 porque pageIndex empieza desde 0
+      this.loadHoraiosData();
+    }
+
+    abrirModalNuevoHorario(mode:number): void {
+      console.log('Abrir modal para nuevo horario');
+      const dialogConfig = new MatDialogConfig();
+        dialogConfig.width = '980px';
+        dialogConfig.height = '600px'; 
+        dialogConfig.hasBackdrop = true; 
+        dialogConfig.data= {use_mode:mode}  // Asegura que haya un fondo oscuro
+        dialogConfig.backdropClass = 'backdrop-modal'; // Clase personalizada para el fondo
+        const dialogRef = this.dialog.open(NuevoHorarioComponent,dialogConfig);
+
+        dialogRef.afterClosed().subscribe(result => {
+          if (result) {
+            if(result.id){
+              this.loadHoraiosData();
+              this.dialog.open(ModalConfirmComponent, {
+                data: {
+                  tipo: 'success',
+                  mensaje: 'El horario se guardó correctamente.'
+                }
+              });
+            }
+            
+            
+            console.log('Horario Creado:', result.id);
+          
+          }
+        });
+    }
+
+    editarHorario(idHorario:number,use_mode:number){
+      console.log('Abrir modal para Editar horario');
+      const dialogConfig = new MatDialogConfig();
+        dialogConfig.width = '980px';
+        dialogConfig.height = '600px'; 
+        dialogConfig.hasBackdrop = true;   // Asegura que haya un fondo oscuro
+        dialogConfig.backdropClass = 'backdrop-modal';
+        dialogConfig.data= {idHorario:idHorario,use_mode:use_mode}// Clase personalizada para el fondo
+        const dialogRef = this.dialog.open(NuevoHorarioComponent,dialogConfig);
+        dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        if(result.id){
+              this.loadHoraiosData();
+              this.dialog.open(ModalConfirmComponent, {
+                width: '400px',
+                height: '200px',
+                hasBackdrop: true,
+                backdropClass: 'backdrop-modal',
+                data: {
+                  tipo: 'success',
+                  mensaje: 'El horario se guardó correctamente.'
+                }
+              });
+            }
+        console.log('Horario Creado:', result);
+       
+      }
+    });
+    }
 
 
+    // Método para eliminar un horario
+    eliminarHorario(idHorario: number) {
+     this.service.deleteHorario(idHorario).subscribe({
+          next: (response) => {
+            console.log('Horario eliminado:', response);
+            this.loadHoraiosData();
+          },
+          error: (error) => {
+            console.error('Error al eliminar horario:', error);
+          }
+        });
+    }
+    // Método para abrir el modal de confirmación
+    openConfirmationDialog(idHorario: number) {
+     const dialogRef = this.dialog.open(ModalConfirmComponent, {
+        width: '400px',
+        height: '200px',
+        hasBackdrop: true,
+        backdropClass: 'backdrop-modal',
+        data: {
+          tipo: 'danger',
+          titulo: '¿Eliminar horario?',
+          mensaje: '¿Estás seguro de que deseas eliminar este horario? Esta acción no se puede deshacer.',
+          confirmacion: true,
+          textoConfirmar: 'Eliminar'
+        }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          // El usuario confirmó
+          this.eliminarHorario(idHorario);
+        }
+      });
+    }
   
     
 

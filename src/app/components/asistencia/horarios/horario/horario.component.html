@@ -1,12 +1,12 @@
-<div class="mt-2">
+<div class="mt-5 container">
   <div class="btn-group btn-group-sm border mt-3" role="group" aria-label="Acciones">
     <button mat-stroked-button class="btn btn-light btn-outline-danger">
       <small>Borrar</small>
     </button>
-    <button mat-stroked-button class="btn btn-outline-danger ml-1">
+    <button mat-stroked-button class="btn btn-light btn-outline-info ml-1" (click)="abrirModalNuevoHorario(0)">
       <small>Nuevo Horario Normal</small>
     </button>
-    <button mat-stroked-button class="btn btn-outline-info ml-1">
+    <button mat-stroked-button class="btn btn-outline-info ml-1" (click)="abrirModalNuevoHorario(1)">
       <small>Nuevo Horario Flexible</small>
     </button>
   </div>
@@ -14,8 +14,8 @@
   <table class="table table-striped table-light table-hover table-bordered" style="width: 100%; table-layout: auto">
     <thead class="thead-light">
       <tr>
-        <th>
-          <input type="checkbox" aria-label="Checkbox for following text input">
+        <th scope="col" class="text-center">
+          <input type="checkbox" aria-label="Checkbox for following text input" >
         </th>
         <th scope="col"><small>Nombre</small></th>
         <th scope="col"><small>Tipo</small></th>
@@ -30,7 +30,7 @@
     </thead>
     <tbody>
       <tr *ngFor="let item of dataHorarios">
-        <th scope="row" style="padding: 0.1rem">
+        <th scope="row" style="padding: 0.1rem" class="text-center">
           <input type="checkbox" aria-label="Checkbox for following text input">
         </th>
         <td style="padding: 0.1rem">
@@ -72,14 +72,26 @@
           </small>
         </td> -->
         <td style="padding: 0.1rem">
-          <button mat-button aria-label="Example icon button with a menu icon">
+          <button mat-button aria-label="Example icon button with a menu icon" (click)="editarHorario(item.id,item.useMode)">
               <mat-icon>edit</mat-icon>
           </button>
-          <button mat-button aria-label="Example icon button with a menu icon">
+          <button mat-button aria-label="Example icon button with a menu icon" (click)="openConfirmationDialog(item.id)">
               <mat-icon style="color: red;">delete</mat-icon>
           </button>
         </td>
       </tr>
     </tbody>
   </table>
+
+  <mat-paginator
+        [length]="totalRecords"
+        [pageSize]="pageSize"
+        [pageIndex]="pageNumber - 1" 
+        (page)="handlePageEvent($event)"
+        [pageSizeOptions]="[5, 10, 20, 50]"
+        showFirstLastButtons
+        aria-label="Seleccione la página">
+      </mat-paginator>
+      
+
 </div>

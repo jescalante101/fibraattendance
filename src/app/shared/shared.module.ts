@@ -6,23 +6,27 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { ModalConfirmComponent } from './modal-confirm/modal-confirm.component';
 import { ModalLoadingComponent } from './modal-loading/modal-loading.component';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   declarations: [
     ModalAlertaComponent,
     ModalConfirmComponent,
-    ModalLoadingComponent
+    ModalLoadingComponent,
+    
   ],
   imports: [
     CommonModule,
     FormsModule,
     MatDialogModule,
-    MatButtonModule
+    MatButtonModule,
+    MatCardModule
   ],
   exports: [
     ModalAlertaComponent,
     ModalConfirmComponent,
-    ModalLoadingComponent
+    ModalLoadingComponent,
+    MatCardModule
   ]
 })
 export class SharedModule { }

@@ -1,0 +1,29 @@
+export interface Horario {
+  nombre: string;
+  horaEntrada: string;
+  horaEntradaDesde: string;
+  horaEntradaHasta: string;
+  horaSalida: string;
+  horaSalidaDesde: string;
+  horaSalidaHasta: string;
+  isSelected: boolean;
+  breakTimeId: number;
+  entradaTemprana: number;
+  entradaTarde: number;
+  minEntradaTemprana: number;
+  minSalidaTarde: number;
+  hNivel: number;
+  hNivel1: number;
+  hNivel2: number;
+  hNivel3: number;
+  marcarEntrada: boolean;
+  marcarSalida: boolean;
+  permiteLLegarT: number;
+  permiteSalidaT: number;
+  periodoMarcacion: number;
+  tipoIntervalo: number;
+  basadoM: number;
+  horaCambio: string;
+  id: number;
+  diasLaboral: number;
+}

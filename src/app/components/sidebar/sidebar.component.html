@@ -557,13 +557,13 @@
           </a>
           <ul class="submenu" *ngIf="isOpen(1, 'horarioturno')">
             <li>
-              <a class="nav-link" routerLinkActive="active">Descanso</a>
+              <a class="nav-link" [routerLink]="['/panel/asistencia/descansos']" routerLinkActive="active">Descanso</a>
             </li>
             <li>
               <a class="nav-link" routerLinkActive="active" [routerLink]="['/panel/asistencia/horarios']">Horario</a>
             </li>
              <li>
-              <a class="nav-link">Turno</a>
+              <a class="nav-link" [routerLink]="['/panel/asistencia/turno']" routerLinkActive="active" >Turno</a>
             </li>
             
           </ul>

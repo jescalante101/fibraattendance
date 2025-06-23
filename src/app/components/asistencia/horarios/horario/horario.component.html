@@ -33,36 +33,36 @@
         <th scope="row" style="padding: 0.1rem" class="text-center">
           <input type="checkbox" aria-label="Checkbox for following text input">
         </th>
-        <td style="padding: 0.1rem">
-          <small>{{item.alias}}</small>
+        <td style="padding: 0.1rem" >
+          <small>{{item.nombre}}</small>
         </td>
         <td style="padding: 0.1rem">
           <small>
-            <div *ngIf="item.useMode==1;else noEstado">Flexible</div>
+            <div *ngIf="item.tipo!=0;else noEstado">Flexible</div>
             <ng-template #noEstado>Normal</ng-template>
           </small>
         </td>
         <td style="padding: 0.1rem">
           <small>
-            {{item.inTime  | date : "HH:mm:ss" }}
+            {{item.horaEntrada}}
           </small>
         </td>
         <td style="padding: 0.1rem">
           <small>
-            {{calcularHoraSalida(ExtraerHoraDeFecha(item.inTime)  ,item.workTimeDuration )}}
+            {{item.horaSalida}}
           </small>
         </td>
         <td style="padding: 0.1rem">
-          <small>{{item.workTimeDuration}}</small>
+          <small>{{item.tiempoTrabajo}}</small>
         </td>
         <td style="padding: 0.1rem">
           <small>
-            {{item.minEarlyIn}} 
+            {{item.descanso}} 
           </small>
         </td>
         <td style="padding: 0.1rem">
           <small>
-            {{item.workDay}}
+            {{item.diasLaboral}}
           </small>
         </td>
         <!-- <td>
@@ -72,11 +72,11 @@
           </small>
         </td> -->
         <td style="padding: 0.1rem">
-          <button mat-button aria-label="Example icon button with a menu icon" (click)="editarHorario(item.id,item.useMode)">
-              <mat-icon>edit</mat-icon>
+          <button mat-button aria-label="Example icon button with a menu icon" (click)="editarHorario(item.idHorio,item.tipo)" matTooltip="Editar" style="font-size: 16px; width: 28px; height: 28px; min-width: 28px; min-height: 28px; padding: 2px;">
+              <mat-icon style="font-size: 16px;">edit</mat-icon>
           </button>
-          <button mat-button aria-label="Example icon button with a menu icon" (click)="openConfirmationDialog(item.id)">
-              <mat-icon style="color: red;">delete</mat-icon>
+          <button mat-button aria-label="Example icon button with a menu icon" (click)="openConfirmationDialog(item.idHorio)" matTooltip="Eliminar" style="font-size: 16px; width: 28px; height: 28px; min-width: 28px; min-height: 28px; padding: 2px;">
+              <mat-icon style="color: red; font-size: 16px;">delete</mat-icon>
           </button>
         </td>
       </tr>

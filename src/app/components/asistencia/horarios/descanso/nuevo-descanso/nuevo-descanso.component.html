@@ -1,6 +1,9 @@
 <mat-card>
   <mat-card-content>
-    <h2>Editar</h2>
+    <h2  *ngIf="idDescanso==0; else EditDescanso">Nuevo Descanso</h2>
+    <ng-template #EditDescanso>
+      <h2>Editar </h2>
+    </ng-template>
     <form [formGroup]="descansoForm" (ngSubmit)="onConfirm()">
       <div class="row mb-3">
         <div class="col-md-6">

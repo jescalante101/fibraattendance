@@ -95,18 +95,18 @@ export class TurnoComponent implements OnInit {
 
   openNuevoTurnoModal(): void {
     const dialogConfig = new MatDialogConfig();
-  dialogConfig.width = '980px';
-  dialogConfig.height = '800px';
+    // dialogConfig.width = '900px'; // Ancho del modal
+    // dialogConfig.height = '500px'; // Alto del modal
   // dialogConfig.disableClose = true;  // Evita que se cierre al hacer clic fuera
-  dialogConfig.hasBackdrop = true;   // Asegura que haya un fondo oscuro
-  dialogConfig.backdropClass = 'backdrop-modal'; // Clase personalizada para el fondo
-    const dialogRef = this.dialog.open(ModalNuevoTurnoComponent,dialogConfig);
+    dialogConfig.hasBackdrop = true;   // Asegura que haya un fondo oscuro
+    dialogConfig.backdropClass = 'backdrop-modal'; // Clase personalizada para el fondo
+      const dialogRef = this.dialog.open(ModalNuevoTurnoComponent,dialogConfig);
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        console.log('Turno creado:', result);
-        this.loadTurnosData();
-      }
-    });
-  }
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          console.log('Turno creado:', result);
+          this.loadTurnosData();
+        }
+      });
+    }
 }

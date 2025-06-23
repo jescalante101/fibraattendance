@@ -32,7 +32,7 @@ export class AttendanceService {
   }
 
   getHorarios(page:number=1,pageSize:number=15):Observable<any>{
-    return this.http.get<any>(`${this.apiUrl}Attendance/lstHorarios?page=${page}&pageSize=${pageSize}`,);
+    return this.http.get<any>(`${this.apiUrl}Attendance/lstHoraiosMap?page=${page}&pageSize=${pageSize}`,);
   }
 
   saveHorario(horario:any):Observable<any>{

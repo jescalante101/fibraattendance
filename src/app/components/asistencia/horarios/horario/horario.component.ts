@@ -6,6 +6,7 @@ import { AttendanceService } from 'src/app/core/services/attendance.service';
 import { ModalLoadingComponent } from 'src/app/shared/modal-loading/modal-loading.component';
 import { NuevoHorarioComponent } from './nuevo-horario/nuevo-horario.component';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
+import { FixedSizeVirtualScrollStrategy } from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'app-horario',
@@ -49,50 +50,16 @@ export class HorarioComponent implements OnInit {
     
 
 
-  timeToMinutes(time: string): number {
-    const [hours, minutes] = time.split(':').map(Number);
-    return hours * 60 + minutes;
-  }
-
-  minutesToTime(totalMinutes: number): string {
-    const hours = Math.floor(totalMinutes / 60) % 24; // Usamos el módulo 24 para manejar el cambio de día
-    const minutes = totalMinutes % 60;
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-  }
-
-  ExtraerHoraDeFecha(fechaHora: string ): string {
-    const fecha = new Date(fechaHora);
-    const hora = fecha.getHours();
-    const minutos = fecha.getMinutes();
-    const segundos = fecha.getSeconds();
-    return `${hora.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-  }
-
-  calcularHoraSalida(horaIngreso: string, tiempoTrabajoMinutos: number): string {
-    const horaIngresoCorta = horaIngreso.substring(0, 5);
-    const minutosIngreso = this.timeToMinutes(horaIngresoCorta);
-    const minutosSalidaTotales = minutosIngreso + tiempoTrabajoMinutos;
-    const horaSalida = this.minutesToTime(minutosSalidaTotales);
-
-    if (horaIngreso.length > 5) {
-      const segundos = horaIngreso.substring(5);
-      return horaSalida + segundos;
-    }
-
-    return horaSalida;
-  }
-
    handlePageEvent(event: PageEvent): void {
       this.pageSize = event.pageSize;
       this.pageNumber = event.pageIndex + 1; // Sumamos 1 porque pageIndex empieza desde 0
       this.loadHoraiosData();
     }
-
+    // Método para abrir el modal de nuevo horario
     abrirModalNuevoHorario(mode:number): void {
       console.log('Abrir modal para nuevo horario');
       const dialogConfig = new MatDialogConfig();
-        dialogConfig.width = '980px';
-        dialogConfig.height = '600px'; 
+        
         dialogConfig.hasBackdrop = true; 
         dialogConfig.data= {use_mode:mode}  // Asegura que haya un fondo oscuro
         dialogConfig.backdropClass = 'backdrop-modal'; // Clase personalizada para el fondo
@@ -116,13 +83,11 @@ export class HorarioComponent implements OnInit {
           }
         });
     }
-
+    // Método para abrir el modal de edición
     editarHorario(idHorario:number,use_mode:number){
       console.log('Abrir modal para Editar horario');
       const dialogConfig = new MatDialogConfig();
-        dialogConfig.width = '980px';
-        dialogConfig.height = '600px'; 
-        dialogConfig.hasBackdrop = true;   // Asegura que haya un fondo oscuro
+        dialogConfig.hasBackdrop = true;
         dialogConfig.backdropClass = 'backdrop-modal';
         dialogConfig.data= {idHorario:idHorario,use_mode:use_mode}// Clase personalizada para el fondo
         const dialogRef = this.dialog.open(NuevoHorarioComponent,dialogConfig);

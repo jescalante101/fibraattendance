@@ -1,14 +1,27 @@
-<div class="">
-  <table class="table table-bordered mt-2">
-  <tbody>
-    <tr *ngFor="let horarioDia of tablaHorarios">
-      <td class="bg-info text-white"  style="padding: 0.5rem"><small>
-        {{ horarioDia.dia }}
-      </small></td>
-      <td  style="padding: 0.5rem"><small>
-        {{ horarioDia.horario }}
-      </small></td>
-    </tr>
-  </tbody>
-</table>
-</div>
+<mat-card class="w-100">
+  <mat-card-header>
+    <mat-card-title class="text-center w-100">
+      <strong>Horario Semanal</strong>
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <table class="table table-bordered table-hover mb-0 w-100">
+      <thead class="thead-light">
+        <tr>
+          <th class="bg-secondary text-dark text-center" style="width: 40%;">Día</th>
+          <th class="bg-secondary text-dark text-center" style="width: 60%;">Horario</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let horarioDia of tablaHorarios">
+          <td class="align-middle text-center" style="padding: 0.5rem;">
+            <small>{{ horarioDia.dia }}</small>
+          </td>
+          <td class="align-middle text-center" style="padding: 0.5rem;">
+            <small>{{ horarioDia.horario }}</small>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </mat-card-content>
+</mat-card>

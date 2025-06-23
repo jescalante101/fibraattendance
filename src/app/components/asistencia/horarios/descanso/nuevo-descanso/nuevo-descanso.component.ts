@@ -42,9 +42,10 @@ export class NuevoDescansoComponent implements OnInit {
   ngOnInit() {
     // Si hay un id de descanso, cargamos los datos del descanso
     if (this.data?.id) {
-      this.idDescanso = this.data.id;
+      this.idDescanso = this.data.id ;
       this.loadDescansoData(this.data.id);
     }
+    console.log(`DESCANSO: ${this.idDescanso}`)
   }
 
   onConfirm() {

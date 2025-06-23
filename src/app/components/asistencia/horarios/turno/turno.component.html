@@ -1,12 +1,8 @@
-<div class="mt-5 container">
-  <div class="conatiner-fluid">
+<div class="container mt-5 ml-5 pt-4">
+  <div class="container-fluid">
     <div class="row">
-      <div class="cold-md-9">
-        <div
-          class="btn-group btn-group-sm border mt-3"
-          role="group"
-          aria-label="Acciones"
-        >
+      <div class="col-md-9">
+        <div class="btn-group btn-group-sm border mt-3" role="group" aria-label="Acciones">
           <button mat-stroked-button class="btn btn-light btn-outline-success" (click)="openNuevoTurnoModal()">
             <small>Nuevo</small>
           </button>
@@ -15,68 +11,60 @@
           </button>
         </div>
 
-        <table
-          class="mt-2 table table-striped table-light table-hover table-bordered"
-          style="width: 100%; table-layout: auto"
-        >
+        <table class="mt-2 table table-striped table-light table-hover table-bordered" style="width: 100%; table-layout: auto">
           <thead class="thead-light">
             <tr>
               <th>
-                <input
-                  type="checkbox"
-                  aria-label="Checkbox for following text input"
-                />
+                <input type="checkbox" aria-label="Seleccionar todos los turnos" />
               </th>
               <th scope="col"><small>Nombre de Turno</small></th>
               <th scope="col"><small>Horario</small></th>
               <th scope="col"><small>Unidad</small></th>
               <th scope="col"><small>Ciclo</small></th>
-              <th scope="col"><small>Turno Automatico</small></th>
+              <th scope="col"><small>Turno Automático</small></th>
               <th scope="col"></th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of dataHorarios" (click) ="updateThorarioSelect(item.thoras)">
-              <th>
+            <tr *ngFor="let item of dataHorarios" (click)="updateThorarioSelect(item.thoras)">
+              <th class="align-items-center text-center">
                 <small>
-                  <input
-                    type="checkbox"
-                    aria-label="Checkbox for following text input"
-                  />
+                  <input type="checkbox" aria-label="Seleccionar turno" />
                 </small>
               </th>
-              <td style="padding: 0.1rem">
-                <small>{{ item.alias }}</small>
+              <td style="padding: 0.1rem" class="align-items-center text-center">
+                <small >{{ item.alias }}</small>
               </td>
-              <td style="padding: 0.1rem">
+              <td style="padding: 0.1rem" class="align-items-center  ">
                 <small>{{ getAreas(item.horario) }}</small>
               </td>
               <td style="padding: 0.1rem">
-                <small>
-                  <div *ngIf="item.cycleUnit == 1; else noUnidad">Semanal</div>
+                <small class="text-center">
+                  <ng-container *ngIf="item.cycleUnit == 1; else noUnidad">Semanal</ng-container>
                   <ng-template #noUnidad>Diario</ng-template>
                 </small>
               </td>
-              <td style="padding: 0.1rem">
+              <td style="padding: 0.1rem" class="align-items-center text-center">
                 <small>{{ item.shiftCycle }}</small>
               </td>
-              <td style="padding: 0.1rem" class="align-item-center text-center">
-                <small>
-                  <i class="fa-solid fa-circle-check" style="color: green;" *ngIf="item.autoShift; else noAutoShift"></i>
-                  <ng-template #noAutoShift>
-                    
-                    <i class="fa-solid fa-circle-minus" style="color: red;"></i>
+              <td style="padding: 0.1rem" class="align-items-center text-center">
+                <small >
+                  <ng-container *ngIf="item.autoShift; else noAutoShift" class="d-flex justify-content-center align-items-center" style="height: 100%; ">
+                    <i class="fa-solid fa-circle-check text-success" aria-label="Automático"></i>
+                  </ng-container>
+                  <ng-template #noAutoShift class="d-flex justify-content-center align-items-center" style="height: 100%; ">
+                    <i class="fa-solid fa-circle-minus text-danger" aria-label="Manual"></i>
                   </ng-template>
                 </small>
               </td>
-              <td style="padding: 0.1rem">
-                <small>
-                  <a mat-icon-button aria-label="Example icon button with a vertical three dot icon">
-                  <mat-icon >edit</mat-icon>
-                  </a>
-                <a mat-icon-button >
-                  <mat-icon style="color: red;">delete</mat-icon>
-                </a>
+              <td >
+                <small class="d-flex justify-content-center align-items-center" style="height: 100%; ">
+                  <button mat-icon-button aria-label="Editar turno" matTooltip="Editar" style="font-size: 16px; width: 28px; height: 28px; min-width: 28px; min-height: 28px; padding: 2px;">
+                    <mat-icon style="font-size: 16px;">edit</mat-icon>
+                  </button>
+                  <button mat-icon-button aria-label="Eliminar turno" matTooltip="Eliminar" style="font-size: 16px; width: 28px; height: 28px; min-width: 28px; min-height: 28px; padding: 2px;">
+                    <mat-icon style="color: red; font-size: 16px;">delete</mat-icon>
+                  </button>
                 </small>
               </td>
             </tr>
@@ -95,12 +83,7 @@
         </mat-paginator>
       </div>
       <div class="cold-md-3 ml-5 mt-5">
-       <mat-card class="mt-5">
-         <mat-card-header>
-          <mat-card-title>Horario</mat-card-title>
-        </mat-card-header>
-         <app-thorassemanal [datos]="datosSeleccionado"></app-thorassemanal>
-       </mat-card>
+      <app-thorassemanal [datos]="datosSeleccionado"></app-thorassemanal>
       </div>
     </div>
   </div>

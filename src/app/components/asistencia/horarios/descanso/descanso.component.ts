@@ -103,9 +103,7 @@ calcularHoraFin(horaInicio: string, duracionEnMinutos: number): string {
      
       hasBackdrop: true,
       backdropClass: 'backdrop-modal', // Clase personalizada para el fondo
-      data: {
-         id:0
-      }
+      
     }).afterClosed().subscribe(result => {
       if (result) {
         // Aquí puedes manejar el resultado del modal

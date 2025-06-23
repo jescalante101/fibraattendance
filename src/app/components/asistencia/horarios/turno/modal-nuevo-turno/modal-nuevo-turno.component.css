@@ -58,3 +58,13 @@ h3 {
   overflow: hidden; /* Oculta el texto que se desborda */
   text-overflow: ellipsis; /* Añade puntos suspensivos si el texto se corta */
 }
+
+.tabla-scroll-x {
+  max-height: 300px; /* Ajusta la altura según tu preferencia */
+  overflow-y: auto;
+  overflow-x: auto; /* Mantén el scroll horizontal si hay muchas columnas */
+}
+.mat-form-field {
+  min-width: 70px;
+  max-width: 80px;
+}

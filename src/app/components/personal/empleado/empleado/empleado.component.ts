@@ -39,20 +39,24 @@ export class EmpleadoComponent implements OnInit {
     this.personalService.getEmpleados(this.pageNumber, this.pageSize).subscribe( 
       {
         next:(response:HttpResponse<any>)=>{
-          console.log(response.body);
-        this.dataEmployees = response.body.data;
-        this.datosFiltrados = [...this.dataEmployees];
-        this.totalRecords = response.body.totalRecords;
-        dialgoRef.close();
-         
-           },
+          console.log("Data-"+response.body.data);
+          this.dataEmployees = response.body.data;
+          this.datosFiltrados = [...this.dataEmployees];
+          this.totalRecords = response.body.totalRecords;
+          
+        },
         error:(error)=>{
            this.dialog.open(ModalConfirmComponent, {
           data: {mensaje: error, tipo: 'error'}
         });
           dialgoRef.close();
+        },
+        complete: () => {
+          dialgoRef.close();
+          console.log('Carga de empleados completada');
         }
-      }
+      },
+      
     );
   }
 

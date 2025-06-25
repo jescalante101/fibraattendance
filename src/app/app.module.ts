@@ -56,6 +56,8 @@ import { ModalConfirmComponent } from './shared/modal-confirm/modal-confirm.comp
 import { NuevoDescansoComponent } from './components/asistencia/horarios/descanso/nuevo-descanso/nuevo-descanso.component';
 import { CustomHeaderComponent } from './components/sidebar/custom-header/custom-header.component';
 import { AsignarHorarioEmpleadoComponent } from './components/personal/empleado/asignar-horario-empleado/asignar-horario-empleado.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { AsignarNuevoHorarioComponent } from './components/personal/empleado/asignar-horario-empleado/asignar-nuevo-horario/asignar-nuevo-horario.component';
 
 
 @NgModule({
@@ -90,6 +92,7 @@ import { AsignarHorarioEmpleadoComponent } from './components/personal/empleado/
     HorarioComponent,
     TurnoComponent,
     NuevoHorarioComponent,
+    AsignarNuevoHorarioComponent,
 
     ThorassemanalComponent,
     ModalNuevoTurnoComponent,
@@ -112,6 +115,7 @@ import { AsignarHorarioEmpleadoComponent } from './components/personal/empleado/
     MatInputModule,
     MatCardModule,
     NgxPaginationModule,
+    MatDialogModule,
     GanttModule,
     MatTabsModule,
     MatButtonModule,

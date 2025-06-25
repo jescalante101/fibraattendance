@@ -1,200 +1,352 @@
-
-<aside
-  class="bg-fiori-surface border-r border-fiori-border text-fiori-text w-[260px] lg:w-[240px] xl:w-[220px] min-w-[220px]"
-  id="componentsNav"
-  [class.collapsed]="isCollapsed"
->
-<!-- Header solo móvil -->
-<div class="flex items-center justify-between px-4 py-2 border-b border-fiori-border bg-fiori-surface text-fiori-text lg:hidden">
-  <div class="flex items-center space-x-3">
-    <h5 class="text-base font-semibold">Menú</h5>
-    <span class="text-xs font-semibold bg-fiori-warning text-black px-2 py-0.5 rounded">Docs</span>
+<!-- sidebar.component.html -->
+<aside class="fiori-sidebar bg-fiori-surface border-r border-fiori-border w-full flex flex-col h-full">
+  <!-- Header del sidebar -->
+  <div class="px-4 py-3 border-b border-fiori-border bg-gradient-to-r from-fiori-surface to-fiori-hover">
+    <div class="flex items-center gap-3" *ngIf="!isCollapsed">
+      <div class="w-8 h-8 bg-fiori-primary rounded-fiori flex items-center justify-center">
+        <i class="fa-solid fa-layer-group text-white text-sm"></i>
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold text-fiori-text">Navigation</h3>
+        <p class="text-xs text-fiori-subtext">Sistema de Asistencia</p>
+      </div>
+    </div>
+    <div class="flex justify-center" *ngIf="isCollapsed">
+      <div class="w-8 h-8 bg-fiori-primary rounded-fiori flex items-center justify-center">
+        <i class="fa-solid fa-layer-group text-white text-sm"></i>
+      </div>
+    </div>
   </div>
-  <button
-    class="text-fiori-text hover:text-red-400 text-xl"
-    type="button"
-    aria-label="Cerrar"
-    (click)="toggleSidebar()"
-  >
-    &times;
-  </button>
-</div>
 
-<!-- Accesos rápidos solo móvil -->
-<div class="flex lg:hidden items-center gap-2 px-4 py-3 border-b border-fiori-border bg-fiori-surface">
-  <a class="flex-1 text-center bg-fiori-primary hover:bg-blue-500 text-white py-2 rounded font-medium transition" href="index.html">
-    <i class="fa-solid fa-eye mr-2"></i>Preview
-  </a>
-  <a class="flex-1 text-center bg-fiori-success hover:bg-green-500 text-white py-2 rounded font-medium transition" href="../components/typography.html">
-    <i class="fa-solid fa-layer-group mr-2"></i>Components
-  </a>
-</div>
-
-  <!-- Menú principal con scroll -->
-  <div class="px-0 pt-3 pb-3 overflow-y-auto h-screen bg-fiori-background text-fiori-text">
-
-    <nav class="flex flex-col">
-   
-
-    <!-- Seccion :Personal -->
-    <section *ngIf="activeItem==='personal'" class="mb-4">
-      <div class="px-4 text-[11px] uppercase tracking-wider text-fiori-subtext font-bold mb-2">Personal</div>
-      <ul class="flex flex-col gap-1 text-[13px]">
+  <!-- Contenido del menú con scroll -->
+  <div class="flex-1 overflow-y-auto py-2">
+    
+    <!-- Sección Personal -->
+    <div class="section-divider" *ngIf="activeItem === 'personal'">
+      <div class="px-4 py-2" *ngIf="!isCollapsed">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Personal</h4>
+      </div>
+      
+      <nav class="space-y-1">
         <!-- Organización -->
-        <li class="group" data-level="1" data-menu-name="organizacion">
-          <button
-            class="w-full flex items-center justify-between px-3 py-2 bg-fiori-surface hover:bg-fiori-primary hover:text-white text-fiori-text rounded-md transition-all shadow-sm"
+        <div class="menu-item" [class.active]="isMenuActive('organizacion')">
+          <button 
+            class="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-fiori-hover transition-colors group"
             (click)="toggleMenu(1, 'organizacion')"
-          >
-            <span class="flex items-center gap-2">
-              <i class="fa-regular fa-building"></i>
-              <span class="font-medium">Organización</span>
-            </span>
-            <i class="fa-solid text-[10px] transition-transform" [ngClass]="{ 'fa-chevron-down': isOpen(1, 'organizacion'), 'fa-chevron-right': !isOpen(1, 'organizacion') }"></i>
+            [attr.title]="isCollapsed ? 'Organización' : null">
+            <div class="flex items-center gap-3">
+              <div class="w-6 h-6 flex items-center justify-center">
+                <i class="fa-regular fa-building text-fiori-primary text-sm"></i>
+              </div>
+              <span class="text-sm font-medium text-fiori-text" *ngIf="!isCollapsed">Organización</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-xs text-fiori-subtext chevron-icon transition-transform" 
+               [class.rotate-90]="isOpen(1, 'organizacion')"
+               *ngIf="!isCollapsed"></i>
           </button>
-          <ul *ngIf="isOpen(1, 'organizacion')" class="ml-6 mt-1 flex flex-col gap-1">
-            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="['panel/personal/organizacion']" routerLinkActive="bg-fiori-primary text-white">Empresa</a></li>
-            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="['panel/personal/organizacion/departamento']" routerLinkActive="bg-fiori-primary text-white">Departamentos</a></li>
-            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="['panel/personal/organizacion/cargo']" routerLinkActive="bg-fiori-primary text-white">Cargo</a></li>
-            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="['panel/personal/organizacion/area']" routerLinkActive="bg-fiori-primary text-white">Área</a></li>
-          </ul>
-        </li>
+          
+          <div class="submenu overflow-hidden transition-all duration-200" 
+               [class.max-h-0]="!isOpen(1, 'organizacion')"
+               [class.max-h-96]="isOpen(1, 'organizacion')"
+               *ngIf="!isCollapsed">
+            <div class="pl-8 py-1 space-y-0.5">
+              <a 
+                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                [class.active]="isRouteActive('panel/personal/organizacion')"
+                [routerLink]="['panel/personal/organizacion']"
+                routerLinkActive="active">
+                Empresa
+              </a>
+              <a 
+                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                [class.active]="isRouteActive('panel/personal/organizacion/departamento')"
+                [routerLink]="['panel/personal/organizacion/departamento']"
+                routerLinkActive="active">
+                Departamentos
+              </a>
+              <a 
+                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                [class.active]="isRouteActive('panel/personal/organizacion/cargo')"
+                [routerLink]="['panel/personal/organizacion/cargo']"
+                routerLinkActive="active">
+                Cargo
+              </a>
+              <a 
+                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                [class.active]="isRouteActive('panel/personal/organizacion/area')"
+                [routerLink]="['panel/personal/organizacion/area']"
+                routerLinkActive="active">
+                Área
+              </a>
+            </div>
+          </div>
+        </div>
 
         <!-- Empleado -->
-        <li class="group" data-level="1" data-menu-name="empleado">
-          <button
-            class="w-full flex items-center justify-between px-3 py-2 bg-fiori-surface hover:bg-fiori-primary hover:text-white text-fiori-text rounded-md transition-all shadow-sm"
+        <div class="menu-item" [class.active]="isMenuActive('empleado')">
+          <button 
+            class="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-fiori-hover transition-colors group"
             (click)="toggleMenu(1, 'empleado')"
-          >
-            <span class="flex items-center gap-2">
-              <i class="fa-solid fa-id-badge"></i>
-              <span class="font-medium">Empleado</span>
-            </span>
-            <i class="fa-solid text-[10px] transition-transform" [ngClass]="{ 'fa-chevron-down': isOpen(1, 'empleado'), 'fa-chevron-right': !isOpen(1, 'empleado') }"></i>
+            [attr.title]="isCollapsed ? 'Empleado' : null">
+            <div class="flex items-center gap-3">
+              <div class="w-6 h-6 flex items-center justify-center">
+                <i class="fa-solid fa-id-badge text-fiori-primary text-sm"></i>
+              </div>
+              <span class="text-sm font-medium text-fiori-text" *ngIf="!isCollapsed">Empleado</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-xs text-fiori-subtext chevron-icon transition-transform" 
+               [class.rotate-90]="isOpen(1, 'empleado')"
+               *ngIf="!isCollapsed"></i>
           </button>
-          <ul *ngIf="isOpen(1, 'empleado')" class="ml-6 mt-1 flex flex-col gap-1">
-            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="['panel/personal/empleado/empleado']" routerLinkActive="bg-fiori-primary text-white">Empleados</a></li>
-            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="['panel/personal/empleado/cese']" routerLinkActive="bg-fiori-primary text-white">Cese</a></li>
-            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="['panel/personal/empleado/asignar-horario']" routerLinkActive="bg-fiori-primary text-white">Asignar Horario</a></li>
-          </ul>
-        </li>
+          
+          <div class="submenu overflow-hidden transition-all duration-200" 
+               [class.max-h-0]="!isOpen(1, 'empleado')"
+               [class.max-h-96]="isOpen(1, 'empleado')"
+               *ngIf="!isCollapsed">
+            <div class="pl-8 py-1 space-y-0.5">
+              <a 
+                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                [routerLink]="['panel/personal/empleado/empleado']"
+                routerLinkActive="active">
+                Empleados
+              </a>
+              <a 
+                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                [routerLink]="['panel/personal/empleado/cese']"
+                routerLinkActive="active">
+                Cese
+              </a>
+              <a 
+                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                [routerLink]="['panel/personal/empleado/asignar-horario']"
+                routerLinkActive="active">
+                Asignar Horario
+              </a>
+            </div>
+          </div>
+        </div>
 
         <!-- Proceso y Aprobación -->
-        <li class="group" data-level="1" data-menu-name="pamenu">
-          <button
-            class="w-full flex items-center justify-between px-3 py-2 bg-fiori-surface hover:bg-fiori-primary hover:text-white text-fiori-text rounded-md transition-all shadow-sm"
+        <div class="menu-item" [class.active]="isMenuActive('pamenu')">
+          <button 
+            class="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-fiori-hover transition-colors group"
             (click)="toggleMenu(1, 'pamenu')"
-          >
-            <span class="flex items-center gap-2">
-              <i class="fa-solid fa-check-double"></i>
-              <span class="font-medium">Proceso y Aprobación</span>
-            </span>
-            <i class="fa-solid text-[10px] transition-transform" [ngClass]="{ 'fa-chevron-down': isOpen(1, 'pamenu'), 'fa-chevron-right': !isOpen(1, 'pamenu') }"></i>
+            [attr.title]="isCollapsed ? 'Proceso y Aprobación' : null">
+            <div class="flex items-center gap-3">
+              <div class="w-6 h-6 flex items-center justify-center">
+                <i class="fa-solid fa-check-double text-fiori-primary text-sm"></i>
+              </div>
+              <span class="text-sm font-medium text-fiori-text" *ngIf="!isCollapsed">Proceso y Aprobación</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-xs text-fiori-subtext chevron-icon transition-transform" 
+               [class.rotate-90]="isOpen(1, 'pamenu')"
+               *ngIf="!isCollapsed"></i>
           </button>
-          <ul *ngIf="isOpen(1, 'pamenu')" class="ml-6 mt-1 flex flex-col gap-1">
-            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" routerLinkActive="bg-fiori-primary text-white">Rol Aprobadores</a></li>
-            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" routerLinkActive="bg-fiori-primary text-white">Proceso de Permiso</a></li>
-            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" routerLinkActive="bg-fiori-primary text-white">Aprobaciones</a></li>
-          </ul>
-        </li>
+          
+          <div class="submenu overflow-hidden transition-all duration-200" 
+               [class.max-h-0]="!isOpen(1, 'pamenu')"
+               [class.max-h-96]="isOpen(1, 'pamenu')"
+               *ngIf="!isCollapsed">
+            <div class="pl-8 py-1 space-y-0.5">
+              <a class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors" href="#" routerLinkActive="active">
+                Rol Aprobadores
+              </a>
+              <a class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors" href="#" routerLinkActive="active">
+                Proceso de Permiso
+              </a>
+              <a class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors" href="#" routerLinkActive="active">
+                Aprobaciones
+              </a>
+            </div>
+          </div>
+        </div>
 
         <!-- Configuración -->
-        <li class="group" data-level="1" data-menu-name="configuracion">
-          <button
-            class="w-full flex items-center justify-between px-3 py-2 bg-fiori-surface hover:bg-fiori-primary hover:text-white text-fiori-text rounded-md transition-all shadow-sm"
+        <div class="menu-item" [class.active]="isMenuActive('configuracion')">
+          <button 
+            class="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-fiori-hover transition-colors group"
             (click)="toggleMenu(1, 'configuracion')"
-          >
-            <span class="flex items-center gap-2">
-              <i class="fa-solid fa-wrench"></i>
-              <span class="font-medium">Configuración</span>
-            </span>
-            <i class="fa-solid text-[10px] transition-transform" [ngClass]="{ 'fa-chevron-down': isOpen(1, 'configuracion'), 'fa-chevron-right': !isOpen(1, 'configuracion') }"></i>
+            [attr.title]="isCollapsed ? 'Configuración' : null">
+            <div class="flex items-center gap-3">
+              <div class="w-6 h-6 flex items-center justify-center">
+                <i class="fa-solid fa-wrench text-fiori-primary text-sm"></i>
+              </div>
+              <span class="text-sm font-medium text-fiori-text" *ngIf="!isCollapsed">Configuración</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-xs text-fiori-subtext chevron-icon transition-transform" 
+               [class.rotate-90]="isOpen(1, 'configuracion')"
+               *ngIf="!isCollapsed"></i>
           </button>
-          <ul *ngIf="isOpen(1, 'configuracion')" class="ml-6 mt-1 flex flex-col gap-1">
-            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" routerLinkActive="bg-fiori-primary text-white">Documento</a></li>
-          </ul>
-        </li>
-      </ul>
-    </section>
+          
+          <div class="submenu overflow-hidden transition-all duration-200" 
+               [class.max-h-0]="!isOpen(1, 'configuracion')"
+               [class.max-h-96]="isOpen(1, 'configuracion')"
+               *ngIf="!isCollapsed">
+            <div class="pl-8 py-1 space-y-0.5">
+              <a class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors" href="#" routerLinkActive="active">
+                Documento
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
 
-    <!-- Sección: Dispositivo -->
-<section *ngIf="activeItem==='dispositivo'" class="mb-4">
-  <div class="px-4 text-[11px] uppercase tracking-wider text-fiori-subtext font-bold mb-2">Dispositivo</div>
-  <ul class="flex flex-col gap-1 text-[13px]">
+    <!-- Sección Dispositivo -->
+    <div class="section-divider" *ngIf="activeItem === 'dispositivo'">
+      <div class="px-4 py-2" *ngIf="!isCollapsed">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Dispositivo</h4>
+      </div>
+      
+      <nav class="space-y-1">
+        <div class="menu-item" *ngFor="let item of dispositivoMenu" [class.active]="isMenuActive(item.key)">
+          <button 
+            class="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-fiori-hover transition-colors group"
+            (click)="toggleMenu(1, item.key)"
+            [attr.title]="isCollapsed ? item.label : null">
+            <div class="flex items-center gap-3">
+              <div class="w-6 h-6 flex items-center justify-center">
+                <i class="fa-solid text-fiori-primary text-sm" [ngClass]="item.icon"></i>
+              </div>
+              <span class="text-sm font-medium text-fiori-text" *ngIf="!isCollapsed">{{ item.label }}</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-xs text-fiori-subtext chevron-icon transition-transform" 
+               [class.rotate-90]="isOpen(1, item.key)"
+               *ngIf="!isCollapsed"></i>
+          </button>
+          
+          <div class="submenu overflow-hidden transition-all duration-200" 
+               [class.max-h-0]="!isOpen(1, item.key)"
+               [class.max-h-96]="isOpen(1, item.key)"
+               *ngIf="!isCollapsed">
+            <div class="pl-8 py-1 space-y-0.5">
+              <a 
+                *ngFor="let sub of item.submenu"
+                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                [class.active]="sub.link && isRouteActive(sub.link)"
+                [routerLink]="sub.link || '#'"
+                [class.text-fiori-subtext]="!sub.link"
+                [class.cursor-default]="!sub.link"
+                routerLinkActive="active">
+                {{ sub.label }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
 
-    <!-- Item genérico -->
-    <li *ngFor="let item of dispositivoMenu" class="group" [attr.data-level]="1" [attr.data-menu-name]="item.key">
-      <button
-        class="w-full flex items-center justify-between px-3 py-2 bg-fiori-surface hover:bg-fiori-primary hover:text-white text-fiori-text rounded-md transition-all shadow-sm"
-        (click)="toggleMenu(1, item.key)"
-      >
-        <span class="flex items-center gap-2">
-          <i class="fa-solid" [ngClass]="item.icon"></i>
-          <span class="font-medium">{{ item.label }}</span>
-        </span>
-        <i class="fa-solid text-[10px] transition-transform" [ngClass]="{ 'fa-chevron-down': isOpen(1, item.key), 'fa-chevron-right': !isOpen(1, item.key) }"></i>
-      </button>
-      <ul *ngIf="isOpen(1, item.key)" class="ml-6 mt-1 flex flex-col gap-1">
-        <li *ngFor="let sub of item.submenu">
-          <a
-            *ngIf="sub.link"
-            class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all"
-            [routerLink]="sub.link"
-            routerLinkActive="bg-fiori-primary text-white"
-            [routerLinkActiveOptions]="{ exact: true }"
-          >
-            {{ sub.label }}
+    <!-- Sección Asistencia -->
+    <div class="section-divider" *ngIf="activeItem === 'asistencia'">
+      <div class="px-4 py-2" *ngIf="!isCollapsed">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Asistencia</h4>
+      </div>
+      
+      <nav class="space-y-1">
+        <div class="menu-item" *ngFor="let item of asistenciaMenu" [class.active]="isMenuActive(item.key)">
+          <button 
+            class="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-fiori-hover transition-colors group"
+            (click)="toggleMenu(1, item.key)"
+            [attr.title]="isCollapsed ? item.label : null">
+            <div class="flex items-center gap-3">
+              <div class="w-6 h-6 flex items-center justify-center">
+                <i class="fa-solid text-fiori-primary text-sm" [ngClass]="item.icon"></i>
+              </div>
+              <span class="text-sm font-medium text-fiori-text" *ngIf="!isCollapsed">{{ item.label }}</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-xs text-fiori-subtext chevron-icon transition-transform" 
+               [class.rotate-90]="isOpen(1, item.key)"
+               *ngIf="!isCollapsed"></i>
+          </button>
+          
+          <div class="submenu overflow-hidden transition-all duration-200" 
+               [class.max-h-0]="!isOpen(1, item.key)"
+               [class.max-h-96]="isOpen(1, item.key)"
+               *ngIf="!isCollapsed">
+            <div class="pl-8 py-1 space-y-0.5">
+              <a 
+                *ngFor="let sub of item.submenu"
+                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                [class.active]="sub.link && isRouteActive(sub.link)"
+                [routerLink]="sub.link || '#'"
+                [class.text-fiori-subtext]="!sub.link"
+                [class.cursor-default]="!sub.link"
+                routerLinkActive="active">
+                {{ sub.label }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Secciones adicionales para otros activeItems -->
+    <div class="section-divider" *ngIf="activeItem === 'acceso'">
+      <div class="px-4 py-2" *ngIf="!isCollapsed">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Control de Acceso</h4>
+      </div>
+      <nav class="space-y-1">
+        <div class="menu-item">
+          <a class="w-full flex items-center px-4 py-2.5 text-left hover:bg-fiori-hover transition-colors" href="#" [attr.title]="isCollapsed ? 'Configuración de Acceso' : null">
+            <div class="flex items-center gap-3">
+              <div class="w-6 h-6 flex items-center justify-center">
+                <i class="fa-solid fa-key text-fiori-primary text-sm"></i>
+              </div>
+              <span class="text-sm font-medium text-fiori-text" *ngIf="!isCollapsed">Configuración de Acceso</span>
+            </div>
           </a>
-          <span
-            *ngIf="!sub.link"
-            class="block px-3 py-1 rounded text-fiori-subtext cursor-default"
-          >
-            {{ sub.label }}
-          </span>
-        </li>
-      </ul>
-    </li>
+        </div>
+      </nav>
+    </div>
 
-  </ul>
-</section>
+    <div class="section-divider" *ngIf="activeItem === 'temperatura'">
+      <div class="px-4 py-2" *ngIf="!isCollapsed">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Control de Temperatura</h4>
+      </div>
+      <nav class="space-y-1">
+        <div class="menu-item">
+          <a class="w-full flex items-center px-4 py-2.5 text-left hover:bg-fiori-hover transition-colors" href="#" [attr.title]="isCollapsed ? 'Monitor de Temperatura' : null">
+            <div class="flex items-center gap-3">
+              <div class="w-6 h-6 flex items-center justify-center">
+                <i class="fa-solid fa-thermometer text-fiori-primary text-sm"></i>
+              </div>
+              <span class="text-sm font-medium text-fiori-text" *ngIf="!isCollapsed">Monitor de Temperatura</span>
+            </div>
+          </a>
+        </div>
+      </nav>
+    </div>
 
+    <div class="section-divider" *ngIf="activeItem === 'sistema'">
+      <div class="px-4 py-2" *ngIf="!isCollapsed">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Configuración del Sistema</h4>
+      </div>
+      <nav class="space-y-1">
+        <div class="menu-item">
+          <a class="w-full flex items-center px-4 py-2.5 text-left hover:bg-fiori-hover transition-colors" href="#" [attr.title]="isCollapsed ? 'Configuración General' : null">
+            <div class="flex items-center gap-3">
+              <div class="w-6 h-6 flex items-center justify-center">
+                <i class="fa-solid fa-cog text-fiori-primary text-sm"></i>
+              </div>
+              <span class="text-sm font-medium text-fiori-text" *ngIf="!isCollapsed">Configuración General</span>
+            </div>
+          </a>
+        </div>
+      </nav>
+    </div>
 
-
-  <!-- Sección: Asistencia -->
-<section *ngIf="activeItem==='asistencia'" class="mb-4">
-  <div class="px-4 text-[11px] uppercase tracking-wider text-fiori-subtext font-bold mb-2">Asistencia</div>
-  <ul class="flex flex-col gap-1 text-[13px]">
-
-    <!-- Item genérico -->
-    <li *ngFor="let item of asistenciaMenu" class="group" [attr.data-level]="1" [attr.data-menu-name]="item.key">
-      <button
-        class="w-full flex items-center justify-between px-3 py-2 bg-fiori-surface hover:bg-fiori-primary hover:text-white text-fiori-text rounded-md transition-all shadow-sm"
-        (click)="toggleMenu(1, item.key)"
-      >
-        <span class="flex items-center gap-2">
-          <i class="fa-solid" [ngClass]="item.icon"></i>
-          <span class="font-medium">{{ item.label }}</span>
-        </span>
-        <i class="fa-solid text-[10px] transition-transform" [ngClass]="{ 'fa-chevron-down': isOpen(1, item.key), 'fa-chevron-right': !isOpen(1, item.key) }"></i>
-      </button>
-      <ul *ngIf="isOpen(1, item.key)" class="ml-6 mt-1 flex flex-col gap-1">
-        <li *ngFor="let sub of item.submenu">
-          <a *ngIf="sub.link" class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="sub.link" routerLinkActive="bg-fiori-primary text-white" [routerLinkActiveOptions]="{ exact: true }">{{ sub.label }}</a>
-          <span *ngIf="!sub.link" class="block px-3 py-1 text-fiori-subtext">{{ sub.label }}</span>
-        </li>
-      </ul>
-    </li>
-
-  </ul>
-</section>
-
-    </nav>
   </div>
 
+  <!-- Footer del sidebar -->
+  <div class="border-t border-fiori-border p-3" *ngIf="!isCollapsed">
+    <div class="flex items-center gap-2 text-xs text-fiori-subtext">
+      <i class="fa-solid fa-info-circle"></i>
+      <span>Sistema v2.1.0</span>
+    </div>
+  </div>
+  
+  <!-- Footer colapsado -->
+  <div class="border-t border-fiori-border p-3 flex justify-center" *ngIf="isCollapsed">
+    <i class="fa-solid fa-info-circle text-fiori-subtext text-xs" title="Sistema v2.1.0"></i>
+  </div>
 </aside>
-
-<!-- en index.html dentro del <head> -->
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-/>

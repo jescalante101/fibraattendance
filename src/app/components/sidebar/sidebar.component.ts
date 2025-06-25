@@ -4,6 +4,7 @@ import {
   EventEmitter,
   Input,
 } from '@angular/core';
+import { Router } from '@angular/router';
 
 export interface SubMenuItem {
   label: string;
@@ -24,11 +25,12 @@ export interface MenuItem {
 })
 export class SidebarComponent {
   @Output() collapsedChange = new EventEmitter<boolean>();
- @Input() isCollapsed: boolean = false;
-@Input() activeItem: string = 'personal';// ← viene del componente padre
+  @Input() isCollapsed: boolean = false;
+  @Input() activeItem: string = 'personal'; // ← viene del componente padre
 
-  
   openMenus: { [level: number]: string | null } = {};
+
+  constructor(private router: Router) {}
 
   dispositivoMenu: MenuItem[] = [
     {
@@ -217,5 +219,67 @@ export class SidebarComponent {
 
   isOpen(level: number, menuName: string): boolean {
     return this.openMenus[level] === menuName;
+  }
+
+  /**
+   * Verifica si un menú está activo basado en la ruta actual
+   * @param menuKey - Clave del menú a verificar
+   * @returns true si el menú está activo
+   */
+  isMenuActive(menuKey: string): boolean {
+    const currentUrl = this.router.url;
+    
+    // Para la sección personal
+    if (this.activeItem === 'personal') {
+      switch (menuKey) {
+        case 'organizacion':
+          return currentUrl.includes('/panel/personal/organizacion');
+        case 'empleado':
+          return currentUrl.includes('/panel/personal/empleado');
+        case 'pamenu':
+          return currentUrl.includes('/panel/personal/proceso') || 
+                 currentUrl.includes('/panel/personal/aprobacion');
+        case 'configuracion':
+          return currentUrl.includes('/panel/personal/configuracion');
+        default:
+          return false;
+      }
+    }
+    
+    // Para la sección dispositivo
+    if (this.activeItem === 'dispositivo') {
+      const menuItem = this.dispositivoMenu.find(item => item.key === menuKey);
+      if (menuItem) {
+        return menuItem.submenu.some(sub => 
+          sub.link && currentUrl.includes(sub.link)
+        );
+      }
+    }
+    
+    // Para la sección asistencia
+    if (this.activeItem === 'asistencia') {
+      const menuItem = this.asistenciaMenu.find(item => item.key === menuKey);
+      if (menuItem) {
+        return menuItem.submenu.some(sub => 
+          sub.link && currentUrl.includes(sub.link)
+        );
+      }
+    }
+    
+    return false;
+  }
+
+  /**
+   * Verifica si una ruta específica está activa
+   * @param route - Ruta a verificar
+   * @returns true si la ruta está activa
+   */
+  isRouteActive(route: string): boolean {
+    // Remover la barra inicial si existe para comparación consistente
+    const normalizedRoute = route.startsWith('/') ? route.substring(1) : route;
+    const currentUrl = this.router.url.startsWith('/') ? this.router.url.substring(1) : this.router.url;
+    
+    // Verificar si la URL actual coincide exactamente o contiene la ruta
+    return currentUrl === normalizedRoute || currentUrl.includes(normalizedRoute);
   }
 }

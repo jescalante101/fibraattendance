@@ -5,6 +5,7 @@ module.exports = {
   content: [
     "./src/**/*.{html,ts}",
   ],
+  
   theme: {
     extend: {
       colors: {
@@ -21,6 +22,9 @@ module.exports = {
           warning: '#e9730c',
           success: '#107e3e',
           info: '#0a6ed1',
+          hover: '#f5f5f5',        // Nuevo color hover
+          active: '#e3f2fd',       // Nuevo color active
+          muted: '#f8f9fa',        // Nuevo color muted
         },
       },
       fontFamily: {
@@ -29,12 +33,13 @@ module.exports = {
       borderRadius: {
         lg: '12px',
         xl: '16px',
-        fiori: '0.5rem',
+        fiori: '0.25rem',          // Actualizado para ser más sutil
       },
       boxShadow: {
-        fiori: '0 2px 6px rgba(0,0,0,0.08)',
-        fioriSm: '0 1px 3px rgba(0,0,0,0.05)',
-        fioriHover: '0 4px 12px rgba(0,0,0,0.1)',
+        fiori: '0 1px 3px rgba(0,0,0,0.06)',
+        fioriSm: '0 1px 2px rgba(0,0,0,0.05)',
+        fioriHover: '0 2px 8px rgba(10,110,209,0.15)',
+        fioriActive: '0 1px 3px rgba(10,110,209,0.2)',
       },
       fontSize: {
         sm: '0.75rem',
@@ -48,6 +53,25 @@ module.exports = {
         'card-padding': '1rem',
         'section': '2rem',
         'nav-height': '3rem',
+        'sidebar-width': '260px',
+        'sidebar-collapsed': '60px',
+      },
+      transitionProperty: {
+        'max-height': 'max-height',
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.2s ease-in-out',
+        'slide-down': 'slideDown 0.3s ease-in-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideDown: {
+          '0%': { maxHeight: '0', opacity: '0' },
+          '100%': { maxHeight: '200px', opacity: '1' },
+        },
       },
     },
   },
@@ -63,16 +87,35 @@ module.exports = {
           fontSize: theme('fontSize.base'),
           borderRadius: theme('borderRadius.fiori'),
           boxShadow: theme('boxShadow.fioriSm'),
-          transition: 'background-color 0.2s ease',
+          transition: 'all 0.2s ease',
+          '&:hover': {
+            backgroundColor: theme('colors.fiori.secondary'),
+            boxShadow: theme('boxShadow.fioriHover'),
+          },
+          '&:active': {
+            boxShadow: theme('boxShadow.fioriActive'),
+          },
         },
-        '.btn-fiori:hover': {
-          backgroundColor: theme('colors.fiori.secondary'),
+        '.btn-fiori-secondary': {
+          backgroundColor: 'transparent',
+          color: theme('colors.fiori.primary'),
+          border: `1px solid ${theme('colors.fiori.primary')}`,
+          padding: '0.5rem 1rem',
+          fontWeight: '500',
+          fontSize: theme('fontSize.base'),
+          borderRadius: theme('borderRadius.fiori'),
+          transition: 'all 0.2s ease',
+          '&:hover': {
+            backgroundColor: theme('colors.fiori.primary'),
+            color: '#fff',
+          },
         },
         '.card-fiori': {
           backgroundColor: theme('colors.fiori.surface'),
           borderRadius: theme('borderRadius.fiori'),
           padding: theme('spacing.card-padding'),
           boxShadow: theme('boxShadow.fiori'),
+          border: `1px solid ${theme('colors.fiori.border')}`,
         },
         '.text-label': {
           color: theme('colors.fiori.subtext'),
@@ -83,6 +126,21 @@ module.exports = {
           color: theme('colors.fiori.text'),
           fontSize: theme('fontSize.title'),
           fontWeight: '600',
+        },
+        '.sidebar-item': {
+          display: 'flex',
+          alignItems: 'center',
+          padding: '0.625rem 1rem',
+          borderRadius: theme('borderRadius.fiori'),
+          transition: 'all 0.2s ease',
+          '&:hover': {
+            backgroundColor: theme('colors.fiori.hover'),
+          },
+          '&.active': {
+            backgroundColor: theme('colors.fiori.active'),
+            color: theme('colors.fiori.primary'),
+            fontWeight: '500',
+          },
         },
       });
     }),

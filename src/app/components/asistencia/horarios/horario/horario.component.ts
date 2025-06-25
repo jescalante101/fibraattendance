@@ -59,33 +59,34 @@ export class HorarioComponent implements OnInit {
       this.loadHoraiosData();
     }
     // Método para abrir el modal de nuevo horario
-    abrirModalNuevoHorario(mode:number): void {
-      console.log('Abrir modal para nuevo horario');
-      const dialogConfig = new MatDialogConfig();
-        
-        dialogConfig.hasBackdrop = true; 
-        dialogConfig.data= {use_mode:mode}  // Asegura que haya un fondo oscuro
-        dialogConfig.backdropClass = 'backdrop-modal'; // Clase personalizada para el fondo
-        const dialogRef = this.dialog.open(NuevoHorarioComponent,dialogConfig);
+   abrirModalNuevoHorario(mode: number): void {
+  console.log('Abrir modal para nuevo horario');
+  
+  const dialogConfig = new MatDialogConfig();
+  
+  dialogConfig.hasBackdrop = true;
+  dialogConfig.disableClose = false;
+  dialogConfig.data = { use_mode: mode };
+  
+  // Configuración más específica
+  dialogConfig.position = undefined; // Dejar que Angular Material maneje la posición
+  dialogConfig.viewContainerRef = undefined;
+  dialogConfig.panelClass = 'custom-dialog-panel';
+  
+  const dialogRef = this.dialog.open(NuevoHorarioComponent, dialogConfig);
 
-        dialogRef.afterClosed().subscribe(result => {
-          if (result) {
-            if(result.id){
-              this.loadHoraiosData();
-              this.dialog.open(ModalConfirmComponent, {
-                data: {
-                  tipo: 'success',
-                  mensaje: 'El horario se guardó correctamente.'
-                }
-              });
-            }
-            
-            
-            console.log('Horario Creado:', result.id);
-          
-          }
-        });
+  dialogRef.afterClosed().subscribe(result => {
+    if (result?.id) {
+      this.loadHoraiosData();
+      this.dialog.open(ModalConfirmComponent, {
+        data: {
+          tipo: 'success',
+          mensaje: 'El horario se guardó correctamente.'
+        }
+      });
     }
+  });
+}
     // Método para abrir el modal de edición
     editarHorario(idHorario:number,use_mode:number){
       console.log('Abrir modal para Editar horario');
@@ -134,7 +135,7 @@ export class HorarioComponent implements OnInit {
         width: '400px',
         height: '200px',
         hasBackdrop: true,
-        backdropClass: 'backdrop-modal',
+        // backdropClass: 'backdrop-modal',
         data: {
           tipo: 'danger',
           titulo: '¿Eliminar horario?',
@@ -151,6 +152,17 @@ export class HorarioComponent implements OnInit {
         }
       });
     }
+
+
+    testModal() {
+  console.log('=== TEST MODAL BÁSICO ===');
+  try {
+    const ref = this.dialog.open(NuevoHorarioComponent);
+    console.log('Modal de test abierto:', ref);
+  } catch (e) {
+    console.error('Error en test modal:', e);
+  }
+}
   
     
 

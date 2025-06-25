@@ -1,3 +1,221 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+/* Arreglar posicionamiento de Angular Material Dialogs cuando se usa con Tailwind */
+
+/* 1. Asegurar que el overlay container esté bien posicionado */
+.cdk-overlay-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 1000 !important;
+  pointer-events: none !important;
+}
+
+/* 2. Backdrop (fondo oscuro) */
+.cdk-overlay-backdrop {
+  position: absolute !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  background: rgba(0, 0, 0, 0.32) !important;
+  pointer-events: auto !important;
+  z-index: 1000 !important;
+}
+
+/* 3. Panel del modal */
+.cdk-overlay-pane {
+  position: absolute !important;
+  pointer-events: auto !important;
+  box-sizing: border-box !important;
+  z-index: 1001 !important;
+}
+
+/* 4. Contenedor del dialog */
+.mat-mdc-dialog-container,
+.mat-dialog-container {
+  position: relative !important;
+  transform: none !important;
+  margin: auto !important;
+  max-height: calc(100vh - 32px) !important;
+  max-width: calc(100vw - 32px) !important;
+  overflow: auto !important;
+  box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2),
+              0 24px 38px 3px rgba(0, 0, 0, 0.14),
+              0 9px 46px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* 5. Centrar el dialog */
+.cdk-global-overlay-wrapper {
+  display: flex !important;
+  position: absolute !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 1000 !important;
+  pointer-events: auto !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* 6. Resetear estilos de Tailwind que pueden interferir */
+.mat-mdc-dialog-container *,
+.mat-dialog-container * {
+  box-sizing: border-box !important;
+}
+
+/* 7. Asegurar visibilidad del backdrop personalizado si lo usas */
+.backdrop-modal {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  z-index: 1000 !important;
+}
+
+/* 8. Para modales específicos más grandes */
+.large-dialog .mat-mdc-dialog-container {
+  width: 90vw !important;
+  max-width: 1200px !important;
+}
+
+/* 9. Para modales medianos */
+.medium-dialog .mat-mdc-dialog-container {
+  width: 70vw !important;
+  max-width: 800px !important;
+}
+
+/* 10. Para modales pequeños */
+.small-dialog .mat-mdc-dialog-container {
+  width: 50vw !important;
+  max-width: 500px !important;
+  min-width: 300px !important;
+}
+/* Estilos para el sidebar Fiori - Agregar a styles.css o al componente */
+
+.fiori-sidebar {
+  font-family: '72', 'Segoe UI', Arial, sans-serif;
+}
+
+/* Estilo para items del menú principal */
+.menu-item {
+  position: relative;
+}
+
+.menu-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: background-color 0.2s ease;
+}
+
+.menu-item.active::before {
+  background: #0a6ed1;
+}
+
+/* Estilo para items del submenu */
+.submenu-item {
+  position: relative;
+}
+
+.submenu-item.active {
+  background: linear-gradient(90deg, rgba(10,110,209,0.08) 0%, transparent 100%);
+  color: #0a6ed1;
+  font-weight: 500;
+}
+
+/* Animación del chevron */
+.chevron-icon {
+  transition: transform 0.2s ease;
+}
+
+/* Dividers entre secciones */
+.section-divider {
+  position: relative;
+  margin: 1rem 0;
+}
+
+.section-divider::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: 1rem;
+  right: 1rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #d1d1d1, transparent);
+}
+
+/* Estilo hover mejorado */
+.menu-item button:hover,
+.submenu-item:hover {
+  background: #f5f5f5;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+/* Transiciones suaves para el colapso */
+.submenu {
+  transition: max-height 0.3s ease-in-out;
+}
+
+/* Estados de iconos */
+.menu-item button:hover .fa-building,
+.menu-item button:hover .fa-id-badge,
+.menu-item button:hover .fa-check-double,
+.menu-item button:hover .fa-wrench,
+.menu-item button:hover .fa-fingerprint,
+.menu-item button:hover .fa-chart-bar,
+.menu-item button:hover .fa-key,
+.menu-item button:hover .fa-thermometer,
+.menu-item button:hover .fa-cog {
+  color: #0854a0;
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 1024px) {
+  .fiori-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 40;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .fiori-sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+/* Estilos adicionales para el tema Fiori */
+.bg-fiori-hover {
+  background-color: #f5f5f5;
+}
+
+.rounded-fiori {
+  border-radius: 0.25rem;
+}
+
+
+/* Estilos para el dialog de Fiori */
+::ng-deep .fiori-dialog .mat-dialog-container {
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  background-color: white;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  ::ng-deep .fiori-dialog .mat-dialog-container {
+    width: 600px;
+  }
+}

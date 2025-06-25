@@ -1,77 +1,91 @@
-<div class="mt-8 mx-auto max-w-6xl">
-  <div class="flex items-center gap-2 mb-4">
-    <button mat-stroked-button class="px-3 py-1.5 text-sm border border-red-500 text-red-600 hover:bg-red-50 rounded" (click)="eliminarSeleccionados()">
-      <small>Borrar</small>
-    </button>
-    <button mat-stroked-button class="px-3 py-1.5 text-sm border border-blue-500 text-blue-600 hover:bg-blue-50 rounded" (click)="openModalNuevoDescanso()">
-      <small>Nuevo Descanso</small>
+<div class="max-w-7xl mx-auto mt-8 space-y-6">
+  <!-- Cabecera y botón -->
+  <div class="flex justify-between items-center">
+    <h2 class="text-title">Horarios Asignados</h2>
+    <button class="btn-fiori" (click)="abrirModalAsignarHorario()">
+      + Asignar Horario
     </button>
   </div>
 
-  <div class="overflow-x-auto bg-white border rounded shadow-sm">
-    <table class="min-w-full text-sm text-left">
-      <thead class="bg-gray-100">
+  <!-- Campo de filtro -->
+  <div>
+    <input
+      type="text"
+      [(ngModel)]="filtro"
+      placeholder="Buscar por nombre..."
+      class="w-full max-w-sm px-3 py-2 text-sm border border-fiori-border rounded focus:outline-none focus:ring-2 focus:ring-fiori-primary"
+    />
+  </div>
+
+  <!-- Tabla -->
+  <div class="overflow-x-auto card-fiori">
+    <table class="min-w-full text-sm">
+      <thead class="bg-fiori-muted text-left text-fiori-subtext">
         <tr>
-          <th class="px-2 py-2 text-center">
-            <input type="checkbox" aria-label="Seleccionar todos">
-          </th>
-          <th class="px-2 py-2">Nombre</th>
-          <th class="px-2 py-2">DNI</th>
-          <th class="px-2 py-2">Asignar Horario</th>
-          <th class="px-2 py-2"></th>
+          <th class="px-4 py-2">Empleado</th>
+          <th class="px-4 py-2">Turno</th>
+          <th class="px-4 py-2 text-center">Semana</th>
+          <th class="px-4 py-2">Fecha Inicio</th>
+          <th class="px-4 py-2">Fecha Fin</th>
+          <th class="px-4 py-2">Observación</th>
+          <th class="px-4 py-2 text-right">Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let emp of empleados" class="border-t hover:bg-gray-50">
-          <td class="px-2 py-1 text-center">
-            <input type="checkbox" aria-label="Seleccionar empleado">
+        <tr
+          *ngFor="let a of asignacionesFiltradas"
+          class="border-t hover:bg-fiori-hover"
+        >
+          <td class="px-4 py-2 font-medium text-fiori-text">
+            {{ a.empleado }}
           </td>
-          <td class="px-2 py-1">{{emp.apellido_Paterno}} {{emp.apellido_Materno}}, {{emp.nombres}}</td>
-          <td class="px-2 py-1">{{emp.nro_Doc}}</td>
-          <td class="px-2 py-1">
-            <mat-form-field appearance="fill" class="w-60">
-              <mat-label>Horario</mat-label>
-              <mat-select [(value)]="asignaciones[emp.personal_Id]" panelClass="horario-panel">
-                <mat-option>
-                  <input
-                    type="text"
-                    placeholder="Buscar horario..."
-                    [(ngModel)]="filtrosHorarios[emp.personal_Id]"
-                    (click)="$event.stopPropagation()"
-                    (keyup)="filtrarHorarios(emp.personal_Id)"
-                    class="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                  />
-                </mat-option>
-                <mat-option *ngFor="let h of horariosFiltrados[emp.personal_Id] || horarios" [value]="h.id">
-                  {{ h.alias }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </td>
-          <td class="px-2 py-1 text-right">
-            <button mat-icon-button (click)="guardarAsignacion(emp.personal_Id)">
-              <mat-icon fontIcon="check_circle" class="text-green-500"></mat-icon>
+          <td class="px-4 py-2">{{ a.turno }}</td>
+          <td class="px-4 py-2 text-center">{{ a.semana }}</td>
+          <td class="px-4 py-2">{{ a.fechaInicio }}</td>
+          <td class="px-4 py-2">{{ a.fechaFin }}</td>
+          <td class="px-4 py-2 text-fiori-subtext">{{ a.observacion }}</td>
+          <td class="px-4 py-2 text-right space-x-1">
+            <button
+              class="text-fiori-primary hover:underline"
+              (click)="editar(a)"
+              title="Editar"
+            >
+              ✏️
             </button>
+            <button
+              class="text-fiori-error hover:underline"
+              (click)="eliminar(a)"
+              title="Eliminar"
+            >
+              🗑️
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="asignacionesFiltradas.length === 0">
+          <td colspan="7" class="text-center py-4 text-fiori-subtext">
+            No se encontraron resultados.
           </td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <div class="mt-4 flex justify-end">
-    <mat-paginator
-      [length]="empleados.length"
-      [pageSize]="pageSize"
-      [pageIndex]="pageNumber - 1"
-      (page)="handlePageEvent($event)"
-      [pageSizeOptions]="[5, 10, 20, 50]"
-      showFirstLastButtons>
-    </mat-paginator>
+  <!-- Paginación -->
+  <div class="flex justify-end gap-2 text-sm items-center">
+    <button
+      class="btn-fiori-secondary"
+      [disabled]="page === 1"
+      (click)="page = page - 1"
+    >
+      Anterior
+    </button>
+    <span>Página {{ page }}</span>
+    <button
+      class="btn-fiori-secondary"
+      [disabled]="page * pageSize >= asignacionesMock.length"
+      (click)="page = page + 1"
+    >
+      Siguiente
+    </button>
   </div>
 </div>
-
-<style>
-::ng-deep .horario-panel .mat-select-panel {
-  max-height: 350px;
-}
-</style>

@@ -1,72 +1,118 @@
 <header
-  class="bg-fiori-surface border-b border-fiori-border text-fiori-text z-10 h-16 px-6 flex items-center justify-between"
+  class="bg-fiori-surface border-b border-fiori-border text-fiori-text sticky top-0 z-50 h-16 px-6 flex items-center justify-between shadow-fiori"
 >
   <!-- Sección izquierda: Botón hamburguesa + logo -->
-  <div class="flex items-center gap-4 min-w-[180px]">
+  <div class="flex items-center gap-4 min-w-[200px]">
     <button
       (click)="toggleSidebar()"
-      class="lg:hidden border border-fiori-border rounded p-2 hover:bg-fiori-background transition"
-      aria-label="Abrir menú lateral"
+      class="lg:hidden p-2 rounded-fiori border border-fiori-border hover:bg-fiori-hover active:bg-fiori-active transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-fiori-primary/30"
+      [attr.aria-label]="isCollapsed ? 'Abrir menú lateral' : 'Cerrar menú lateral'"
+      [attr.aria-expanded]="!isCollapsed"
     >
-      <i class="fa-solid fa-bars text-fiori-text"></i>
+      <i 
+        class="fa-solid transition-transform duration-300"
+        [ngClass]="isCollapsed ? 'fa-bars' : 'fa-xmark'"
+      ></i>
     </button>
-    <a class="text-xl font-semibold tracking-wide text-fiori-primary hover:underline" routerLink="/">ASISTENCIA FB</a>
+    
+    <a 
+      class="text-xl font-semibold tracking-wide text-fiori-primary hover:text-fiori-secondary transition-colors duration-200 focus:outline-none focus:underline" 
+      routerLink="/"
+      role="banner"
+    >
+      ASISTENCIA FB
+    </a>
   </div>
 
   <!-- Sección centro: Navegación -->
-  <nav class="hidden lg:flex items-center gap-6 text-sm font-medium flex-1 justify-center">
+  <nav 
+    class="hidden lg:flex items-center gap-8 text-sm font-medium flex-1 justify-center"
+    role="navigation"
+    aria-label="Navegación principal"
+  >
     <a
-      [routerLink]="['./panel/personal/organizacion']"
-      (click)="selectItem('personal')"
-      [ngClass]="{ 'text-fiori-accent': activeItem === 'personal' }"
-      class="hover:text-fiori-accent transition flex items-center gap-1"
+      *ngFor="let item of navigationItems"
+      [routerLink]="item.route"
+      (click)="selectItem(item.key)"
+      [ngClass]="{ 
+        'text-fiori-primary bg-fiori-active border-b-2 border-fiori-primary': activeItem === item.key,
+        'text-fiori-text hover:text-fiori-primary hover:bg-fiori-hover': activeItem !== item.key
+      }"
+      class="px-3 py-2 rounded-t-fiori transition-all duration-200 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-fiori-primary/30"
+      [attr.aria-current]="activeItem === item.key ? 'page' : null"
     >
-      <i class="fa-solid fa-user-group"></i> Personal
-    </a>
-    <a
-      [routerLink]="['./panel/dispositivo']"
-      (click)="selectItem('dispositivo')"
-      [ngClass]="{ 'text-fiori-accent': activeItem === 'dispositivo' }"
-      class="hover:text-fiori-accent transition flex items-center gap-1"
-    >
-      <i class="fa-solid fa-mobile-retro"></i> Dispositivo
-    </a>
-    <a
-      [routerLink]="['./panel/asistencia']"
-      (click)="selectItem('asistencia')"
-      [ngClass]="{ 'text-fiori-accent': activeItem === 'asistencia' }"
-      class="hover:text-fiori-accent transition flex items-center gap-1"
-    >
-      <i class="fa-solid fa-calendar-check"></i> Asistencia
-    </a>
-    <a href="#" (click)="selectItem('acceso')" [ngClass]="{ 'text-fiori-accent': activeItem === 'acceso' }" class="hover:text-fiori-accent transition flex items-center gap-1">
-      <i class="fa-solid fa-door-open"></i> Acceso
-    </a>
-    <a href="#" (click)="selectItem('temperatura')" [ngClass]="{ 'text-fiori-accent': activeItem === 'temperatura' }" class="hover:text-fiori-accent transition flex items-center gap-1">
-      <i class="fa-solid fa-temperature-half"></i> Temperatura
-    </a>
-    <a href="#" (click)="selectItem('sistema')" [ngClass]="{ 'text-fiori-accent': activeItem === 'sistema' }" class="hover:text-fiori-accent transition flex items-center gap-1">
-      <i class="fa-solid fa-gears"></i> Sistema
+      <i [class]="item.icon" class="text-sm"></i>
+      <span>{{ item.label }}</span>
     </a>
   </nav>
 
   <!-- Sección derecha: Usuario -->
-  <div class="relative flex items-center gap-2 cursor-pointer min-w-[100px] justify-end" (click)="toggleUserMenu()">
-    <span class="w-8 h-8 rounded-full bg-fiori-primary text-white font-bold flex items-center justify-center uppercase">m</span>
-    <i class="fa-solid fa-caret-down text-fiori-text"></i>
-
-    <ul
-      *ngIf="showUserMenu"
-      class="absolute right-0 mt-10 bg-fiori-surface text-fiori-text rounded shadow-xl w-64 z-50 border border-fiori-border"
+  <div class="relative min-w-[120px] flex justify-end">
+    <button
+      (click)="toggleUserMenu()"
+      class="flex items-center gap-3 px-3 py-2 rounded-fiori hover:bg-fiori-hover transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-fiori-primary/30"
+      [attr.aria-expanded]="showUserMenu"
+      aria-haspopup="true"
+      aria-label="Menú de usuario"
     >
-      <li class="px-4 py-2 font-bold border-b border-fiori-border">manager</li>
-      <li><a class="block px-4 py-2 hover:bg-fiori-background transition"><i class="fa-solid fa-clock-rotate-left mr-2"></i>Actividades recientes</a></li>
-      <li><a class="block px-4 py-2 hover:bg-fiori-background transition"><i class="fa-solid fa-clipboard-check mr-2"></i>Utilizado con frecuencia</a></li>
-      <li><a class="block px-4 py-2 hover:bg-fiori-background transition"><i class="fa-solid fa-magnifying-glass mr-2"></i>Busc.Aplic.</a></li>
-      <li><a class="block px-4 py-2 hover:bg-fiori-background transition"><i class="fa-solid fa-gear mr-2"></i>Opciones</a></li>
-      <li><a class="block px-4 py-2 hover:bg-fiori-background transition"><i class="fa-solid fa-envelope mr-2"></i>Comunicarse con soporte</a></li>
-      <li><a class="block px-4 py-2 hover:bg-fiori-background transition"><i class="fa-solid fa-circle-info mr-2"></i>Acerca de</a></li>
-      <li><a class="block px-4 py-2 text-red-500 hover:bg-red-800 hover:text-white transition"><i class="fa-solid fa-power-off mr-2"></i>Salir</a></li>
-    </ul>
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-fiori-primary to-fiori-secondary text-white font-bold flex items-center justify-center uppercase shadow-fioriSm">
+        {{ userInitial }}
+      </div>
+      <div class="hidden sm:flex flex-col items-start">
+        <span class="text-sm font-medium text-fiori-text">{{ userName }}</span>
+        <span class="text-xs text-fiori-subtext">{{ userRole }}</span>
+      </div>
+      <i 
+        class="fa-solid fa-caret-down text-fiori-subtext transition-transform duration-200"
+        [ngClass]="{ 'rotate-180': showUserMenu }"
+      ></i>
+    </button>
+
+    <!-- Menú desplegable del usuario -->
+    <div
+      *ngIf="showUserMenu"
+      class="absolute right-0 top-full mt-2 bg-fiori-surface text-fiori-text rounded-lg shadow-xl w-72 z-50 border border-fiori-border overflow-hidden animate-fade-in"
+      role="menu"
+      aria-label="Opciones de usuario"
+      (clickOutside)="closeUserMenu()"
+    >
+      <!-- Header del menú -->
+      <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-fiori-primary to-fiori-secondary text-white font-bold flex items-center justify-center uppercase">
+            {{ userInitial }}
+          </div>
+          <div>
+            <p class="font-semibold text-fiori-text">{{ userName }}</p>
+            <p class="text-xs text-fiori-subtext">{{ userRole }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opciones del menú -->
+      <div class="py-2">
+        <button
+          *ngFor="let option of userMenuOptions"
+          (click)="handleUserMenuAction(option.action)"
+          class="w-full text-left px-4 py-3 hover:bg-fiori-hover transition-colors duration-200 flex items-center gap-3 focus:outline-none focus:bg-fiori-hover"
+          [ngClass]="{ 
+            'text-red-600 hover:bg-red-50': option.action === 'logout',
+            'border-t border-fiori-border': option.separator
+          }"
+          role="menuitem"
+        >
+          <i [class]="option.icon" class="w-4 text-center"></i>
+          <span class="text-sm">{{ option.label }}</span>
+        </button>
+      </div>
+    </div>
   </div>
+
+  <!-- Overlay para cerrar menú en mobile -->
+  <div
+    *ngIf="showUserMenu"
+    class="fixed inset-0 z-40 bg-black/20 lg:hidden"
+    (click)="closeUserMenu()"
+    aria-hidden="true"
+  ></div>
 </header>

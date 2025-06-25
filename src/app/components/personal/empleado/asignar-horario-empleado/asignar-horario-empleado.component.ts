@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { AttendanceService } from 'src/app/core/services/attendance.service';
 import { PersonService } from 'src/app/core/services/person.service';
+import { AsignarNuevoHorarioComponent } from './asignar-nuevo-horario/asignar-nuevo-horario.component';
 
 @Component({
   selector: 'app-asignar-horario-empleado',
@@ -11,115 +13,74 @@ import { PersonService } from 'src/app/core/services/person.service';
 })
 export class AsignarHorarioEmpleadoComponent implements OnInit {
 
- empleados: any[] = [];
-  horarios: any[] = [];
-  page = 1;
-  pageSize = 10;
-  totalItems = 0;
-  filtroEmpleado = '';
-  filtrosHorarios: { [key: string]: string } = {}; // key = personal_Id
-  empleadosFiltrados: any[] = [];
-  horariosFiltrados: any[] = [];
-
-  asignaciones: { [key: string]: number } = {}; // key = personal_Id, value = horario_Id
-
-
-    // Paginación
-  pageNumber = 1;
-
   constructor(
-    private horariosService: AttendanceService,
-    private personalService: PersonService,
-    private fb: FormBuilder
-  ) {}
+    private dialog: MatDialog
+  ) { }
 
   ngOnInit(): void {
-    this.obtenerEmpleados();
-    this.obtenerHorarios();
+    throw new Error('Method not implemented.');
   }
 
-  obtenerEmpleados(): void {
-    this.personalService.getPersonalActivo().subscribe((data) => {
-      this.empleados = data;
-      this.totalItems = data.length;
-    });
+   filtro = '';
+  page = 1;
+  pageSize = 5;
+
+  asignacionesMock = [
+    {
+      empleado: 'Juan Pérez Ramírez',
+      turno: 'Mañana',
+      semana: 25,
+      fechaInicio: '2025-06-24',
+      fechaFin: '2025-06-28',
+      observacion: 'Horario regular',
+    },
+    {
+      empleado: 'María López García',
+      turno: 'Tarde',
+      semana: 25,
+      fechaInicio: '2025-06-24',
+      fechaFin: '2025-06-28',
+      observacion: 'Cambio temporal',
+    },
+    {
+      empleado: 'Carlos Gómez Torres',
+      turno: 'Noche',
+      semana: 25,
+      fechaInicio: '2025-06-24',
+      fechaFin: '2025-06-28',
+      observacion: 'Turno por rotación',
+    },
+    // Agrega más mock si deseas
+  ];
+
+  get asignacionesFiltradas() {
+    return this.asignacionesMock
+      .filter((a) =>
+        a.empleado.toLowerCase().includes(this.filtro.toLowerCase())
+      )
+      .slice((this.page - 1) * this.pageSize, this.page * this.pageSize);
   }
 
-  obtenerHorarios(): void {
-    this.horariosService.getHorarios(1, 15).subscribe((res) => {
-      this.horarios = res.data;
-    });
+  editar(asignacion: any) {
+    console.log('Editar asignación:', asignacion);
   }
 
-  // get empleadosFiltrados(): any[] {
-  //   if (!this.filtroEmpleado.trim()) return this.paginados;
-  //   return this.paginados.filter((e) => {
-  //     const nombreCompleto = `${e.apellido_Paterno} ${e.apellido_Materno} ${e.nombres}`.toLowerCase();
-  //     return nombreCompleto.includes(this.filtroEmpleado.toLowerCase());
-  //   });
-  // }
-
-  get paginados(): any[] {
-    const start = (this.page - 1) * this.pageSize;
-    return this.empleados.slice(start, start + this.pageSize);
+  eliminar(asignacion: any) {
+    console.log('Eliminar asignación:', asignacion);
   }
 
-  filtrarHorarios(personalId: string): any[] {
-    const filtro = this.filtrosHorarios[personalId]?.toLowerCase() || '';
-    return this.horarios.filter((h) => h.alias.toLowerCase().includes(filtro));
-  }
+  abrirModalAsignarHorario(){
+    const dialogRef = this.dialog.open(AsignarNuevoHorarioComponent, {
+    disableClose: false,
+    width: '600px',
+    minHeight: '400px',
+    panelClass: 'fiori-dialog'
+  });
 
-  cambiarPagina(event: any): void {
-    this.page = event.pageIndex + 1;
-    this.pageSize = event.pageSize;
-  }
-
-  asignarHorario(personalId: string, horarioId: number): void {
-    console.log(`Asignar horario ${horarioId} al empleado ${personalId}`);
-    // Aquí podrías agregar un servicio POST para enviar la asignación
-  }
-
-  actualizarEmpleadosFiltrados(): void {
-    let filtrados = this.empleados;
-
-    if (this.filtroEmpleado.trim()) {
-      const termino = this.filtroEmpleado.toLowerCase();
-      filtrados = filtrados.filter((e) => {
-        const nombreCompleto = `${e.apellido_Paterno} ${e.apellido_Materno} ${e.nombres}`.toLowerCase();
-        return nombreCompleto.includes(termino);
-      });
-    }
-
-    const start = (this.pageNumber - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    this.empleadosFiltrados = filtrados.slice(start, end);
-    this.totalItems = filtrados.length;
-  }
-
-   handlePageEvent(event: PageEvent): void {
-    this.pageSize = event.pageSize;
-    this.pageNumber = event.pageIndex + 1;
-    this.actualizarEmpleadosFiltrados();
-  }
-
-   onBuscarEmpleado(): void {
-    this.pageNumber = 1;
-    this.actualizarEmpleadosFiltrados();
-  }
-
-  guardarAsignacion(personaID:number): void {
-    // Aquí podrías agregar la lógica para guardar las asignaciones de horarios
-    console.log('Asignaciones guardadas');
-  }
-
-  openModalNuevoDescanso():void{
-    // Aquí podrías abrir un modal para crear un nuevo descanso
-    console.log('Abrir modal para nuevo descanso');
-  }
-
-  eliminarSeleccionados(): void {
-    // Aquí podrías agregar la lógica para eliminar los horarios seleccionados
-    console.log('Eliminar horarios seleccionados');
+  dialogRef.afterClosed().subscribe(result => {
+    console.log('Modal cerrado', result);
+    // Puedes recargar datos si es necesario
+  });
   }
 
 }

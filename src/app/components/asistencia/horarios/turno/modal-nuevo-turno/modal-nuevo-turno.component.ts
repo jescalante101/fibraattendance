@@ -238,4 +238,5 @@ isHorarioCheckedMes(i: number, j: number, horario: any): boolean {
   limpiarHorariosMesCelda(i: number, j: number) {
     this.horariosMesPorFila[i][j] = [];
   }
+  
 }

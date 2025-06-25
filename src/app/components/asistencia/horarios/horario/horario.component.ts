@@ -47,6 +47,9 @@ export class HorarioComponent implements OnInit {
     )
   }
   
+  borrarSeleccionados(){
+    
+  }
     
 
 

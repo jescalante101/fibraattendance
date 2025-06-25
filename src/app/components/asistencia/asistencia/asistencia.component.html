@@ -1,347 +1,191 @@
-<div class="container-fluid pt-5 mt-2 mb-5 mr-5">
-  <div class="tab-buttons mt-5">
+<div class="px-6 pb-10">
+
+<div class="flex flex-wrap gap-2">
     <button
-      type="button"
-      class="btn btn-light btn-sm"
-      [ngClass]="{ active: activeSection === 'basica' }"
+      class="px-4 py-1 text-sm rounded border bg-white shadow-sm hover:bg-gray-50"
+      [ngClass]="{ 'bg-fiori-accent text-white': activeSection === 'basica' }"
       (click)="scrollToSection('basica'); activeSection = 'basica'"
     >
       Configuración básica
     </button>
     <button
-      type="button"
-      class="btn btn-light btn-sm"
-      [ngClass]="{ active: activeSection === 'semana' }"
+      class="px-4 py-1 text-sm rounded border bg-white shadow-sm hover:bg-gray-50"
+      [ngClass]="{ 'bg-fiori-accent text-white': activeSection === 'semana' }"
       (click)="scrollToSection('semana'); activeSection = 'semana'"
     >
       Configuración F.Semana
     </button>
     <button
-      type="button"
-      class="btn btn-light btn-sm"
-      [ngClass]="{ active: activeSection === 'hextras' }"
+      class="px-4 py-1 text-sm rounded border bg-white shadow-sm hover:bg-gray-50"
+      [ngClass]="{ 'bg-fiori-accent text-white': activeSection === 'hextras' }"
       (click)="scrollToSection('hextras'); activeSection = 'hextras'"
     >
       Configuración de Horas Extras(H.E)
     </button>
     <button
-      type="button"
-      class="btn btn-light btn-sm"
-      [ngClass]="{ active: activeSection === 'calculo' }"
+      class="px-4 py-1 text-sm rounded border bg-white shadow-sm hover:bg-gray-50"
+      [ngClass]="{ 'bg-fiori-accent text-white': activeSection === 'calculo' }"
       (click)="scrollToSection('calculo'); activeSection = 'calculo'"
     >
       Configuración de cálculo
     </button>
     <button
-      type="button"
-      class="btn btn-light btn-sm"
-      [ngClass]="{ active: activeSection === 'aplicacion' }"
+      class="px-4 py-1 text-sm rounded border bg-white shadow-sm hover:bg-gray-50"
+      [ngClass]="{ 'bg-fiori-accent text-white': activeSection === 'aplicacion' }"
       (click)="scrollToSection('aplicacion'); activeSection = 'aplicacion'"
     >
       Configuración de la Aplicación
     </button>
   </div>
-
-  <section id="basica">
-    <div class="mt-5 container d-flex flex-column align-items-center">
-      <div class="text-center mb-4">
-        <h2>Siguiente Marcación, después de (Minutos)</h2>
-        <div class="mt-3">
-          <input
-            type="number"
-            class="form-control text-center"
-            id="numeroInput"
-            placeholder="Ingrese un número"
-            value="1"
-            style="max-width: 150px; margin: 0 auto"
-          />
-        </div>
-      </div>
-      <button type="button" class="btn btn-success">Guardar</button>
+ <!-- Secciones migradas -->
+  <section id="basica" class="mt-10">
+    <div class="flex flex-col items-center">
+      <h2 class="text-lg font-semibold">Siguiente Marcación, después de (Minutos)</h2>
+      <input
+        type="number"
+        class="mt-4 text-center border border-gray-300 rounded w-32 px-3 py-1"
+        id="numeroInput"
+        placeholder="Ingrese un número"
+        value="1"
+      />
+      <button class="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Guardar</button>
     </div>
   </section>
-
-  <section id="semana">
-    <div class="container mt-5">
-      <table class="table table-bordered">
-        <thead>
+<!-- Sección Semana -->
+  <section id="semana" class="mt-10">
+    <div class="overflow-auto">
+      <table class="min-w-full text-sm text-left border border-gray-300">
+        <thead class="bg-gray-100">
           <tr>
-            <th></th>
-            <th>Fin de Semana</th>
-            <th>Día de Trabajo</th>
-            <th>H.E Nivel 1 (Horas)</th>
-            <th>H.E Nivel 2 (Horas)</th>
-            <th>H.E Nivel 3 (Horas)</th>
+            <th class="p-2 border">Día</th>
+            <th class="p-2 border">Fin de Semana</th>
+            <th class="p-2 border">Día de Trabajo</th>
+            <th class="p-2 border">H.E Nivel 1</th>
+            <th class="p-2 border">H.E Nivel 2</th>
+            <th class="p-2 border">H.E Nivel 3</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th>Lunes</th>
-            <td>
-              <div class="form-check form-switch">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="lunesFinSemana"
-                />
-              </div>
-            </td>
-            <td>
-              <select class="form-select">
-                <option selected>Ignorar</option>
-                <option value="Trabajo">Trabajo</option>
-                <option value="Descanso">Descanso</option>
-              </select>
-            </td>
-            <td><input type="number" class="form-control" value="0" /></td>
-            <td><input type="number" class="form-control" value="0" /></td>
-            <td><input type="number" class="form-control" value="0" /></td>
-          </tr>
-          <tr>
-            <th>Martes</th>
-            <td>
-              <div class="form-check form-switch">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="martesFinSemana"
-                />
-              </div>
-            </td>
-            <td>
-              <select class="form-select">
-                <option selected>Ignorar</option>
-                <option value="Trabajo">Trabajo</option>
-                <option value="Descanso">Descanso</option>
-              </select>
-            </td>
-            <td><input type="number" class="form-control" value="0" /></td>
-            <td><input type="number" class="form-control" value="0" /></td>
-            <td><input type="number" class="form-control" value="0" /></td>
-          </tr>
-          <tr>
-            <th>Miércoles</th>
-            <td>
-              <div class="form-check form-switch">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="miercolesFinSemana"
-                />
-              </div>
-            </td>
-            <td>
-              <select class="form-select">
-                <option selected>Ignorar</option>
-                <option value="Trabajo">Trabajo</option>
-                <option value="Descanso">Descanso</option>
-              </select>
-            </td>
-            <td><input type="number" class="form-control" value="0" /></td>
-            <td><input type="number" class="form-control" value="0" /></td>
-            <td><input type="number" class="form-control" value="0" /></td>
-          </tr>
-          <tr>
-            <th>Jueves</th>
-            <td>
-              <div class="form-check form-switch">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="juevesFinSemana"
-                />
-              </div>
-            </td>
-            <td>
-              <select class="form-select">
-                <option selected>Ignorar</option>
-                <option value="Trabajo">Trabajo</option>
-                <option value="Descanso">Descanso</option>
-              </select>
-            </td>
-            <td><input type="number" class="form-control" value="0" /></td>
-            <td><input type="number" class="form-control" value="0" /></td>
-            <td><input type="number" class="form-control" value="0" /></td>
-          </tr>
-          <tr>
-            <th>Viernes</th>
-            <td>
-              <div class="form-check form-switch">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="viernesFinSemana"
-                />
-              </div>
-            </td>
-            <td>
-              <select class="form-select">
-                <option selected>Ignorar</option>
-                <option value="Trabajo">Trabajo</option>
-                <option value="Descanso">Descanso</option>
-              </select>
-            </td>
-            <td><input type="number" class="form-control" value="0" /></td>
-            <td><input type="number" class="form-control" value="0" /></td>
-            <td><input type="number" class="form-control" value="0" /></td>
-          </tr>
-          <tr>
-            <th>Sábado</th>
-            <td>
-              <div class="form-check form-switch">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="sabadoFinSemana"
-                />
-              </div>
-            </td>
-            <td>
-              <select class="form-select">
-                <option selected>Ignorar</option>
-                <option value="Trabajo">Trabajo</option>
-                <option value="Descanso">Descanso</option>
-              </select>
-            </td>
-            <td><input type="number" class="form-control" value="0" /></td>
-            <td><input type="number" class="form-control" value="0" /></td>
-            <td><input type="number" class="form-control" value="0" /></td>
-          </tr>
-          <tr>
-            <th>Domingo</th>
-            <td>
-              <div class="form-check form-switch">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="domingoFinSemana"
-                />
-              </div>
-            </td>
-            <td>
-              <select class="form-select">
-                <option selected>Ignorar</option>
-                <option value="Trabajo">Trabajo</option>
-                <option value="Descanso">Descanso</option>
-              </select>
-            </td>
-            <td><input type="number" class="form-control" value="0" /></td>
-            <td><input type="number" class="form-control" value="0" /></td>
-            <td><input type="number" class="form-control" value="0" /></td>
-          </tr>
+          <ng-container *ngFor="let dia of ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo']; let i = index">
+            <tr>
+              <th class="p-2 border">{{ dia }}</th>
+              <td class="p-2 border">
+                <input type="checkbox" class="form-checkbox text-blue-600">
+              </td>
+              <td class="p-2 border">
+                <select class="border rounded px-2 py-1 w-full">
+                  <option>Ignorar</option>
+                  <option>Trabajo</option>
+                  <option>Descanso</option>
+                </select>
+              </td>
+              <td class="p-2 border">
+                <input type="number" class="border px-2 py-1 rounded w-full" value="0" />
+              </td>
+              <td class="p-2 border">
+                <input type="number" class="border px-2 py-1 rounded w-full" value="0" />
+              </td>
+              <td class="p-2 border">
+                <input type="number" class="border px-2 py-1 rounded w-full" value="0" />
+              </td>
+            </tr>
+          </ng-container>
         </tbody>
       </table>
     </div>
   </section>
 
-  <section id="hextras">
-    <div class="mt-5 container">
-      <div class="form-group row">
-        <label for="inputPassword" class="col-sm-2 col-form-label"
-          >Regla de H.E :
-        </label>
-        <div class="col-sm-5">
-          <select class="custom-select" id="inputGroupSelect01">
+  <!-- Sección Horas Extras -->
+  <section id="hextras" class="mt-10">
+    <div class="max-w-5xl">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+        <label for="inputReglaHE" class="md:col-span-2 font-medium text-sm">Regla de H.E:</label>
+        <div class="md:col-span-6">
+          <select id="inputReglaHE" class="w-full border px-3 py-2 rounded">
             <option selected>Choose...</option>
             <option value="1">H.E Deshabilitada</option>
             <option value="2">Calcular H.E</option>
             <option value="3">Aprobar H.E</option>
-            <option value="3">Aprobar Prioridad H.E</option>
+            <option value="4">Aprobar Prioridad H.E</option>
           </select>
         </div>
-        <button class="btn btn-success">
-          Guardar
-        </button>
+        <div class="md:col-span-4">
+          <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Guardar</button>
+        </div>
       </div>
     </div>
   </section>
+<!-- Sección Cálculo -->
+  <section id="calculo" class="mt-10">
+    <div class="space-y-8">
+      <div>
+        <h2 class="text-lg font-semibold">Regla de Cálculo</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div class="md:col-span-2 flex items-center gap-2">
+            <label for="tardanzaMayor" class="w-48">Tardanza mayor a:</label>
+            <input type="number" id="tardanzaMayor" class="border rounded px-2 py-1 w-24" value="100">
+            <span>minutos, se considerará ausente</span>
+          </div>
+          <div class="md:col-span-2 flex items-center gap-2">
+            <label for="salidaTempranaMayor" class="w-48">Salida Temprana mayor a:</label>
+            <input type="number" id="salidaTempranaMayor" class="border rounded px-2 py-1 w-24" value="100">
+            <span>minutos, se considerará ausente</span>
+          </div>
+          <div class="md:col-span-3 flex flex-col gap-2">
+            <label>Considerar como:</label>
+            <div class="flex items-center gap-2">
+              <select class="border rounded px-2 py-1">
+                <option>Llegada Tarde</option>
+                <option>Otra Opción</option>
+              </select>
+              <span>Si olvidó la <strong>Marcación Entrada</strong> más de</span>
+              <input type="number" class="border rounded px-2 py-1 w-20" value="60">
+              <span>minutos</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <select class="border rounded px-2 py-1">
+                <option>Salida Temprana</option>
+                <option>Otra Opción</option>
+              </select>
+              <span>Si olvidó la <strong>Marcación Salida</strong> más de</span>
+              <input type="number" class="border rounded px-2 py-1 w-20" value="60">
+              <span>minutos</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-  <section id="calculo">
-    
-    <div class="mt-1 container">
-      <div class="container ">
-        <h2>Regla de Cálculo</h2>
-        <form>
-            <div class="row mb-2">
-                <label for="tardanzaMayor" class="col-md-3 col-form-label">Tardanza mayor a<span class="asterisk"></span></label>
-                <div class="col-md-2">
-                    <input type="number" class="form-control" id="tardanzaMayor" value="100">
-                </div>
-                <div class="col-md-7 col-form-label">minutos, se considerará, ausente</div>
-            </div>
-            <div class="row mb-2">
-                <label for="salidaTempranaMayor" class="col-md-3 col-form-label">Salida Temprana mayor a<span class="asterisk"></span></label>
-                <div class="col-md-2">
-                    <input type="number" class="form-control" id="salidaTempranaMayor" value="100">
-                </div>
-                <div class="col-md-7 col-form-label">minutos, se considerará, ausente</div>
-            </div>
-            <div class="row mb-2 align-items-center">
-                <label for="considerarLlegadaTarde" class="col-md-3 col-form-label">Considerar como<span class="asterisk"></span></label>
-                <div class="col-md-3">
-                    <select class="form-select" id="considerarLlegadaTarde">
-                        <option selected>Llegada Tarde</option>
-                        <option value="otraOpcion">Otra Opción</option>
-                    </select>
-                </div>
-                <div class="col-md-6 col-form-label">Si olvidó la <strong class="asterisk">Marcación Entrada</strong> más de
-                    <input type="number" class="form-control form-control-sm d-inline-block w-auto mx-2" value="60">
-                    minutos
-                </div>
-            </div>
-            <div class="row mb-4 align-items-center">
-                <label for="considerarSalidaTemprana" class="col-md-3 col-form-label">Considerar como<span class="asterisk"></span></label>
-                <div class="col-md-3">
-                    <select class="form-select" id="considerarSalidaTemprana">
-                        <option selected>Salida Temprana</option>
-                        <option value="otraOpcion">Otra Opción</option>
-                    </select>
-                </div>
-                <div class="col-md-6 col-form-label">Si olvidó la <strong class="asterisk">Marcación Salida</strong> más de
-                    <input type="number" class="form-control form-control-sm d-inline-block w-auto mx-2" value="60">
-                    minutos
-                </div>
-            </div>
-
-            <h2 class="mt-4">Elemento de Cálculo</h2>
-            <div class="row mb-2">
-                <label for="marcacionEntrada" class="col-md-3 col-form-label">Marcación Entrada<span class="asterisk"></span></label>
-                <div class="col-md-2">
-                    <input type="number" class="form-control" id="marcacionEntrada" value="0">
-                </div>
-                <label for="marcacionSalida" class="col-md-3 offset-md-1 col-form-label">Marcación Salida<span class="asterisk"></span></label>
-                <div class="col-md-2">
-                    <input type="number" class="form-control" id="marcacionSalida" value="1">
-                </div>
-            </div>
-            <div class="row mb-2">
-                <label for="descansoSalida" class="col-md-3 col-form-label">Descanso Salida<span class="asterisk"></span></label>
-                <div class="col-md-2">
-                    <input type="number" class="form-control" id="descansoSalida" value="2">
-                </div>
-                <label for="descansoEntrada" class="col-md-3 offset-md-1 col-form-label">Descanso Entrada<span class="asterisk"></span></label>
-                <div class="col-md-2">
-                    <input type="number" class="form-control" id="descansoEntrada" value="3">
-                </div>
-            </div>
-            <div class="row mb-2">
-                <label for="entradaHE" class="col-md-3 col-form-label">Entrada H.E<span class="asterisk"></span></label>
-                <div class="col-md-2">
-                    <input type="number" class="form-control" id="entradaHE" value="4">
-                </div>
-                <label for="salidaHE" class="col-md-3 offset-md-1 col-form-label">Salida H.E<span class="asterisk"></span></label>
-                <div class="col-md-2">
-                    <input type="number" class="form-control" id="salidaHE" value="5">
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-success mt-5">Guardar</button>
-        </form>
+      <div>
+        <h2 class="text-lg font-semibold">Elemento de Cálculo</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div class="flex items-center gap-2">
+            <label for="marcacionEntrada" class="w-48">Marcación Entrada:</label>
+            <input type="number" id="marcacionEntrada" class="border rounded px-2 py-1 w-24" value="0">
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="marcacionSalida" class="w-48">Marcación Salida:</label>
+            <input type="number" id="marcacionSalida" class="border rounded px-2 py-1 w-24" value="1">
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="descansoSalida" class="w-48">Descanso Salida:</label>
+            <input type="number" id="descansoSalida" class="border rounded px-2 py-1 w-24" value="2">
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="descansoEntrada" class="w-48">Descanso Entrada:</label>
+            <input type="number" id="descansoEntrada" class="border rounded px-2 py-1 w-24" value="3">
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="entradaHE" class="w-48">Entrada H.E:</label>
+            <input type="number" id="entradaHE" class="border rounded px-2 py-1 w-24" value="4">
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="salidaHE" class="w-48">Salida H.E:</label>
+            <input type="number" id="salidaHE" class="border rounded px-2 py-1 w-24" value="5">
+          </div>
+        </div>
+        <button class="mt-6 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Guardar</button>
+      </div>
     </div>
-
-    </div>
-
-
   </section>
 
   <section id="aplicacion">
@@ -382,4 +226,5 @@
         </form>
     </div>
   </section>
+
 </div>

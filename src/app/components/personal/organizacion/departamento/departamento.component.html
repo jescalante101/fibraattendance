@@ -1,102 +1,70 @@
-<div class="border-bottom container pt-5 mt-2 mb-5">
-  <h1 class="mt-2 mt-md-4 mb-3 pt-5">Dispositivos</h1>
+<div class="border-b px-4 mt-4 mb-5">
+  <h1 class="mt-4 mb-3 text-lg font-semibold text-fiori-text">Departamento</h1>
 
-  <div class="btn-group btn-group-sm border" role="group" aria-label="Acciones">
-    <button mat-stroked-button class="btn btn-light">
+  <!-- Botones -->
+  <div class="flex flex-wrap items-center gap-2 mb-3 border rounded px-2 py-1">
+    <button mat-stroked-button class="bg-white border border-gray-300 text-xs px-2 py-1 rounded hover:bg-gray-100">
       <small>Nuevo</small>
     </button>
-    <button mat-stroked-button class="btn btn-outline-danger ml-1">
+    <button mat-stroked-button class="bg-white border border-red-400 text-red-600 text-xs px-2 py-1 rounded hover:bg-red-100">
       <small>Borrar</small>
     </button>
-    <button mat-stroked-button class="btn btn-outline-info ml-1">
+    <button mat-stroked-button class="bg-white border border-blue-400 text-blue-600 text-xs px-2 py-1 rounded hover:bg-blue-100">
       <small>Importar</small>
     </button>
-    <button class="btn btn-outline-info ml-1"  mat-stroked-button>
+    <button mat-stroked-button class="bg-white border border-blue-400 text-blue-600 text-xs px-2 py-1 rounded hover:bg-blue-100">
       <small>Asignar Empleado a</small>
     </button>
   </div>
 
-  <div class="mt-4">
-    <table class="table table-striped table-light table-hover"
-              style="width: 100%; table-layout: auto">
-      <thead>
+  <!-- Tabla -->
+  <div class="overflow-auto">
+    <table class="min-w-full text-xs text-left text-gray-700 border bg-white">
+      <thead class="bg-gray-100 text-[11px] uppercase text-gray-500">
         <tr>
-          <th></th>
-          <th scope="col" style="padding: 0.2rem">
-            <small>Código de Departamento</small>
-          </th>
-          <th scope="col" style="padding: 0.2rem">
-            <small>Nombre del Departamento</small>
-          </th>
-          <th scope="col" style="padding: 0.2rem">
-            <small>
-              Departamento superior
-            </small>
-          </th>
-          <th scope="col" style="padding: 0.2rem">
-            <small>Empresa</small>
-          </th>
-          <th scope="col" style="padding: 0.2rem">
-            <small>Cantidad de Empleado</small>
-          </th>
-          <th scope="col" style="padding: 0.2rem"></th>
+          <th class="px-2 py-1"></th>
+          <th class="px-2 py-1 whitespace-nowrap">Código de Departamento</th>
+          <th class="px-2 py-1 whitespace-nowrap">Nombre del Departamento</th>
+          <th class="px-2 py-1 whitespace-nowrap">Departamento Superior</th>
+          <th class="px-2 py-1 whitespace-nowrap">Empresa</th>
+          <th class="px-2 py-1 whitespace-nowrap">Cantidad de Empleado</th>
+          <th class="px-2 py-1"></th>
         </tr>
       </thead>
-      <tbody *ngIf="dataDepartment && dataDepartment.length > 0; else noData">
-        <tr *ngFor="let item of dataDepartment; let i = index">
-          <td style="padding: 0.1rem">
+
+      <tbody *ngIf="dataDepartment && dataDepartment.length > 0; else noData" class="divide-y divide-gray-200">
+        <tr *ngFor="let item of dataDepartment; let i = index" class="hover:bg-gray-50">
+          <td class="px-2 py-1">
             <input
               type="checkbox"
+              class="accent-fiori-primary"
               [(ngModel)]="item.seleccionado"
-              (change)="actualizarSeleccionados()"
-            />
+              (change)="actualizarSeleccionados()" />
           </td>
-          <th scope="row" style="padding: 0.1rem">
-            <small>{{ item.deptCode }}</small>
-          </th>
-          <td style="padding: 0.1rem">
-            <small>{{ item.companyName }}</small>
-          </td>
-          <td style="padding: 0.1rem">
-            <small>
-              {{ item.sup }}
-            </small>
-          </td>
-          <td style="padding: 0.1rem">
-            <small>{{ item.companyName }}</small>
-          </td>
-          <td style="padding: 0.1rem">
-            <small>
-              {{ item.totalEmpleados }}
-            </small>
-          </td>
-
-          <td>
-            
-          </td>
+          <td class="px-2 py-1 font-semibold">{{ item.deptCode }}</td>
+          <td class="px-2 py-1">{{ item.companyName }}</td>
+          <td class="px-2 py-1">{{ item.sup }}</td>
+          <td class="px-2 py-1">{{ item.companyName }}</td>
+          <td class="px-2 py-1">{{ item.totalEmpleados }}</td>
+          <td class="px-2 py-1"></td>
         </tr>
       </tbody>
+
       <ng-template #noData>
         <tr>
-          <td colspan="13">No se encontraron datos.</td>
+          <td colspan="7" class="text-center py-3 text-xs text-gray-500">No se encontraron datos.</td>
         </tr>
       </ng-template>
     </table>
-
-    <!-- <button class="btn btn-primary mt-2" (click)="seleccionarTodos()">Seleccionar Todos</button>
-    <button class="btn btn-danger mt-2" (click)="deseleccionarTodos()">Deseleccionar Todos</button> -->
-    <ul id="elementosSeleccionados" class="mt-3">
-      <li *ngIf="elementosSeleccionados.length > 0">
-        Elementos seleccionados: {{ elementosSeleccionados.length }} ({{
-          elementosSeleccionados.join(", ")
-        }})
-      </li>
-      <li *ngIf="elementosSeleccionados.length === 0">
-        No hay elementos seleccionados.
-      </li>
-    </ul>
   </div>
 
-  
+  <!-- Lista de seleccionados -->
+  <ul id="elementosSeleccionados" class="mt-3 text-xs text-gray-600 list-disc list-inside">
+    <li *ngIf="elementosSeleccionados.length > 0">
+      Elementos seleccionados: {{ elementosSeleccionados.length }} ({{ elementosSeleccionados.join(", ") }})
+    </li>
+    <li *ngIf="elementosSeleccionados.length === 0">
+      No hay elementos seleccionados.
+    </li>
+  </ul>
 </div>
-

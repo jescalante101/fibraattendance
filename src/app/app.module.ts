@@ -54,9 +54,8 @@ import { DescansoComponent } from './components/asistencia/horarios/descanso/des
 import { NuevoHorarioComponent } from './components/asistencia/horarios/horario/nuevo-horario/nuevo-horario.component';
 import { ModalConfirmComponent } from './shared/modal-confirm/modal-confirm.component';
 import { NuevoDescansoComponent } from './components/asistencia/horarios/descanso/nuevo-descanso/nuevo-descanso.component';
-
-
-
+import { CustomHeaderComponent } from './components/sidebar/custom-header/custom-header.component';
+import { AsignarHorarioEmpleadoComponent } from './components/personal/empleado/asignar-horario-empleado/asignar-horario-empleado.component';
 
 
 @NgModule({
@@ -82,7 +81,6 @@ import { NuevoDescansoComponent } from './components/asistencia/horarios/descans
     EmpleadoComponent,
     CeseComponent,
 
-
     DispositivoComponent,
     MarcacionesComponent,
     TerminalSyncComponent,
@@ -95,10 +93,9 @@ import { NuevoDescansoComponent } from './components/asistencia/horarios/descans
 
     ThorassemanalComponent,
     ModalNuevoTurnoComponent,
-    NuevoDescansoComponent
-    
-    
-  
+    NuevoDescansoComponent,
+    CustomHeaderComponent,
+    AsignarHorarioEmpleadoComponent
 
   ],
   imports: [
@@ -126,7 +123,8 @@ import { NuevoDescansoComponent } from './components/asistencia/horarios/descans
     }),
     BrowserAnimationsModule,
     MatSlideToggleModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+
   ],
   exports:[
     TerminalSyncComponent,
@@ -135,7 +133,8 @@ import { NuevoDescansoComponent } from './components/asistencia/horarios/descans
     ModalNuevoTurnoComponent,
     NuevoHorarioComponent,
     ModalConfirmComponent,
-    NuevoDescansoComponent
+    NuevoDescansoComponent,
+    CustomHeaderComponent
   ],
   providers: [
 

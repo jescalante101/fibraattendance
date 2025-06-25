@@ -1,97 +1,69 @@
-<div class="mt-5 container">
-  <div class="btn-group btn-group-sm border mt-3" role="group" aria-label="Acciones">
-    <button mat-stroked-button class="btn btn-light btn-outline-danger">
-      <small>Borrar</small>
-    </button>
-    <button mat-stroked-button class="btn btn-light btn-outline-info ml-1" (click)="abrirModalNuevoHorario(0)">
-      <small>Nuevo Horario Normal</small>
-    </button>
-    <button mat-stroked-button class="btn btn-outline-info ml-1" (click)="abrirModalNuevoHorario(1)">
-      <small>Nuevo Horario Flexible</small>
-    </button>
+<div class="w-full max-w-6xl mx-auto">
+  <!-- Botones de acción -->
+  <div class="flex flex-wrap gap-1 border p-1 mb-2 text-xs">
+    <button (click)="borrarSeleccionados()" class="border px-2 py-0.5 rounded text-red-600 hover:bg-red-50">Borrar</button>
+    <button (click)="abrirModalNuevoHorario(0)" class="border px-2 py-0.5 rounded text-blue-600 hover:bg-blue-50">Nuevo Horario Normal</button>
+    <button (click)="abrirModalNuevoHorario(1)" class="border px-2 py-0.5 rounded text-blue-600 hover:bg-blue-50">Nuevo Horario Flexible</button>
   </div>
 
-  <table class="table table-striped table-light table-hover table-bordered" style="width: 100%; table-layout: auto">
-    <thead class="thead-light">
-      <tr>
-        <th scope="col" class="text-center">
-          <input type="checkbox" aria-label="Checkbox for following text input" >
-        </th>
-        <th scope="col"><small>Nombre</small></th>
-        <th scope="col"><small>Tipo</small></th>
-        <th scope="col"><small>Entrada</small></th>
-        <th scope="col"><small>Salida</small></th>
-        <th scope="col"><small>Tiempo de Trabajo</small></th>
-        <th scope="col"><small>Descanso</small></th>
-        <th scope="col"><small>Diás laborales</small></th>
-        <!-- <th scope="col">Tipo de Trabajo</th> -->
-        <th scope="col"></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let item of dataHorarios">
-        <th scope="row" style="padding: 0.1rem" class="text-center">
-          <input type="checkbox" aria-label="Checkbox for following text input">
-        </th>
-        <td style="padding: 0.1rem" >
-          <small>{{item.nombre}}</small>
-        </td>
-        <td style="padding: 0.1rem">
-          <small>
-            <div *ngIf="item.tipo!=0;else noEstado">Flexible</div>
-            <ng-template #noEstado>Normal</ng-template>
-          </small>
-        </td>
-        <td style="padding: 0.1rem">
-          <small>
-            {{item.horaEntrada}}
-          </small>
-        </td>
-        <td style="padding: 0.1rem">
-          <small>
-            {{item.horaSalida}}
-          </small>
-        </td>
-        <td style="padding: 0.1rem">
-          <small>{{item.tiempoTrabajo}}</small>
-        </td>
-        <td style="padding: 0.1rem">
-          <small>
-            {{item.descanso}} 
-          </small>
-        </td>
-        <td style="padding: 0.1rem">
-          <small>
-            {{item.diasLaboral}}
-          </small>
-        </td>
-        <!-- <td>
-          <small>
-            <div *ngIf="item.workType==1;else noEstado">Normal</div>
-            <ng-template #noEstado>Extra</ng-template>
-          </small>
-        </td> -->
-        <td style="padding: 0.1rem">
-          <button mat-button aria-label="Example icon button with a menu icon" (click)="editarHorario(item.idHorio,item.tipo)" matTooltip="Editar" style="font-size: 16px; width: 28px; height: 28px; min-width: 28px; min-height: 28px; padding: 2px;">
-              <mat-icon style="font-size: 16px;">edit</mat-icon>
-          </button>
-          <button mat-button aria-label="Example icon button with a menu icon" (click)="openConfirmationDialog(item.idHorio)" matTooltip="Eliminar" style="font-size: 16px; width: 28px; height: 28px; min-width: 28px; min-height: 28px; padding: 2px;">
-              <mat-icon style="color: red; font-size: 16px;">delete</mat-icon>
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- Tabla -->
+  <div class="overflow-x-auto">
+    <table class="w-full text-xs border border-gray-200">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-2 py-1 border text-center">
+            <input type="checkbox" aria-label="Seleccionar todos" />
+          </th>
+          <th class="px-2 py-1 border">Nombre</th>
+          <th class="px-2 py-1 border">Tipo</th>
+          <th class="px-2 py-1 border">Entrada</th>
+          <th class="px-2 py-1 border">Salida</th>
+          <th class="px-2 py-1 border">Trabajo</th>
+          <th class="px-2 py-1 border">Descanso</th>
+          <th class="px-2 py-1 border">Laborales</th>
+          <th class="px-2 py-1 border"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of dataHorarios" class="hover:bg-gray-50">
+          <td class="px-2 py-1 border text-center">
+            <input type="checkbox" aria-label="Seleccionar" />
+          </td>
+          <td class="px-2 py-1 border">{{ item.nombre }}</td>
+          <td class="px-2 py-1 border">
+            <span *ngIf="item.tipo !== 0; else tipoNormal">Flexible</span>
+            <ng-template #tipoNormal>Normal</ng-template>
+          </td>
+          <td class="px-2 py-1 border">{{ item.horaEntrada }}</td>
+          <td class="px-2 py-1 border">{{ item.horaSalida }}</td>
+          <td class="px-2 py-1 border">{{ item.tiempoTrabajo }}</td>
+          <td class="px-2 py-1 border">{{ item.descanso }}</td>
+          <td class="px-2 py-1 border">{{ item.diasLaboral }}</td>
+          <td class="px-2 py-1 border text-center">
+            <button (click)="editarHorario(item.idHorio, item.tipo)" class="w-5 h-5 text-blue-600 hover:text-blue-800" title="Editar">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487a2.25 2.25 0 113.182 3.182L7.5 20.213 3 21l.787-4.5L16.862 4.487z" />
+              </svg>
+            </button>
+            <button (click)="openConfirmationDialog(item.idHorio)" class="w-5 h-5 text-red-600 hover:text-red-800" title="Eliminar">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
+  <!-- Paginador -->
   <mat-paginator
-        [length]="totalRecords"
-        [pageSize]="pageSize"
-        [pageIndex]="pageNumber - 1" 
-        (page)="handlePageEvent($event)"
-        [pageSizeOptions]="[5, 10, 20, 50]"
-        showFirstLastButtons
-        aria-label="Seleccione la página">
-      </mat-paginator>
-      
-
+    [length]="totalRecords"
+    [pageSize]="pageSize"
+    [pageIndex]="pageNumber - 1"
+    (page)="handlePageEvent($event)"
+    [pageSizeOptions]="[5, 10, 20, 50]"
+    showFirstLastButtons
+    aria-label="Seleccione la página">
+  </mat-paginator>
 </div>

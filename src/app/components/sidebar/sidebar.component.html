@@ -1,501 +1,196 @@
-<header
-  class="navbar navbar-expand-lg navbar-dark fixed-top header-blue px-3 px-lg-4"
-  data-scroll-header
-  data-fixed-element
->
-  <div class="d-flex align-items-center">
-    <button (click)="toggleSidebar()" class="btn btn-outline-light me-3 d-lg-none" aria-label="Abrir menú lateral">
-      <i class="fa-solid fa-bars"></i>
-    </button>
-    <a class="navbar-brand fw-bold fs-4" routerLink="/">ASISTENCIA FB</a>
-  </div>
-
-  <ul class="navbar-nav flex-row flex-grow-1 justify-content-center mx-4">
-    <li class="nav-item mx-2" [ngClass]="{ active: activeItem === 'personal' }">
-      <a
-        class="nav-link py-0"
-        aria-current="page"
-        [routerLink]="['./panel/personal/organizacion']"
-        (click)="selectItem('personal'); toggleMenu(1,'organizacion')"
-      >
-        <i class="fa-solid fa-user-group me-1"></i> Personal
-      </a>
-    </li>
-    <li class="nav-item mx-2" [ngClass]="{ active: activeItem === 'dispositivo' }">
-      <a
-        class="nav-link py-0"
-        [routerLink]="['./panel/dispositivo']"
-        (click)="selectItem('dispositivo');toggleMenu(1,'dispositivo')"
-      >
-        <i class="fa-solid fa-mobile-retro me-1"></i> Dispositivo
-      </a>
-    </li>
-    <li class="nav-item mx-2" [ngClass]="{ active: activeItem === 'asistencia' }">
-      <a 
-        class="nav-link py-0"
-        (click)="selectItem('asistencia');toggleMenu(1,'regla')"
-        [routerLink]="['./panel/asistencia']"
-      >
-        <i class="fa-solid fa-calendar-check me-1"></i> Asistencia
-      </a>
-    </li>
-    <li class="nav-item mx-2" [ngClass]="{ active: activeItem === 'acceso' }">
-      <a class="nav-link py-0" href="#" (click)="selectItem('acceso')">
-        <i class="fa-solid fa-door-open me-1"></i> Acceso
-      </a>
-    </li>
-    <li class="nav-item mx-2" [ngClass]="{ active: activeItem === 'temperatura' }">
-      <a class="nav-link py-0" href="#" (click)="selectItem('temperatura')">
-        <i class="fa-solid fa-temperature-half me-1"></i> Temperatura
-      </a>
-    </li>
-    <li class="nav-item mx-2" [ngClass]="{ active: activeItem === 'sistema' }">
-      <a class="nav-link py-0" href="#" (click)="selectItem('sistema')">
-        <i class="fa-solid fa-gears me-1"></i> Sistema
-      </a>
-    </li>
-  </ul>
-
-  <div class="sidebar-user-wrapper d-flex align-items-center ms-auto">
-    <div class="user-trigger d-flex align-items-center" (click)="toggleUserMenu()" style="cursor:pointer;">
-      <span class="rounded-circle user-initial bg-light text-dark fw-bold me-2" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">m</span>
-      <i class="fa-solid fa-caret-down"></i>
-    </div>
-    <ul *ngIf="showUserMenu" class="user-dropdown shadow mt-2 end-0">
-      <li class="fw-bold px-3 py-2">manager</li>
-      <li>
-        <a class="dropdown-item" href="#"><i class="fa-solid fa-clock-rotate-left me-2"></i>Actividades recientes</a>
-      </li>
-      <li>
-        <a class="dropdown-item" href="#"><i class="fa-solid fa-clipboard-check me-2"></i>Utilizado con frecuencia</a>
-      </li>
-      <li>
-        <a class="dropdown-item" href="#"><i class="fa-solid fa-magnifying-glass me-2"></i>Busc.Aplic.</a>
-      </li>
-      <li>
-        <a class="dropdown-item" href="#"><i class="fa-solid fa-gear me-2"></i>Opciones</a>
-      </li>
-      <li>
-        <a class="dropdown-item" href="#"><i class="fa-solid fa-envelope me-2"></i>Comunicarse con soporte</a>
-      </li>
-      <li>
-        <a class="dropdown-item" href="#"><i class="fa-solid fa-circle-info me-2"></i>Acerca de</a>
-      </li>
-      <li>
-        <a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-power-off me-2"></i>Salir</a>
-      </li>
-    </ul>
-  </div>
-</header>
 
 <aside
-  class="hamburguesa sidebar-propio cs-offcanvas cs-offcanvas-expand aside-blue sidebar"
+  class="bg-fiori-surface border-r border-fiori-border text-fiori-text w-[260px] lg:w-[240px] xl:w-[220px] min-w-[220px]"
   id="componentsNav"
   [class.collapsed]="isCollapsed"
 >
-  <!-- Header solo móvil -->
-  <div class="cs-offcanvas-cap d-flex d-lg-none justify-content-between align-items-center px-3 py-2 border-bottom">
-    <div class="d-flex align-items-center">
-      <h5 class="text-light mb-0 mr-3">Menú</h5>
-      <span class="badge badge-warning">Docs</span>
-    </div>
-    <button
-      class="close text-light"
-      type="button"
-      data-dismiss="offcanvas"
-      aria-label="Close"
-    >
-      <span aria-hidden="true">&times;</span>
-    </button>
+<!-- Header solo móvil -->
+<div class="flex items-center justify-between px-4 py-2 border-b border-fiori-border bg-fiori-surface text-fiori-text lg:hidden">
+  <div class="flex items-center space-x-3">
+    <h5 class="text-base font-semibold">Menú</h5>
+    <span class="text-xs font-semibold bg-fiori-warning text-black px-2 py-0.5 rounded">Docs</span>
   </div>
-  <!-- Accesos rápidos solo móvil -->
-  <div class="d-flex d-lg-none align-items-center py-3 px-3 border-bottom border-light">
-    <a class="btn btn-primary btn-block mr-2 px-4" href="index.html">
-      <i class="cxi-eye mr-2"></i>Preview
-    </a>
-    <a class="btn btn-success btn-block px-4" href="../components/typography.html">
-      <i class="cxi-layouts mr-2"></i>Components
-    </a>
-  </div>
+  <button
+    class="text-fiori-text hover:text-red-400 text-xl"
+    type="button"
+    aria-label="Cerrar"
+    (click)="toggleSidebar()"
+  >
+    &times;
+  </button>
+</div>
+
+<!-- Accesos rápidos solo móvil -->
+<div class="flex lg:hidden items-center gap-2 px-4 py-3 border-b border-fiori-border bg-fiori-surface">
+  <a class="flex-1 text-center bg-fiori-primary hover:bg-blue-500 text-white py-2 rounded font-medium transition" href="index.html">
+    <i class="fa-solid fa-eye mr-2"></i>Preview
+  </a>
+  <a class="flex-1 text-center bg-fiori-success hover:bg-green-500 text-white py-2 rounded font-medium transition" href="../components/typography.html">
+    <i class="fa-solid fa-layer-group mr-2"></i>Components
+  </a>
+</div>
+
   <!-- Menú principal con scroll -->
-  <div class="cs-offcanvas-body px-0 pt-3 pb-3" style="height: 100vh; overflow-y: auto;">
-    <nav class="nav nav-light flex-column">
-      <div class="px-3 pb-2">
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Buscar..."
-          #buscador
-          (input)="filtrarSidebar(buscador.value)"
-        />
-      </div>
+  <div class="px-0 pt-3 pb-3 overflow-y-auto h-screen bg-fiori-background text-fiori-text">
 
-      <!-- Sección: Personal -->
-      <section *ngIf="activeItem==='personal'" class="sidebar-section mb-4">
-        <div class="sidebar-title px-3 text-uppercase text-muted small mb-2">Personal</div>
-        <ul class="nav flex-column">
-          <!-- Organización -->
-          <li class="nav-item" data-level="1" data-menu-name="organizacion">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'organizacion')" href="javascript:void(0)">
-              <i class="fa-solid fa-sitemap mr-2"></i>
-              <span>Organización</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'organizacion'),
-                  'fa-angle-right': !isOpen(1, 'organizacion')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'organizacion')">
-              <li><a class="nav-link" [routerLink]="['panel/personal/organizacion']" routerLinkActive="active">Empresa</a></li>
-              <li><a class="nav-link" [routerLink]="['panel/personal/organizacion/departamento']" routerLinkActive="active">Departamentos</a></li>
-              <li><a class="nav-link" [routerLink]="['panel/personal/organizacion/cargo']" routerLinkActive="active">Cargo</a></li>
-              <li><a class="nav-link" [routerLink]="['panel/personal/organizacion/area']" routerLinkActive="active">Área</a></li>
-            </ul>
-          </li>
-          <!-- Empleado -->
-          <li class="nav-item" data-level="1" data-menu-name="empleado">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'empleado')" href="javascript:void(0)">
-              <i class="fa-solid fa-users-line mr-2"></i>
-              <span>Empleado</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'empleado'),
-                  'fa-angle-right': !isOpen(1, 'empleado')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'empleado')">
-              <li><a class="nav-link" [routerLink]="['panel/personal/empleado/empleado']" routerLinkActive="active">Empleados</a></li>
-              <li><a class="nav-link" [routerLink]="['panel/personal/empleado/cese']" routerLinkActive="active">Cese</a></li>
-            </ul>
-          </li>
-          <!-- Proceso y Aprobación -->
-          <li class="nav-item" data-level="1" data-menu-name="pamenu">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'pamenu')" href="javascript:void(0)">
-              <i class="fa-solid fa-bars-progress mr-2"></i>
-              <span>Proceso y Aprobación</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'pamenu'),
-                  'fa-angle-right': !isOpen(1, 'pamenu')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'pamenu')">
-              <li><a class="nav-link" routerLinkActive="active">Rol Aprobadores</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Proceso de Permiso</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Aprobaciones</a></li>
-            </ul>
-          </li>
-          <!-- Configuración -->
-          <li class="nav-item" data-level="1" data-menu-name="configuracion">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'configuracion')" href="javascript:void(0)">
-              <i class="fa-solid fa-gear mr-2"></i>
-              <span>Configuración</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'configuracion'),
-                  'fa-angle-right': !isOpen(1, 'configuracion')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'configuracion')">
-              <li><a class="nav-link" routerLinkActive="active">Documento</a></li>
-            </ul>
-          </li>
-        </ul>
-      </section>
+    <nav class="flex flex-col">
+   
 
-      <!-- Sección: Dispositivo -->
-      <section *ngIf="activeItem==='dispositivo'" class="sidebar-section mb-4">
-        <div class="sidebar-title px-3 text-uppercase text-muted small mb-2">Dispositivo</div>
-        <ul class="nav flex-column">
-          <!-- Dispositivo -->
-          <li class="nav-item" data-level="1" data-menu-name="dispositivo">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'dispositivo')" href="javascript:void(0)">
-              <i class="fa-solid fa-mobile-retro mr-2"></i>
-              <span>Dispositivo</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'dispositivo'),
-                  'fa-angle-right': !isOpen(1, 'dispositivo')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'dispositivo')">
-              <li><a class="nav-link" [routerLink]="['./panel/dispositivo']" routerLinkActive="active">Dispositivos</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Comandos de Dispositivo</a></li>
-            </ul>
-          </li>
-          <!-- Mensajes -->
-          <li class="nav-item" data-level="1" data-menu-name="mensaje">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'mensaje')" href="javascript:void(0)">
-              <i class="fa-solid fa-comment mr-2"></i>
-              <span>Mensajes</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'mensaje'),
-                  'fa-angle-right': !isOpen(1, 'mensaje')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'mensaje')">
-              <li><a class="nav-link" routerLinkActive="active">Público</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Privado</a></li>
-            </ul>
-          </li>
-          <!-- Datos -->
-          <li class="nav-item" data-level="1" data-menu-name="menudato">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'menudato')" href="javascript:void(0)">
-              <i class="fa-solid fa-database mr-2"></i>
-              <span>Datos</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'menudato'),
-                  'fa-angle-right': !isOpen(1, 'menudato')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'menudato')">
-              <li><a class="nav-link" routerLinkActive="active">Incidencias</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Plantilla Biométrica</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Foto Biométrica</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/dispositivo/marcaciones']" routerLinkActive="active">Marcaciones</a></li>
-            </ul>
-          </li>
-          <!-- Eventos -->
-          <li class="nav-item" data-level="1" data-menu-name="eventos">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'eventos')" href="javascript:void(0)">
-              <i class="fa-solid fa-clock-rotate-left mr-2"></i>
-              <span>Eventos</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'eventos'),
-                  'fa-angle-right': !isOpen(1, 'eventos')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'eventos')">
-              <li><a class="nav-link" routerLinkActive="active">Evento de Operación</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Evento de Errores</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Cargar Registros</a></li>
-            </ul>
-          </li>
-          <!-- Aplicación móvil -->
-          <li class="nav-item" data-level="1" data-menu-name="apmovil">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'apmovil')" href="javascript:void(0)">
-              <i class="fa-solid fa-mobile mr-2"></i>
-              <span>Aplicación móvil</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'apmovil'),
-                  'fa-angle-right': !isOpen(1, 'apmovil')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'apmovil')">
-              <li><a class="nav-link" routerLinkActive="active">Límite GPS del empleado</a></li>
-              <li><a class="nav-link">Límite GPS de Departamento</a></li>
-              <li><a class="nav-link">Cuentas</a></li>
-              <li><a class="nav-link">Aviso</a></li>
-              <li><a class="nav-link">Notificación</a></li>
-              <li><a class="nav-link">Operación de registros</a></li>
-            </ul>
-          </li>
-          <!-- Configuraciones -->
-          <li class="nav-item" data-level="1" data-menu-name="devicesetting">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'devicesetting')" href="javascript:void(0)">
-              <i class="fa-solid fa-gear mr-2"></i>
-              <span>Configuraciones</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'devicesetting'),
-                  'fa-angle-right': !isOpen(1, 'devicesetting')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'devicesetting')">
-              <li><a class="nav-link" routerLinkActive="active">Configuración</a></li>
-            </ul>
-          </li>
-        </ul>
-      </section>
+    <!-- Seccion :Personal -->
+    <section *ngIf="activeItem==='personal'" class="mb-4">
+      <div class="px-4 text-[11px] uppercase tracking-wider text-fiori-subtext font-bold mb-2">Personal</div>
+      <ul class="flex flex-col gap-1 text-[13px]">
+        <!-- Organización -->
+        <li class="group" data-level="1" data-menu-name="organizacion">
+          <button
+            class="w-full flex items-center justify-between px-3 py-2 bg-fiori-surface hover:bg-fiori-primary hover:text-white text-fiori-text rounded-md transition-all shadow-sm"
+            (click)="toggleMenu(1, 'organizacion')"
+          >
+            <span class="flex items-center gap-2">
+              <i class="fa-regular fa-building"></i>
+              <span class="font-medium">Organización</span>
+            </span>
+            <i class="fa-solid text-[10px] transition-transform" [ngClass]="{ 'fa-chevron-down': isOpen(1, 'organizacion'), 'fa-chevron-right': !isOpen(1, 'organizacion') }"></i>
+          </button>
+          <ul *ngIf="isOpen(1, 'organizacion')" class="ml-6 mt-1 flex flex-col gap-1">
+            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="['panel/personal/organizacion']" routerLinkActive="bg-fiori-primary text-white">Empresa</a></li>
+            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="['panel/personal/organizacion/departamento']" routerLinkActive="bg-fiori-primary text-white">Departamentos</a></li>
+            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="['panel/personal/organizacion/cargo']" routerLinkActive="bg-fiori-primary text-white">Cargo</a></li>
+            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="['panel/personal/organizacion/area']" routerLinkActive="bg-fiori-primary text-white">Área</a></li>
+          </ul>
+        </li>
 
-      <!-- Sección: Asistencia -->
-      <section *ngIf="activeItem==='asistencia'" class="sidebar-section mb-4">
-        <div class="sidebar-title px-3 text-uppercase text-muted small mb-2">Asistencia</div>
-        <ul class="nav flex-column">
-          <!-- Regla -->
-          <li class="nav-item" data-level="1" data-menu-name="regla">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'regla')" href="javascript:void(0)">
-              <i class="fa-solid fa-registered mr-2"></i>
-              <span>Regla</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'regla'),
-                  'fa-angle-right': !isOpen(1, 'regla')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'regla')">
-              <li><a class="nav-link" routerLinkActive="active">Regla General</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Regla del Departamento</a></li>
-            </ul>
-          </li>
-          <!-- Horario y Turno -->
-          <li class="nav-item" data-level="1" data-menu-name="horarioturno">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'horarioturno')" href="javascript:void(0)">
-              <i class="fa-solid fa-clock mr-2"></i>
-              <span>Horario y Turno</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'horarioturno'),
-                  'fa-angle-right': !isOpen(1, 'horarioturno')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'horarioturno')">
-              <li><a class="nav-link" [routerLink]="['/panel/asistencia/descansos']" routerLinkActive="active">Descanso</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/asistencia/horarios']" routerLinkActive="active">Horario</a></li>
-              <li><a class="nav-link" [routerLink]="['/panel/asistencia/turno']" routerLinkActive="active">Turno</a></li>
-            </ul>
-          </li>
-          <!-- Calendario -->
-          <li class="nav-item" data-level="1" data-menu-name="calendario">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'calendario')" href="javascript:void(0)">
-              <i class="fa-solid fa-calendar-days mr-2"></i>
-              <span>Calendario</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'calendario'),
-                  'fa-angle-right': !isOpen(1, 'calendario')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'calendario')">
-              <li><a class="nav-link" routerLinkActive="active">Por Departamento</a></li>
-              <li><a class="nav-link">Por Empleado</a></li>
-              <li><a class="nav-link">Calendario Temporal</a></li>
-              <li><a class="nav-link">Ver Calendario</a></li>
-            </ul>
-          </li>
-          <!-- Aprobaciones -->
-          <li class="nav-item" data-level="1" data-menu-name="maprobaciones">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'maprobaciones')" href="javascript:void(0)">
-              <i class="fa-solid fa-check-to-slot mr-2"></i>
-              <span>Aprobaciones</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'maprobaciones'),
-                  'fa-angle-right': !isOpen(1, 'maprobaciones')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'maprobaciones')">
-              <li><a class="nav-link" routerLinkActive="active">Marcación Manual</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Permiso Papeleta</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Horas Extras</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Entrenamiento</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Ajuste de Calendario</a></li>
-            </ul>
-          </li>
-          <!-- Festivo -->
-          <li class="nav-item" data-level="1" data-menu-name="menufestivo">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'menufestivo')" href="javascript:void(0)">
-              <i class="fa-solid fa-file-circle-plus mr-2"></i>
-              <span>Festivo</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'menufestivo'),
-                  'fa-angle-right': !isOpen(1, 'menufestivo')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'menufestivo')">
-              <li><a class="nav-link">Festivo</a></li>
-            </ul>
-          </li>
-          <!-- Reporte Marcaciones -->
-          <li class="nav-item" data-level="1" data-menu-name="menumarcaciones">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'menumarcaciones')" href="javascript:void(0)">
-              <i class="fa-solid fa-file-pdf mr-2"></i>
-              <span>Reporte Marcaciones</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'menumarcaciones'),
-                  'fa-angle-right': !isOpen(1, 'menumarcaciones')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'menumarcaciones')">
-              <li><a class="nav-link">Marcación</a></li>
-              <li><a class="nav-link">Cartilla de Tiempo</a></li>
-              <li><a class="nav-link">Primero & Último</a></li>
-              <li><a class="nav-link">Primera Entrada Última Entrada</a></li>
-            </ul>
-          </li>
-          <!-- Cálculo -->
-          <li class="nav-item" data-level="1" data-menu-name="menucalculo">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'menucalculo')" href="javascript:void(0)">
-              <i class="fa-solid fa-calculator mr-2"></i>
-              <span>Cálculo</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'menucalculo'),
-                  'fa-angle-right': !isOpen(1, 'menucalculo')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'menucalculo')">
-              <li><a class="nav-link">Cálculo</a></li>
-            </ul>
-          </li>
-          <!-- Reporte Calendario -->
-          <li class="nav-item" data-level="1" data-menu-name="repocalendario">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'repocalendario')" href="javascript:void(0)">
-              <i class="fa-solid fa-file-pdf mr-2"></i>
-              <span>Reporte Calendario</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'repocalendario'),
-                  'fa-angle-right': !isOpen(1, 'repocalendario')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'repocalendario')">
-              <li><a class="nav-link">Registros del Calendario</a></li>
-              <li><a class="nav-link">Asistencia Diaria</a></li>
-              <li><a class="nav-link">Asistencia Total</a></li>
-              <li><a class="nav-link">Excepciones</a></li>
-              <li><a class="nav-link">Tardanza</a></li>
-              <li><a class="nav-link">Salidas Temporales</a></li>
-              <li><a class="nav-link">Horas Extras</a></li>
-              <li><a class="nav-link">Ausencias</a></li>
-              <li><a class="nav-link">Marcaciones Múltiples</a></li>
-              <li><a class="nav-link">Descanso Múltiple</a></li>
-            </ul>
-          </li>
-          <!-- Reporte Resumen -->
-          <li class="nav-item" data-level="1" data-menu-name="reportresumen">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'reportresumen')" href="javascript:void(0)">
-              <i class="fa-solid fa-file-pdf mr-2"></i>
-              <span>Reporte Resumen</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'reportresumen'),
-                  'fa-angle-right': !isOpen(1, 'reportresumen')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'reportresumen')">
-              <li><a class="nav-link" routerLinkActive="active">Empleado</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Permisos</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Departamentos</a></li>
-            </ul>
-          </li>
-          <!-- Configuraciones -->
-          <li class="nav-item" data-level="1" data-menu-name="settingasistencia">
-            <a class="nav-link d-flex align-items-center" (click)="toggleMenu(1, 'settingasistencia')" href="javascript:void(0)">
-              <i class="fa-solid fa-gear mr-2"></i>
-              <span>Configuraciones</span>
-              <i class="fas ml-auto"
-                [ngClass]="{
-                  'fa-chevron-down': isOpen(1, 'settingasistencia'),
-                  'fa-angle-right': !isOpen(1, 'settingasistencia')
-                }"></i>
-            </a>
-            <ul class="submenu pl-4" *ngIf="isOpen(1, 'settingasistencia')">
-              <li><a class="nav-link" routerLinkActive="active">Tipo de Permiso Papeleta</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Tipo de Entrenamiento</a></li>
-              <li><a class="nav-link" routerLinkActive="active">Configuración Reporte</a></li>
-            </ul>
-          </li>
-        </ul>
-      </section>
+        <!-- Empleado -->
+        <li class="group" data-level="1" data-menu-name="empleado">
+          <button
+            class="w-full flex items-center justify-between px-3 py-2 bg-fiori-surface hover:bg-fiori-primary hover:text-white text-fiori-text rounded-md transition-all shadow-sm"
+            (click)="toggleMenu(1, 'empleado')"
+          >
+            <span class="flex items-center gap-2">
+              <i class="fa-solid fa-id-badge"></i>
+              <span class="font-medium">Empleado</span>
+            </span>
+            <i class="fa-solid text-[10px] transition-transform" [ngClass]="{ 'fa-chevron-down': isOpen(1, 'empleado'), 'fa-chevron-right': !isOpen(1, 'empleado') }"></i>
+          </button>
+          <ul *ngIf="isOpen(1, 'empleado')" class="ml-6 mt-1 flex flex-col gap-1">
+            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="['panel/personal/empleado/empleado']" routerLinkActive="bg-fiori-primary text-white">Empleados</a></li>
+            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="['panel/personal/empleado/cese']" routerLinkActive="bg-fiori-primary text-white">Cese</a></li>
+            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="['panel/personal/empleado/asignar-horario']" routerLinkActive="bg-fiori-primary text-white">Asignar Horario</a></li>
+          </ul>
+        </li>
+
+        <!-- Proceso y Aprobación -->
+        <li class="group" data-level="1" data-menu-name="pamenu">
+          <button
+            class="w-full flex items-center justify-between px-3 py-2 bg-fiori-surface hover:bg-fiori-primary hover:text-white text-fiori-text rounded-md transition-all shadow-sm"
+            (click)="toggleMenu(1, 'pamenu')"
+          >
+            <span class="flex items-center gap-2">
+              <i class="fa-solid fa-check-double"></i>
+              <span class="font-medium">Proceso y Aprobación</span>
+            </span>
+            <i class="fa-solid text-[10px] transition-transform" [ngClass]="{ 'fa-chevron-down': isOpen(1, 'pamenu'), 'fa-chevron-right': !isOpen(1, 'pamenu') }"></i>
+          </button>
+          <ul *ngIf="isOpen(1, 'pamenu')" class="ml-6 mt-1 flex flex-col gap-1">
+            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" routerLinkActive="bg-fiori-primary text-white">Rol Aprobadores</a></li>
+            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" routerLinkActive="bg-fiori-primary text-white">Proceso de Permiso</a></li>
+            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" routerLinkActive="bg-fiori-primary text-white">Aprobaciones</a></li>
+          </ul>
+        </li>
+
+        <!-- Configuración -->
+        <li class="group" data-level="1" data-menu-name="configuracion">
+          <button
+            class="w-full flex items-center justify-between px-3 py-2 bg-fiori-surface hover:bg-fiori-primary hover:text-white text-fiori-text rounded-md transition-all shadow-sm"
+            (click)="toggleMenu(1, 'configuracion')"
+          >
+            <span class="flex items-center gap-2">
+              <i class="fa-solid fa-wrench"></i>
+              <span class="font-medium">Configuración</span>
+            </span>
+            <i class="fa-solid text-[10px] transition-transform" [ngClass]="{ 'fa-chevron-down': isOpen(1, 'configuracion'), 'fa-chevron-right': !isOpen(1, 'configuracion') }"></i>
+          </button>
+          <ul *ngIf="isOpen(1, 'configuracion')" class="ml-6 mt-1 flex flex-col gap-1">
+            <li><a class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" routerLinkActive="bg-fiori-primary text-white">Documento</a></li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Sección: Dispositivo -->
+<section *ngIf="activeItem==='dispositivo'" class="mb-4">
+  <div class="px-4 text-[11px] uppercase tracking-wider text-fiori-subtext font-bold mb-2">Dispositivo</div>
+  <ul class="flex flex-col gap-1 text-[13px]">
+
+    <!-- Item genérico -->
+    <li *ngFor="let item of dispositivoMenu" class="group" [attr.data-level]="1" [attr.data-menu-name]="item.key">
+      <button
+        class="w-full flex items-center justify-between px-3 py-2 bg-fiori-surface hover:bg-fiori-primary hover:text-white text-fiori-text rounded-md transition-all shadow-sm"
+        (click)="toggleMenu(1, item.key)"
+      >
+        <span class="flex items-center gap-2">
+          <i class="fa-solid" [ngClass]="item.icon"></i>
+          <span class="font-medium">{{ item.label }}</span>
+        </span>
+        <i class="fa-solid text-[10px] transition-transform" [ngClass]="{ 'fa-chevron-down': isOpen(1, item.key), 'fa-chevron-right': !isOpen(1, item.key) }"></i>
+      </button>
+      <ul *ngIf="isOpen(1, item.key)" class="ml-6 mt-1 flex flex-col gap-1">
+        <li *ngFor="let sub of item.submenu">
+          <a
+            *ngIf="sub.link"
+            class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all"
+            [routerLink]="sub.link"
+            routerLinkActive="bg-fiori-primary text-white"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            {{ sub.label }}
+          </a>
+          <span
+            *ngIf="!sub.link"
+            class="block px-3 py-1 rounded text-fiori-subtext cursor-default"
+          >
+            {{ sub.label }}
+          </span>
+        </li>
+      </ul>
+    </li>
+
+  </ul>
+</section>
+
+
+
+  <!-- Sección: Asistencia -->
+<section *ngIf="activeItem==='asistencia'" class="mb-4">
+  <div class="px-4 text-[11px] uppercase tracking-wider text-fiori-subtext font-bold mb-2">Asistencia</div>
+  <ul class="flex flex-col gap-1 text-[13px]">
+
+    <!-- Item genérico -->
+    <li *ngFor="let item of asistenciaMenu" class="group" [attr.data-level]="1" [attr.data-menu-name]="item.key">
+      <button
+        class="w-full flex items-center justify-between px-3 py-2 bg-fiori-surface hover:bg-fiori-primary hover:text-white text-fiori-text rounded-md transition-all shadow-sm"
+        (click)="toggleMenu(1, item.key)"
+      >
+        <span class="flex items-center gap-2">
+          <i class="fa-solid" [ngClass]="item.icon"></i>
+          <span class="font-medium">{{ item.label }}</span>
+        </span>
+        <i class="fa-solid text-[10px] transition-transform" [ngClass]="{ 'fa-chevron-down': isOpen(1, item.key), 'fa-chevron-right': !isOpen(1, item.key) }"></i>
+      </button>
+      <ul *ngIf="isOpen(1, item.key)" class="ml-6 mt-1 flex flex-col gap-1">
+        <li *ngFor="let sub of item.submenu">
+          <a *ngIf="sub.link" class="block px-3 py-1 rounded hover:bg-fiori-primary hover:text-white transition-all" [routerLink]="sub.link" routerLinkActive="bg-fiori-primary text-white" [routerLinkActiveOptions]="{ exact: true }">{{ sub.label }}</a>
+          <span *ngIf="!sub.link" class="block px-3 py-1 text-fiori-subtext">{{ sub.label }}</span>
+        </li>
+      </ul>
+    </li>
+
+  </ul>
+</section>
+
     </nav>
   </div>
+
 </aside>
 
 <!-- en index.html dentro del <head> -->

@@ -1,78 +1,66 @@
-<div class="border-bottom container pt-5 mt-2 mb-5">
-  <div class="btn-group btn-group-sm border mt-3" role="group" aria-label="Acciones">
-    <button mat-stroked-button class="btn btn-light">
+<div class="border-b w-full px-4 pb-5">
+  <div class="flex flex-wrap gap-2 border p-2 text-sm">
+    <button mat-stroked-button class="border border-gray-300 px-3 py-1 bg-white rounded hover:bg-gray-50">
       <small>Nuevo</small>
     </button>
-    <button mat-stroked-button class="btn btn-outline-danger ml-1">
+    <button mat-stroked-button class="border border-red-500 text-red-500 px-3 py-1 rounded hover:bg-red-100">
       <small>Borrar</small>
     </button>
-    <button mat-stroked-button class="btn btn-outline-info ml-1">
+    <button mat-stroked-button class="border border-blue-500 text-blue-500 px-3 py-1 rounded hover:bg-blue-100">
       <small>Reintegro</small>
     </button>
-    <button class="btn btn-outline-info ml-1" mat-stroked-button>
+    <button mat-stroked-button class="border border-blue-500 text-blue-500 px-3 py-1 rounded hover:bg-blue-100">
       <small>Importar</small>
     </button>
-    <button class="btn btn-outline-info ml-1" mat-stroked-button>
+    <button mat-stroked-button class="border border-blue-500 text-blue-500 px-3 py-1 rounded hover:bg-blue-100">
       <small>Desactivar la Función de asistencia</small>
     </button>
   </div>
-  <div class="mt-2">
-    <table  class="table table-striped table-light table-hover table-bordered"
-      style="width: 100%; table-layout: auto">
-      <thead class="thead-light">
-        <tr>
-          <th></th>
-          <th scope="col" ><small>Empleado</small></th>
-          <th scope="col" ><small>Departamento</small></th>
-          <th scope="col" ><small>Cargo</small></th>
-          <th scope="col" ><small>Tipo de Cese</small></th>
-          <th scope="col"><small>Fecha de Cese</small></th>
-          <th scope="col" class="actions" ><small>Deshabilitar la asistencia</small></th>
-          <th scope="col" class="actions" ><small>Motivo Cese</small></th>
-          <th scope="col" class="actions" ><small></small></th>
+
+  <div class="overflow-auto mt-2">
+    <table class="min-w-full text-sm border border-gray-200">
+      <thead class="bg-gray-100 text-left">
+        <tr class="text-gray-700">
+          <th class="p-2"></th>
+          <th class="p-2">Empleado</th>
+          <th class="p-2">Departamento</th>
+          <th class="p-2">Cargo</th>
+          <th class="p-2">Tipo de Cese</th>
+          <th class="p-2">Fecha de Cese</th>
+          <th class="p-2">Deshabilitar la asistencia</th>
+          <th class="p-2">Motivo Cese</th>
+          <th class="p-2"></th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="divide-y divide-gray-200" *ngIf="dataCeses.length > 0; else noData">
         <tr *ngFor="let item of dataCeses">
-          <td style="padding: 0.1rem">
-            <input
-              type="checkbox"
-              
-              (change)="actualizarSeleccionados()"
-            />
+          <td class="p-1">
+            <input type="checkbox" (change)="actualizarSeleccionados()" />
           </td>
-          <td style="padding: 0.1rem">
-            <small><strong>{{item.employeeId}} {{item.empName}}</strong></small>
+          <td class="p-1">
+            <small><strong>{{ item.employeeId }} {{ item.empName }}</strong></small>
           </td>
-          <td>
-            <small>{{item.departamento}}</small>
-          </td>
-          <td>
-            <small>{{item.cargo}}</small>
-          </td>
-          
-          <td>
-            <small>{{getTipoCese(item.resignType)}}</small>
-          </td>
-          <td>
-            <small>{{item.resignDate}}</small>
-          </td>
-          <td>
-            <small>Deshabilitar</small>
-          </td>
-          <td>
-            <small>{{item.reason}}</small>
-          </td>
-          <td>
-             <button mat-button aria-label="Example icon button with a menu icon">
+          <td class="p-1"><small>{{ item.departamento }}</small></td>
+          <td class="p-1"><small>{{ item.cargo }}</small></td>
+          <td class="p-1"><small>{{ getTipoCese(item.resignType) }}</small></td>
+          <td class="p-1"><small>{{ item.resignDate }}</small></td>
+          <td class="p-1"><small>Deshabilitar</small></td>
+          <td class="p-1"><small>{{ item.reason }}</small></td>
+          <td class="p-1 flex gap-1">
+            <button mat-button aria-label="Editar">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-button aria-label="Example icon button with a menu icon" style="color: red;">
+            <button mat-button aria-label="Eliminar" style="color: red;">
               <mat-icon>delete</mat-icon>
             </button>
           </td>
         </tr>
       </tbody>
+      <ng-template #noData>
+        <tr>
+          <td colspan="9" class="text-center py-2">No se encontraron datos.</td>
+        </tr>
+      </ng-template>
     </table>
   </div>
 </div>

@@ -199,5 +199,9 @@ calcularHoraFin(horaInicio: string, duracionEnMinutos: number): string {
       });
     }
 
+  eliminarSeleccionados(){
+    
+  }
+
 
 }

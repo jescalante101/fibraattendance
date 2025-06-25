@@ -44,7 +44,7 @@ section {
             -moz-appearance: none;
             appearance: none;
             -webkit-print-color-adjust: exact;
-            color-adjust: exact;
+            print-color-adjust: exact;
         }
         .form-switch .form-check-input:focus {
             border-color: #86b7fe;

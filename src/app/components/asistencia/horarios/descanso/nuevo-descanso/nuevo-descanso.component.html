@@ -1,93 +1,75 @@
-<mat-card>
-  <mat-card-content>
-    <h2  *ngIf="idDescanso==0; else EditDescanso">Nuevo Descanso</h2>
-    <ng-template #EditDescanso>
-      <h2>Editar </h2>
-    </ng-template>
-    <form [formGroup]="descansoForm" (ngSubmit)="onConfirm()">
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <mat-form-field appearance="fill" class="w-100">
-            <mat-label>Nombre</mat-label>
-            <input matInput required formControlName="alias" name="nombre">
-          </mat-form-field>
-        </div>
-        <div class="col-md-6">
-          <mat-form-field appearance="fill" class="w-100">
-            <mat-label>Tipo de Cálculo</mat-label>
-            <mat-select required formControlName="calcType" name="tipoCalculo">
-              <mat-option [value]="0">Auto Deducir</mat-option>
-              <mat-option [value]="1">Requiere marcación</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-      </div>
+<div class="max-w-4xl mx-auto mt-8 bg-white rounded shadow p-6">
+  <h2 class="text-xl font-semibold mb-4" *ngIf="idDescanso==0; else EditDescanso">Nuevo Descanso</h2>
+  <ng-template #EditDescanso>
+    <h2 class="text-xl font-semibold mb-4">Editar</h2>
+  </ng-template>
 
-      <mat-tab-group>
-        <mat-tab label="Configuración básica">
-          <div class="p-3">
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <mat-form-field appearance="fill" class="w-100">
-                  <mat-label>Hora de Inicio</mat-label>
-                  <input matInput type="time" required formControlName="periodStart" name="horaInicio">
-                </mat-form-field>
-              </div>
-              <div class="col-md-6">
-                <mat-form-field appearance="fill" class="w-100">
-                  <mat-label>Hora Final</mat-label>
-                  <input matInput type="time" required formControlName="endMargin" name="horaFin">
-                </mat-form-field>
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-md-6 offset-md-3">
-                <mat-form-field appearance="fill" class="w-100">
-                  <mat-label>Duración (minutos)</mat-label>
-                  <input matInput type="number" required formControlName="duration" name="duracion">
-                </mat-form-field>
-              </div>
-            </div>
-          </div>
-        </mat-tab>
-        <mat-tab label="Configuración reglas">
-          <div class="p-3">
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <mat-form-field appearance="fill" class="w-100">
-                  <mat-label>Marcación Duplicada</mat-label>
-                  <mat-select formControlName="multiplePunch" name="marcacionDuplicada">
-                    <mat-option [value]="0">Acorde a la regla</mat-option>
-                    <mat-option [value]="1">Usuario Definido</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-              <div class="col-md-6">
-                <mat-form-field appearance="fill" class="w-100">
-                  <mat-label>Intervalo efectivo</mat-label>
-                  <input matInput type="number" formControlName="availableInterval" name="intervaloEfectivo">
-                </mat-form-field>
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-md-6 offset-md-3">
-                <mat-form-field appearance="fill" class="w-100">
-                  <mat-label>Basado en Marcación</mat-label>
-                  <mat-select formControlName="availableIntervalType" name="basadoMarcacion">
-                    <mat-option [value]="1">Si</mat-option>
-                    <mat-option [value]="0">No</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-            </div>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
-
-      <div class="mt-4 d-flex justify-content-end">
-        <button mat-raised-button color="primary" type="submit" [disabled]="!descansoForm.valid">Confirmar</button>
-        <button mat-button type="button" class="ml-2" (click)="onCancel()">Cancelar</button>
+  <form [formGroup]="descansoForm" (ngSubmit)="onConfirm()">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        <label class="block text-sm font-medium mb-1">Nombre</label>
+        <input type="text" formControlName="alias" name="nombre" class="w-full border rounded px-3 py-2" required />
       </div>
-    </form>
-  </mat-card-content>
-</mat-card>
+      <div>
+        <label class="block text-sm font-medium mb-1">Tipo de Cálculo</label>
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-select required formControlName="calcType" name="tipoCalculo">
+            <mat-option [value]="0">Auto Deducir</mat-option>
+            <mat-option [value]="1">Requiere marcación</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <mat-tab-group>
+      <mat-tab label="Configuración básica">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Hora de Inicio</label>
+            <input type="time" formControlName="periodStart" name="horaInicio" class="w-full border rounded px-3 py-2" required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Hora Final</label>
+            <input type="time" formControlName="endMargin" name="horaFin" class="w-full border rounded px-3 py-2" required />
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium mb-1">Duración (minutos)</label>
+            <input type="number" formControlName="duration" name="duracion" class="w-full border rounded px-3 py-2" required />
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Configuración reglas">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Marcación Duplicada</label>
+            <mat-form-field appearance="fill" class="w-full">
+              <mat-select formControlName="multiplePunch" name="marcacionDuplicada">
+                <mat-option [value]="0">Acorde a la regla</mat-option>
+                <mat-option [value]="1">Usuario Definido</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Intervalo efectivo</label>
+            <input type="number" formControlName="availableInterval" name="intervaloEfectivo" class="w-full border rounded px-3 py-2" />
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium mb-1">Basado en Marcación</label>
+            <mat-form-field appearance="fill" class="w-full">
+              <mat-select formControlName="availableIntervalType" name="basadoMarcacion">
+                <mat-option [value]="1">Si</mat-option>
+                <mat-option [value]="0">No</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+
+    <div class="mt-6 flex justify-end gap-2">
+      <button mat-raised-button color="primary" type="submit" [disabled]="!descansoForm.valid">Confirmar</button>
+      <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+    </div>
+  </form>
+</div>

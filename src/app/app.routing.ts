@@ -15,6 +15,7 @@ import { CeseComponent } from "./components/personal/empleado/cese/cese.componen
 import { HorarioComponent } from "./components/asistencia/horarios/horario/horario.component";
 import { TurnoComponent } from "./components/asistencia/horarios/turno/turno.component";
 import { DescansoComponent } from "./components/asistencia/horarios/descanso/descanso.component";
+import { AsignarHorarioEmpleadoComponent } from "./components/personal/empleado/asignar-horario-empleado/asignar-horario-empleado.component";
 
 
 
@@ -32,7 +33,8 @@ const appRoutes: Routes = [
         {path:"personal/organizacion/cargo",component:CargoComponent},
 
         {path:'personal/empleado/empleado',component:EmpleadoComponent},
-        {path:'personal/empleado/cese',component:CeseComponent},   
+        {path:'personal/empleado/cese',component:CeseComponent},
+        {path:'personal/empleado/asignar-horario',component:AsignarHorarioEmpleadoComponent},
 
         //TODO:agregar las vistas para el panel de los dispositivos
         {path: 'dispositivo',component: DispositivoComponent},

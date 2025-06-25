@@ -1,477 +1,336 @@
-<div class="card">
-  <div class="card-header">
-    <h4 class="mb-0">Nuevo Horario Normal</h4>
-  </div>
-  <div class="card-body">
-    <form [formGroup]="horarioForm" (ngSubmit)="guardarTurno()">
-      <div class="form-group mb-4">
-        <label for="nombreHorario">Nombre del Horario</label>
-        <input
-          type="text"
-          id="nombreHorario"
-          formControlName="nombre"
-          class="form-control"
-          placeholder="Ingrese el nombre del horario"
-          [ngClass]="{'is-invalid': horarioForm.get('nombre')?.invalid && (horarioForm.get('nombre')?.touched || horarioForm.get('nombre')?.dirty)}"
-        />
-        <div class="invalid-feedback" *ngIf="horarioForm.get('nombre')?.errors && (horarioForm.get('nombre')?.touched || horarioForm.get('nombre')?.dirty)">
-          <span *ngIf="horarioForm.get('nombre')?.errors?.['required']">El nombre es obligatorio.</span>
-          <span *ngIf="horarioForm.get('nombre')?.errors?.['maxlength']">Máximo 50 caracteres.</span>
+<div class="w-full max-w-6xl mx-auto">
+  <div class="bg-white shadow rounded mb-6">
+    <div class="border-b px-4 py-2">
+      <h2 class="text-lg font-semibold">
+  {{ useMode == 0 ? 'Nuevo Horario Normal' : 'Nuevo Horario Flexible' }}
+</h2>
+    </div>
+    <div class="p-4">
+      <form [formGroup]="horarioForm" (ngSubmit)="guardarTurno()" class="space-y-6">
+        <div>
+          <label for="nombreHorario" class="block text-sm font-medium text-gray-700">Nombre del Horario</label>
+          <input
+            type="text"
+            id="nombreHorario"
+            formControlName="nombre"
+            placeholder="Ingrese el nombre del horario"
+            class="mt-1 block w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            [ngClass]="{'border-red-500': horarioForm.get('nombre')?.invalid && (horarioForm.get('nombre')?.touched || horarioForm.get('nombre')?.dirty)}"
+          />
+          <div class="text-red-500 text-xs mt-1" *ngIf="horarioForm.get('nombre')?.errors && (horarioForm.get('nombre')?.touched || horarioForm.get('nombre')?.dirty)">
+            <span *ngIf="horarioForm.get('nombre')?.errors?.['required']">El nombre es obligatorio.</span>
+            <span *ngIf="horarioForm.get('nombre')?.errors?.['maxlength']">Máximo 50 caracteres.</span>
+          </div>
         </div>
-      </div>
 
-      <mat-tab-group>
-        <mat-tab label="Configuración básica">
-          <div class="p-3">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="card shadow-sm mb-3">
-                  <div class="card-header bg-light">
-                    <h5 class="mb-0">Horario de entrada</h5>
+        <mat-tab-group>
+
+          <mat-tab label="Configuración básica">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+              <div class="bg-gray-50 border rounded shadow-sm p-4">
+                <h3 class="font-semibold text-sm mb-3">Horario de entrada</h3>
+                <div class="space-y-4">
+                  <div>
+                    <label for="horaEntrada" class="block text-sm font-medium">Hora de entrada</label>
+                    <input type="time" id="horaEntrada" formControlName="horaEntrada" class="w-full border px-3 py-2 rounded text-sm focus:outline-none focus:ring" />
                   </div>
-                  <div class="card-body">
-                    <div class="row mb-3">
-                      <div class="col-md-6">
-                        <div class="form-group">
-                          <label for="horaEntrada" class="form-label">Hora de entrada</label>
-                          <input
-                            type="time"
-                            id="horaEntrada"
-                            formControlName="horaEntrada"
-                            class="form-control"
-                            [ngClass]="{'is-invalid': horarioForm.get('horaEntrada')?.invalid && (horarioForm.get('horaEntrada')?.touched || horarioForm.get('horaEntrada')?.dirty)}"
-                          />
-                          <div class="invalid-feedback" *ngIf="horarioForm.get('horaEntrada')?.errors && (horarioForm.get('horaEntrada')?.touched || horarioForm.get('horaEntrada')?.dirty)">
-                            <span *ngIf="horarioForm.get('horaEntrada')?.errors?.['required']">La hora de entrada es obligatoria.</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-md-6" *ngIf="useMode==0">
-                        <div class="form-group">
-                          <label for="permitirMarcarDesde" class="form-label">Permitir marcar desde</label>
-                          <input
-                            type="time"
-                            id="permitirMarcarDesde"
-                            formControlName="horaEntradaDesde"
-                            class="form-control"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row mb-3" >
-                      <div class="col-md-6" *ngIf="useMode==0">
-                        <div class="form-group">
-                          <label for="toleranciaEntrada" class="form-label">Permitir marcar hasta</label>
-                          <input
-                            type="time"
-                            id="toleranciaEntrada"
-                            formControlName="horaEntradaHasta"
-                            class="form-control"
-                          />
-                        </div>
-                      </div>
-                      <div class="col-md-6" >
-                        <div class="form-group">
-                          <label for="diasLaborales" class="form-label">Días Laborales</label>
-                          <input
-                            type="number"
-                            id="diasLaborales"
-                            formControlName="diasLaboral"
-                            class="form-control"
-                            [ngClass]="{'is-invalid': horarioForm.get('diasLaboral')?.invalid && (horarioForm.get('diasLaboral')?.touched || horarioForm.get('diasLaboral')?.dirty)}"
-                          />
-                          <div class="invalid-feedback" *ngIf="horarioForm.get('diasLaboral')?.errors && (horarioForm.get('diasLaboral')?.touched || horarioForm.get('diasLaboral')?.dirty)">
-                            <span *ngIf="horarioForm.get('diasLaboral')?.errors?.['required']">Campo obligatorio.</span>
-                            <span *ngIf="horarioForm.get('diasLaboral')?.errors?.['min']">Mínimo 1 día.</span>
-                            <span *ngIf="horarioForm.get('diasLaboral')?.errors?.['max']">Máximo 7 días.</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  <div *ngIf="useMode == 0">
+                    <label for="permitirMarcarDesde" class="block text-sm font-medium">Permitir marcar desde</label>
+                    <input type="time" id="permitirMarcarDesde" formControlName="horaEntradaDesde" class="w-full border px-3 py-2 rounded text-sm" />
+                  </div>
+                  <div *ngIf="useMode == 0">
+                    <label for="toleranciaEntrada" class="block text-sm font-medium">Permitir marcar hasta</label>
+                    <input type="time" id="toleranciaEntrada" formControlName="horaEntradaHasta" class="w-full border px-3 py-2 rounded text-sm" />
+                  </div>
+                  <div>
+                    <label for="diasLaborales" class="block text-sm font-medium">Días Laborales</label>
+                    <input type="number" id="diasLaborales" formControlName="diasLaboral" class="w-full border px-3 py-2 rounded text-sm" />
                   </div>
                 </div>
               </div>
-
-              <div class="col-md-6">
-                <div class="card shadow-sm mb-3">
-                  <div class="card-header bg-light">
-                    <h5 class="mb-0">Horario de salida</h5>
+              <div class="bg-gray-50 border rounded shadow-sm p-4">
+                <h3 class="font-semibold text-sm mb-3">Horario de salida</h3>
+                <div class="space-y-4">
+                  <div>
+                    <label for="horaSalida" class="block text-sm font-medium">Hora de salida</label>
+                    <input type="time" id="horaSalida" formControlName="horaSalida" class="w-full border px-3 py-2 rounded text-sm" />
                   </div>
-                  <div class="card-body">
-                    <div class="row mb-3">
-                      <div class="col-md-6">
-                        <div class="form-group">
-                          <label for="horaSalida" class="form-label">Hora de salida</label>
-                          <input
-                            type="time"
-                            id="horaSalida"
-                            formControlName="horaSalida"
-                            class="form-control"
-                            [ngClass]="{'is-invalid': horarioForm.get('horaSalida')?.invalid && (horarioForm.get('horaSalida')?.touched || horarioForm.get('horaSalida')?.dirty)}"
-                          />
-                          <div class="invalid-feedback" *ngIf="horarioForm.get('horaSalida')?.errors && (horarioForm.get('horaSalida')?.touched || horarioForm.get('horaSalida')?.dirty)">
-                            <span *ngIf="horarioForm.get('horaSalida')?.errors?.['required']">La hora de salida es obligatoria.</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-md-6" *ngIf="useMode==0">
-                        <div class="form-group">
-                          <label for="permitirMarcarHasta" class="form-label">Permitir marcar desde</label>
-                          <input
-                            type="time"
-                            id="permitirMarcarHasta"
-                            formControlName="horaSalidaDesde"
-                            class="form-control"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row" *ngIf="useMode==0">
-                      <div class="col-md-6">
-                        <div class="form-group">
-                          <label for="toleranciaSalida" class="form-label">Permitir marcar hasta</label>
-                          <input
-                            type="time"
-                            id="toleranciaSalida"
-                            formControlName="horaSalidaHasta"
-                            class="form-control"
-                          />
-                        </div>
-                      </div>
-                    </div>
+                  <div *ngIf="useMode == 0">
+                    <label for="permitirMarcarHasta" class="block text-sm font-medium">Permitir marcar desde</label>
+                    <input type="time" id="permitirMarcarHasta" formControlName="horaSalidaDesde" class="w-full border px-3 py-2 rounded text-sm" />
+                  </div>
+                  <div *ngIf="useMode == 0">
+                    <label for="toleranciaSalida" class="block text-sm font-medium">Permitir marcar hasta</label>
+                    <input type="time" id="toleranciaSalida" formControlName="horaSalidaHasta" class="w-full border px-3 py-2 rounded text-sm" />
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </mat-tab>
+          </mat-tab>
 
-        <mat-tab label="Cónfiguración de descanso" *ngIf="useMode==0">
-          <div class="p-3">
-            <div class="card shadow-sm">
-              <div class="card-body">
-                <div class="table-responsive">
-                  <table class="table table-striped table-hover">
-                    <thead>
-                      <tr>
-                        <th></th>
-                        <th>Nombre</th>
-                        <th>Hora inicio</th>
-                        <th>Hora fin</th>
-                        <th>Duración</th>
-                        <th>Tipo</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngFor="let item of descansoData">
-                        <td>
-                          <small>
-                            <input
-                              type="radio"
-                              name="descansoSelect"
-                              [value]="item.id"
-                              formControlName="breakTimeId"
-                            />
-                          </small>
-                        </td>
-                        <td><small>{{item.alias}}</small></td>
-                        <td><small>{{item.periodStart | date: "HH:mm:ss"}}</small></td>
-                        <td><small>{{item.periodEnd | date: "HH:mm:ss"}}</small></td>
-                        <td>{{item.duration}}</td>
-                        <td>
-                          <small>
-                            <ng-container *ngIf="item.calcType == 0; else manualTemplate">
-                              Auto Deducir
-                            </ng-container>
-                            <ng-template #manualTemplate>
-                              Manual
-                            </ng-template>
-                          </small>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                  <mat-paginator
-                    [length]="totalRecords"
-                    [pageSize]="pageSize"
-                    [pageIndex]="pageNumber - 1"
-                    (page)="handlePageEvent($event)"
-                    [pageSizeOptions]="[5, 10, 20, 50]"
-                    showFirstLastButtons
-                    aria-label="Seleccione la página">
-                  </mat-paginator>
-                </div>
+          <mat-tab *ngIf="useMode==0" label="Cónfiguración de descanso">
+            <div class="overflow-x-auto mt-4">
+              <table class="min-w-full text-sm border rounded">
+                <thead class="bg-gray-100">
+                  <tr>
+                    <th class="px-2 py-1 border">Seleccionar</th>
+                    <th class="px-2 py-1 border">Nombre</th>
+                    <th class="px-2 py-1 border">Hora inicio</th>
+                    <th class="px-2 py-1 border">Hora fin</th>
+                    <th class="px-2 py-1 border">Duración</th>
+                    <th class="px-2 py-1 border">Tipo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of descansoData" class="hover:bg-gray-50">
+                    <td class="px-2 py-1 border text-center">
+                      <input type="radio" name="descansoSelect" [value]="item.id" formControlName="breakTimeId" />
+                    </td>
+                    <td class="px-2 py-1 border">{{item.alias}}</td>
+                    <td class="px-2 py-1 border">{{item.periodStart | date: 'HH:mm:ss'}}</td>
+                    <td class="px-2 py-1 border">{{item.periodEnd | date: 'HH:mm:ss'}}</td>
+                    <td class="px-2 py-1 border">{{item.duration}}</td>
+                    <td class="px-2 py-1 border">
+                      <ng-container *ngIf="item.calcType == 0; else manualTemplate">Auto Deducir</ng-container>
+                      <ng-template #manualTemplate>Manual</ng-template>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="mt-4">
+                <mat-paginator
+                  [length]="totalRecords"
+                  [pageSize]="pageSize"
+                  [pageIndex]="pageNumber - 1"
+                  (page)="handlePageEvent($event)"
+                  [pageSizeOptions]="[5, 10, 20, 50]"
+                  showFirstLastButtons
+                  aria-label="Seleccione la página">
+                </mat-paginator>
               </div>
             </div>
-          </div>
-        </mat-tab>
+          </mat-tab>
 
-        <mat-tab label="Tiempo no programado">
-          <div class="p-3">
-            <div class="card shadow-sm">
-              <!-- <div class="card-header bg-light">
-                <h5 class="mb-0">Configuración de tiempo no programado</h5>
-              </div> -->
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="mb-4" *ngIf="useMode==0">
-                      <label for="entradaTemprana" class="form-label">Entrada temprana<span class="required">*</span></label>
-                      <mat-form-field appearance="outline" class="w-100">
-                        <mat-select id="entradaTemprana" formControlName="entradaTemprana">
-                          <mat-option [value]="0">Ignorar</mat-option>
-                          <mat-option [value]="1">Mover al Trabajo normal</mat-option>
-                          <mat-option [value]="2">Mover al H.E Normal</mat-option>
-                          <mat-option [value]="3">Mover al F.Semana H.E</mat-option>
-                          <mat-option [value]="4">Mover al H.E Vacaciones</mat-option>
-                        </mat-select>
-                      </mat-form-field>
-                    </div>
-                    <div>
-                      <label for="salidaTarde" class="form-label">Salida tarde<span class="required">*</span></label>
-                      <mat-form-field appearance="outline" class="w-100">
-                        <mat-select id="salidaTarde" formControlName="entradaTarde">
-                          <mat-option [value]="0">Ignorar</mat-option>
-                          <mat-option [value]="1">Mover al Trabajo normal</mat-option>
-                          <mat-option [value]="2">Mover al H.E Normal</mat-option>
-                          <mat-option [value]="3">Mover al F.Semana H.E</mat-option>
-                          <mat-option [value]="4">Mover al H.E Vacaciones</mat-option>
-                        </mat-select>
-                      </mat-form-field>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="mb-4" *ngIf="useMode==0">
-                      <label for="minimoEntrada" class="form-label">Mínimo Entrada temprana<span class="required">*</span></label>
-                      <mat-form-field appearance="outline" class="w-100">
-                        <input
-                          matInput
-                          type="number"
-                          id="minimoEntrada"
-                          formControlName="minEntradaTemprana"
-                          [disabled]="horarioForm.get('entradaTemprana')?.value == 0"
-                          min="0"
-                        />
-                        <span matSuffix>Minuto(s)</span>
-                      </mat-form-field>
-                    </div>
-                    <div>
-                      <label for="minimoSalida" class="form-label">Mínimo Salida tarde<span class="required">*</span></label>
-                      <mat-form-field appearance="outline" class="w-100">
-                        <input
-                          matInput
-                          type="number"
-                          id="minimoSalida"
-                          formControlName="minSalidaTarde"
-                          [disabled]="horarioForm.get('entradaTarde')?.value == 0"
-                          min="0"
-                        />
-                        <span matSuffix>Minuto(s)</span>
-                      </mat-form-field>
-                    </div>
-                  </div>
-                </div>
+          <mat-tab *ngIf="useMode==0" label="Tiempo no programado">
+            <div class="p-4 grid md:grid-cols-2 gap-4">
+              <div *ngIf="useMode==0">
+                <label for="entradaTemprana" class="block text-sm font-medium mb-1">Entrada temprana</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-select id="entradaTemprana" formControlName="entradaTemprana">
+                    <mat-option [value]="0">Ignorar</mat-option>
+                    <mat-option [value]="1">Mover al Trabajo normal</mat-option>
+                    <mat-option [value]="2">Mover al H.E Normal</mat-option>
+                    <mat-option [value]="3">Mover al F.Semana H.E</mat-option>
+                    <mat-option [value]="4">Mover al H.E Vacaciones</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div>
+                <label for="salidaTarde" class="block text-sm font-medium mb-1">Salida tarde</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-select id="salidaTarde" formControlName="entradaTarde">
+                    <mat-option [value]="0">Ignorar</mat-option>
+                    <mat-option [value]="1">Mover al Trabajo normal</mat-option>
+                    <mat-option [value]="2">Mover al H.E Normal</mat-option>
+                    <mat-option [value]="3">Mover al F.Semana H.E</mat-option>
+                    <mat-option [value]="4">Mover al H.E Vacaciones</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div *ngIf="useMode==0">
+                <label for="minimoEntrada" class="block text-sm font-medium mb-1">Mínimo Entrada temprana</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <input matInput type="number" id="minimoEntrada" formControlName="minEntradaTemprana" [disabled]="horarioForm.get('entradaTemprana')?.value == 0" min="0" />
+                  <span matSuffix>Minuto(s)</span>
+                </mat-form-field>
+              </div>
+              <div>
+                <label for="minimoSalida" class="block text-sm font-medium mb-1">Mínimo Salida tarde</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <input matInput type="number" id="minimoSalida" formControlName="minSalidaTarde" [disabled]="horarioForm.get('entradaTarde')?.value == 0" min="0" />
+                  <span matSuffix>Minuto(s)</span>
+                </mat-form-field>
               </div>
             </div>
-          </div>
-        </mat-tab>
+          </mat-tab>
 
-        <mat-tab label="Ajuste de nivel de H.E">
-          <div class="p-3">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="card shadow-sm mb-3">
-                  <div class="card-header bg-light">
-                    <h5 class="mb-0">Configuración nivel 1</h5>
+         <mat-tab label="Ajuste de nivel de H.E">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+              <div class="bg-gray-50 border rounded shadow-sm p-4">
+                <h3 class="font-semibold text-sm mb-3">Configuración nivel 1</h3>
+                <div class="space-y-4">
+                  <div>
+                    <label for="heNivel" class="block text-sm font-medium">H.E. Nivel</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <mat-select id="heNivel" formControlName="hNivel">
+                        <mat-option [value]="0">Ignorar</mat-option>
+                        <mat-option [value]="1">Depende del T.Trabajo</mat-option>
+                        <mat-option [value]="2">Depende del H.E</mat-option>
+                      </mat-select>
+                    </mat-form-field>
                   </div>
-                  <div class="card-body">
-                    <div class="form-group mb-3">
-                      <label for="heNivel" class="form-label">H.E. Nivel</label>
-                      <mat-form-field appearance="outline" class="w-100">
-                        <mat-select id="heNivel" formControlName="hNivel">
-                          <mat-option [value]="0">Ignorar</mat-option>
-                          <mat-option [value]="1">Depende del T.Trabajo</mat-option>
-                          <mat-option [value]="2">Depende del H.E</mat-option>
-                        </mat-select>
-                      </mat-form-field>
-                    </div>
-                    <div class="form-group">
-                      <label for="heNivel2" class="form-label">H.E. Nivel 2</label>
-                      <mat-form-field appearance="outline" class="w-100">
-                        <input
-                          matInput
-                          type="number"
-                          id="heNivel2"
-                          formControlName="hNivel1"
-                          [disabled]="horarioForm.get('hNivel')?.value == 0"
-                        />
-                        <span matSuffix>minutos</span>
-                      </mat-form-field>
-                    </div>
+                  <div>
+                    <label for="heNivel2" class="block text-sm font-medium">H.E. Nivel 2</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <input matInput type="number" id="heNivel2" formControlName="hNivel1" [disabled]="horarioForm.get('hNivel')?.value == 0" />
+                      <span matSuffix>minutos</span>
+                    </mat-form-field>
                   </div>
                 </div>
               </div>
-              <div class="col-md-6">
-                <div class="card shadow-sm mb-3">
-                  <div class="card-header bg-light">
-                    <h5 class="mb-0">Configuración nivel 2</h5>
+
+              <div class="bg-gray-50 border rounded shadow-sm p-4">
+                <h3 class="font-semibold text-sm mb-3">Configuración nivel 2</h3>
+                <div class="space-y-4">
+                  <div>
+                    <label for="heNivel1" class="block text-sm font-medium">H.E. Nivel 1</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <input matInput type="number" id="heNivel1" formControlName="hNivel2" [disabled]="horarioForm.get('hNivel')?.value == 0" />
+                      <span matSuffix>minutos</span>
+                    </mat-form-field>
                   </div>
-                  <div class="card-body">
-                    <div class="form-group mb-3">
-                      <label for="heNivel1" class="form-label">H.E. Nivel 1</label>
-                      <mat-form-field appearance="outline" class="w-100">
-                        <input
-                          matInput
-                          type="number"
-                          id="heNivel1"
-                          formControlName="hNivel2"
-                          [disabled]="horarioForm.get('hNivel')?.value == 0"
-                        />
-                        <span matSuffix>minutos</span>
-                      </mat-form-field>
-                    </div>
-                    <div class="form-group">
-                      <label for="heNivel3" class="form-label">H.E. Nivel 3</label>
-                      <mat-form-field appearance="outline" class="w-100">
-                        <input
-                          matInput
-                          type="number"
-                          id="heNivel3"
-                          formControlName="hNivel3"
-                          [disabled]="horarioForm.get('hNivel')?.value == 0"
-                        />
-                        <span matSuffix>minutos</span>
-                      </mat-form-field>
-                    </div>
+                  <div>
+                    <label for="heNivel3" class="block text-sm font-medium">H.E. Nivel 3</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <input matInput type="number" id="heNivel3" formControlName="hNivel3" [disabled]="horarioForm.get('hNivel')?.value == 0" />
+                      <span matSuffix>minutos</span>
+                    </mat-form-field>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </mat-tab>
+          </mat-tab>
 
-        <mat-tab label="Configuración reglas">
-          <div class="p-3">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="card shadow-sm mb-3">
-                  <div class="card-header bg-light">
-                    <h5 class="mb-0">Configuración de entrada</h5>
+          <mat-tab label="Ajuste de nivel de H.E">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+              <div class="bg-gray-50 border rounded shadow-sm p-4">
+                <h3 class="font-semibold text-sm mb-3">Configuración nivel 1</h3>
+                <div class="space-y-4">
+                  <div>
+                    <label for="heNivel" class="block text-sm font-medium">H.E. Nivel</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <mat-select id="heNivel" formControlName="hNivel">
+                        <mat-option [value]="0">Ignorar</mat-option>
+                        <mat-option [value]="1">Depende del T.Trabajo</mat-option>
+                        <mat-option [value]="2">Depende del H.E</mat-option>
+                      </mat-select>
+                    </mat-form-field>
                   </div>
-                  <div class="card-body">
-                    <div class="form-group mb-3">
-                      <label for="necesarioMarcarEntrada" class="form-label">Necesario marcar entrada</label>
-                      <mat-form-field appearance="outline" class="w-100">
-                        <mat-select id="necesarioMarcarEntrada" formControlName="marcarEntrada">
-                          <mat-option [value]="true">Sí</mat-option>
-                          <mat-option [value]="false">No</mat-option>
-                        </mat-select>
-                      </mat-form-field>
-                    </div>
-                    <div class="form-group mb-3">
-                      <label for="permitirLlegadaTarde" class="form-label">Permitir llegada tarde</label>
-                      <mat-form-field appearance="outline" class="w-100">
-                        <input
-                          matInput
-                          type="number"
-                          id="permitirLlegadaTarde"
-                          formControlName="permiteLLegarT"
-                          min="0"
-                        />
-                        <span matSuffix>minutos</span>
-                      </mat-form-field>
-                    </div>
-                    <div class="form-group mb-3">
-                      <label for="tipoIntervaloMarcacion" class="form-label">Tipo de intervalo marcación</label>
-                      <mat-form-field appearance="outline" class="w-100">
-                        <mat-select id="tipoIntervaloMarcacion" formControlName="tipoIntervalo">
-                          <mat-option [value]="0">Acorde a la regla</mat-option>
-                          <mat-option [value]="1">Usuario Definido</mat-option>
-                        </mat-select>
-                      </mat-form-field>
-                    </div>
-                    <div class="form-group">
-                      <label for="basadoEnMarcacion" class="form-label">Basado en Marcación</label>
-                      <mat-form-field appearance="outline" class="w-100">
-                        <mat-select id="basadoEnMarcacion" formControlName="basadoM">
-                          <mat-option [value]="0">NO</mat-option>
-                          <mat-option [value]="1">SI</mat-option>
-                        </mat-select>
-                      </mat-form-field>
-                    </div>
+                  <div>
+                    <label for="heNivel2" class="block text-sm font-medium">H.E. Nivel 2</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <input matInput type="number" id="heNivel2" formControlName="hNivel1" [disabled]="horarioForm.get('hNivel')?.value == 0" />
+                      <span matSuffix>minutos</span>
+                    </mat-form-field>
                   </div>
                 </div>
               </div>
 
-              <div class="col-md-6">
-                <div class="card shadow-sm mb-3">
-                  <div class="card-header bg-light">
-                    <h5 class="mb-0">Configuración de salida</h5>
+              <div class="bg-gray-50 border rounded shadow-sm p-4">
+                <h3 class="font-semibold text-sm mb-3">Configuración nivel 2</h3>
+                <div class="space-y-4">
+                  <div>
+                    <label for="heNivel1" class="block text-sm font-medium">H.E. Nivel 1</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <input matInput type="number" id="heNivel1" formControlName="hNivel2" [disabled]="horarioForm.get('hNivel')?.value == 0" />
+                      <span matSuffix>minutos</span>
+                    </mat-form-field>
                   </div>
-                  <div class="card-body">
-                    <div class="form-group mb-3">
-                      <label for="necesarioMarcarSalida" class="form-label">Necesario marcar salida</label>
-                      <mat-form-field appearance="outline" class="w-100">
-                        <mat-select id="necesarioMarcarSalida" formControlName="marcarSalida">
-                          <mat-option [value]="true">Sí</mat-option>
-                          <mat-option [value]="false">No</mat-option>
-                        </mat-select>
-                      </mat-form-field>
-                    </div>
-                    <div class="form-group mb-3">
-                      <label for="permitirSalidaTemprana" class="form-label">Permitir salida temprana</label>
-                      <mat-form-field appearance="outline" class="w-100">
-                        <input
-                          matInput
-                          type="number"
-                          id="permitirSalidaTemprana"
-                          formControlName="permiteSalidaT"
-                          min="0"
-                        />
-                        <span matSuffix>minutos</span>
-                      </mat-form-field>
-                    </div>
-                    <div class="form-group mb-3">
-                      <label for="periodoMarcacion" class="form-label">Periodo de Marcación</label>
-                      <mat-form-field appearance="outline" class="w-100">
-                        <input
-                          matInput
-                          type="number"
-                          id="periodoMarcacion"
-                          formControlName="periodoMarcacion"
-                          min="0"
-                          [disabled]="true"
-                        />
-                        <span matSuffix>minutos</span>
-                      </mat-form-field>
-                    </div>
-                    <div class="form-group">
-                      <label for="horaCambio" class="form-label">Hora de cambio</label>
-                      <input
-                        matInput
-                        type="time"
-                        id="horaCambio"
-                        formControlName="horaCambio"
-                        class="form-control"
-                      />
-                    </div>
+                  <div>
+                    <label for="heNivel3" class="block text-sm font-medium">H.E. Nivel 3</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <input matInput type="number" id="heNivel3" formControlName="hNivel3" [disabled]="horarioForm.get('hNivel')?.value == 0" />
+                      <span matSuffix>minutos</span>
+                    </mat-form-field>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
-      <div class="d-flex justify-content-end mt-3">
-        <button type="submit" class="btn btn-info" [disabled]="horarioForm.invalid">
-          Guardar
-        </button>
-        <button type="button" class="btn btn-secondary me-2" (click)="cancelar()">
-          Cancelar
-        </button>
-      </div>
-    </form>
+          </mat-tab>
+
+          <mat-tab label="Configuración reglas">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+              <div class="bg-gray-50 border rounded shadow-sm p-4">
+                <h3 class="font-semibold text-sm mb-3">Configuración de entrada</h3>
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium">Necesario marcar entrada</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <mat-select formControlName="marcarEntrada">
+                        <mat-option [value]="true">Sí</mat-option>
+                        <mat-option [value]="false">No</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Permitir llegada tarde</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <input matInput type="number" formControlName="permiteLLegarT" min="0" />
+                      <span matSuffix>minutos</span>
+                    </mat-form-field>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Tipo de intervalo marcación</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <mat-select formControlName="tipoIntervalo">
+                        <mat-option [value]="0">Acorde a la regla</mat-option>
+                        <mat-option [value]="1">Usuario Definido</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Basado en Marcación</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <mat-select formControlName="basadoM">
+                        <mat-option [value]="0">NO</mat-option>
+                        <mat-option [value]="1">SI</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-gray-50 border rounded shadow-sm p-4">
+                <h3 class="font-semibold text-sm mb-3">Configuración de salida</h3>
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium">Necesario marcar salida</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <mat-select formControlName="marcarSalida">
+                        <mat-option [value]="true">Sí</mat-option>
+                        <mat-option [value]="false">No</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Permitir salida temprana</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <input matInput type="number" formControlName="permiteSalidaT" min="0" />
+                      <span matSuffix>minutos</span>
+                    </mat-form-field>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Periodo de Marcación</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <input matInput type="number" formControlName="periodoMarcacion" min="0" [disabled]="true" />
+                      <span matSuffix>minutos</span>
+                    </mat-form-field>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Hora de cambio</label>
+                    <input matInput type="time" formControlName="horaCambio" class="mt-1 block w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+
+        <div class="flex justify-end gap-2">
+          <button type="button" (click)="cancelar()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm" [disabled]="horarioForm.invalid">Guardar</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

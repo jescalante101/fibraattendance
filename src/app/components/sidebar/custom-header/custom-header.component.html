@@ -1,0 +1,72 @@
+<header
+  class="bg-fiori-surface border-b border-fiori-border text-fiori-text z-10 h-16 px-6 flex items-center justify-between"
+>
+  <!-- Sección izquierda: Botón hamburguesa + logo -->
+  <div class="flex items-center gap-4 min-w-[180px]">
+    <button
+      (click)="toggleSidebar()"
+      class="lg:hidden border border-fiori-border rounded p-2 hover:bg-fiori-background transition"
+      aria-label="Abrir menú lateral"
+    >
+      <i class="fa-solid fa-bars text-fiori-text"></i>
+    </button>
+    <a class="text-xl font-semibold tracking-wide text-fiori-primary hover:underline" routerLink="/">ASISTENCIA FB</a>
+  </div>
+
+  <!-- Sección centro: Navegación -->
+  <nav class="hidden lg:flex items-center gap-6 text-sm font-medium flex-1 justify-center">
+    <a
+      [routerLink]="['./panel/personal/organizacion']"
+      (click)="selectItem('personal')"
+      [ngClass]="{ 'text-fiori-accent': activeItem === 'personal' }"
+      class="hover:text-fiori-accent transition flex items-center gap-1"
+    >
+      <i class="fa-solid fa-user-group"></i> Personal
+    </a>
+    <a
+      [routerLink]="['./panel/dispositivo']"
+      (click)="selectItem('dispositivo')"
+      [ngClass]="{ 'text-fiori-accent': activeItem === 'dispositivo' }"
+      class="hover:text-fiori-accent transition flex items-center gap-1"
+    >
+      <i class="fa-solid fa-mobile-retro"></i> Dispositivo
+    </a>
+    <a
+      [routerLink]="['./panel/asistencia']"
+      (click)="selectItem('asistencia')"
+      [ngClass]="{ 'text-fiori-accent': activeItem === 'asistencia' }"
+      class="hover:text-fiori-accent transition flex items-center gap-1"
+    >
+      <i class="fa-solid fa-calendar-check"></i> Asistencia
+    </a>
+    <a href="#" (click)="selectItem('acceso')" [ngClass]="{ 'text-fiori-accent': activeItem === 'acceso' }" class="hover:text-fiori-accent transition flex items-center gap-1">
+      <i class="fa-solid fa-door-open"></i> Acceso
+    </a>
+    <a href="#" (click)="selectItem('temperatura')" [ngClass]="{ 'text-fiori-accent': activeItem === 'temperatura' }" class="hover:text-fiori-accent transition flex items-center gap-1">
+      <i class="fa-solid fa-temperature-half"></i> Temperatura
+    </a>
+    <a href="#" (click)="selectItem('sistema')" [ngClass]="{ 'text-fiori-accent': activeItem === 'sistema' }" class="hover:text-fiori-accent transition flex items-center gap-1">
+      <i class="fa-solid fa-gears"></i> Sistema
+    </a>
+  </nav>
+
+  <!-- Sección derecha: Usuario -->
+  <div class="relative flex items-center gap-2 cursor-pointer min-w-[100px] justify-end" (click)="toggleUserMenu()">
+    <span class="w-8 h-8 rounded-full bg-fiori-primary text-white font-bold flex items-center justify-center uppercase">m</span>
+    <i class="fa-solid fa-caret-down text-fiori-text"></i>
+
+    <ul
+      *ngIf="showUserMenu"
+      class="absolute right-0 mt-10 bg-fiori-surface text-fiori-text rounded shadow-xl w-64 z-50 border border-fiori-border"
+    >
+      <li class="px-4 py-2 font-bold border-b border-fiori-border">manager</li>
+      <li><a class="block px-4 py-2 hover:bg-fiori-background transition"><i class="fa-solid fa-clock-rotate-left mr-2"></i>Actividades recientes</a></li>
+      <li><a class="block px-4 py-2 hover:bg-fiori-background transition"><i class="fa-solid fa-clipboard-check mr-2"></i>Utilizado con frecuencia</a></li>
+      <li><a class="block px-4 py-2 hover:bg-fiori-background transition"><i class="fa-solid fa-magnifying-glass mr-2"></i>Busc.Aplic.</a></li>
+      <li><a class="block px-4 py-2 hover:bg-fiori-background transition"><i class="fa-solid fa-gear mr-2"></i>Opciones</a></li>
+      <li><a class="block px-4 py-2 hover:bg-fiori-background transition"><i class="fa-solid fa-envelope mr-2"></i>Comunicarse con soporte</a></li>
+      <li><a class="block px-4 py-2 hover:bg-fiori-background transition"><i class="fa-solid fa-circle-info mr-2"></i>Acerca de</a></li>
+      <li><a class="block px-4 py-2 text-red-500 hover:bg-red-800 hover:text-white transition"><i class="fa-solid fa-power-off mr-2"></i>Salir</a></li>
+    </ul>
+  </div>
+</header>

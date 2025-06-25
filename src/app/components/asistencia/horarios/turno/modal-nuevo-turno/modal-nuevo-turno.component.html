@@ -1,286 +1,148 @@
-<mat-card>
-  <div class="modal-container">
-    <h2 mat-dialog-title>Nuevo Turno</h2>
+<div class="bg-white rounded shadow p-6 w-full max-w-6xl mx-auto">
+  <h2 class="text-xl font-semibold mb-4">Nuevo Turno</h2>
+
+  <!-- Nombre del Turno -->
+  <div class="mb-4">
+    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Turno</label>
+    <input
+      type="text"
+      [(ngModel)]="nombreTurno"
+      placeholder="Ingrese nombre del turno"
+      class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring focus:border-blue-400"
+    />
+    <label class="inline-flex items-center mt-2 text-sm text-green-700">
+      <input type="checkbox" [(ngModel)]="turnoAutomatico" class="form-checkbox mr-2 text-green-600" /> Turno Automático
+    </label>
+  </div>
+
+  <!-- Tablas -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Horarios disponibles -->
     <div>
-      <mat-form-field appearance="outline" class="nombre-input">
-        <mat-label>Nombre del Turno</mat-label>
+      <h3 class="text-sm font-semibold mb-2">Horarios Disponibles</h3>
+      <div class="overflow-x-auto max-h-72 overflow-y-auto border rounded">
+        <table class="min-w-full text-sm border border-gray-200">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="p-2 border">Seleccionar</th>
+              <th class="p-2 border">Nombre</th>
+              <th class="p-2 border">Entrada</th>
+              <th class="p-2 border">Salida</th>
+              <th class="p-2 border">Descanso</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let horario of dataHorarios" class="hover:bg-gray-50">
+              <td class="p-2 border text-center">
+                <input
+                  type="checkbox"
+                  (click)="$event.stopPropagation()"
+                  (change)="toggleHorarioSelection(horario)"
+                  [checked]="isSelected(horario)"
+                  class="form-checkbox text-blue-600"
+                />
+              </td>
+              <td class="p-2 border">{{ horario.nombre }}</td>
+              <td class="p-2 border">{{ horario.horaEntrada }}</td>
+              <td class="p-2 border">{{ horario.horaSalida }}</td>
+              <td class="p-2 border">{{ horario.descanso }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Horario Semanal -->
+    <div>
+      <h3 class="text-sm font-semibold mb-2">Horario Semanal</h3>
+
+      <div class="flex gap-3 mb-2">
+        <select [(ngModel)]="tipoVistaHorario" class="border rounded px-3 py-2 text-sm">
+          <option value="Dia">Día</option>
+          <option value="Semana">Semana</option>
+          <option value="Mes">Mes</option>
+        </select>
+
         <input
-          matInput
-          [(ngModel)]="nombreTurno"
-          placeholder="Ingrese nombre del turno"
+          type="number"
+          [(ngModel)]="cicloValor"
+          min="1"
+          (ngModelChange)="onCicloValorChange()"
+          placeholder="1"
+          class="w-20 border rounded px-3 py-2 text-sm"
         />
-      </mat-form-field>
-      <mat-slide-toggle class="text-success" color="secondary"
-        >Turno Automatico</mat-slide-toggle
-      >
-    </div>
-    <div class="tables-container">
-      <!-- Tabla de Horarios -->
-      <div class="horarios-table">
-        <h3>Horarios Disponibles</h3>
-        <div class="tabla-scroll-x">
-          <table mat-table [dataSource]="dataHorarios" class="mat-elevation-z2">
-            <!-- Checkbox Column -->
-            <ng-container matColumnDef="select">
-              <th mat-header-cell *matHeaderCellDef style="padding: 0.5rem">
-                <small>Seleccionar</small>
-              </th>
-              <td mat-cell *matCellDef="let horario" style="padding: 0.1rem">
-                <small>
-                  <mat-checkbox
-                    (click)="$event.stopPropagation()"
-                    (change)="toggleHorarioSelection(horario)"
-                    [checked]="isSelected(horario)"
-                    color="primary"
-                  >
-                  </mat-checkbox>
-                </small>
-              </td>
-            </ng-container>
-            <!-- Nombre Column -->
-            <ng-container matColumnDef="nombre">
-              <th mat-header-cell *matHeaderCellDef style="padding: 0.5rem">
-                <small>Nombre</small>
-              </th>
-              <td mat-cell *matCellDef="let horario" style="padding: 0.1rem">
-                <small>{{ horario.nombre }}</small>
-              </td>
-            </ng-container>
-            <!-- Entrada Column -->
-            <ng-container matColumnDef="entrada">
-              <th mat-header-cell *matHeaderCellDef style="padding: 0.5rem">
-                <small>Entrada</small>
-              </th>
-              <td mat-cell *matCellDef="let horario" style="padding: 0.1rem">
-                <small>{{ horario.horaEntrada }}</small>
-              </td>
-            </ng-container>
-            <!-- Salida Column -->
-            <ng-container matColumnDef="salida">
-              <th mat-header-cell *matHeaderCellDef style="padding: 0.5rem">
-                <small>Salida</small>
-              </th>
-              <td mat-cell *matCellDef="let horario" style="padding: 0.1rem">
-                <small>{{ horario.horaSalida }}</small>
-              </td>
-            </ng-container>
-            <!-- Descanso Column -->
-            <ng-container matColumnDef="descanso">
-              <th mat-header-cell *matHeaderCellDef style="padding: 0.5rem">
-                <small>Descanso</small>
-              </th>
-              <td mat-cell *matCellDef="let horario" style="padding: 0.1rem">
-                <small>{{ horario.descanso }}</small>
-              </td>
-            </ng-container>
-            <tr
-              mat-header-row
-              *matHeaderRowDef="[
-                'select',
-                'nombre',
-                'entrada',
-                'salida',
-                'descanso'
-              ]"
-            ></tr>
-            <tr
-              mat-row
-              *matRowDef="
-                let row;
-                columns: ['select', 'nombre', 'entrada', 'salida', 'descanso']
-              "
-            ></tr>
+      </div>
+
+      <div class="overflow-x-auto">
+        <ng-container [ngSwitch]="tipoVistaHorario">
+          <!-- Vista Día -->
+          <table *ngSwitchCase="'Dia'" class="min-w-full border">
+            <thead>
+              <tr><th class="p-2 text-sm">Horario</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of horariosDiaPorFila; let i = index">
+                <td class="p-2">
+                  <div class="cursor-pointer border rounded p-2" (click)="asignarHorariosSeleccionadosADia(i)" (dblclick)="limpiarHorariosDiaCelda(i)">
+                    <div class="flex flex-wrap gap-1">
+                      <span *ngFor="let horario of row" class="bg-gray-200 px-2 py-1 rounded text-xs">{{ horario.nombre }}</span>
+                    </div>
+                    <p class="text-gray-500 text-xs mt-1">Click para asignar - Doble click para limpiar</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
           </table>
-        </div>
-        <mat-paginator
-          [length]="totalRecords"
-          [pageSize]="pageSize"
-          [pageSizeOptions]="[5, 10, 15]"
-          (page)="handlePageEvent($event)"
-          aria-label="Seleccionar página de horarios"
-        >
-        </mat-paginator>
+
+          <!-- Vista Semana -->
+          <table *ngSwitchCase="'Semana'" class="min-w-full border">
+            <thead>
+              <tr>
+                <th *ngFor="let dia of diasSemana" class="p-2 text-sm">{{ dia }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of horariosSemanaPorFila; let i = index">
+                <td *ngFor="let dia of diasSemana" class="p-2">
+                  <div class="cursor-pointer border rounded p-2" (click)="asignarHorariosSeleccionadosASemana(i, dia)" (dblclick)="limpiarHorariosSemanaCelda(i, dia)">
+                    <div class="flex flex-wrap gap-1">
+                      <span *ngFor="let horario of row[dia]" class="bg-gray-200 px-2 py-1 rounded text-xs">{{ horario.nombre }}</span>
+                    </div>
+                    <p class="text-gray-500 text-xs mt-1">Click para asignar - Doble click para limpiar</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Vista Mes -->
+          <table *ngSwitchCase="'Mes'" class="min-w-full border">
+            <thead>
+              <tr>
+                <th *ngFor="let dia of diasMes; let j = index" class="p-2 text-sm">{{ j + 1 }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of horariosMesPorFila; let i = index">
+                <td *ngFor="let cell of row; let j = index" class="p-2">
+                  <div class="cursor-pointer border rounded p-2" (click)="asignarHorariosSeleccionadosAMes(i, j)" (dblclick)="limpiarHorariosMesCelda(i, j)">
+                    <div class="flex flex-wrap gap-1">
+                      <span *ngFor="let horario of cell" class="bg-gray-200 px-2 py-1 rounded text-xs">{{ horario.nombre }}</span>
+                    </div>
+                    <p class="text-gray-500 text-xs mt-1">Click para asignar - Doble click para limpiar</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </ng-container>
       </div>
-      <!-- Tabla de Semana -->
-      <div class="semana-table">
-        <h3>Horario Semanal</h3>
-        <mat-card>
-          <div
-            style="
-              display: flex;
-              flex-direction: row;
-              gap: 16px;
-              align-items: center;
-            "
-          >
-            <mat-form-field>
-              <mat-select [(ngModel)]="tipoVistaHorario">
-                <mat-option value="Dia">Día</mat-option>
-                <mat-option value="Semana">Semana</mat-option>
-                <mat-option value="Mes">Mes</mat-option>
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="outline" style="width: 100px">
-              <mat-label>Ciclo</mat-label>
-              <input
-                matInput
-                type="number"
-                [(ngModel)]="cicloValor"
-                min="1"
-                placeholder="1"
-                (ngModelChange)="onCicloValorChange()"
-              />
-            </mat-form-field>
-          </div>
-          <div class="tabla-scroll-x">
-            <ng-container [ngSwitch]="tipoVistaHorario">
-              <!-- Vista Día -->
-              <table
-                *ngSwitchCase="'Dia'"
-                mat-table
-                [dataSource]="horariosDiaPorFila"
-                class="mat-elevation-z2"
-              >
-                <ng-container matColumnDef="horario">
-                  <th mat-header-cell *matHeaderCellDef>
-                    <small>Horario</small>
-                  </th>
-                  <td mat-cell *matCellDef="let row; let i = index">
-                    <mat-card
-                      style=" cursor: pointer"
-                      (click)="asignarHorariosSeleccionadosADia(i)"
-                      (dblclick)="limpiarHorariosDiaCelda(i)"
-                    >
-                      <mat-card-content>
-                        <div>
-                          <span
-                            *ngFor="let horario of horariosDiaPorFila[i]"
-                            style="
-                              background: #e0e0e0;
-                              margin: 2px;
-                              padding: 2px 8px;
-                              border-radius: 4px;
-                              display: inline-block;
-                            "
-                          >
-                            {{ horario.nombre }}
-                          </span>
-                        </div>
-                        <small style="color: #888"
-                          >Haz click para asignar los horarios seleccionados<br>
-                          Doble click para limpiar</small
-                        >
-                      </mat-card-content>
-                    </mat-card>
-                  </td>
-                </ng-container>
-                <tr mat-header-row *matHeaderRowDef="['horario']"></tr>
-                <tr mat-row *matRowDef="let row; columns: ['horario']"></tr>
-              </table>
-              <!-- Vista Semana -->
-              <table
-                *ngSwitchCase="'Semana'"
-                mat-table
-                [dataSource]="horariosSemanaPorFila"
-                class="mat-elevation-z2"
-              >
-                <ng-container
-                  *ngFor="let dia of diasSemana; let j = index"
-                  [matColumnDef]="dia"
-                >
-                  <th mat-header-cell *matHeaderCellDef>
-                    <small>{{ dia }}</small>
-                  </th>
-                  <td mat-cell *matCellDef="let semana; let i = index">
-                    <mat-card
-                      style="width: 180px; cursor: pointer"
-                      (click)="asignarHorariosSeleccionadosASemana(i, dia)"
-                      (dblclick)="limpiarHorariosSemanaCelda(i, dia)"
-                    >
-                      <mat-card-content>
-                        <div>
-                          <span
-                            *ngFor="let horario of horariosSemanaPorFila[i][dia]"
-                            style="
-                              background: #e0e0e0;
-                              margin: 2px;
-                              padding: 2px 8px;
-                              border-radius: 4px;
-                              display: inline-block;
-                            "
-                          >
-                            {{ horario.nombre }}
-                          </span>
-                        </div>
-                        <small style="color: #888"
-                          >Haz click para asignar los horarios seleccionados<br>
-                          Doble click para limpiar</small
-                        >
-                      </mat-card-content>
-                    </mat-card>
-                  </td>
-                </ng-container>
-                <tr mat-header-row *matHeaderRowDef="diasSemana"></tr>
-                <tr mat-row *matRowDef="let row; columns: diasSemana"></tr>
-              </table>
-              <!-- Vista Mes -->
-              <table
-                *ngSwitchCase="'Mes'"
-                mat-table
-                [dataSource]="horariosMesPorFila"
-                class="mat-elevation-z2"
-              >
-                <ng-container
-                  *ngFor="let dia of diasMes; let j = index"
-                  [matColumnDef]="'dia' + j"
-                >
-                  <th mat-header-cell *matHeaderCellDef>
-                    <small>{{ j + 1 }}</small>
-                  </th>
-                  <td mat-cell *matCellDef="let fila; let i = index">
-                    <mat-card
-                      style="width: 180px; cursor: pointer"
-                      (click)="asignarHorariosSeleccionadosAMes(i, j)"
-                      (dblclick)="limpiarHorariosMesCelda(i, j)"
-                    >
-                      <mat-card-content>
-                        <div>
-                          <span
-                            *ngFor="let horario of horariosMesPorFila[i][j]"
-                            style="
-                              background: #e0e0e0;
-                              margin: 2px;
-                              padding: 2px 8px;
-                              border-radius: 4px;
-                              display: inline-block;
-                            "
-                          >
-                            {{ horario.nombre }}
-                          </span>
-                        </div>
-                        <small style="color: #888"
-                          >Haz click para asignar los horarios seleccionados<br>
-                          Doble click para limpiar</small
-                        >
-                      </mat-card-content>
-                    </mat-card>
-                  </td>
-                </ng-container>
-                <tr mat-header-row *matHeaderRowDef="diasMesColumnas"></tr>
-                <tr mat-row *matRowDef="let row; columns: diasMesColumnas"></tr>
-              </table>
-            </ng-container>
-          </div>
-        </mat-card>
-      </div>
-    </div>
-    <div mat-dialog-actions align="end">
-      <button mat-button (click)="cancelar()">Cancelar</button>
-      <button mat-raised-button color="primary" (click)="guardarTurno()">
-        Guardar
-      </button>
     </div>
   </div>
-</mat-card>
 
-<!-- Agrega este CSS en tu archivo de estilos correspondiente -->
+  <!-- Botones acciones -->
+  <div class="mt-6 flex justify-end gap-2">
+    <button (click)="cancelar()" class="px-4 py-2 text-sm border rounded text-gray-600 hover:bg-gray-100">Cancelar</button>
+    <button (click)="guardarTurno()" class="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">Guardar</button>
+  </div>
+</div>

@@ -12,4 +12,10 @@ export class AppComponent {
   onSidebarToggled(collapsed: boolean) {
     this.sidebarCollapsed = collapsed;
   }
+
+  activeItem = 'personal';
+
+onSectionSelected(section: string) {
+  this.activeItem = section;
+}
 }

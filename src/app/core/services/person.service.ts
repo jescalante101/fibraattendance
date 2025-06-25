@@ -34,4 +34,8 @@ export class PersonService {
     return this.http.get<any[]>(`${this.apiUrl}Personal/organizacion/listarCeses`,);
   }
 
+  getPersonalActivo():Observable<any[]>{
+    return this.http.get<any[]>(`${this.apiUrl}Scire/api/scire/personal`,);
+  }
+
 }

@@ -71,10 +71,10 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
 
   abrirModalAsignarHorario(){
     const dialogRef = this.dialog.open(AsignarNuevoHorarioComponent, {
-    disableClose: false,
+    disableClose: true,
     width: '600px',
     minHeight: '400px',
-    panelClass: 'fiori-dialog'
+    // panelClass: 'fiori-dialog'
   });
 
   dialogRef.afterClosed().subscribe(result => {

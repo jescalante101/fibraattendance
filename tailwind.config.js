@@ -75,6 +75,7 @@ module.exports = {
       },
     },
   },
+  
   plugins: [
     require('@tailwindcss/forms'),
     plugin(function ({ addComponents, theme }) {
@@ -145,4 +146,5 @@ module.exports = {
       });
     }),
   ],
+
 }

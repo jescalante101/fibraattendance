@@ -1,0 +1,15 @@
+.skeleton {
+  background-color: #f3f4f6; /* Replace with the actual color value for bg-fiori-muted */
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  min-width: 0.5rem;
+}
+
+/* Add keyframes for animate-pulse if not already present */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

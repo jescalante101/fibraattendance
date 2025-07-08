@@ -37,6 +37,11 @@
 
 /* Estilos para el menú de usuario */
 .user-menu {
+  position: fixed !important;
+  right: 0 !important;
+  top: 64px !important; /* Ajusta si tu header tiene otro alto */
+  margin-top: 0 !important;
+  z-index: 9999;
   transform-origin: top right;
   will-change: transform, opacity;
 }
@@ -131,10 +136,11 @@
   
   .user-menu {
     width: 100vw;
-    right: -1rem;
+    right: 0;
     border-radius: 0;
     border-left: none;
     border-right: none;
+    top: 56px !important; /* Ajusta si el header es más bajo en mobile */
   }
 }
 

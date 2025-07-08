@@ -35,6 +35,8 @@ export class DeviceService {
     return this.http.get<any[]>(`${this.apiUrl}terminal/list_new_records_transaction_today`,{params:{"IpAddress":ipAddress,"port":port,"idDevice":idDevice}});
   }
 
+  //prueba de conexion
+
 
 
 

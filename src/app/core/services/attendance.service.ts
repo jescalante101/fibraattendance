@@ -55,6 +55,9 @@ export class AttendanceService {
   }
 
  
-
+  //Asignacion de horarios
+  getEmployeeScheduleAssignmentDTO(){
+    
+  }
 
 }

@@ -1,20 +1,47 @@
-<div class="max-w-7xl mx-auto mt-8 space-y-6">
+<div class="max-w-7xl mx-auto  space-y-6">
   <!-- Cabecera y botón -->
   <div class="flex justify-between items-center">
     <h2 class="text-title">Horarios Asignados</h2>
-    <button class="btn-fiori" (click)="abrirModalAsignarHorario()">
+    <button class="btn-fiori" (click)="irAEmpleados()">
       + Asignar Horario
     </button>
   </div>
 
   <!-- Campo de filtro -->
-  <div>
+  <div class="flex items-center gap-2 bg-white border rounded-lg shadow-sm p-3">
+    <div class="relative flex-1 max-w-sm">
+      <input
+        type="text"
+        [(ngModel)]="filtro"
+        (ngModelChange)="aplicarFiltro()"
+        placeholder="Buscar por nombre..."
+        class="w-full px-3 py-2 pr-10 text-sm border border-fiori-border rounded focus:outline-none focus:ring-2 focus:ring-fiori-primary"
+      />
+      <button 
+        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-fiori-subtext hover:text-fiori-primary"
+        (click)="aplicarFiltro()"
+      >
+        <span class="material-icons text-base">search</span>
+      </button>
+    </div>
     <input
-      type="text"
-      [(ngModel)]="filtro"
-      placeholder="Buscar por nombre..."
-      class="w-full max-w-sm px-3 py-2 text-sm border border-fiori-border rounded focus:outline-none focus:ring-2 focus:ring-fiori-primary"
+      type="date"
+      [(ngModel)]="startDate"
+      placeholder="Fecha inicio"
+      class="px-3 py-2 text-sm border border-fiori-border rounded focus:outline-none focus:ring-2 focus:ring-fiori-primary"
     />
+    <input
+      type="date"
+      [(ngModel)]="endDate"
+      placeholder="Fecha fin"
+      class="px-3 py-2 text-sm border border-fiori-border rounded focus:outline-none focus:ring-2 focus:ring-fiori-primary"
+    />
+    <button 
+      class="btn-fiori-secondary"
+      (click)="aplicarFiltroFechas()"
+    >
+      Filtrar Fechas
+    </button>
   </div>
 
   <!-- Tabla -->
@@ -22,8 +49,9 @@
     <table class="min-w-full text-sm">
       <thead class="bg-fiori-muted text-left text-fiori-subtext">
         <tr>
-          <th class="px-4 py-2">Empleado</th>
-          <th class="px-4 py-2">Turno</th>
+          <th class="px-4 py-2">ID Empleado</th>
+          <th class="px-4 py-2">Nombre Completo</th>
+          <th class="px-4 py-2">Nombre Horario</th>
           <th class="px-4 py-2 text-center">Semana</th>
           <th class="px-4 py-2">Fecha Inicio</th>
           <th class="px-4 py-2">Fecha Fin</th>
@@ -32,40 +60,73 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          *ngFor="let a of asignacionesFiltradas"
-          class="border-t hover:bg-fiori-hover"
-        >
-          <td class="px-4 py-2 font-medium text-fiori-text">
-            {{ a.empleado }}
-          </td>
-          <td class="px-4 py-2">{{ a.turno }}</td>
-          <td class="px-4 py-2 text-center">{{ a.semana }}</td>
-          <td class="px-4 py-2">{{ a.fechaInicio }}</td>
-          <td class="px-4 py-2">{{ a.fechaFin }}</td>
-          <td class="px-4 py-2 text-fiori-subtext">{{ a.observacion }}</td>
-          <td class="px-4 py-2 text-right space-x-1">
-            <button
-              class="text-fiori-primary hover:underline"
-              (click)="editar(a)"
-              title="Editar"
-            >
-              ✏️
-            </button>
-            <button
-              class="text-fiori-error hover:underline"
-              (click)="eliminar(a)"
-              title="Eliminar"
-            >
-              🗑️
-            </button>
-          </td>
-        </tr>
-        <tr *ngIf="asignacionesFiltradas.length === 0">
-          <td colspan="7" class="text-center py-4 text-fiori-subtext">
-            No se encontraron resultados.
-          </td>
-        </tr>
+        <!-- Skeleton Loader -->
+        <ng-container *ngIf="isLoading; else dataLoaded">
+          <tr *ngFor="let s of [1,2,3,4,5,6]">
+            <td class="px-4 py-2">
+              <div class="h-4 w-20 skeleton"></div>
+            </td>
+            <td class="px-4 py-2">
+              <div class="h-4 w-32 skeleton"></div>
+            </td>
+            <td class="px-4 py-2">
+              <div class="h-4 w-20 skeleton"></div>
+            </td>
+            <td class="px-4 py-2 text-center">
+              <div class="h-4 w-12 mx-auto skeleton"></div>
+            </td>
+            <td class="px-4 py-2">
+              <div class="h-4 w-20 skeleton"></div>
+            </td>
+            <td class="px-4 py-2">
+              <div class="h-4 w-20 skeleton"></div>
+            </td>
+            <td class="px-4 py-2">
+              <div class="h-4 w-28 skeleton"></div>
+            </td>
+            <td class="px-4 py-2 text-right">
+              <div class="h-4 w-14 ml-auto skeleton"></div>
+            </td>
+          </tr>
+        </ng-container>
+        <!-- Data loaded -->
+        <ng-template #dataLoaded>
+          <tr
+            *ngFor="let a of asignaciones"
+            class="border-t hover:bg-fiori-hover"
+          >
+            <td class="px-4 py-2 font-medium text-fiori-text">
+              {{ a.employeeId }}
+            </td>
+            <td class="px-4 py-2">{{ a.fullNameEmployee || '-' }}</td>
+            <td class="px-4 py-2">{{ a.scheduleName || '-' }}</td>
+            <td class="px-4 py-2 text-center">{{ a.createdWeek }}</td>
+            <td class="px-4 py-2">{{ a.startDate | date: 'yyyy-MM-dd' }}</td>
+            <td class="px-4 py-2">{{ a.endDate | date: 'yyyy-MM-dd' }}</td>
+            <td class="px-4 py-2 text-fiori-subtext">{{ a.remarks || '-' }}</td>
+            <td class="px-4 py-2 text-right space-x-1">
+              <button
+                class="text-fiori-primary hover:underline"
+                (click)="editar(a)"
+                title="Editar"
+              >
+                ✏️
+              </button>
+              <button
+                class="text-fiori-error hover:underline"
+                (click)="eliminar(a)"
+                title="Eliminar"
+              >
+                🗑️
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="asignaciones.length === 0">
+            <td colspan="8" class="text-center py-4 text-fiori-subtext">
+              No se encontraron resultados.
+            </td>
+          </tr>
+        </ng-template>
       </tbody>
     </table>
   </div>
@@ -74,7 +135,7 @@
   <div class="flex justify-end gap-2 text-sm items-center">
     <button
       class="btn-fiori-secondary"
-      [disabled]="page === 1"
+      [disabled]="page === 1 || isLoading"
       (click)="page = page - 1"
     >
       Anterior
@@ -82,7 +143,7 @@
     <span>Página {{ page }}</span>
     <button
       class="btn-fiori-secondary"
-      [disabled]="page * pageSize >= asignacionesMock.length"
+      [disabled]="page * pageSize >= totalCount || isLoading"
       (click)="page = page + 1"
     >
       Siguiente

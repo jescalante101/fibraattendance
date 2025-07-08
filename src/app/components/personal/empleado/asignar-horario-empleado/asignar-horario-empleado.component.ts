@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { AttendanceService } from 'src/app/core/services/attendance.service';
-import { PersonService } from 'src/app/core/services/person.service';
 import { AsignarNuevoHorarioComponent } from './asignar-nuevo-horario/asignar-nuevo-horario.component';
+import { DeviceService } from 'src/app/core/device.service';
+import { finalize } from 'rxjs';
+import { EmployeeScheduleAssignmentService, EmployeeScheduleAssignment } from 'src/app/core/services/employee-schedule-assignment.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-asignar-horario-empleado',
@@ -14,58 +15,75 @@ import { AsignarNuevoHorarioComponent } from './asignar-nuevo-horario/asignar-nu
 export class AsignarHorarioEmpleadoComponent implements OnInit {
 
   constructor(
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private employeeScheduleAssignmentService: EmployeeScheduleAssignmentService,
+    private router: Router
   ) { }
 
-  ngOnInit(): void {
-    throw new Error('Method not implemented.');
-  }
-
-   filtro = '';
+  filtro = '';
   page = 1;
   pageSize = 5;
+  totalCount = 0;
+  
+  startDate = '';
+  endDate = '';
+  
+  asignaciones: (EmployeeScheduleAssignment & { selected?: boolean })[] = [];
+  isLoading: boolean = false;
 
-  asignacionesMock = [
-    {
-      empleado: 'Juan Pérez Ramírez',
-      turno: 'Mañana',
-      semana: 25,
-      fechaInicio: '2025-06-24',
-      fechaFin: '2025-06-28',
-      observacion: 'Horario regular',
-    },
-    {
-      empleado: 'María López García',
-      turno: 'Tarde',
-      semana: 25,
-      fechaInicio: '2025-06-24',
-      fechaFin: '2025-06-28',
-      observacion: 'Cambio temporal',
-    },
-    {
-      empleado: 'Carlos Gómez Torres',
-      turno: 'Noche',
-      semana: 25,
-      fechaInicio: '2025-06-24',
-      fechaFin: '2025-06-28',
-      observacion: 'Turno por rotación',
-    },
-    // Agrega más mock si deseas
-  ];
-
-  get asignacionesFiltradas() {
-    return this.asignacionesMock
-      .filter((a) =>
-        a.empleado.toLowerCase().includes(this.filtro.toLowerCase())
-      )
-      .slice((this.page - 1) * this.pageSize, this.page * this.pageSize);
+  ngOnInit(): void {
+    this.cargarAsignaciones();
   }
 
-  editar(asignacion: any) {
+  cargarAsignaciones() {
+    this.isLoading = true;
+    this.employeeScheduleAssignmentService.getEmployeeScheduleAssignments(this.page, this.pageSize, this.filtro, this.startDate, this.endDate)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (res) => {
+          console.log('Asignaciones cargadas:', res);
+          if (res.exito && res.data) {
+            this.asignaciones = res.data.items.map(item => ({ ...item, selected: false }));
+            this.totalCount = res.data.totalCount;
+            this.page = res.data.pageNumber;
+            this.pageSize = res.data.pageSize;
+          } else {
+            this.asignaciones = [];
+            this.totalCount = 0;
+          }
+        },
+        error: (err) => {
+          console.error('Error cargando asignaciones:', err);
+          this.asignaciones = [];
+          this.totalCount = 0;
+        }
+      });
+  }
+  irAEmpleados() {
+    this.router.navigate(['/panel/personal/empleado/empleado'], { queryParams: { modoAsignar: true } });
+  }
+
+  aplicarFiltro() {
+    this.page = 1;
+    this.cargarAsignaciones();
+  }
+
+  aplicarFiltroFechas() {
+    this.page = 1;
+    this.cargarAsignaciones();
+  }
+
+  cambiarPagina(event: PageEvent) {
+    this.page = event.pageIndex + 1;
+    this.pageSize = event.pageSize;
+    this.cargarAsignaciones();
+  }
+
+  editar(asignacion: EmployeeScheduleAssignment) {
     console.log('Editar asignación:', asignacion);
   }
 
-  eliminar(asignacion: any) {
+  eliminar(asignacion: EmployeeScheduleAssignment) {
     console.log('Eliminar asignación:', asignacion);
   }
 
@@ -79,8 +97,9 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
 
   dialogRef.afterClosed().subscribe(result => {
     console.log('Modal cerrado', result);
-    // Puedes recargar datos si es necesario
+    // Recargar datos después de cerrar el modal
+    this.cargarAsignaciones();
   });
+  
   }
-
 }

@@ -3,8 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { PersonService } from 'src/app/core/services/person.service';
-import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
-import { ModalLoadingComponent } from 'src/app/shared/modal-loading/modal-loading.component';
+import { Employee } from './model/employeeDto';
+import { finalize } from 'rxjs';
+import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
+import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
+import { ActivatedRoute } from '@angular/router';
+import { AsignarNuevoHorarioComponent } from '../asignar-horario-empleado/asignar-nuevo-horario/asignar-nuevo-horario.component';
 
 @Component({
   selector: 'app-empleado',
@@ -12,65 +16,130 @@ import { ModalLoadingComponent } from 'src/app/shared/modal-loading/modal-loadin
   styleUrls: ['./empleado.component.css']
 })
 export class EmpleadoComponent implements OnInit {
-  dataEmployees: any[] = [];
-  datosFiltrados: any[] = [];
-  elementosSeleccionados: string[] = [];
-  totalRecords: number = 0;
-  pageSize: number = 15;
-  pageNumber: number = 1;
 
-  constructor(private personalService: PersonService, private dialog: MatDialog) { }
+  constructor(
+    private personalService: PersonService, 
+    private dialog: MatDialog, 
+    private categoriaAuxiliarService: CategoriaAuxiliarService, 
+    private rhAreaService: RhAreaService,
+    private route: ActivatedRoute
+  )
+     { }
+  mostrarBotonAsignar = false;
+
+  employees: Employee[] = [];
+  loading = true;
+  skeletonArray = Array(10); // 10 filas de skeleton
+
+  allSelected = false;
+  totalCount = 0;
+  pageNumber = 1;
+  pageSize = 15;
+  filtro = '';
+
+  categoriaAuxiliarList: CategoriaAuxiliar[] = [];
+  selectedCategoriaAuxiliar: string = '';
+
+  rhAreaList: RhArea[] = [];
+  selectedRhArea: string = '';
 
   ngOnInit() {
-    this.loadEmpleados();
-  }
-  
-  /**
-   * Maneja los eventos de paginación
-   */
-  handlePageEvent(event: PageEvent): void {
-    this.pageSize = event.pageSize;
-    this.pageNumber = event.pageIndex + 1; // Sumamos 1 porque pageIndex empieza desde 0
-    this.loadEmpleados();
+    this.route.queryParams.subscribe(params => {
+      this.mostrarBotonAsignar = params['modoAsignar'] === 'true' || params['modoAsignar'] === true;
+     
+    });
+    this.getEmployees();
+    this.getCategoriasAuxiliar();
+    this.getRhAreas();
+
   }
 
-  loadEmpleados() {
-    const dialgoRef = this.dialog.open(ModalLoadingComponent);    
-    this.personalService.getEmpleados(this.pageNumber, this.pageSize).subscribe( 
-      {
-        next:(response:HttpResponse<any>)=>{
-          console.log("Data-"+response.body.data);
-          this.dataEmployees = response.body.data;
-          this.datosFiltrados = [...this.dataEmployees];
-          this.totalRecords = response.body.totalRecords;
-          
+  getEmployees() {
+    this.loading = true;
+    this.personalService.getPersonalActivo(this.pageNumber, this.pageSize, this.filtro,this.selectedCategoriaAuxiliar,this.selectedRhArea)
+      .pipe(finalize(() => this.loading = false))
+      .subscribe({
+        next: res => {
+          console.log(res);
+          if (res.exito && res.data) {
+            this.employees = res.data.items.map(emp => ({ ...emp, selected: false }));
+            this.totalCount = res.data.totalCount;
+            this.pageNumber = res.data.pageNumber;
+            this.pageSize = res.data.pageSize;
+          } else {
+            this.employees = [];
+            this.totalCount = 0;
+          }
         },
-        error:(error)=>{
-           this.dialog.open(ModalConfirmComponent, {
-          data: {mensaje: error, tipo: 'error'}
-        });
-          dialgoRef.close();
-        },
-        complete: () => {
-          dialgoRef.close();
-          console.log('Carga de empleados completada');
+        error: _ => {
+          this.employees = [];
+          this.totalCount = 0;
         }
+      });
+  }
+
+  getCategoriasAuxiliar() {
+    this.categoriaAuxiliarService.getCategoriasAuxiliar().subscribe({
+      next: (data) => {
+        this.categoriaAuxiliarList = data;
       },
-      
-    );
+      error: (err) => {
+        this.categoriaAuxiliarList = [];
+      }
+    });
   }
 
-  actualizarSeleccionados(): void {
-    this.actualizarSeleccionadosLista();
+  getRhAreas() {
+    this.rhAreaService.getAreas().subscribe({
+      next: (data) => {
+        this.rhAreaList = data;
+      },
+      error: (err) => {
+        this.rhAreaList = [];
+      }
+    });
   }
 
-  getEmplArea(lst:any[]):string{
-    return lst.map(item => item.areaName).join(', ');
+  buscarEmpleado() {
+    this.pageNumber = 1;
+    this.getEmployees();
   }
 
-  actualizarSeleccionadosLista(): void {
-    this.elementosSeleccionados = this.datosFiltrados
-      .filter(item => item.seleccionado)
-      .map(item => item.CantidadEmp);
+  toggleAllEmployees() {
+    this.employees.forEach(emp => emp.selected = this.allSelected);
   }
+
+  changePage(nuevaPagina: number) {
+    if (nuevaPagina > 0 && (nuevaPagina - 1) * this.pageSize < this.totalCount) {
+      this.pageNumber = nuevaPagina;
+      this.getEmployees();
+    }
+  }
+
+  abrirModalAsignarTurno(empleado: Employee) {
+    this.dialog.open(AsignarNuevoHorarioComponent, {
+      width: '900px',
+      data: { empleado } // aquí pasas el empleado seleccionado
+    }).afterClosed().subscribe(resultado => {
+      if (resultado) {
+        // Aquí puedes refrescar la lista, mostrar un mensaje, etc.
+        console.log('Asignación guardada:', resultado);
+      }
+    });
+  }
+
+
+  onCategoriaAuxiliarChange() {
+    this.pageNumber = 1;
+    this.getEmployees();
+  }
+
+
+  onRhAreaChange() {
+    this.pageNumber = 1;
+    this.getEmployees();
+  }
+
+
+  
 }

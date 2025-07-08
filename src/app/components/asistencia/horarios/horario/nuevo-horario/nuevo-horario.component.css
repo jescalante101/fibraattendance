@@ -1,0 +1,10 @@
+/* Mejora visual para selects y campos dentro del modal de nuevo horario */
+.mat-select, .mat-form-field {
+  background: #fff !important;
+  color: #222 !important;
+  opacity: 1 !important;
+}
+
+.mat-select-disabled, .mat-form-field-disabled {
+  opacity: 0.5 !important;
+}

@@ -58,6 +58,8 @@ import { CustomHeaderComponent } from './components/sidebar/custom-header/custom
 import { AsignarHorarioEmpleadoComponent } from './components/personal/empleado/asignar-horario-empleado/asignar-horario-empleado.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { AsignarNuevoHorarioComponent } from './components/personal/empleado/asignar-horario-empleado/asignar-nuevo-horario/asignar-nuevo-horario.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 
 @NgModule({
@@ -102,6 +104,8 @@ import { AsignarNuevoHorarioComponent } from './components/personal/empleado/asi
 
   ],
   imports: [
+    MatDatepickerModule,
+    MatNativeDateModule,
     MatTableModule,
     SharedModule, // 🔥 Aquí sí, aquí se importa todo lo de shared
     BrowserModule,

@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+
 
 @Component({
   selector: 'app-asignar-nuevo-horario',
@@ -7,72 +8,67 @@ import { MatDialogRef } from '@angular/material/dialog';
   styleUrls: ['./asignar-nuevo-horario.component.css']
 })
 export class AsignarNuevoHorarioComponent implements OnInit {
-
-  constructor(public dialogRef: MatDialogRef<AsignarNuevoHorarioComponent>) {}
-
-  ngOnInit() {}
-
-  filtro = '';
-
-  empleadosSinHorario = [
-    { id: 1, nombre: 'Pedro Álvarez' },
-    { id: 2, nombre: 'Ana Castillo' },
-    { id: 3, nombre: 'Luis Mendoza' },
-  ];
-
-  slideOver = false;
-  empleadoSeleccionado: any = null;
-
-  formDetalle = {
-    horario: '',
-    semana: null as number | null,
-    fechaInicio: '',
-    fechaFin: '',
-    observacion: ''
+  formulario = {
+    employeeId: '',
+    scheduleId: null,
+    startDate: null as Date | null,
+    endDate: null as Date | null,
+    remarks: '',
+    createdAt: new Date().toISOString(),
+    crearteBY: '', // puedes llenarlo con el usuario logueado
+    fullName: '',
+    shiftDescription: ''
   };
 
-  // Empleados filtrados según búsqueda
-  get empleadosFiltrados() {
-    return this.empleadosSinHorario.filter(e =>
-      e.nombre.toLowerCase().includes(this.filtro.toLowerCase())
-    );
+  turnos = [
+    { id: 1, descripcion: 'Mañana' },
+    { id: 2, descripcion: 'Tarde' },
+    { id: 3, descripcion: 'Noche' }
+  ];
+
+  empleadoSeleccionado: any;
+
+  constructor(
+    public dialogRef: MatDialogRef<AsignarNuevoHorarioComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
+    console.log(data);
+    this.empleadoSeleccionado = data.empleado;
+    this.formulario.employeeId = data.empleado.id;
+    this.formulario.fullName = data.empleado.nombre;
+    // Si tienes el usuario logueado, asigna crearteBY aquí
   }
 
-  // Abre el slide-over y resetea el formulario
-  abrirSlideOver(emp: any) {
-    this.empleadoSeleccionado = emp;
-    this.slideOver = true;
-
-    this.formDetalle = {
-      horario: '',
-      semana: null,
-      fechaInicio: '',
-      fechaFin: '',
-      observacion: ''
-    };
+  ngOnInit() {
+    const hoy = new Date();
+    this.formulario.startDate = this.getStartOfWeek(hoy);
+    this.formulario.endDate = this.getEndOfWeek(hoy);
   }
 
-  // Cierra el slide-over
-  cerrarSlideOver() {
-    this.slideOver = false;
-    this.empleadoSeleccionado = null;
+  getStartOfWeek(date: Date): Date {
+    const d = new Date(date);
+    const day = d.getDay() || 7;
+    if (day !== 1) d.setDate(d.getDate() - (day - 1));
+    d.setHours(0, 0, 0, 0);
+    return d;
   }
 
-  // Simula guardar asignación
-  guardarHorario() {
-    const data = {
-      ...this.formDetalle,
-      empleado: this.empleadoSeleccionado
-    };
+  getEndOfWeek(date: Date): Date {
+    const d = this.getStartOfWeek(date);
+    d.setDate(d.getDate() + 6);
+    d.setHours(23, 59, 59, 999);
+    return d;
+  }
 
-    console.log('✅ Asignación registrada:', data);
+  guardarAsignacion() {
+    // Puedes buscar el turno seleccionado para llenar shiftDescription
+    const turno = this.turnos.find(t => t.id === this.formulario.scheduleId);
+    this.formulario.shiftDescription = turno ? turno.descripcion : '';
 
-    // Elimina al empleado de la lista mock
-    this.empleadosSinHorario = this.empleadosSinHorario.filter(
-      e => e.id !== this.empleadoSeleccionado.id
-    );
+    // Aquí puedes emitir el formulario o hacer la petición al backend
+    console.log('Asignación registrada:', this.formulario);
 
-    this.cerrarSlideOver();
+    this.dialogRef.close(this.formulario);
   }
 
   cerrar() {

@@ -16,7 +16,26 @@
     position: relative;
     transition: transform 0.3s ease, opacity 0.3s ease;
     opacity: 1;
+    /* Asegura que los selects y campos dentro del modal no hereden opacidad */
+    color: #222;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.12);
   }
+
+/* Mejora visual para mat-select dentro de modales */
+.modal-content .mat-select, .modal-content .mat-form-field {
+  background: #fff !important;
+  color: #222 !important;
+  opacity: 1 !important;
+}
+
+.modal-content .mat-select-disabled, .modal-content .mat-form-field-disabled {
+  opacity: 0.5 !important;
+}
+
+/* Mejora el z-index de los overlays de Angular Material dentro de modales personalizados */
+.cdk-overlay-container, .cdk-overlay-backdrop {
+  z-index: 2000 !important;
+}
   /* Tamaños */
 .modal-sm { width: 300px; }
 .modal-md { width: 500px; }

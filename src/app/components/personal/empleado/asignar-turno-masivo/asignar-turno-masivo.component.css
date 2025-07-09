@@ -1,0 +1,17 @@
+.flex-1.flex.flex-col ::ng-deep .mat-stepper-horizontal {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .flex-1.flex.flex-col ::ng-deep .mat-horizontal-content-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .flex-1.flex.flex-col ::ng-deep .mat-step-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }

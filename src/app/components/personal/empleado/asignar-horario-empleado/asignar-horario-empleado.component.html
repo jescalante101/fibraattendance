@@ -1,7 +1,7 @@
 <div class="max-w-7xl mx-auto  space-y-6">
   <!-- Cabecera y botón -->
   <div class="flex justify-between items-center">
-    <h2 class="text-title">Horarios Asignados</h2>
+    <span class="text-title">Personal con Turno</span>
     <button class="btn-fiori" (click)="irAEmpleados()">
       + Asignar Horario
     </button>
@@ -50,9 +50,12 @@
       <thead class="bg-fiori-muted text-left text-fiori-subtext">
         <tr>
           <th class="px-4 py-2">ID Empleado</th>
+          <th class="px-4 py-2">Documento</th>
           <th class="px-4 py-2">Nombre Completo</th>
           <th class="px-4 py-2">Nombre Horario</th>
           <th class="px-4 py-2 text-center">Semana</th>
+          <th class="px-4 py-2">Sede</th>
+          <th class="px-4 py-2">Área</th>
           <th class="px-4 py-2">Fecha Inicio</th>
           <th class="px-4 py-2">Fecha Fin</th>
           <th class="px-4 py-2">Observación</th>
@@ -98,9 +101,12 @@
             <td class="px-4 py-2 font-medium text-fiori-text">
               {{ a.employeeId }}
             </td>
+            <td class="px-4 py-2">{{ a.nroDoc || '-' }}</td>
             <td class="px-4 py-2">{{ a.fullNameEmployee || '-' }}</td>
             <td class="px-4 py-2">{{ a.scheduleName || '-' }}</td>
             <td class="px-4 py-2 text-center">{{ a.createdWeek }}</td>
+            <td class="px-4 py-2">{{ a.locationName || '-' }}</td>
+            <td class="px-4 py-2">{{ a.areaName || '-' }}</td>
             <td class="px-4 py-2">{{ a.startDate | date: 'yyyy-MM-dd' }}</td>
             <td class="px-4 py-2">{{ a.endDate | date: 'yyyy-MM-dd' }}</td>
             <td class="px-4 py-2 text-fiori-subtext">{{ a.remarks || '-' }}</td>

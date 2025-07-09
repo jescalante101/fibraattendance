@@ -1,63 +1,62 @@
 <div class="border-b px-4 mb-5">
-  <h2 class="mb-3 text-lg font-semibold text-fiori-text">Empresa</h2>
-
-  <!-- Botones -->
-  <div class="flex flex-wrap items-center gap-2 mb-2">
-    <button mat-stroked-button class="bg-white border border-gray-300 text-xs px-2 py-1 rounded shadow-sm hover:bg-gray-100">
-      <small>Nuevo</small>
-    </button>
-    <button mat-stroked-button class="bg-white border border-red-400 text-red-600 text-xs px-2 py-1 rounded shadow-sm hover:bg-red-100">
-      <small>Borrar</small>
-    </button>
+  <!-- Cabecera en card-fiori -->
+  <div class="card-fiori flex justify-between items-center mb-4">
+    <span class="text-title">Empresas</span>
+    <div class="flex gap-2">
+      <button class="" mat-stroked-button>
+        <small>Nuevo</small>
+      </button>
+      <button class="" mat-stroked-button>
+        <small>Borrar</small>
+      </button>
+    </div>
   </div>
 
   <!-- Tabla -->
-  <div class="overflow-auto">
-    <table class="min-w-full text-xs text-left text-gray-700 border bg-white">
-      <thead class="bg-gray-100 text-[11px] uppercase text-gray-500">
+  <div class="card-fiori overflow-auto">
+    <table class="min-w-full text-xs text-left text-fiori-text bg-fiori-surface">
+      <thead class="bg-fiori-muted text-[11px] uppercase text-fiori-subtext">
         <tr>
-          <th class="px-2 py-1 whitespace-nowrap">RUC</th>
-          <th class="px-2 py-1 whitespace-nowrap">Nombre</th>
-          <th class="px-2 py-1 whitespace-nowrap">País</th>
-          <th class="px-2 py-1 whitespace-nowrap">Ciudad</th>
-          <th class="px-2 py-1 whitespace-nowrap">Fax</th>
-          <th class="px-2 py-1 whitespace-nowrap">Provincia</th>
-          <th class="px-2 py-1 whitespace-nowrap">Correo Electrónico</th>
-          <th class="px-2 py-1 whitespace-nowrap">Teléfono</th>
-          <th class="px-2 py-1 whitespace-nowrap">Código Postal</th>
-          <th class="px-2 py-1 whitespace-nowrap"># Departamentos</th>
-          <th class="px-2 py-1 whitespace-nowrap">Dirección</th>
-          <th class="px-2 py-1"></th>
+          <th class="px-3 py-2 whitespace-nowrap">RUC</th>
+          <th class="px-3 py-2 whitespace-nowrap">Nombre</th>
+          <th class="px-3 py-2 whitespace-nowrap">País</th>
+          <th class="px-3 py-2 whitespace-nowrap">Ciudad</th>
+          <th class="px-3 py-2 whitespace-nowrap">Fax</th>
+          <th class="px-3 py-2 whitespace-nowrap">Provincia</th>
+          <th class="px-3 py-2 whitespace-nowrap">Correo Electrónico</th>
+          <th class="px-3 py-2 whitespace-nowrap">Teléfono</th>
+          <th class="px-3 py-2 whitespace-nowrap">Código Postal</th>
+          <th class="px-3 py-2 whitespace-nowrap"># Departamentos</th>
+          <th class="px-3 py-2 whitespace-nowrap">Dirección</th>
+          <th class="px-3 py-2"></th>
         </tr>
       </thead>
-
-      <tbody *ngIf="dataCompany.length > 0; else noData" class="divide-y divide-gray-200">
-        <tr *ngFor="let item of dataCompany" class="hover:bg-gray-50">
-          <td class="px-2 py-1"><strong>{{ item.companyCode }}</strong></td>
-          <td class="px-2 py-1">{{ item.companyName }}</td>
-          <td class="px-2 py-1">{{ item.country }}</td>
-          <td class="px-2 py-1">{{ item.city }}</td>
-          <td class="px-2 py-1">{{ item.fax }}</td>
-          <td class="px-2 py-1">{{ item.state }}</td>
-          <td class="px-2 py-1">{{ item.email }}</td>
-          <td class="px-2 py-1">{{ item.phone }}</td>
-          <td class="px-2 py-1">{{ item.postalCode }}</td>
-          <td class="px-2 py-1">{{ item.cantidadDepartamentos }}</td>
-          <td class="px-2 py-1">{{ item.address }}</td>
-          <td class="px-2 py-1 flex gap-1">
-            <button mat-button aria-label="Editar">
+      <tbody *ngIf="dataCompany.length > 0; else noData" class="divide-y divide-fiori-border">
+        <tr *ngFor="let item of dataCompany" class="hover:bg-fiori-hover transition">
+          <td class="px-3 py-2 font-medium">{{ item.companyCode }}</td>
+          <td class="px-3 py-2">{{ item.companyName }}</td>
+          <td class="px-3 py-2">{{ item.country }}</td>
+          <td class="px-3 py-2">{{ item.city }}</td>
+          <td class="px-3 py-2">{{ item.fax }}</td>
+          <td class="px-3 py-2">{{ item.state }}</td>
+          <td class="px-3 py-2">{{ item.email }}</td>
+          <td class="px-3 py-2">{{ item.phone }}</td>
+          <td class="px-3 py-2">{{ item.postalCode }}</td>
+          <td class="px-3 py-2">{{ item.cantidadDepartamentos }}</td>
+          <td class="px-3 py-2">{{ item.address }}</td>
+          <td class="px-3 py-2 flex gap-1">
+            <button mat-icon-button class="text-fiori-primary hover:bg-fiori-hover rounded-fiori" aria-label="Editar">
               <mat-icon fontIcon="edit"></mat-icon>
             </button>
-            <button mat-button aria-label="Eliminar">
-              <mat-icon fontIcon="delete" class="text-red-500"></mat-icon>
+            <button mat-icon-button class="text-fiori-error hover:bg-fiori-hover rounded-fiori" aria-label="Eliminar">
+              <mat-icon fontIcon="delete"></mat-icon>
             </button>
           </td>
         </tr>
       </tbody>
-
       <ng-template #noData>
         <tr>
-          <td colspan="13" class="text-center py-3 text-xs text-gray-500">No se encontraron datos.</td>
+          <td colspan="13" class="text-center py-4 text-fiori-subtext">No se encontraron datos.</td>
         </tr>
       </ng-template>
     </table>

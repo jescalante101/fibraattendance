@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { AsignarNuevoHorarioComponent } from './asignar-nuevo-horario/asignar-nuevo-horario.component';
-import { DeviceService } from 'src/app/core/device.service';
 import { finalize } from 'rxjs';
 import { EmployeeScheduleAssignmentService, EmployeeScheduleAssignment } from 'src/app/core/services/employee-schedule-assignment.service';
 import { Router } from '@angular/router';
@@ -87,19 +85,4 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
     console.log('Eliminar asignación:', asignacion);
   }
 
-  abrirModalAsignarHorario(){
-    const dialogRef = this.dialog.open(AsignarNuevoHorarioComponent, {
-    disableClose: true,
-    width: '600px',
-    minHeight: '400px',
-    // panelClass: 'fiori-dialog'
-  });
-
-  dialogRef.afterClosed().subscribe(result => {
-    console.log('Modal cerrado', result);
-    // Recargar datos después de cerrar el modal
-    this.cargarAsignaciones();
-  });
-  
-  }
 }

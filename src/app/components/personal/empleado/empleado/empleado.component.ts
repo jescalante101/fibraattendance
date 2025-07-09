@@ -8,7 +8,7 @@ import { finalize } from 'rxjs';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 import { ActivatedRoute } from '@angular/router';
-import { AsignarNuevoHorarioComponent } from '../asignar-horario-empleado/asignar-nuevo-horario/asignar-nuevo-horario.component';
+import { AsignarTurnoMasivoComponent } from '../asignar-turno-masivo/asignar-turno-masivo.component';
 
 @Component({
   selector: 'app-empleado',
@@ -116,17 +116,6 @@ export class EmpleadoComponent implements OnInit {
     }
   }
 
-  abrirModalAsignarTurno(empleado: Employee) {
-    this.dialog.open(AsignarNuevoHorarioComponent, {
-      width: '900px',
-      data: { empleado } // aquí pasas el empleado seleccionado
-    }).afterClosed().subscribe(resultado => {
-      if (resultado) {
-        // Aquí puedes refrescar la lista, mostrar un mensaje, etc.
-        console.log('Asignación guardada:', resultado);
-      }
-    });
-  }
 
 
   onCategoriaAuxiliarChange() {
@@ -140,6 +129,14 @@ export class EmpleadoComponent implements OnInit {
     this.getEmployees();
   }
 
+  abrirAsignarTurnoMasivo() {
+    this.dialog.open(AsignarTurnoMasivoComponent, {
+      width: '95vw',
+      height: '90vh',
+      maxWidth: '95vw',
+      maxHeight: '90vh', // o el ancho que prefieras
+    });
+  }
 
   
 }

@@ -7,13 +7,20 @@ import { ApiResponse } from '../models/api-response.model';
 export interface EmployeeScheduleAssignment {
   assignmentId: number;
   employeeId: string;
+  nroDoc: string;
   fullNameEmployee: string | null;
   scheduleName: string | null;
+  scheduleId: number;
   startDate: string;
   endDate: string;
   remarks: string;
   createdAt: string;
   createdWeek: number;
+  areaId: number;
+  areaName: string;
+  locationId: number;
+  locationName: string;
+
 }
 
 

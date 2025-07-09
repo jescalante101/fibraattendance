@@ -37,6 +37,12 @@
         {{ area.descripcion }}
       </option>
     </select>
+    <button mat-raised-button
+      class="btn-fiori-primary flex items-center gap-2 px-4 py-2 text-sm"
+      (click)="abrirAsignarTurnoMasivo()">
+      <span class="material-icons text-base">schedule</span>
+      Asignar turnos
+    </button>
   </div>
 
   <!-- Tabla empleados -->
@@ -44,16 +50,16 @@
     <table class="min-w-full table-auto text-sm">
       <thead class="bg-fiori-muted text-fiori-subtext">
         <tr>
-          <th *ngIf="mostrarBotonAsignar" class="px-2 py-2 text-center w-10 whitespace-nowrap">
+          <th *ngIf="mostrarBotonAsignar" class="px-2 py-2 text-start w-10 whitespace-nowrap">
             <input type="checkbox" [(ngModel)]="allSelected" (change)="toggleAllEmployees()" />
           </th>
-          <th *ngIf="!mostrarBotonAsignar" class="px-2 py-2  whitespace-nowrap w-auto">ID Empleado</th>
-          <th class="px-2 py-2  whitespace-nowrap w-auto">Documento</th>
-          <th class="px-2 py-2  whitespace-nowrap w-auto">Apellido Paterno</th>
-          <th class="px-2 py-2  whitespace-nowrap w-auto">Apellido Materno</th>
-          <th class="px-2 py-2  whitespace-nowrap w-auto">Nombres</th>
-          <th class="px-2 py-2  whitespace-nowrap w-auto">Sede</th>
-          <th class="px-2 py-2  whitespace-nowrap w-auto">Área</th>
+          <th *ngIf="!mostrarBotonAsignar" class="px-2 py-2 text-start whitespace-nowrap w-auto">ID Empleado</th>
+          <th class="px-2 py-2 text-start  whitespace-nowrap w-auto">Documento</th>
+          <th class="px-2 py-2 text-start whitespace-nowrap w-auto">Apellido Paterno</th>
+          <th class="px-2 py-2 text-start whitespace-nowrap w-auto">Apellido Materno</th>
+          <th class="px-2 py-2 text-start whitespace-nowrap w-auto">Nombres</th>
+          <th class="px-2 py-2 text-start whitespace-nowrap w-auto">Sede</th>
+          <th class="px-2 py-2 text-start whitespace-nowrap w-auto">Área</th>
           <th *ngIf="mostrarBotonAsignar" class="px-2 py-2 text-center whitespace-nowrap w-auto"></th>
         </tr>
       </thead>
@@ -70,7 +76,7 @@
           <td class="px-2 py-2  whitespace-nowrap">{{ emp.categoriaAuxiliarDescripcion || '-' }}</td>
           <td class="px-2 py-2  whitespace-nowrap">{{ emp.areaDescripcion || '-' }}</td>
           <td *ngIf="mostrarBotonAsignar" class="px-2 py-2 text-center whitespace-nowrap">
-            <button class="btn-fiori-secondary"  (click)="abrirModalAsignarTurno(emp)" >Asignar</button>
+            <button class="btn-fiori-secondary" >Asignar</button>
           </td>
         </tr>
         <tr *ngIf="employees.length === 0">

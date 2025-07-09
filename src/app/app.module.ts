@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule }  from '@angular/forms';
-import { HttpClient,HttpClientModule }  from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptorsFromDi }  from '@angular/common/http';
 
 
 import { AppRoutingModule } from './app-routing.module';
@@ -57,96 +57,88 @@ import { NuevoDescansoComponent } from './components/asistencia/horarios/descans
 import { CustomHeaderComponent } from './components/sidebar/custom-header/custom-header.component';
 import { AsignarHorarioEmpleadoComponent } from './components/personal/empleado/asignar-horario-empleado/asignar-horario-empleado.component';
 import { MatDialogModule } from '@angular/material/dialog';
-import { AsignarNuevoHorarioComponent } from './components/personal/empleado/asignar-horario-empleado/asignar-nuevo-horario/asignar-nuevo-horario.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { AsignarTurnoMasivoComponent } from './components/personal/empleado/asignar-turno-masivo/asignar-turno-masivo.component';
+import {MatStepperModule} from '@angular/material/stepper';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatRadioModule} from '@angular/material/radio';
 
 
-@NgModule({
-  declarations: [
 
-    AppComponent,
-    LoginComponent,
-    ConfigComponent,
-    InicioComponent,
-    SidebarComponent,
-    TableComponent,
-    FilterOrdenesPipe,
-    InvLecturaComponent,
-    ModalComponent,
-    
-    // 🔥 Aquí ya NO pongas ModalAlertaComponent
 
-    PersonalComponent,
-    DepartamentoComponent,
-    AreaComponent,
-    CargoComponent,
-
-    EmpleadoComponent,
-    CeseComponent,
-
-    DispositivoComponent,
-    MarcacionesComponent,
-    TerminalSyncComponent,
-
-    AsistenciaComponent,
-    DescansoComponent,
-    HorarioComponent,
-    TurnoComponent,
-    NuevoHorarioComponent,
-    AsignarNuevoHorarioComponent,
-
-    ThorassemanalComponent,
-    ModalNuevoTurnoComponent,
-    NuevoDescansoComponent,
-    CustomHeaderComponent,
-    AsignarHorarioEmpleadoComponent
-
-  ],
-  imports: [
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatTableModule,
-    SharedModule, // 🔥 Aquí sí, aquí se importa todo lo de shared
-    BrowserModule,
-    AppRoutingModule,
-    FormsModule,
-    HttpClientModule,
-    MatMenuModule,
-    routing,
-    MatCheckboxModule,
-    MatIconModule,
-    MatInputModule,
-    MatCardModule,
-    NgxPaginationModule,
-    MatDialogModule,
-    GanttModule,
-    MatTabsModule,
-    MatButtonModule,
-    MatPaginatorModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    NgxTinymceModule.forRoot({
-      baseURL : '../../../assets/tinymce/'
-    }),
-    BrowserAnimationsModule,
-    MatSlideToggleModule,
-    ReactiveFormsModule,
-
-  ],
-  exports:[
-    TerminalSyncComponent,
-    ModalLoadingComponent,
-    ThorassemanalComponent,
-    ModalNuevoTurnoComponent,
-    NuevoHorarioComponent,
-    ModalConfirmComponent,
-    NuevoDescansoComponent,
-    CustomHeaderComponent
-  ],
-  providers: [
-
-  ],
-  bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        LoginComponent,
+        ConfigComponent,
+        InicioComponent,
+        SidebarComponent,
+        TableComponent,
+        FilterOrdenesPipe,
+        InvLecturaComponent,
+        ModalComponent,
+        // 🔥 Aquí ya NO pongas ModalAlertaComponent
+        PersonalComponent,
+        DepartamentoComponent,
+        AreaComponent,
+        CargoComponent,
+        EmpleadoComponent,
+        CeseComponent,
+        DispositivoComponent,
+        MarcacionesComponent,
+        TerminalSyncComponent,
+        AsistenciaComponent,
+        DescansoComponent,
+        HorarioComponent,
+        TurnoComponent,
+        NuevoHorarioComponent,
+        ThorassemanalComponent,
+        ModalNuevoTurnoComponent,
+        NuevoDescansoComponent,
+        CustomHeaderComponent,
+        AsignarHorarioEmpleadoComponent,
+        AsignarTurnoMasivoComponent
+    ],
+    exports: [
+        TerminalSyncComponent,
+        ModalLoadingComponent,
+        ThorassemanalComponent,
+        ModalNuevoTurnoComponent,
+        NuevoHorarioComponent,
+        ModalConfirmComponent,
+        NuevoDescansoComponent,
+        CustomHeaderComponent
+    ],
+    bootstrap: [AppComponent], imports: [MatDatepickerModule,
+        MatStepperModule,
+        MatProgressSpinnerModule,
+        MatNativeDateModule,
+        MatTableModule,
+        SharedModule, // 🔥 Aquí sí, aquí se importa todo lo de shared
+        BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        MatMenuModule,
+        routing,
+        MatCheckboxModule,
+        MatIconModule,
+        MatInputModule,
+        MatCardModule,
+        NgxPaginationModule,
+        MatDialogModule,
+        GanttModule,
+        MatTabsModule,
+        MatButtonModule,
+        MatPaginatorModule,
+        MatFormFieldModule,
+        MatSelectModule,
+        MatRadioModule,
+        NgxTinymceModule.forRoot({
+            baseURL: '../../../assets/tinymce/'
+        }),
+        BrowserAnimationsModule,
+        MatSlideToggleModule,
+        ReactiveFormsModule], providers: [
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule { }

@@ -7,7 +7,7 @@
         <i class="fa-solid fa-layer-group text-white text-sm"></i>
       </div>
       <div>
-        <h3 class="text-sm font-semibold text-fiori-text">Navigation</h3>
+        <span class="text-lg font-semibold text-fiori-text">Navigation</span>
         <p class="text-xs text-fiori-subtext">Sistema de Asistencia</p>
       </div>
     </div>
@@ -24,7 +24,7 @@
     <!-- Sección Personal -->
     <div class="section-divider" *ngIf="activeItem === 'personal'">
       <div class="px-4 py-2" *ngIf="!isCollapsed">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Personal</h4>
+        <span class="text-sm font-bold uppercase tracking-wider text-fiori-subtext">Personal</span>
       </div>
       
       <nav class="space-y-1">
@@ -74,7 +74,7 @@
               <a 
                 class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
                 [class.active]="isRouteActive('panel/personal/organizacion/area')"
-                [routerLink]="['panel/personal/organizacion/area']"
+                
                 routerLinkActive="active">
                 Área
               </a>
@@ -195,7 +195,7 @@
     <!-- Sección Dispositivo -->
     <div class="section-divider" *ngIf="activeItem === 'dispositivo'">
       <div class="px-4 py-2" *ngIf="!isCollapsed">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Dispositivo</h4>
+        <span class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Dispositivo</span>
       </div>
       
       <nav class="space-y-1">
@@ -239,7 +239,7 @@
     <!-- Sección Asistencia -->
     <div class="section-divider" *ngIf="activeItem === 'asistencia'">
       <div class="px-4 py-2" *ngIf="!isCollapsed">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Asistencia</h4>
+        <span class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Asistencia</span>
       </div>
       
       <nav class="space-y-1">
@@ -283,7 +283,7 @@
     <!-- Secciones adicionales para otros activeItems -->
     <div class="section-divider" *ngIf="activeItem === 'acceso'">
       <div class="px-4 py-2" *ngIf="!isCollapsed">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Control de Acceso</h4>
+        <span class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Control de Acceso</span>
       </div>
       <nav class="space-y-1">
         <div class="menu-item">
@@ -301,7 +301,7 @@
 
     <div class="section-divider" *ngIf="activeItem === 'temperatura'">
       <div class="px-4 py-2" *ngIf="!isCollapsed">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Control de Temperatura</h4>
+        <span class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Control de Temperatura</span>
       </div>
       <nav class="space-y-1">
         <div class="menu-item">
@@ -319,7 +319,7 @@
 
     <div class="section-divider" *ngIf="activeItem === 'sistema'">
       <div class="px-4 py-2" *ngIf="!isCollapsed">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Configuración del Sistema</h4>
+        <span class="text-xs font-bold uppercase tracking-wider text-fiori-subtext">Configuración del Sistema</span>
       </div>
       <nav class="space-y-1">
         <div class="menu-item">
@@ -346,7 +346,6 @@
   </div>
   
   <!-- Footer colapsado -->
-  <div class="border-t border-fiori-border p-3 flex justify-center" *ngIf="isCollapsed">
-    <i class="fa-solid fa-info-circle text-fiori-subtext text-xs" title="Sistema v2.1.0"></i>
-  </div>
+ 
+
 </aside>

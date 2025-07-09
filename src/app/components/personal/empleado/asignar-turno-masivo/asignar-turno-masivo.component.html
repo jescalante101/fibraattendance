@@ -1,0 +1,208 @@
+<div class="p-6 md:p-8 rounded-2xl bg-white shadow-lg h-screen flex flex-col">
+    <mat-horizontal-stepper [linear]="true" #stepper (selectionChange)="stepper.selectedIndex === 1 && cargarPersonal()" class="flex-1 flex flex-col">
+        <!-- Paso 1: Filtro -->
+        <mat-step [stepControl]="filtroForm">
+          <form [formGroup]="filtroForm" class="h-full flex flex-col">
+            <ng-template matStepLabel>Selecciona Sede y Área</ng-template>
+            <div class="flex-1 flex flex-col">
+                <div *ngIf="!datosListos" class="flex-1 flex items-center justify-center">
+                    <div class="text-center p-4">
+                        <mat-spinner diameter="30"></mat-spinner>
+                        <p>Cargando datos...</p>
+                    </div>
+                </div>
+              <div *ngIf="datosListos" class="flex-1 flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto w-full p-4">
+                <!-- Card de Sedes -->
+                <div class="flex-1">
+                  <mat-card class="h-full flex flex-col">
+                    <mat-card-header>
+                      <mat-card-subtitle>Seleccione una sede</mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content class="flex-1 flex flex-col min-h-0 p-0">
+                      <div class="flex-1 overflow-auto max-h-80">
+                        <table mat-table [dataSource]="sedes" class="w-full">
+                          <ng-container matColumnDef="select">
+                            <th mat-header-cell *matHeaderCellDef class="w-12"></th>
+                            <td mat-cell *matCellDef="let sede">
+                              <mat-radio-button
+                                name="sedeRadio"
+                                [value]="sede.categoriaAuxiliarId"
+                                (change)="onSedeSeleccionada(sede)"
+                                [checked]="filtroForm.get('sede')?.value === sede.categoriaAuxiliarId"
+                                aria-label="Seleccionar sede"
+                              ></mat-radio-button>
+                            </td>
+                          </ng-container>
+                          
+                          <ng-container matColumnDef="id">
+                            <th mat-header-cell *matHeaderCellDef>ID</th>
+                            <td mat-cell *matCellDef="let sede">{{ sede.categoriaAuxiliarId }}</td>
+                          </ng-container>
+                          
+                          <ng-container matColumnDef="descripcion">
+                            <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                            <td mat-cell *matCellDef="let sede">{{ sede.descripcion }}</td>
+                          </ng-container>
+                          
+                          <tr mat-header-row *matHeaderRowDef="['select', 'id', 'descripcion']"></tr>
+                          <tr mat-row *matRowDef="let row; columns: ['select', 'id', 'descripcion'];"
+                              [ngClass]="{'bg-fiori-hover border-l-4 border-fiori-primary': filtroForm.get('sede')?.value === row.categoriaAuxiliarId}"
+                              (click)="onSedeSeleccionada(row)"
+                              style="cursor:pointer"></tr>
+                        </table>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                  <div *ngIf="filtroForm.get('sede')?.hasError('required') && filtroForm.get('sede')?.touched" 
+                       class="text-red-500 text-sm mt-2">
+                    Sede es requerida
+                  </div>
+                </div>
+
+                <!-- Card de Áreas -->
+                <div class="flex-1">
+                  <mat-card class="h-full flex flex-col">
+                    <mat-card-header>
+                      <mat-card-subtitle>Seleccione un área</mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content class="flex-1 flex flex-col min-h-0 p-0">
+                      <div class="flex-1 overflow-auto max-h-80">
+                        <table mat-table [dataSource]="areas" class="w-full">
+                          <ng-container matColumnDef="select">
+                            <th mat-header-cell *matHeaderCellDef class="w-12"></th>
+                            <td mat-cell *matCellDef="let area">
+                              <mat-radio-button
+                                name="areaRadio"
+                                [value]="area.areaId"
+                                (change)="onAreaSeleccionada(area)"
+                                [checked]="filtroForm.get('area')?.value === area.areaId"
+                                aria-label="Seleccionar área"
+                              ></mat-radio-button>
+                            </td>
+                          </ng-container>
+                          
+                          <ng-container matColumnDef="id">
+                            <th mat-header-cell *matHeaderCellDef>ID</th>
+                            <td mat-cell *matCellDef="let area">{{ area.areaId }}</td>
+                          </ng-container>
+                          
+                          <ng-container matColumnDef="descripcion">
+                            <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                            <td mat-cell *matCellDef="let area">{{ area.descripcion }}</td>
+                          </ng-container>
+                          
+                          <tr mat-header-row *matHeaderRowDef="['select', 'id', 'descripcion']"></tr>
+                          <tr mat-row *matRowDef="let row; columns: ['select', 'id', 'descripcion'];"
+                              [ngClass]="{'bg-fiori-hover border-l-4 border-fiori-primary': filtroForm.get('area')?.value === row.areaId}"
+                              (click)="onAreaSeleccionada(row)"
+                              style="cursor:pointer"></tr>
+                        </table>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                  <div *ngIf="filtroForm.get('area')?.hasError('required') && filtroForm.get('area')?.touched" 
+                       class="text-red-500 text-sm mt-2">
+                    Área es requerida
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex-shrink-0 pt-4 border-t border-gray-200 mt-auto flex justify-end" >
+              <button mat-raised-button color="primary" 
+              matStepperNext [disabled]="!filtroForm.valid"
+              (click)="cargarPersonal()"
+              >
+                Siguiente
+            </button>
+            </div>
+          </form>
+        </mat-step>
+      
+        <!-- Paso 2: Selección de personal -->
+        <mat-step [stepControl]="personalForm">
+          <form [formGroup]="personalForm" class="h-full flex flex-col">
+            <ng-template matStepLabel>Selecciona Personal</ng-template>
+            <div class="flex-1 flex flex-col min-h-0">
+              <div *ngIf="loadingPersonal" class="flex-1 flex items-center justify-center">
+                <div class="text-center p-4">
+                    <mat-spinner diameter="30"></mat-spinner>
+                    <p>Cargando personal...</p>
+                </div>
+              </div>
+              <div *ngIf="!loadingPersonal" class="flex-1 flex flex-col min-h-0">
+                <div class="flex-1 overflow-auto border rounded-lg mb-4">
+                  <table mat-table [dataSource]="personalFiltrado" class="w-full min-w-[600px]">
+                    <!-- Checkbox -->
+                    <ng-container matColumnDef="select">
+                      <th mat-header-cell *matHeaderCellDef>
+                        <mat-checkbox
+                          (change)="$event ? masterToggle() : null"
+                          [checked]="isAllSelected()"
+                          [indeterminate]="isIndeterminate()">
+                        </mat-checkbox>
+                      </th>
+                      <td mat-cell *matCellDef="let row">
+                        <mat-checkbox
+                          (change)="toggleSelection(row)"
+                          [checked]="isSelected(row)">
+                        </mat-checkbox>
+                      </td>
+                    </ng-container>
+                    <!-- personalId -->
+                    <ng-container matColumnDef="personalId">
+                      <th mat-header-cell *matHeaderCellDef>ID</th>
+                      <td mat-cell *matCellDef="let row">{{ row.personalId }}</td>
+                    </ng-container>
+                    <!-- nroDoc -->
+                    <ng-container matColumnDef="nroDoc">
+                      <th mat-header-cell *matHeaderCellDef>Nro. Doc</th>
+                      <td mat-cell *matCellDef="let row">{{ row.nroDoc }}</td>
+                    </ng-container>
+                    <!-- nombre completo -->
+                    <ng-container matColumnDef="nombreCompleto">
+                      <th mat-header-cell *matHeaderCellDef>Nombre Completo</th>
+                      <td mat-cell *matCellDef="let row">{{ row.nombres }} {{ row.apellidoPaterno }} {{ row.apellidoMaterno }}</td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="['select', 'personalId', 'nroDoc', 'nombreCompleto']"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['select', 'personalId', 'nroDoc', 'nombreCompleto'];"></tr>
+                    <tr *ngIf="personalFiltrado.length === 0">
+                      <td colspan="4" class="text-center py-4 text-gray-500">No se encontraron empleados.</td>
+                    </tr>
+                  </table>
+                </div>
+                <!-- Paginación con Angular Material -->
+                <mat-paginator
+                    showFirstLastButtons
+                  [length]="totalCount"
+                  [pageSize]="pageSize"
+                  [pageIndex]="paginaActual - 1"
+                  [pageSizeOptions]="[5, 10, 15, 30, 50,totalCount]"
+                  (page)="onPageChange($event)"
+                  class="flex-shrink-0">
+                </mat-paginator>
+              </div>
+            </div>
+            <div class="flex-shrink-0 pt-4 border-t border-gray-200 mt-auto flex justify-end">
+              <button mat-button matStepperPrevious>Anterior</button>
+              <button mat-raised-button color="primary" matStepperNext [disabled]="!personalForm.valid">Siguiente</button>
+            </div>
+          </form>
+        </mat-step>
+      
+        <!-- Paso 3: Selección de turno y registro -->
+        <mat-step [stepControl]="turnoForm">
+          <form [formGroup]="turnoForm" class="h-full flex flex-col">
+            <ng-template matStepLabel>Selecciona Turno y Completa Registro</ng-template>
+            <div class="flex-1 flex flex-col">
+              <!-- Selector de turno, fechas, observaciones -->
+            </div>
+            <div class="flex-shrink-0 pt-4 border-t border-gray-200 mt-auto flex justify-end">
+              <button mat-button matStepperPrevious>Anterior</button>
+              <button mat-raised-button color="primary" (click)="guardarAsignacion()">Guardar</button>
+            </div>
+          </form>
+        </mat-step>
+        
+      </mat-horizontal-stepper>
+      
+</div>

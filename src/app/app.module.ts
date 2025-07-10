@@ -66,6 +66,7 @@ import {MatRadioModule} from '@angular/material/radio';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { AppUserComponent } from './components/personal/organizacion/app-user/app-user.component';
+import { SedeAreaCostoComponent } from './components/personal/organizacion/sede-area-costo/sede-area-costo.component';
 
 
 
@@ -100,7 +101,8 @@ import { AppUserComponent } from './components/personal/organizacion/app-user/ap
         CustomHeaderComponent,
         AsignarHorarioEmpleadoComponent,
         AsignarTurnoMasivoComponent,
-        AppUserComponent
+        AppUserComponent,
+        SedeAreaCostoComponent
     ],
     exports: [
         TerminalSyncComponent,

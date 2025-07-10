@@ -1,3 +1,150 @@
-<p>
-  sede-area-costo works!
-</p>
+<!-- sede-area-costo.component.html -->
+<div class="min-h-screen bg-fiori-background ">
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Header -->
+    <div class="mb-4">
+      <span class="text-2xl font-semibold text-fiori-text mb-1">Gestión de Sitios</span>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="card-fiori mb-6">
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex-1">
+          <input
+            id="search"
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            placeholder="Buscar por nombre de sitio, área o centro de costo..."
+            class="w-full px-3 py-2 border border-fiori-border rounded-fiori 
+                   focus:outline-none focus:ring-2 focus:ring-fiori-primary focus:border-transparent
+                   text-fiori-text placeholder-fiori-subtext bg-fiori-surface"
+          />
+        </div>
+        <div class="flex-shrink-0">
+          <button 
+            type="button"
+            (click)="onAddNew()"
+            class="btn-fiori flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Añadir Nuevo
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card-fiori">
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="filteredSites" class="w-full">
+          <!-- Sitio Column -->
+          <ng-container matColumnDef="siteName">
+            <th mat-header-cell *matHeaderCellDef class="text-left py-3 px-4 text-label font-medium">Sitio</th>
+            <td mat-cell *matCellDef="let site" class="py-3 px-4">
+              <div>
+                <div class="font-medium text-fiori-text">{{ site.siteName }}</div>
+                <div class="text-sm text-fiori-subtext">ID: {{ site.siteId }}</div>
+              </div>
+            </td>
+          </ng-container>
+          <!-- Área Column -->
+          <ng-container matColumnDef="areaName">
+            <th mat-header-cell *matHeaderCellDef class="text-left py-3 px-4 text-label font-medium">Área</th>
+            <td mat-cell *matCellDef="let site" class="py-3 px-4">
+              <div>
+                <div class="font-medium text-fiori-text">{{ site.areaName }}</div>
+                <div class="text-sm text-fiori-subtext">ID: {{ site.areaId }}</div>
+              </div>
+            </td>
+          </ng-container>
+          <!-- Centro de Costo Column -->
+          <ng-container matColumnDef="costCenterName">
+            <th mat-header-cell *matHeaderCellDef class="text-left py-3 px-4 text-label font-medium">Centro de Costo</th>
+            <td mat-cell *matCellDef="let site" class="py-3 px-4">
+              <div>
+                <div class="font-medium text-fiori-text">{{ site.costCenterName }}</div>
+                <div class="text-sm text-fiori-subtext">ID: {{ site.costCenterId }}</div>
+              </div>
+            </td>
+          </ng-container>
+          <!-- Creado Por Column -->
+          <ng-container matColumnDef="createdBy">
+            <th mat-header-cell *matHeaderCellDef class="text-left py-3 px-4 text-label font-medium">Creado Por</th>
+            <td mat-cell *matCellDef="let site" class="py-3 px-4 text-fiori-text">{{ site.createdBy }}</td>
+          </ng-container>
+          <!-- Fecha Column -->
+          <ng-container matColumnDef="creationDate">
+            <th mat-header-cell *matHeaderCellDef class="text-left py-3 px-4 text-label font-medium">Fecha</th>
+            <td mat-cell *matCellDef="let site" class="py-3 px-4 text-fiori-text">{{ formatDate(site.creationDate) }}</td>
+          </ng-container>
+          <!-- Estado Column -->
+          <ng-container matColumnDef="active">
+            <th mat-header-cell *matHeaderCellDef class="text-left py-3 px-4 text-label font-medium">Estado</th>
+            <td mat-cell *matCellDef="let site" class="py-3 px-4">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    [class]="site.active === 'Y' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                {{ site.active === 'Y' ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+          </ng-container>
+          <!-- Acciones Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="text-left py-3 px-4 text-label font-medium">Acciones</th>
+            <td mat-cell *matCellDef="let site" class="py-3 px-4">
+              <div class="flex items-center gap-2">
+                <button type="button" (click)="onEdit(site)" class="text-fiori-primary hover:text-fiori-secondary transition-colors p-1" title="Editar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                </button>
+                <button type="button" (click)="onView(site)" class="text-fiori-primary hover:text-fiori-secondary transition-colors p-1" title="Ver detalles">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                </button>
+                <button type="button" (click)="onDelete(site)" class="text-fiori-error hover:text-red-700 transition-colors p-1" title="Eliminar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+          <!-- Header and Row Declarations -->
+          <tr mat-header-row *matHeaderRowDef="['siteName', 'areaName', 'costCenterName', 'createdBy', 'creationDate', 'active', 'actions']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['siteName', 'areaName', 'costCenterName', 'createdBy', 'creationDate', 'active', 'actions']; trackBy: trackBySiteId"
+            class="border-b border-fiori-border hover:bg-fiori-hover transition-colors"></tr>
+          <!-- Empty State -->
+          <tr *ngIf="filteredSites.length === 0">
+            <td colspan="7" class="py-8 text-center">
+              <div class="text-fiori-subtext">
+                <svg class="w-12 h-12 mx-auto mb-4 text-fiori-border" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                </svg>
+                <p class="text-lg font-medium mb-2">No se encontraron sitios</p>
+                <p *ngIf="searchTerm">Prueba con diferentes términos de búsqueda</p>
+                <p *ngIf="!searchTerm">Comienza añadiendo tu primer sitio</p>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination (optional) -->
+    <div class="mt-6 flex items-center justify-between" *ngIf="filteredSites.length > 0">
+      <div class="text-label">
+        Mostrando {{ filteredSites.length }} resultados
+      </div>
+      <div class="flex items-center gap-2">
+        <!-- Add pagination controls here if needed -->
+      </div>
+    </div>
+
+  </div>
+</div>

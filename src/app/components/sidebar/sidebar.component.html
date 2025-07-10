@@ -61,6 +61,14 @@
 
               <a 
                 class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                [class.active]="isRouteActive('panel/personal/organizacion/sede-area-costo')"
+                [routerLink]="['panel/personal/organizacion/sede-area-costo']"
+                routerLinkActive="active">
+                sede y Área de Costo
+              </a>
+
+              <a 
+                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
                 [class.active]="isRouteActive('panel/personal/organizacion')"
                 [routerLink]="['panel/personal/organizacion']"
                 routerLinkActive="active">

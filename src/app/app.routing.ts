@@ -17,6 +17,7 @@ import { TurnoComponent } from "./components/asistencia/horarios/turno/turno.com
 import { DescansoComponent } from "./components/asistencia/horarios/descanso/descanso.component";
 import { AsignarHorarioEmpleadoComponent } from "./components/personal/empleado/asignar-horario-empleado/asignar-horario-empleado.component";
 import { AppUserComponent } from "./components/personal/organizacion/app-user/app-user.component";
+import { SedeAreaCostoComponent } from "./components/personal/organizacion/sede-area-costo/sede-area-costo.component";
 
 
 
@@ -30,6 +31,7 @@ const appRoutes: Routes = [
         //TODO: Agregar las vistas para el panel de personal
         {path: 'personal/organizacion',component:PersonalComponent},
         {path:'personal/organizacion/app-user',component:AppUserComponent},
+        {path:'personal/organizacion/sede-area-costo',component:SedeAreaCostoComponent},
         {path:'personal/organizacion/departamento',component:DepartamentoComponent},
         {path:"personal/organizacion/area",component:AreaComponent},
         {path:"personal/organizacion/cargo",component:CargoComponent},

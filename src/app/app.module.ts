@@ -63,7 +63,9 @@ import { AsignarTurnoMasivoComponent } from './components/personal/empleado/asig
 import {MatStepperModule} from '@angular/material/stepper';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatRadioModule} from '@angular/material/radio';
-
+import { MatTooltipModule } from '@angular/material/tooltip';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { AppUserComponent } from './components/personal/organizacion/app-user/app-user.component';
 
 
 
@@ -97,7 +99,8 @@ import {MatRadioModule} from '@angular/material/radio';
         NuevoDescansoComponent,
         CustomHeaderComponent,
         AsignarHorarioEmpleadoComponent,
-        AsignarTurnoMasivoComponent
+        AsignarTurnoMasivoComponent,
+        AppUserComponent
     ],
     exports: [
         TerminalSyncComponent,
@@ -109,7 +112,8 @@ import {MatRadioModule} from '@angular/material/radio';
         NuevoDescansoComponent,
         CustomHeaderComponent
     ],
-    bootstrap: [AppComponent], imports: [MatDatepickerModule,
+    bootstrap: [AppComponent], imports: [
+        MatDatepickerModule,
         MatStepperModule,
         MatProgressSpinnerModule,
         MatNativeDateModule,
@@ -133,12 +137,15 @@ import {MatRadioModule} from '@angular/material/radio';
         MatFormFieldModule,
         MatSelectModule,
         MatRadioModule,
+        MatSnackBarModule,
         NgxTinymceModule.forRoot({
             baseURL: '../../../assets/tinymce/'
         }),
         BrowserAnimationsModule,
         MatSlideToggleModule,
-        ReactiveFormsModule], providers: [
+        ReactiveFormsModule,
+        MatTooltipModule
+    ], providers: [
         provideHttpClient(withInterceptorsFromDi())
     ] })
 export class AppModule { }

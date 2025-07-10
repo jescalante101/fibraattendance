@@ -144,3 +144,21 @@
 }
 
 
+::ng-deep .mat-form-field-label {
+  white-space: nowrap;
+}
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline-start {
+  border-left-style: none !important;
+}
+
+.snackbar-error {
+  background: #ee3e3eea;
+  color: #fff;
+  font-weight: bold;
+}
+
+.snackbar-success {
+  background: #07ce71ea;
+  color: #fff;
+  font-weight: bold;
+}

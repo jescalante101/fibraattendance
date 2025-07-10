@@ -1,10 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
-import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
-import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
+import { CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
+import { RhArea } from 'src/app/core/services/rh-area.service';
 import { PersonService } from 'src/app/core/services/person.service';
-import { forkJoin } from 'rxjs';
+import { AppUserService, SedeArea } from 'src/app/core/services/app-user.services';
+import { ShiftsService, Shift } from 'src/app/core/services/shifts.service';
 import { PageEvent } from '@angular/material/paginator';
+import { EmployeeScheduleAssignmentService, EmployeeScheduleAssignmentInsert } from 'src/app/core/services/employee-schedule-assignment.service';
+import { forkJoin } from 'rxjs';
+import { MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-asignar-turno-masivo',
@@ -16,6 +21,15 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   personalForm!: FormGroup;
   turnoForm!: FormGroup;
 
+  // Nuevas propiedades para los datos del endpoint
+  sedesAreas: SedeArea[] = [];
+  areasFiltradas: RhArea[] = [];
+  
+  // Propiedades para turnos
+  turnos: Shift[] = [];
+  loadingTurnos = false;
+  
+  // Propiedades existentes
   sedes: CategoriaAuxiliar[] = [];
   areas: RhArea[] = [];
   personalFiltrado: any[] = [];
@@ -33,9 +47,12 @@ export class AsignarTurnoMasivoComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private categoriaAuxiliarService: CategoriaAuxiliarService,
-    private rhAreaService: RhAreaService,
-    private personService: PersonService
+    private personService: PersonService,
+    private appUserService: AppUserService,
+    private shiftsService: ShiftsService,
+    private employeeScheduleAssignmentService: EmployeeScheduleAssignmentService,
+    private dialogRef: MatDialogRef<AsignarTurnoMasivoComponent>,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -63,21 +80,87 @@ export class AsignarTurnoMasivoComponent implements OnInit {
 
   private cargarDatosIniciales(): void {
     this.datosListos = false;
-    forkJoin({
-      sedes: this.categoriaAuxiliarService.getCategoriasAuxiliar(),
-      areas: this.rhAreaService.getAreas()
-    }).subscribe({
-      next: ({ sedes, areas }) => {
-        this.sedes = sedes;
-        this.areas = areas;
+    
+    // Usar el nuevo servicio para obtener sedes y áreas
+    this.appUserService.getSedesAreas(3).subscribe({
+      next: (sedesAreas) => {
+        this.sedesAreas = sedesAreas;
+        
+        // Convertir los datos del endpoint al formato esperado por el componente
+        this.sedes = sedesAreas.map(sede => ({
+          categoriaAuxiliarId: sede.siteId,
+          descripcion: sede.siteName,
+          companiaId: '1', // Valor por defecto
+          codigoAuxiliar: sede.siteId // Usar el siteId como código auxiliar
+        }));
+        
+        // Inicializar áreas vacías hasta que se seleccione una sede
+        this.areas = [];
+        this.areasFiltradas = [];
+        
         this.datosListos = true;
+        // Seleccionar automáticamente la primera sede si existe
+        if (this.sedes.length > 0) {
+          this.filtroForm.patchValue({ sede: this.sedes[0].categoriaAuxiliarId });
+          this.onSedeSeleccionada(this.sedes[0].categoriaAuxiliarId);
+        }
       },
       error: err => {
+        console.error('Error al cargar sedes y áreas:', err);
+        this.sedesAreas = [];
         this.sedes = [];
         this.areas = [];
+        this.areasFiltradas = [];
         this.datosListos = true;
       }
     });
+  }
+
+  // Método para cargar turnos
+  cargarTurnos(): void {
+    this.loadingTurnos = true;
+    this.shiftsService.getShifts(1, 50).subscribe({
+      next: (response) => {
+        this.turnos = response.data;
+        this.loadingTurnos = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar turnos:', error);
+        this.turnos = [];
+        this.loadingTurnos = false;
+      }
+    });
+  }
+
+  // Método para obtener resumen del horario
+  getHorarioResumen(turno: Shift): string {
+    if (!turno.horario || turno.horario.length === 0) {
+      return 'Sin horario definido';
+    }
+    
+    const diasLaborables = turno.horario.filter(h => h.workTimeDuration > 0);
+    if (diasLaborables.length === 0) {
+      return 'Sin días laborables';
+    }
+    
+    const primerHorario = diasLaborables[0];
+    const horaInicio = new Date(primerHorario.inTime).toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    return `${diasLaborables.length} días, ${horaInicio}`;
+  }
+
+  // Método para obtener tipo de ciclo
+  getTipoCiclo(turno: Shift): string {
+    if (turno.shiftCycle === 1) {
+      return 'Semanal';
+    } else if (turno.shiftCycle === 2) {
+      return 'Quincenal';
+    } else {
+      return `Ciclo ${turno.shiftCycle}`;
+    }
   }
 
   cargarPersonal() {
@@ -95,8 +178,8 @@ export class AsignarTurnoMasivoComponent implements OnInit {
           this.totalCount = 0;
           this.hayMasPaginas = false;
         }
-        this.seleccionados.clear();
-        this.empleados.clear();
+        //this.seleccionados.clear();
+        //this.empleados.clear();
         this.loadingPersonal = false;
       },
       error: _ => {
@@ -173,17 +256,91 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     const filtro = this.filtroForm.value;
     const empleados = this.personalForm.value.empleados;
     const turno = this.turnoForm.value;
-    console.log('Filtro:', filtro);
+    // Buscar datos de la sede y área seleccionada
+    const sede = this.sedes.find(s => s.categoriaAuxiliarId === filtro.sede);
+    const area = this.areasFiltradas.find(a => a.areaId === filtro.area);
+    const turnoSeleccionado = this.turnos.find(t => t.id === turno.turno);
+    const now = new Date().toISOString();
+    // Aquí deberías obtener el usuario logueado, por ahora lo dejamos como 'admin'
+    const createdBy = 'huali';
+    // Armar los registros para cada empleado seleccionado
+    const registros: EmployeeScheduleAssignmentInsert[] = empleados.map((employeeId: string) => {
+      // Buscar datos del empleado en la lista filtrada
+      const empleado = this.personalFiltrado.find(e => e.personalId === employeeId);
+      return {
+        employeeId: employeeId,
+        scheduleId: turnoSeleccionado ? turnoSeleccionado.id : 0,
+        startDate: turno.fechaInicio,
+        endDate: turno.fechaFin,
+        remarks: turno.observaciones || '',
+        createdAt: now,
+        crearteBY: createdBy,
+        fullName: empleado ? `${empleado.nombres} ${empleado.apellidoPaterno} ${empleado.apellidoMaterno}` : '',
+        shiftDescription: turnoSeleccionado ? turnoSeleccionado.alias : '',
+        nroDoc: empleado ? empleado.nroDoc : '',
+        areaId: area ? area.areaId : '',
+        areaDescription: area ? area.descripcion : '',
+        locationId: sede ? sede.categoriaAuxiliarId : '',
+        locationName: sede ? sede.descripcion : ''
+      };
+    });
     console.log('Empleados seleccionados:', empleados);
-    console.log('Turno:', turno);
+    console.log('Personal filtrado:', this.personalFiltrado);
+    console.log('Turno seleccionado:', turnoSeleccionado);
+    console.log('Sede:', sede);
+    console.log('Area:', area);
+    console.log('Fecha inicio:', turno.fechaInicio);
+    console.log('Fecha fin:', turno.fechaFin);
+    console.log('Observaciones:', turno.observaciones);
+    // Enviar el array de registros en una sola petición
+    console.log('Registros:', registros);
+    this.employeeScheduleAssignmentService.insertEmployeeScheduleAssignment(registros).subscribe({
+      next: (response) => {
+        if (response && response.exito) {
+          this.dialogRef.close(response); // Cierra el modal y pasa la respuesta al padre
+        } else {
+          this.snackBar.open('No se pudo registrar la asignación.', 'Cerrar', {
+            duration: 4000,
+            verticalPosition: 'top',
+            horizontalPosition: 'end',
+            panelClass: ['snackbar-error']
+          });
+        }
+      },
+      error: (error) => {
+        this.snackBar.open('Error al registrar asignaciones.', 'Cerrar', {
+          duration: 4000,
+          verticalPosition: 'top',
+          horizontalPosition: 'end',
+          panelClass: ['snackbar-error']
+        });
+      }
+    });
   }
 
   // Agregar estos métodos a tu componente
 
-  onSedeSeleccionada(sede: CategoriaAuxiliar): void {
+  // Método para filtrar áreas cuando se selecciona una sede
+  onSedeSeleccionada(sedeId: string): void {
+    const sede = this.sedes.find(s => s.categoriaAuxiliarId === sedeId);
+    if (!sede) return;
     this.filtroForm.patchValue({
-      sede: sede.categoriaAuxiliarId
+      sede: sede.categoriaAuxiliarId,
+      area: null // Resetear área cuando cambia la sede
     });
+    
+    // Filtrar áreas para la sede seleccionada
+    const sedeSeleccionada = this.sedesAreas.find(s => s.siteId === sede.categoriaAuxiliarId);
+    if (sedeSeleccionada) {
+      this.areasFiltradas = sedeSeleccionada.areas.map(area => ({
+        areaId: area.areaId,
+        descripcion: area.areaName,
+        companiaId: '1' // Valor por defecto
+      }));
+    } else {
+      this.areasFiltradas = [];
+    }
+    
     // Marcar el campo como touched para validaciones
     this.filtroForm.get('sede')?.markAsTouched();
   }
@@ -194,6 +351,26 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     });
     // Marcar el campo como touched para validaciones
     this.filtroForm.get('area')?.markAsTouched();
+  }
+
+  // Método para mostrar detalle del horario en tooltip
+  getHorarioDetalle(turno: Shift): string {
+    if (!turno.horario || turno.horario.length === 0) {
+      return 'Sin detalle de horario';
+    }
+    return turno.horario
+      .map(h => `${this.getNombreDia(h.dayIndex)}: ${this.formatHora(h.inTime)} (${h.workTimeDuration} min) \nn`)
+      .join('\n');
+  }
+
+  getNombreDia(index: number): string {
+    const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    return dias[index % 7] || `Día ${index}`;
+  }
+
+  formatHora(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
   }
 
 }

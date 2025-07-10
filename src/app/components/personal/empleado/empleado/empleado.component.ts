@@ -9,6 +9,7 @@ import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/servic
 import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 import { ActivatedRoute } from '@angular/router';
 import { AsignarTurnoMasivoComponent } from '../asignar-turno-masivo/asignar-turno-masivo.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-empleado',
@@ -22,7 +23,8 @@ export class EmpleadoComponent implements OnInit {
     private dialog: MatDialog, 
     private categoriaAuxiliarService: CategoriaAuxiliarService, 
     private rhAreaService: RhAreaService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private snackBar: MatSnackBar
   )
      { }
   mostrarBotonAsignar = false;
@@ -130,12 +132,32 @@ export class EmpleadoComponent implements OnInit {
   }
 
   abrirAsignarTurnoMasivo() {
-    this.dialog.open(AsignarTurnoMasivoComponent, {
+    const dialogRef = this.dialog.open(AsignarTurnoMasivoComponent, {
       width: '95vw',
       height: '90vh',
       maxWidth: '95vw',
-      maxHeight: '90vh', // o el ancho que prefieras
+      maxHeight: '90vh',
     });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.exito) {
+        this.snackBar.open('Asignación masiva realizada correctamente.', 'Cerrar', {
+          duration: 4000,
+          verticalPosition: 'top',
+          horizontalPosition: 'end',
+          panelClass: ['snackbar-success']
+        });
+        // Si quieres refrescar la lista de empleados, llama aquí a this.getEmployees();
+      } else if (result && result.exito === false) {
+        this.snackBar.open('No se pudo realizar la asignación masiva.', 'Cerrar', {
+          duration: 4000,
+          verticalPosition: 'top',
+          horizontalPosition: 'end',
+          panelClass: ['snackbar-error']
+        });
+      }
+    });
+
   }
 
   

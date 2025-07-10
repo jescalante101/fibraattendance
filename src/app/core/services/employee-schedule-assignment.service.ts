@@ -23,6 +23,23 @@ export interface EmployeeScheduleAssignment {
 
 }
 
+export interface EmployeeScheduleAssignmentInsert {
+  employeeId: string;
+  scheduleId: number;
+  startDate: string;
+  endDate: string;
+  remarks: string;
+  createdAt: string;
+  crearteBY: string;
+  fullName: string;
+  shiftDescription: string;
+  nroDoc: string;
+  areaId: string;
+  areaDescription: string;
+  locationId: string;
+  locationName: string;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -41,5 +58,12 @@ export class EmployeeScheduleAssignmentService {
       .set('endDate', endDate);
 
     return this.http.get<ApiResponse<EmployeeScheduleAssignment>>(`${this.apiUrl}api/employee-schedule-assignment/search`, { params });
+  }
+
+  insertEmployeeScheduleAssignment(body: EmployeeScheduleAssignmentInsert[]): Observable<ApiResponse<EmployeeScheduleAssignment>> {
+    return this.http.post<ApiResponse<EmployeeScheduleAssignment>>(
+      `${this.apiUrl}api/employee-schedule-assignment/insert`,
+      body
+    );
   }
 } 

@@ -2,76 +2,87 @@
 .alert-header {
   display: flex;
   align-items: center;
-  padding: 16px 16px 8px 16px;
-  background-color: #fff;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-
-  border-bottom: 1px solid rgba(0,0,0,0.12);
+  padding: 20px 20px 8px 20px;
+  background: #fff;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom: 1px solid #e5e5e5;
+  box-shadow: none;
 }
-.alert-header.success {
-  border-top: 4px solid #4caf50; /* línea verde */
-}
+.alert-header.success { border-top: 3px solid #107e3e; }
+.alert-header.error { border-top: 3px solid #bb0000; }
+.alert-header.info { border-top: 3px solid #0a6ed1; }
+.alert-header.danger { border-top: 3px solid #e9730c; }
 
-/* Icono y título */
 .alert-icon {
-  display: inline-flex;
-  justify-content: center;
+  display: flex;
   align-items: center;
-  width: 24px;
-  height: 24px;
-  margin-right: 16px;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-right: 18px;
 }
 .alert-title {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: #000;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #32363a;
+  letter-spacing: 0.01em;
 }
 
-/* ===== Divider ===== */
 .alert-divider {
-  height: 3px;
-  margin: 0 16px 16px 16px;
-  border-radius: 2px;
-  background: #e0e0e0;
+  height: 2px;
+  margin: 0 20px 16px 20px;
+  border-radius: 1px;
+  background: #e5e5e5;
 }
-.alert-divider.success { background: #4caf50; }
-.alert-divider.error { background: #d32f2f; }
-.alert-divider.info { background: #1976d2; }
-.alert-divider.danger { background: #ff9800; }
+.alert-divider.success { background: #107e3e; }
+.alert-divider.error { background: #bb0000; }
+.alert-divider.info { background: #0a6ed1; }
+.alert-divider.danger { background: #e9730c; }
 
-/* ===== Cuerpo ===== */
 .alert-body {
-  padding: 0 16px 16px 16px;
-  font-size: 1.1rem;
-  color: rgba(0,0,0,0.87);
-  background-color: #fff;
+  padding: 0 20px 18px 20px;
+  font-size: 1rem;
+  color: #32363a;
+  background: #fff;
 }
 
-/* ===== Footer ===== */
 .alert-footer {
   display: flex;
   justify-content: flex-end;
-  padding: 8px 16px 16px 16px;
-  border-top: 1px solid rgba(0,0,0,0.12);
-  background-color: #fff;
-  border-bottom-right-radius: 16px;
-  border-bottom-left-radius: 16px;
+  gap: 12px;
+  padding: 10px 20px 18px 20px;
+  border-top: 1px solid #e5e5e5;
+  background: #fff;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
 }
 
 .alert-footer button {
-  border: none;
-  background: none;
-  padding: 4px 16px;
-  font-size: 14px;
-  min-width: 64px;
-  color: #1976d2;               /* texto verde */
-  font-weight: 600;
+  border-radius: 4px;
+  font-size: 15px;
+  min-width: 90px;
+  font-weight: 500;
+  box-shadow: none;
+  text-transform: none;
+  letter-spacing: 0.01em;
 }
-.alert-footer button:hover {
-  background: rgba(76,175,80,0.1);  /* hover suave verde */
+.alert-footer button[mat-button] {
+  color: #0a6ed1;
+}
+.alert-footer button[mat-raised-button] {
+  background: #0a6ed1;
+  color: #fff;
+}
+.alert-footer button[mat-raised-button]:hover {
+  background: #0854a0;
 }
 
 .cdk-overlay-dark-backdrop {
-  background: rgba(0, 0, 0, .32);
+  background: rgba(0, 0, 0, .18);
+}
+
+mat-card {
+  box-shadow: 0 2px 8px rgba(50,54,58,0.08);
+  border-radius: 8px !important;
 }

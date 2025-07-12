@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit, Optional, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
@@ -13,6 +13,11 @@ import { ModalLoadingComponent } from 'src/app/shared/modal-loading/modal-loadin
 })
 export class NuevoHorarioComponent implements OnInit {
 
+  @Input() componentData: any;
+  
+  // Referencia al modal padre (será inyectada por el modal component)
+  modalRef: any;
+
   descansoData: any[] = [];
   horarioForm!: FormGroup;
   idHorario: number = 0;
@@ -22,14 +27,22 @@ export class NuevoHorarioComponent implements OnInit {
   useMode:number=0;
 
   constructor(
-    public dialogRef: MatDialogRef<NuevoHorarioComponent>,
+    @Optional() public dialogRef: MatDialogRef<NuevoHorarioComponent>,
     private attendanceService: AttendanceService,
     private fb: FormBuilder,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    private dialogLoading:MatDialog
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
+    private dialogLoading: MatDialog
   ) {}
 
   ngOnInit() {
+    console.log('componentData nuevo horario',this.componentData);
+    console.log('data nuevo horario',this.data);
+    const data2 = this.data;
+    if (data2) {
+      this.useMode = data2.use_mode;
+      
+      this.loadEdit(data2.idHorario);
+    }
     this.horarioForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(50)]],
       horaEntrada: ['', Validators.required],
@@ -56,15 +69,25 @@ export class NuevoHorarioComponent implements OnInit {
       tipoIntervalo: [0],
       basadoM: [0],
       horaCambio: [''],
-      diasLaboral: [0, [Validators.required, Validators.min(1), Validators.max(7)]],
+      diasLaboral: [0, [Validators.required, Validators.min(0), Validators.max(1)]],
     });
 
     this.loadDescansoData();
 
-    if (this.data) {
-      console.log(this.data);
-      this.useMode=this.data.use_mode;
-      this.loadEdit(this.data.idHorario);
+    
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    console.log('componentData',this.componentData);
+    console.log('data',this.data);
+    if (changes['componentData'] && this.componentData) {
+      // Aquí sí puedes usar los datos
+      console.log('componentData',changes['componentData']);
+      const data2 = this.componentData;
+      if (data2) {
+        this.useMode = data2.use_mode;
+        this.loadEdit(data2.idHorario);
+      }
     }
   }
 
@@ -86,38 +109,56 @@ export class NuevoHorarioComponent implements OnInit {
     this.attendanceService.getHorarioByID(idHorario).subscribe({
       next: (response: any) => {
         if (response && response.horario) {
+          console.log('Datos recibidos del API:', response);
+          
           // Mapeo de propiedades del API al formulario
           const horario = {
-            nombre: response.horario.nombre,
-            horaEntrada: response.horario.horaEntrada,
-            horaEntradaDesde: response.horario.horaEntradaDesde,
-            horaEntradaHasta: response.horario.horaEntradaHasta,
-            horaSalida: response.horario.horaSalida,
-            horaSalidaDesde: response.horario.horaSalidaDesde,
-            horaSalidaHasta: response.horario.horaSalidaHasta,
+            nombre: response.horario.nombre || '',
+            horaEntrada: response.horario.horaEntrada || '',
+            horaEntradaDesde: response.horario.horaEntradaDesde || '',
+            horaEntradaHasta: response.horario.horaEntradaHasta || '',
+            horaSalida: response.horario.horaSalida || '',
+            horaSalidaDesde: response.horario.horaSalidaDesde || '',
+            horaSalidaHasta: response.horario.horaSalidaHasta || '',
             isSelected: false,
-            breakTimeId: response.breaktimeId,
-            entradaTemprana: response.horario.entradaTemprana,
-            entradaTarde: response.horario.entradaTarde,
-            minEntradaTemprana: response.horario.minEntradaTemprana,
-            minSalidaTarde: response.horario.minSalidaTarde,
-            hNivel: response.horario.hnivel,
-            hNivel1: response.horario.hNivel1,
-            hNivel2: response.horario.hNivel2,
-            hNivel3: response.horario.hNivel3,
-            marcarEntrada: response.horario.marcarEntrada,
-            marcarSalida: response.horario.marcarSalida,
-            permiteLLegarT: response.horario.pLlegadaT,
-            permiteSalidaT: response.horario.pSalidaT,
-            periodoMarcacion: response.horario.periodoMarcacion,
-            tipoIntervalo: response.horario.tipoIntervalo,
-            basadoM: response.horario.basadoM,
-            horaCambio: response.horario.hCambioDia,
-            diasLaboral:response.horario.diasLaboral,
+            breakTimeId: response.breaktimeId || 0,
+            entradaTemprana: response.horario.entradaTemprana || 0,
+            entradaTarde: response.horario.entradaTarde || 0,
+            minEntradaTemprana: response.horario.minEntradaTemprana || 0,
+            minSalidaTarde: response.horario.minSalidaTarde || 0,
+            hNivel: response.horario.hnivel || 0,
+            hNivel1: response.horario.hNivel1 || 0,
+            hNivel2: response.horario.hNivel2 || 0,
+            hNivel3: response.horario.hNivel3 || 0,
+            marcarEntrada: response.horario.marcarEntrada || false,
+            marcarSalida: response.horario.marcarSalida || false,
+            permiteLLegarT: response.horario.pLlegadaT || 0,
+            permiteSalidaT: response.horario.pSalidaT || 0,
+            periodoMarcacion: response.horario.periodoMarcacion || 0,
+            tipoIntervalo: response.horario.tipoIntervalo || 0,
+            basadoM: response.horario.basadoM || 0,
+            horaCambio: response.horario.hCambioDia || '',
+            diasLaboral: response.horario.diasLaboral || 0,
           };
+          
+          console.log('Datos mapeados para el formulario:', horario);
+          
           this.horarioForm.patchValue(horario);
           this.idHorario = response.horario.idHorio || 0;
+          
+          // Verificar el estado del formulario después de cargar los datos
+          setTimeout(() => {
+            console.log('Estado del formulario después de cargar datos:', {
+              valid: this.horarioForm.valid,
+              invalid: this.horarioForm.invalid,
+              errors: this.getFormErrors(),
+              values: this.horarioForm.value
+            });
+          }, 100);
         }
+      },
+      error: (error) => {
+        console.error('Error al cargar horario para editar:', error);
       }
     });
   }
@@ -126,6 +167,8 @@ export class NuevoHorarioComponent implements OnInit {
     // Si el formulario es inválido, marca todos los campos como tocados y no continúa
     if (this.horarioForm.invalid) {
       this.horarioForm.markAllAsTouched();
+      console.log('formulario invalido', this.horarioForm);
+      console.log('Errores del formulario:', this.getFormErrors());
       return;
     }
 
@@ -170,8 +213,13 @@ export class NuevoHorarioComponent implements OnInit {
     if (this.idHorario !== 0) {
       this.attendanceService.updateHorario(horarioApi).subscribe({
         next: (response) => {
-          this.dialogRef.close(response);
           loadinngRef.close();
+          // Cerrar el modal padre con los datos de respuesta
+          if (this.modalRef) {
+            this.modalRef.closeModalFromChild(response);
+          } else if (this.dialogRef) {
+            this.dialogRef.close(response);
+          }
         },
         error: (error) => {
           console.error('Error al actualizar horario:', error);
@@ -181,8 +229,13 @@ export class NuevoHorarioComponent implements OnInit {
     } else {
       this.attendanceService.saveHorario(horarioApi).subscribe({
         next: (response) => {
-          this.dialogRef.close(response);
           loadinngRef.close();
+          // Cerrar el modal padre con los datos de respuesta
+          if (this.modalRef) {
+            this.modalRef.closeModalFromChild(response);
+          } else if (this.dialogRef) {
+            this.dialogRef.close(response);
+          }
         },
         error: (error) => {
           console.error('Error al guardar horario:', error);
@@ -192,6 +245,18 @@ export class NuevoHorarioComponent implements OnInit {
     }
   }
 
+  // Método para debuggear errores del formulario
+  getFormErrors(): any {
+    const errors: any = {};
+    Object.keys(this.horarioForm.controls).forEach(key => {
+      const control = this.horarioForm.get(key);
+      if (control && control.errors) {
+        errors[key] = control.errors;
+      }
+    });
+    return errors;
+  }
+
   handlePageEvent(event: PageEvent): void {
     this.pageSize = event.pageSize;
     this.pageNumber = event.pageIndex + 1;
@@ -199,7 +264,12 @@ export class NuevoHorarioComponent implements OnInit {
   }
 
   cancelar() {
-    this.dialogRef.close();
+    // Cerrar el modal padre
+    if (this.modalRef) {
+      this.modalRef.closeModalFromChild();
+    } else if (this.dialogRef) {
+      this.dialogRef.close();
+    }
   }
 
 }

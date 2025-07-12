@@ -1,0 +1,109 @@
+<div class="flex flex-col md:flex-row gap-6">
+  <!-- Formulario de registro/edición -->
+  <div class="md:w-1/3 w-full">
+    <div class="card-fiori">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4 p-6">
+        <span class="text-lg font-semibold mb-2 block">{{ editing ? 'Editar' : 'Registrar' }} Sede - Centro de Costo</span>
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Sede</mat-label>
+          <mat-select formControlName="siteId" required>
+            <mat-option *ngFor="let sede of sedes" [value]="sede.categoriaAuxiliarId">{{ sede.descripcion }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Centro de Costo</mat-label>
+          <mat-select formControlName="costCenterId" required>
+            <mat-option *ngFor="let cc of ccostos" [value]="cc.ccostoId">{{ cc.descripcion }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Fecha de creación</mat-label>
+          <input matInput formControlName="creationDate" type="datetime-local" readonly>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Observación</mat-label>
+          <textarea matInput formControlName="observation" rows="2"></textarea>
+        </mat-form-field>
+        <div class="flex gap-2 justify-end">
+          <button mat-stroked-button type="button" (click)="cancelEdit()" *ngIf="editing">Cancelar</button>
+          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || loading">
+            {{ editing ? 'Actualizar' : 'Registrar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tabla de registros -->
+  <div class="md:w-2/3 w-full">
+    <div class="card-fiori p-4">
+      <span class="text-lg font-semibold mb-4 block">Sedes y Centros de Costo</span>
+      <div *ngIf="loading" class="text-center py-8 text-fiori-subtext flex flex-col items-center justify-center">
+        <mat-spinner></mat-spinner>
+        <span class="text-fiori-subtext">Cargando...</span>
+      </div>
+      <table mat-table [dataSource]="sedeCcostoList" class="w-full" *ngIf="!loading">
+        <!-- Columnas -->
+        <ng-container matColumnDef="siteName">
+          <th mat-header-cell *matHeaderCellDef>Sede</th>
+          <td mat-cell *matCellDef="let item">{{ item.siteName }}</td>
+        </ng-container>
+        <ng-container matColumnDef="costCenterName">
+          <th mat-header-cell *matHeaderCellDef>Centro de Costo</th>
+          <td mat-cell *matCellDef="let item">{{ item.costCenterName }}</td>
+        </ng-container>
+        <ng-container matColumnDef="observation">
+          <th mat-header-cell *matHeaderCellDef>Observación</th>
+          <td mat-cell *matCellDef="let item">{{ item.observation }}</td>
+        </ng-container>
+        <ng-container matColumnDef="active">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let item">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [ngClass]="item.active === 'Y' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+              {{ item.active === 'Y' ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let item">
+            <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Acciones">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="onEdit(item)">
+                <mat-icon>edit</mat-icon>
+                <span>Editar</span>
+              </button>
+              <button mat-menu-item (click)="onDelete(item)">
+                <mat-icon>delete</mat-icon>
+                <span>Eliminar</span>
+              </button>
+              <button mat-menu-item (click)="onToggleActive(item)">
+                <mat-icon>{{ item.active === 'Y' ? 'block' : 'check_circle' }}</mat-icon>
+                <span>{{ item.active === 'Y' ? 'Desactivar' : 'Activar' }}</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+        <!-- Header y filas -->
+        <tr mat-header-row *matHeaderRowDef="['siteName','costCenterName','observation','active','actions']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['siteName','costCenterName','observation','active','actions']"></tr>
+        <!-- Estado vacío -->
+        <tr *ngIf="sedeCcostoList.length === 0 && !loading && !error">
+          <td colspan="5" class="py-8 text-center">
+            <div class="text-fiori-subtext">
+              <svg class="w-12 h-12 mx-auto mb-4 text-fiori-border" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+              </svg>
+              <p class="text-lg font-medium mb-2">No se encontraron registros</p>
+              <p>Comienza añadiendo tu primer registro</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>

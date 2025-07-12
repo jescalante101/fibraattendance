@@ -1,26 +1,21 @@
 <div class="mx-auto px-4 w-full max-w-7xl space-y-4">
-
   <!-- Campo de filtro -->
-  <div class="flex items-center gap-2 bg-white border rounded-lg shadow-sm p-3">
+  <div class="flex flex-wrap items-center gap-2 bg-white border rounded-lg shadow-sm p-3">
     <div class="relative flex-1 max-w-sm">
       <input
         type="text"
         [(ngModel)]="filtro"
-        placeholder="Buscar empleado por nombre, documento, etc."
-        class="w-full px-3 py-2 pr-10 text-sm border border-fiori-border rounded focus:outline-none focus:ring-2 focus:ring-fiori-primary"
+        placeholder="Nombre, documento, etc."
         (keyup.enter)="buscarEmpleado()"
+        class="w-full pl-3 pr-10 py-2 border border-fiori-border rounded-lg focus:outline-none focus:ring-1 focus:ring-fiori-primary text-sm"
       />
-      <button 
-        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-fiori-subtext hover:text-fiori-primary"
-        (click)="buscarEmpleado()"
-      >
-        <span class="material-icons text-base">search</span>
-      </button>
+      <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-fiori-primary cursor-pointer"
+            (click)="buscarEmpleado()">search</span>
     </div>
     <select
       [(ngModel)]="selectedCategoriaAuxiliar"
-      class="px-3 py-2 text-sm border border-fiori-border rounded focus:outline-none focus:ring-2 focus:ring-fiori-primary w-48"
       (change)="onCategoriaAuxiliarChange()"
+      class="w-48 px-3 py-2 border border-fiori-border rounded-lg bg-fiori-gray focus:outline-none focus:ring-1 focus:ring-fiori-primary text-sm"
     >
       <option value="">Todas las sedes</option>
       <option *ngFor="let cat of categoriaAuxiliarList" [value]="cat.categoriaAuxiliarId">
@@ -29,90 +24,112 @@
     </select>
     <select
       [(ngModel)]="selectedRhArea"
-      class="px-3 py-2 text-sm border border-fiori-border rounded focus:outline-none focus:ring-2 focus:ring-fiori-primary"
       (change)="onRhAreaChange()"
+      class="w-48 px-3 py-2 border border-fiori-border rounded-lg bg-fiori-gray focus:outline-none focus:ring-1 focus:ring-fiori-primary text-sm"
     >
       <option value="">Todas las áreas</option>
       <option *ngFor="let area of rhAreaList" [value]="area.areaId">
         {{ area.descripcion }}
       </option>
     </select>
-    <button mat-raised-button
-      class="btn-fiori-primary flex items-center gap-2 px-4 py-2 text-sm"
-      (click)="abrirAsignarTurnoMasivo()">
+    <div class="flex-1"></div>
+    <button
+      (click)="abrirAsignarTurnoMasivo()"
+      class="flex items-center gap-2 px-4 py-2 rounded-full bg-white border shadow text-fiori-primary hover:bg-fiori-primary hover:text-white transition ml-auto"
+    >
       <span class="material-icons text-base">schedule</span>
       Asignar turnos
     </button>
   </div>
 
   <!-- Tabla empleados -->
-  <div class="overflow-x-auto card-fiori">
-    <table class="min-w-full table-auto text-sm">
-      <thead class="bg-fiori-muted text-fiori-subtext">
-        <tr>
-          <th *ngIf="mostrarBotonAsignar" class="px-2 py-2 text-start w-10 whitespace-nowrap">
-            <input type="checkbox" [(ngModel)]="allSelected" (change)="toggleAllEmployees()" />
+  <div class="overflow-x-auto card-fiori h-[550px] lg:h-[900px] xl:h-full overflow-y-auto relative">
+    <!-- Overlay de loading -->
+    <div *ngIf="loading" class="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
+      <mat-progress-spinner mode="indeterminate" color="primary" diameter="50"></mat-progress-spinner>
+    </div>
+    <table mat-table [dataSource]="employees" class="min-w-full text-sm ">
+      <ng-container matColumnDef="select">
+        <ng-container *ngIf="mostrarBotonAsignar">
+          <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox [(ngModel)]="allSelected" (change)="toggleAllEmployees()"></mat-checkbox>
           </th>
-          <th *ngIf="!mostrarBotonAsignar" class="px-2 py-2 text-start whitespace-nowrap w-auto">ID Empleado</th>
-          <th class="px-2 py-2 text-start  whitespace-nowrap w-auto">Documento</th>
-          <th class="px-2 py-2 text-start whitespace-nowrap w-auto">Apellido Paterno</th>
-          <th class="px-2 py-2 text-start whitespace-nowrap w-auto">Apellido Materno</th>
-          <th class="px-2 py-2 text-start whitespace-nowrap w-auto">Nombres</th>
-          <th class="px-2 py-2 text-start whitespace-nowrap w-auto">Sede</th>
-          <th class="px-2 py-2 text-start whitespace-nowrap w-auto">Área</th>
-          <th *ngIf="mostrarBotonAsignar" class="px-2 py-2 text-center whitespace-nowrap w-auto"></th>
-        </tr>
-      </thead>
-      <tbody  *ngIf="!loading; else skeletonRows">
-        <tr  *ngFor="let emp of employees" class="border-t hover:bg-fiori-hover transition">
-          <td *ngIf="mostrarBotonAsignar" class="px-2 py-2 text-center">
-            <input type="checkbox" [(ngModel)]="emp.selected">
+          <td mat-cell *matCellDef="let emp">
+            <mat-checkbox [(ngModel)]="emp.selected"></mat-checkbox>
           </td>
-          <td *ngIf="!mostrarBotonAsignar" class="px-2 py-2  whitespace-nowrap">{{ emp.personalId }}</td>
-          <td class="px-2 py-2 whitespace-nowrap">{{ emp.nroDoc }}</td>
-          <td class="px-2 py-2  whitespace-nowrap">{{ emp.apellidoPaterno || '-' }}</td>
-          <td class="px-2 py-2  whitespace-nowrap">{{ emp.apellidoMaterno || '-' }}</td>
-          <td class="px-2 py-2  whitespace-nowrap">{{ emp.nombres }}</td>
-          <td class="px-2 py-2  whitespace-nowrap">{{ emp.categoriaAuxiliarDescripcion || '-' }}</td>
-          <td class="px-2 py-2  whitespace-nowrap">{{ emp.areaDescripcion || '-' }}</td>
-          <td *ngIf="mostrarBotonAsignar" class="px-2 py-2 text-center whitespace-nowrap">
-            <button class="btn-fiori-secondary" >Asignar</button>
+        </ng-container>
+      </ng-container>
+      <ng-container matColumnDef="personalId">
+        <ng-container *ngIf="!mostrarBotonAsignar">
+          <th mat-header-cell *matHeaderCellDef>ID Empleado</th>
+          <td mat-cell *matCellDef="let emp">{{ emp.personalId }}</td>
+        </ng-container>
+      </ng-container>
+      <ng-container matColumnDef="nroDoc">
+        <th mat-header-cell *matHeaderCellDef>Documento</th>
+        <td mat-cell *matCellDef="let emp">{{ emp.nroDoc }}</td>
+      </ng-container>
+      <ng-container matColumnDef="apellidoPaterno">
+        <th mat-header-cell *matHeaderCellDef>Apellido Paterno</th>
+        <td mat-cell *matCellDef="let emp">{{ emp.apellidoPaterno || '-' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="apellidoMaterno">
+        <th mat-header-cell *matHeaderCellDef>Apellido Materno</th>
+        <td mat-cell *matCellDef="let emp">{{ emp.apellidoMaterno || '-' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="nombres">
+        <th mat-header-cell *matHeaderCellDef>Nombres</th>
+        <td mat-cell *matCellDef="let emp">{{ emp.nombres }}</td>
+      </ng-container>
+      <ng-container matColumnDef="categoriaAuxiliarDescripcion">
+        <th mat-header-cell *matHeaderCellDef>Sede</th>
+        <td mat-cell *matCellDef="let emp">{{ emp.categoriaAuxiliarDescripcion || '-' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="areaDescripcion">
+        <th mat-header-cell *matHeaderCellDef>Área</th>
+        <td mat-cell *matCellDef="let emp">{{ emp.areaDescripcion || '-' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="asignar">
+        <ng-container *ngIf="mostrarBotonAsignar">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let emp">
+            <button mat-stroked-button color="primary">Asignar</button>
           </td>
-        </tr>
-        <tr *ngIf="employees.length === 0">
-          <td colspan="11" class="text-center py-4 text-fiori-subtext">No se encontraron datos.</td>
-        </tr>
-      </tbody>
-      <ng-template #skeletonRows>
-        <tr *ngFor="let skel of skeletonArray">
-          <td class="px-4 py-2 text-center"><div class="skeleton h-4 w-4 mx-auto rounded"></div></td>
-          <td class="px-4 py-2 text-center"><div class="skeleton h-4 w-20 mx-auto rounded"></div></td>
-          <td class="px-4 py-2 text-center"><div class="skeleton h-4 w-16 mx-auto rounded"></div></td>
-          <td class="px-4 py-2 text-center"><div class="skeleton h-4 w-20 mx-auto rounded"></div></td>
-          <td class="px-4 py-2 text-center"><div class="skeleton h-4 w-28 mx-auto rounded"></div></td>
-          <td class="px-4 py-2 text-center"><div class="skeleton h-4 w-16 mx-auto rounded"></div></td>
-          <td class="px-4 py-2 text-center"><div class="skeleton h-4 w-24 mx-auto rounded"></div></td>
-        </tr>
-      </ng-template>
+        </ng-container>
+      </ng-container>
+      <ng-container matColumnDef="acciones">
+        <ng-container *ngIf="!mostrarBotonAsignar">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let emp">
+            <button 
+              mat-icon-button 
+              color="primary" 
+              (click)="verMarcaciones(emp)"
+              matTooltip="Ver marcaciones"
+              class="hover:bg-fiori-primary/10">
+              <mat-icon>schedule</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr *ngIf="employees.length === 0 && !loading">
+        <td [attr.colspan]="displayedColumns.length" class="text-center py-8 text-fiori-subtext">
+          <div class="flex flex-col items-center justify-center">
+            <mat-icon class="mb-2" style="font-size: 48px;">group_off</mat-icon>
+            <span class="text-lg font-medium mb-2">No se encontraron empleados</span>
+            <span>Prueba con diferentes filtros o añade un nuevo empleado</span>
+          </div>
+        </td>
+      </tr>
     </table>
-  </div>
-
-  <!-- Paginación -->
-  <div class="flex justify-between items-center mt-4">
-    <div class="text-sm text-fiori-subtext">
-      Mostrando {{ totalCount === 0 ? 0 : ((pageNumber - 1) * pageSize + 1) }}
-      -
-      {{ (pageNumber - 1) * pageSize + employees.length }}
-      de {{ totalCount }}
-    </div>
-    <div class="flex gap-2">
-      <button class="btn-fiori-secondary" [disabled]="pageNumber === 1" (click)="changePage(pageNumber - 1)">
-        Anterior
-      </button>
-      <span>Página {{ pageNumber }}</span>
-      <button class="btn-fiori-secondary" [disabled]="pageNumber * pageSize >= totalCount" (click)="changePage(pageNumber + 1)">
-        Siguiente
-      </button>
-    </div>
+    <mat-paginator
+      [length]="totalCount"
+      [pageSize]="pageSize"
+      [pageIndex]="pageNumber - 1"
+      [pageSizeOptions]="[5, 10, 15, 25, 50]"
+      (page)="onPageChange($event)">
+    </mat-paginator>
   </div>
 </div>

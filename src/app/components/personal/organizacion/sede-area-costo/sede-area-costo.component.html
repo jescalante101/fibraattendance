@@ -4,7 +4,7 @@
     
     <!-- Header -->
     <div class="mb-4">
-      <span class="text-2xl font-semibold text-fiori-text mb-1">Gestión de Sitios</span>
+      <span class="text-2x2 font-semibold text-fiori-text mb-1">Gestión Relacion Sede - Area - Centro de Costo</span>
     </div>
 
     <!-- Filter Card -->
@@ -39,7 +39,13 @@
     <!-- Table Card -->
     <div class="card-fiori">
       <div class="overflow-x-auto">
-        <table mat-table [dataSource]="filteredSites" class="w-full">
+        <div *ngIf="loading" class="py-8 text-center text-fiori-subtext">
+          <span class="loader inline-block align-middle mr-2"></span> Cargando sitios...
+        </div>
+        <div *ngIf="error && !loading" class="py-8 text-center text-fiori-error">
+          {{ error }}
+        </div>
+        <table *ngIf="!loading && !error" mat-table [dataSource]="filteredSites" class="w-full">
           <!-- Sitio Column -->
           <ng-container matColumnDef="siteName">
             <th mat-header-cell *matHeaderCellDef class="text-left py-3 px-4 text-label font-medium">Sitio</th>
@@ -100,7 +106,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                   </svg>
                 </button>
-                <button type="button" (click)="onView(site)" class="text-fiori-primary hover:text-fiori-secondary transition-colors p-1" title="Ver detalles">
+                <button type="button" (click)="onDisable(site)" class="text-fiori-primary hover:text-fiori-secondary transition-colors p-1" title="Ver detalles">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -119,7 +125,7 @@
           <tr mat-row *matRowDef="let row; columns: ['siteName', 'areaName', 'costCenterName', 'createdBy', 'creationDate', 'active', 'actions']; trackBy: trackBySiteId"
             class="border-b border-fiori-border hover:bg-fiori-hover transition-colors"></tr>
           <!-- Empty State -->
-          <tr *ngIf="filteredSites.length === 0">
+          <tr *ngIf="filteredSites.length === 0 && !loading && !error">
             <td colspan="7" class="py-8 text-center">
               <div class="text-fiori-subtext">
                 <svg class="w-12 h-12 mx-auto mb-4 text-fiori-border" fill="none" stroke="currentColor" viewBox="0 0 24 24">

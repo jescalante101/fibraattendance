@@ -58,6 +58,13 @@
                 routerLinkActive="active">
                 Usuarios
               </a>
+              <a 
+                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                [class.active]="isRouteActive('panel/personal/organizacion/usuario-sede')"
+                [routerLink]="['panel/personal/organizacion/usuario-sede']"
+                routerLinkActive="active">
+                Usuarios Sede
+              </a>
 
               <a 
                 class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
@@ -66,36 +73,13 @@
                 routerLinkActive="active">
                 sede y Área de Costo
               </a>
-
               <a 
                 class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
-                [class.active]="isRouteActive('panel/personal/organizacion')"
-                [routerLink]="['panel/personal/organizacion']"
+                [class.active]="isRouteActive('panel/personal/organizacion/sede-ccosto')"
+                [routerLink]="['panel/personal/organizacion/sede-ccosto']"
                 routerLinkActive="active">
-                Empresa
-              </a>
-              <a 
-                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
-                [class.active]="isRouteActive('panel/personal/organizacion/departamento')"
-                [routerLink]="['panel/personal/organizacion/departamento']"
-                routerLinkActive="active">
-                Departamentos
-              </a>
-              <a 
-                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
-                [class.active]="isRouteActive('panel/personal/organizacion/cargo')"
-                [routerLink]="['panel/personal/organizacion/cargo']"
-                routerLinkActive="active">
-                Cargo
-              </a>
-              <a 
-                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
-                [class.active]="isRouteActive('panel/personal/organizacion/area')"
-                
-                routerLinkActive="active">
-                Área
-              </a>
-              
+                Sede y Centro de Costo
+              </a>              
             </div>
           </div>
         </div>

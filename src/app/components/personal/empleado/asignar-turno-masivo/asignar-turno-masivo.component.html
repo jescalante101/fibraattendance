@@ -207,14 +207,11 @@
                       <ng-container matColumnDef="horarioResumen">
                         <th mat-header-cell *matHeaderCellDef>Horario</th>
                         <td mat-cell *matCellDef="let turno">
-                          <span
-                            [matTooltip]="getHorarioDetalle(turno)"
-                            matTooltipPosition="above"
-                            matTooltipClass="tooltip-horario"
-                            style="cursor: help; white-space: pre-line;"
-                          >
-                            {{ getHorarioResumen(turno) }}
-                          </span>
+                          <ng-container *ngIf="getPrimerHorarioValido(turno) as horario">
+                            <span>
+                              {{ formatHora(horario.inTime) }} - {{ getHoraFin(horario.inTime, horario.workTimeDuration) }}
+                            </span>
+                          </ng-container>
                         </td>
                       </ng-container>
                       <tr mat-header-row *matHeaderRowDef="['select', 'alias', 'horarioResumen']; sticky: true"></tr>

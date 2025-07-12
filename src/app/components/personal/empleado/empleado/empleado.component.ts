@@ -10,6 +10,9 @@ import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 import { ActivatedRoute } from '@angular/router';
 import { AsignarTurnoMasivoComponent } from '../asignar-turno-masivo/asignar-turno-masivo.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { IClockTransactionService } from 'src/app/core/services/iclock-transaction.service';
+import { IClockTransactionResponse } from 'src/app/core/models/iclock-transaction.model';
+import { IclockTransactionComponent } from '../iclock-transaction/iclock-transaction.component';
 
 @Component({
   selector: 'app-empleado',
@@ -24,7 +27,8 @@ export class EmpleadoComponent implements OnInit {
     private categoriaAuxiliarService: CategoriaAuxiliarService, 
     private rhAreaService: RhAreaService,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private iClockTransactionService: IClockTransactionService
   )
      { }
   mostrarBotonAsignar = false;
@@ -36,7 +40,7 @@ export class EmpleadoComponent implements OnInit {
   allSelected = false;
   totalCount = 0;
   pageNumber = 1;
-  pageSize = 15;
+  pageSize = 10;
   filtro = '';
 
   categoriaAuxiliarList: CategoriaAuxiliar[] = [];
@@ -45,15 +49,22 @@ export class EmpleadoComponent implements OnInit {
   rhAreaList: RhArea[] = [];
   selectedRhArea: string = '';
 
+  displayedColumns: string[] = [];
+
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       this.mostrarBotonAsignar = params['modoAsignar'] === 'true' || params['modoAsignar'] === true;
-     
     });
+    this.setDisplayedColumns();
     this.getEmployees();
     this.getCategoriasAuxiliar();
     this.getRhAreas();
+  }
 
+  setDisplayedColumns() {
+    this.displayedColumns = this.mostrarBotonAsignar
+      ? ['select', 'nroDoc', 'apellidoPaterno', 'apellidoMaterno', 'nombres', 'categoriaAuxiliarDescripcion', 'areaDescripcion', 'asignar']
+      : ['personalId', 'nroDoc', 'apellidoPaterno', 'apellidoMaterno', 'nombres', 'categoriaAuxiliarDescripcion', 'areaDescripcion', 'acciones'];
   }
 
   getEmployees() {
@@ -62,9 +73,8 @@ export class EmpleadoComponent implements OnInit {
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: res => {
-          console.log(res);
           if (res.exito && res.data) {
-            this.employees = res.data.items.map(emp => ({ ...emp, selected: false }));
+            this.employees = res.data.items.map(emp => ({ ...emp, selected: this.mostrarBotonAsignar ? false : undefined }));
             this.totalCount = res.data.totalCount;
             this.pageNumber = res.data.pageNumber;
             this.pageSize = res.data.pageSize;
@@ -118,13 +128,16 @@ export class EmpleadoComponent implements OnInit {
     }
   }
 
-
+  onPageChange(event: PageEvent) {
+    this.pageNumber = event.pageIndex + 1;
+    this.pageSize = event.pageSize;
+    this.getEmployees();
+  }
 
   onCategoriaAuxiliarChange() {
     this.pageNumber = 1;
     this.getEmployees();
   }
-
 
   onRhAreaChange() {
     this.pageNumber = 1;
@@ -159,6 +172,25 @@ export class EmpleadoComponent implements OnInit {
     });
 
   }
-
+  verMarcaciones(empleado: Employee) {
+    const empCode = empleado.nroDoc;
+    if (!empCode) {
+      this.snackBar.open('No se pudo obtener el código del empleado', 'Cerrar', {
+        duration: 3000,
+        verticalPosition: 'top',
+        horizontalPosition: 'end',
+        panelClass: ['snackbar-error']
+      });
+      return;
+    }
+  
+    this.dialog.open(IclockTransactionComponent, {
+      width: '70vw',
+      height: '90vh',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      data: { empCode, empleado }
+    });
+  }
   
 }

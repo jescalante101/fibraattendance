@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule }  from '@angular/forms';
 import { HttpClient, provideHttpClient, withInterceptorsFromDi }  from '@angular/common/http';
@@ -42,7 +42,7 @@ import { ModalLoadingComponent } from './shared/modal-loading/modal-loading.comp
 import { CargoComponent } from './components/personal/organizacion/cargo/cargo.component';
 import { EmpleadoComponent } from './components/personal/empleado/empleado/empleado.component';
 
-import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import { CeseComponent } from './components/personal/empleado/cese/cese.component';
 import { HorarioComponent } from './components/asistencia/horarios/horario/horario.component';
 import { TurnoComponent } from './components/asistencia/horarios/turno/turno.component';
@@ -67,9 +67,15 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { AppUserComponent } from './components/personal/organizacion/app-user/app-user.component';
 import { SedeAreaCostoComponent } from './components/personal/organizacion/sede-area-costo/sede-area-costo.component';
-
-
-
+import { AddNewSacComponent } from './components/personal/organizacion/sede-area-costo/add-new-sac/add-new-sac.component';
+import { UsuarioSedeComponent } from './components/personal/organizacion/usuario-sede/usuario-sede.component';
+import { SedeCcostoComponent } from './components/personal/organizacion/sede-ccosto/sede-ccosto.component';
+import { IclockTransactionComponent } from './components/personal/empleado/iclock-transaction/iclock-transaction.component';
+import { MatBadgeModule } from '@angular/material/badge';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
+import { SpanishPaginatorIntl } from './spanish-paginator-intl.service';
+registerLocaleData(localeEs);
 @NgModule({ declarations: [
         AppComponent,
         LoginComponent,
@@ -102,7 +108,11 @@ import { SedeAreaCostoComponent } from './components/personal/organizacion/sede-
         AsignarHorarioEmpleadoComponent,
         AsignarTurnoMasivoComponent,
         AppUserComponent,
-        SedeAreaCostoComponent
+        SedeAreaCostoComponent,
+        AddNewSacComponent,
+        UsuarioSedeComponent,
+        SedeCcostoComponent,
+        IclockTransactionComponent
     ],
     exports: [
         TerminalSyncComponent,
@@ -116,6 +126,7 @@ import { SedeAreaCostoComponent } from './components/personal/organizacion/sede-
     ],
     bootstrap: [AppComponent], imports: [
         MatDatepickerModule,
+        MatBadgeModule,
         MatStepperModule,
         MatProgressSpinnerModule,
         MatNativeDateModule,
@@ -148,6 +159,8 @@ import { SedeAreaCostoComponent } from './components/personal/organizacion/sede-
         ReactiveFormsModule,
         MatTooltipModule
     ], providers: [
-        provideHttpClient(withInterceptorsFromDi())
+        provideHttpClient(withInterceptorsFromDi()),
+        { provide: LOCALE_ID, useValue: 'es' },
+        { provide: MatPaginatorIntl, useClass: SpanishPaginatorIntl }
     ] })
 export class AppModule { }

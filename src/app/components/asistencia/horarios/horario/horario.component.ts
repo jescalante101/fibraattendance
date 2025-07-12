@@ -7,6 +7,7 @@ import { ModalLoadingComponent } from 'src/app/shared/modal-loading/modal-loadin
 import { NuevoHorarioComponent } from './nuevo-horario/nuevo-horario.component';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 import { FixedSizeVirtualScrollStrategy } from '@angular/cdk/scrolling';
+import { ModalService } from 'src/app/shared/modal/modal.service';
 
 @Component({
   selector: 'app-horario',
@@ -21,9 +22,11 @@ export class HorarioComponent implements OnInit {
   pageSize: number = 15;
   pageNumber: number = 1;
 
-
-
-  constructor(private service: AttendanceService,private dialog:MatDialog,) { }
+  constructor(
+    private service: AttendanceService,
+    private dialog: MatDialog,
+    private modalService: ModalService
+  ) { }
 
   ngOnInit() {
     this.loadHoraiosData();
@@ -51,119 +54,124 @@ export class HorarioComponent implements OnInit {
     
   }
     
+  handlePageEvent(event: PageEvent): void {
+    this.pageSize = event.pageSize;
+    this.pageNumber = event.pageIndex + 1; // Sumamos 1 porque pageIndex empieza desde 0
+    this.loadHoraiosData();
+  }
 
-
-   handlePageEvent(event: PageEvent): void {
-      this.pageSize = event.pageSize;
-      this.pageNumber = event.pageIndex + 1; // Sumamos 1 porque pageIndex empieza desde 0
-      this.loadHoraiosData();
-    }
-    // Método para abrir el modal de nuevo horario
-   abrirModalNuevoHorario(mode: number): void {
-  console.log('Abrir modal para nuevo horario');
-  
-  const dialogConfig = new MatDialogConfig();
-  
-  dialogConfig.hasBackdrop = true;
-  dialogConfig.disableClose = false;
-  dialogConfig.data = { use_mode: mode };
-  
-  // Configuración más específica
-  dialogConfig.position = undefined; // Dejar que Angular Material maneje la posición
-  dialogConfig.viewContainerRef = undefined;
-  dialogConfig.panelClass = 'custom-dialog-panel';
-  
-  const dialogRef = this.dialog.open(NuevoHorarioComponent, dialogConfig);
-
-  dialogRef.afterClosed().subscribe(result => {
-    if (result?.id) {
-      this.loadHoraiosData();
-      this.dialog.open(ModalConfirmComponent, {
-        data: {
-          tipo: 'success',
-          mensaje: 'El horario se guardó correctamente.'
-        }
-      });
-    }
-  });
-}
-    // Método para abrir el modal de edición
-    editarHorario(idHorario:number,use_mode:number){
-      console.log('Abrir modal para Editar horario');
-      const dialogConfig = new MatDialogConfig();
-        dialogConfig.hasBackdrop = true;
-        dialogConfig.backdropClass = 'backdrop-modal';
-        dialogConfig.data= {idHorario:idHorario,use_mode:use_mode}// Clase personalizada para el fondo
-        const dialogRef = this.dialog.open(NuevoHorarioComponent,dialogConfig);
-        dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        if(result.id){
-              this.loadHoraiosData();
-              this.dialog.open(ModalConfirmComponent, {
-                width: '400px',
-                height: '200px',
-                hasBackdrop: true,
-                backdropClass: 'backdrop-modal',
-                data: {
-                  tipo: 'success',
-                  mensaje: 'El horario se guardó correctamente.'
-                }
-              });
-            }
-        console.log('Horario Creado:', result);
-       
-      }
-    });
-    }
-
-
-    // Método para eliminar un horario
-    eliminarHorario(idHorario: number) {
-     this.service.deleteHorario(idHorario).subscribe({
-          next: (response) => {
-            console.log('Horario eliminado:', response);
-            this.loadHoraiosData();
-          },
-          error: (error) => {
-            console.error('Error al eliminar horario:', error);
+  // Método para abrir el modal de nuevo horario usando el modal personalizado
+  abrirModalNuevoHorario(mode: number): void {
+    console.log('Abrir modal para nuevo horario');
+    
+    this.modalService.open({
+      title: mode == 0 ? 'Nuevo Horario Normal' : 'Nuevo Horario Flexible',
+      componentType: NuevoHorarioComponent,
+      componentData: { use_mode: mode },
+      width: '800px',
+      height: '550px'
+    }).then(result => {
+      if (result?.id) {
+        this.loadHoraiosData();
+        this.dialog.open(ModalConfirmComponent, {
+          data: {
+            tipo: 'success',
+            mensaje: 'El horario se guardó correctamente.'
           }
         });
-    }
-    // Método para abrir el modal de confirmación
-    openConfirmationDialog(idHorario: number) {
-     const dialogRef = this.dialog.open(ModalConfirmComponent, {
-        width: '400px',
-        height: '200px',
-        hasBackdrop: true,
-        // backdropClass: 'backdrop-modal',
-        data: {
-          tipo: 'danger',
-          titulo: '¿Eliminar horario?',
-          mensaje: '¿Estás seguro de que deseas eliminar este horario? Esta acción no se puede deshacer.',
-          confirmacion: true,
-          textoConfirmar: 'Eliminar'
-        }
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          // El usuario confirmó
-          this.eliminarHorario(idHorario);
-        }
-      });
-    }
-
-
-    testModal() {
-  console.log('=== TEST MODAL BÁSICO ===');
-  try {
-    const ref = this.dialog.open(NuevoHorarioComponent);
-    console.log('Modal de test abierto:', ref);
-  } catch (e) {
-    console.error('Error en test modal:', e);
+      }
+    });
   }
-}
-  
-    
 
+  // Método para abrir el modal de edición usando el modal personalizado
+  editarHorario(idHorario: number, use_mode: number) {
+    console.log('Abrir modal para Editar horario');
+    
+    this.modalService.open({
+      title: 'Editar Horario',
+      componentType: NuevoHorarioComponent,
+      componentData: { idHorario: idHorario, use_mode: use_mode },
+      width: '800px',
+      height: '550px'
+    }).then(result => {
+      if (result) {
+        if(result.id){
+          this.loadHoraiosData();
+          this.dialog.open(ModalConfirmComponent, {
+            width: '400px',
+            height: '200px',
+            hasBackdrop: true,
+            backdropClass: 'backdrop-modal',
+            data: {
+              tipo: 'success',
+              mensaje: 'El horario se guardó correctamente.'
+            }
+          });
+        }
+        console.log('Horario Creado:', result);
+      }
+    });
+  }
+
+  // Método para eliminar un horario
+  eliminarHorario(idHorario: number) {
+    this.service.deleteHorario(idHorario).subscribe({
+      next: (response) => {
+        console.log('Horario eliminado:', response);
+        this.loadHoraiosData();
+      },
+      error: (error) => {
+        console.error('Error al eliminar horario:', error);
+      }
+    });
+  }
+
+  // Método para abrir el modal de confirmación
+  openConfirmationDialog(idHorario: number) {
+    const dialogRef = this.dialog.open(ModalConfirmComponent, {
+      width: '400px',
+      height: '200px',
+      hasBackdrop: true,
+      data: {
+        tipo: 'danger',
+        titulo: '¿Eliminar horario?',
+        mensaje: '¿Estás seguro de que deseas eliminar este horario? Esta acción no se puede deshacer.',
+        confirmacion: true,
+        textoConfirmar: 'Eliminar'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // El usuario confirmó
+        this.eliminarHorario(idHorario);
+      }
+    });
+  }
+
+  testModal() {
+    console.log('=== TEST MODAL BÁSICO ===');
+    try {
+      this.modalService.open({
+        title: 'Test Modal',
+        componentType: NuevoHorarioComponent,
+        componentData: { use_mode: 0 },
+        width: '600px',
+        height: 'auto'
+      }).then(result => {
+        console.log('Modal cerrado con resultado:', result);
+      });
+    } catch (e) {
+      console.error('Error en test modal:', e);
+    }
+  }
+
+  // Métodos para estadísticas
+  getHorariosEstandar(): number {
+    return this.dataHorarios?.filter(h => h.tipo === 0)?.length || 0;
+  }
+
+  getHorariosFlexibles(): number {
+    return this.dataHorarios?.filter(h => h.tipo !== 0)?.length || 0;
+  }
 }

@@ -151,6 +151,13 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     
     return `${diasLaborables.length} días, ${horaInicio}`;
   }
+  getPrimerHorarioValido(turno: Shift): any {
+    if (!turno.horario || turno.horario.length === 0) return null;
+    // Busca el primer horario con duración > 0
+    const valido = turno.horario.find(h => h.workTimeDuration > 0);
+    // Si no hay, retorna el primero
+    return valido || turno.horario[0];
+  }
 
   // Método para obtener tipo de ciclo
   getTipoCiclo(turno: Shift): string {
@@ -373,4 +380,24 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
   }
 
+  getHoraFin(inTime: string, workTimeDuration: number): string {
+    if (!inTime || !workTimeDuration) return '';
+    let inicio: Date;
+  
+    // Si inTime es solo hora (ej: "08:00" o "08:00:00")
+    if (/^\d{2}:\d{2}(:\d{2})?$/.test(inTime)) {
+      // Usa una fecha base (hoy) y setea la hora
+      const [h, m, s] = inTime.split(':').map(Number);
+      inicio = new Date();
+      inicio.setHours(h, m, s || 0, 0);
+    } else {
+      // Si es un string ISO válido
+      inicio = new Date(inTime);
+    }
+  
+    if (isNaN(inicio.getTime())) return '';
+  
+    inicio.setMinutes(inicio.getMinutes() + workTimeDuration);
+    return inicio.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+  }
 }

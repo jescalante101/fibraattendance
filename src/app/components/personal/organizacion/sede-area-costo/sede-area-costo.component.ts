@@ -2,19 +2,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SedeAreaCostoService } from 'src/app/core/services/sede-area-costo.service';
+import { SedeAreaCosto } from 'src/app/models/site-area-ccost.model';
+import { MatDialog } from '@angular/material/dialog';
+import { AddNewSacComponent } from './add-new-sac/add-new-sac.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 
-export interface Site {
-  siteId: string;
-  areaId: string;
-  observation: string;
-  siteName: string;
-  areaName: string;
-  createdBy: string;
-  creationDate: string;
-  costCenterId: string;
-  costCenterName: string;
-  active: string;
-}
 
 @Component({
   selector: 'app-sede-area-costo',
@@ -23,55 +17,37 @@ export interface Site {
 })
 export class SedeAreaCostoComponent implements OnInit {
   searchTerm = '';
-  sites: Site[] = [];
-  filteredSites: Site[] = [];
+  sites: SedeAreaCosto[] = [];
+  filteredSites: SedeAreaCosto[] = [];
+  loading = false;
+  error = '';
+
+  constructor(
+    private sedeAreaCostoService: SedeAreaCostoService,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit() {
     this.loadSites();
   }
 
   loadSites() {
-    // Datos de ejemplo - reemplaza con tu servicio
-    this.sites = [
-      {
-        siteId: "000000000000003",
-        areaId: "009",
-        observation: "Admin prueba",
-        siteName: "SEDE CHILCA 02",
-        areaName: "RASCHEL",
-        createdBy: "admin",
-        creationDate: "2025-07-09T15:44:06.883",
-        costCenterId: "000000000000053",
-        costCenterName: "Chilca 2 Raschell",
-        active: "Y"
+    this.loading = true;
+    this.error = '';
+    this.sedeAreaCostoService.getAll().subscribe({
+      next: (data) => {
+        this.sites = data;
+        this.filteredSites = [...this.sites];
+        this.loading = false;
       },
-      {
-        siteId: "000000000000004",
-        areaId: "010",
-        observation: "Sitio principal",
-        siteName: "SEDE LIMA 01",
-        areaName: "PRODUCCIÓN",
-        createdBy: "supervisor",
-        creationDate: "2025-07-08T10:30:00.000",
-        costCenterId: "000000000000054",
-        costCenterName: "Lima Producción",
-        active: "Y"
-      },
-      {
-        siteId: "000000000000005",
-        areaId: "011",
-        observation: "En mantenimiento",
-        siteName: "SEDE AREQUIPA 01",
-        areaName: "ALMACÉN",
-        createdBy: "admin",
-        creationDate: "2025-07-07T14:15:00.000",
-        costCenterId: "000000000000055",
-        costCenterName: "Arequipa Almacén",
-        active: "N"
+      error: (err) => {
+        this.error = 'Error al cargar los sitios';
+        this.sites = [];
+        this.filteredSites = [];
+        this.loading = false;
       }
-    ];
-    
-    this.filteredSites = [...this.sites];
+    });
   }
 
   onSearchChange() {
@@ -90,23 +66,160 @@ export class SedeAreaCostoComponent implements OnInit {
   }
 
   onAddNew() {
-    console.log('Añadir nuevo sitio');
-    // Implementa la navegación o apertura de modal
+    const dialogRef = this.dialog.open(AddNewSacComponent, {
+      width: '500px',
+      data: null
+    });
+    dialogRef.afterClosed().subscribe((result: SedeAreaCosto | undefined) => {
+      if (result) {
+        this.sedeAreaCostoService.create(result).subscribe({
+          next: () => {
+            this.loadSites();
+            this.snackBar.open('Registro creado exitosamente', 'Cerrar', 
+              { 
+                duration: 3000 ,
+                verticalPosition: 'top',
+                horizontalPosition: 'end',
+                panelClass: ['snackbar-success']
+              }
+            );
+          },
+          error: () => {
+            this.snackBar.open(
+              'Error al crear el registro', 
+              'Cerrar', 
+              { 
+                duration: 3000 ,
+                verticalPosition: 'top',
+                horizontalPosition: 'end',
+                panelClass: ['snackbar-error']
+              }
+            );
+          }
+        });
+      }
+    });
   }
 
-  onEdit(site: Site) {
-    console.log('Editar sitio:', site);
-    // Implementa la navegación o apertura de modal de edición
+  onEdit(site: SedeAreaCosto) {
+    const dialogRef = this.dialog.open(AddNewSacComponent, {
+      width: '500px',
+      data: site
+    });
+    dialogRef.afterClosed().subscribe((result: SedeAreaCosto | undefined) => {
+      if (result) {
+        this.sedeAreaCostoService.update(site.siteId, site.areaId, result).subscribe({
+          next: (data) => {
+            console.log('registro actualizado exitosamente', data);
+            this.loadSites();
+            this.snackBar.open(
+              'Registro actualizado exitosamente', 
+              'Cerrar', 
+              { 
+                duration: 3000 ,
+                verticalPosition: 'top',
+                horizontalPosition: 'end',
+                panelClass: ['snackbar-success']
+              }
+            );
+          },
+          error: (error) => {
+            console.log('error al actualizar el registro', error);
+            this.snackBar.open(
+              'Error al actualizar el registro', 
+              'Cerrar', 
+              {
+                 duration: 3000 ,
+                 verticalPosition: 'top',
+                 horizontalPosition: 'end',
+                 panelClass: ['snackbar-error']
+              }
+            );
+          }
+        });
+      }
+    });
   }
 
-  onView(site: Site) {
+
+  onDisable(site: SedeAreaCosto) {
     console.log('Ver sitio:', site);
-    // Implementa la navegación o apertura de modal de vista
+    const dialogRef = this.dialog.open(ModalConfirmComponent, {
+      width: '400px',
+      data: {
+        tipo: 'warning',
+        titulo: 'Confirmar desactivación',
+        mensaje: `¿Estás seguro de que deseas ${site.active === 'Y' ? 'desactivar' : 'activar'} el registro de la sede ${site.siteName} \n y área${site.areaName}?`,
+        confirmacion: true,
+        textoConfirmar: 'Desactivar'
+      }
+    });
+    var siteCopy = { ...site };
+    siteCopy.active = siteCopy.active === 'Y' ? 'N' : 'Y';
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.sedeAreaCostoService.update(site.siteId, site.areaId, siteCopy).subscribe({
+          next: () => {
+            this.loadSites();
+            this.snackBar.open(
+              'Registro desactivado exitosamente',
+              'Cerrar',
+              {
+                duration: 3000,
+                verticalPosition: 'top',
+                horizontalPosition: 'end',
+                panelClass: ['snackbar-success']
+              }
+            );
+          }
+        });
+      }
+    });
   }
 
-  onDelete(site: Site) {
-    console.log('Eliminar sitio:', site);
-    // Implementa la confirmación y eliminación
+  onDelete(site: SedeAreaCosto) {
+    const dialogRef = this.dialog.open(ModalConfirmComponent, {
+      width: '400px',
+      data: {
+        tipo: 'danger',
+        titulo: 'Confirmar eliminación',
+        mensaje: `¿Estás seguro de que deseas eliminar el registro de la sede ${site.siteName} \n y área${site.areaName}?`,
+        confirmacion: true,
+        textoConfirmar: 'Eliminar'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.sedeAreaCostoService.delete(site.siteId, site.areaId).subscribe({
+          next: () => {
+            this.loadSites();
+            this.snackBar.open(
+              'Registro eliminado exitosamente',
+              'Cerrar',
+              {
+                duration: 3000,
+                verticalPosition: 'top',
+                horizontalPosition: 'end',
+                panelClass: ['snackbar-success']
+              }
+            );
+          },
+          error: () => {
+            this.snackBar.open(
+              'Error al eliminar el registro',
+              'Cerrar',
+              {
+                duration: 3000,
+                verticalPosition: 'top',
+                horizontalPosition: 'end',
+                panelClass: ['snackbar-error']
+              }
+            );
+          }
+        });
+      }
+    });
   }
 
   formatDate(dateString: string): string {
@@ -120,7 +233,7 @@ export class SedeAreaCostoComponent implements OnInit {
     });
   }
 
-  trackBySiteId(index: number, site: Site): string {
+  trackBySiteId(index: number, site: SedeAreaCosto): string {
     return site.siteId;
   }
 }

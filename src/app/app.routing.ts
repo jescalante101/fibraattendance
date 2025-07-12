@@ -18,6 +18,8 @@ import { DescansoComponent } from "./components/asistencia/horarios/descanso/des
 import { AsignarHorarioEmpleadoComponent } from "./components/personal/empleado/asignar-horario-empleado/asignar-horario-empleado.component";
 import { AppUserComponent } from "./components/personal/organizacion/app-user/app-user.component";
 import { SedeAreaCostoComponent } from "./components/personal/organizacion/sede-area-costo/sede-area-costo.component";
+import { UsuarioSedeComponent } from "./components/personal/organizacion/usuario-sede/usuario-sede.component";
+import { SedeCcostoComponent } from "./components/personal/organizacion/sede-ccosto/sede-ccosto.component";
 
 
 
@@ -35,6 +37,8 @@ const appRoutes: Routes = [
         {path:'personal/organizacion/departamento',component:DepartamentoComponent},
         {path:"personal/organizacion/area",component:AreaComponent},
         {path:"personal/organizacion/cargo",component:CargoComponent},
+        {path:"personal/organizacion/usuario-sede",component:UsuarioSedeComponent},
+        {path:"personal/organizacion/sede-ccosto",component:SedeCcostoComponent},
 
         {path:'personal/empleado/empleado',component:EmpleadoComponent},
         {path:'personal/empleado/cese',component:CeseComponent},

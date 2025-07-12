@@ -40,6 +40,14 @@ export interface EmployeeScheduleAssignmentInsert {
   locationName: string;
 }
 
+export interface EmployeeHorario {
+  id: number;
+  fullNameEmployee: string;
+  alias: string;
+  inTime: string;
+  outTime: string;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -66,4 +74,29 @@ export class EmployeeScheduleAssignmentService {
       body
     );
   }
+
+  // get employee schedule assignment by employee document
+  getEmployeeScheduleAssignmentByEmployeeDocument(employeeDocument: string): Observable<ApiResponse<EmployeeScheduleAssignment>> {
+    return this.http.get<ApiResponse<EmployeeScheduleAssignment>>(`${this.apiUrl}api/employee-schedule-assignment/get-by-nrodoc/${employeeDocument}`);
+  }
+
+  // obtner sus horarios por nro de documento:
+  //devuelve un array de objetos con los siguientes campos:
+  /*
+  {
+    "id": 31,
+    "fullNameEmployee": "NILSON CALLE NEYRA",
+    "alias": "Turno E (Sólo noche)",
+    "inTime": "1900-01-01T00:00:00"
+  },
+  */
+
+  // Obtener horarios del empleado por nro de documento
+  getHorariosByNroDocumento(nroDoc: string): Observable<EmployeeHorario[]> {
+    return this.http.get<EmployeeHorario[]>(
+      `${this.apiUrl}api/employee-schedule-assignment/get-horaio-by-doc/${nroDoc}`
+    );
+  }
+
+
 } 

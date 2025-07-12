@@ -1,0 +1,8 @@
+{
+    "/iclock/api": {
+      "target": "http://192.168.10.67:8090",
+      "secure": false,
+      "changeOrigin": true,
+      "logLevel": "debug"
+    }
+  }

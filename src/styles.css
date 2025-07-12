@@ -162,3 +162,8 @@
   color: #fff;
   font-weight: bold;
 }
+
+.mat-mdc-paginator .mat-mdc-paginator-range-actions {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}

@@ -1,10 +1,6 @@
 <div class="w-full max-w-6xl mx-auto">
   <div class="bg-white shadow rounded mb-6">
-    <div class="border-b px-4 py-2">
-      <h2 class="text-lg font-semibold">
-  {{ useMode == 0 ? 'Nuevo Horario Normal' : 'Nuevo Horario Flexible' }}
-</h2>
-    </div>
+
     <div class="p-4">
       <form [formGroup]="horarioForm" (ngSubmit)="guardarTurno()" class="space-y-6">
         <div>
@@ -28,7 +24,7 @@
           <mat-tab label="Configuración básica">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               <div class="bg-gray-50 border rounded shadow-sm p-4">
-                <h3 class="font-semibold text-sm mb-3">Horario de entrada</h3>
+                <span class="font-semibold text-sm mb-3">Horario de entrada</span>
                 <div class="space-y-4">
                   <div>
                     <label for="horaEntrada" class="block text-sm font-medium">Hora de entrada</label>
@@ -43,13 +39,20 @@
                     <input type="time" id="toleranciaEntrada" formControlName="horaEntradaHasta" class="w-full border px-3 py-2 rounded text-sm" />
                   </div>
                   <div>
-                    <label for="diasLaborales" class="block text-sm font-medium">Días Laborales</label>
-                    <input type="number" id="diasLaborales" formControlName="diasLaboral" class="w-full border px-3 py-2 rounded text-sm" />
+                    <span class="font-semibold text-sm mb-3">Días Laborales</span>
+                    <div>
+                      <select name="diasLaborales" id="diasLaborales" formControlName="diasLaboral">
+                        <option value="0">Horas</option>
+                        <option value="0.5">Medio día</option>
+                        <option value="1">Completo</option>
+                      </select>
+                    </div>
+                    
                   </div>
                 </div>
               </div>
               <div class="bg-gray-50 border rounded shadow-sm p-4">
-                <h3 class="font-semibold text-sm mb-3">Horario de salida</h3>
+                <span class="font-semibold text-sm mb-3 text-tiltle">Horario de salida</span>
                 <div class="space-y-4">
                   <div>
                     <label for="horaSalida" class="block text-sm font-medium">Hora de salida</label>
@@ -157,7 +160,7 @@
          <mat-tab label="Ajuste de nivel de H.E">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               <div class="bg-gray-50 border rounded shadow-sm p-4">
-                <h3 class="font-semibold text-sm mb-3">Configuración nivel 1</h3>
+                <span class="font-semibold text-sm mb-3">Configuración nivel 1</span>
                 <div class="space-y-4">
                   <div>
                     <label for="heNivel" class="block text-sm font-medium">H.E. Nivel</label>
@@ -180,7 +183,7 @@
               </div>
 
               <div class="bg-gray-50 border rounded shadow-sm p-4">
-                <h3 class="font-semibold text-sm mb-3">Configuración nivel 2</h3>
+                <span class="font-semibold text-sm mb-3">Configuración nivel 2</span>
                 <div class="space-y-4">
                   <div>
                     <label for="heNivel1" class="block text-sm font-medium">H.E. Nivel 1</label>
@@ -204,7 +207,7 @@
           <mat-tab label="Ajuste de nivel de H.E">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               <div class="bg-gray-50 border rounded shadow-sm p-4">
-                <h3 class="font-semibold text-sm mb-3">Configuración nivel 1</h3>
+                <span class="font-semibold text-sm mb-3">Configuración nivel 1</span>
                 <div class="space-y-4">
                   <div>
                     <label for="heNivel" class="block text-sm font-medium">H.E. Nivel</label>
@@ -227,7 +230,7 @@
               </div>
 
               <div class="bg-gray-50 border rounded shadow-sm p-4">
-                <h3 class="font-semibold text-sm mb-3">Configuración nivel 2</h3>
+                <span class="font-semibold text-sm mb-3">Configuración nivel 2</span>
                 <div class="space-y-4">
                   <div>
                     <label for="heNivel1" class="block text-sm font-medium">H.E. Nivel 1</label>
@@ -251,7 +254,7 @@
           <mat-tab label="Configuración reglas">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               <div class="bg-gray-50 border rounded shadow-sm p-4">
-                <h3 class="font-semibold text-sm mb-3">Configuración de entrada</h3>
+                <span class="font-semibold text-sm mb-3">Configuración de entrada</span>
                 <div class="space-y-4">
                   <div>
                     <label class="block text-sm font-medium">Necesario marcar entrada</label>
@@ -291,7 +294,7 @@
               </div>
 
               <div class="bg-gray-50 border rounded shadow-sm p-4">
-                <h3 class="font-semibold text-sm mb-3">Configuración de salida</h3>
+                <span class="font-semibold text-sm mb-3">Configuración de salida</span>
                 <div class="space-y-4">
                   <div>
                     <label class="block text-sm font-medium">Necesario marcar salida</label>
@@ -328,7 +331,7 @@
 
         <div class="flex justify-end gap-2">
           <button type="button" (click)="cancelar()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm">Cancelar</button>
-          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm" [disabled]="horarioForm.invalid">Guardar</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm" >Guardar</button>
         </div>
       </form>
     </div>

@@ -55,7 +55,6 @@
     <table class="min-w-max table-auto w-full text-sm">
       <thead class="bg-fiori-muted">
         <tr>
-          <th class="px-3 py-2 text-start whitespace-nowrap">Empleado ID</th>
           <th class="px-3 py-2 text-start whitespace-nowrap">Documento</th>
           <th class="px-3 py-2 text-start whitespace-nowrap">Fecha/Hora</th>
           <th class="px-3 py-2 text-start whitespace-nowrap">Estado</th>
@@ -66,7 +65,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let item of marcacionesManuales" class="border-t hover:bg-fiori-hover transition-colors duration-200">
-          <td class="px-3 py-2">{{ item.employeeId }}</td>
+         
           <td class="px-3 py-2">
            {{item.nroDoc}}
           </td>

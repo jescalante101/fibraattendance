@@ -1,6 +1,7 @@
 
 
 export interface AttManualLog {
+    manualLogId: number;
     abstractexceptionPtrId: number;
     punchTime: string;
     punchState: number;

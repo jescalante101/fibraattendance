@@ -14,6 +14,8 @@ import { AttManualLog } from 'src/app/models/att-manual-log/att-maunual-log.mode
   styleUrls: ['./nueva-marcacion-manual.component.css']
 })
 export class NuevaMarcacionManualComponent implements OnInit {
+
+  modalRef: any;
   // Formularios reactivos
   empleadoForm: FormGroup;
   marcacionForm: FormGroup;
@@ -129,23 +131,49 @@ export class NuevaMarcacionManualComponent implements OnInit {
     
     this.loadingGuardado = true;
     
+    // Debug: Mostrar valores del formulario
+    const formValue = this.marcacionForm.value;
+    console.log('Valores del formulario:', formValue);
+    console.log('Fecha marcación:', formValue.fechaMarcacion);
+    console.log('Hora marcación:', formValue.horaMarcacion);
+    console.log('Tipo de fecha:', typeof formValue.fechaMarcacion);
+    console.log('Tipo de hora:', typeof formValue.horaMarcacion);
+    
     // Crear lista de marcaciones manuales
     const marcacionesManuales: AttManualLog[] = this.empleadosSeleccionados.map(emp => {
-      const formValue = this.marcacionForm.value;
       
       // Combinar fecha y hora para crear punchTime
       let punchTime: string;
       if (formValue.fechaMarcacion && formValue.horaMarcacion) {
-        const fecha = new Date(formValue.fechaMarcacion);
-        const [horas, minutos] = formValue.horaMarcacion.split(':');
-        fecha.setHours(parseInt(horas), parseInt(minutos), 0, 0);
-        punchTime = fecha.toISOString();
+        // Obtener fecha y hora por separado
+        let fechaStr = formValue.fechaMarcacion;
+        const horaStr = formValue.horaMarcacion;
+        
+        // Si la fecha es un objeto Date, convertir a string YYYY-MM-DD
+        if (formValue.fechaMarcacion instanceof Date) {
+          const year = formValue.fechaMarcacion.getFullYear();
+          const month = String(formValue.fechaMarcacion.getMonth() + 1).padStart(2, '0');
+          const day = String(formValue.fechaMarcacion.getDate()).padStart(2, '0');
+          fechaStr = `${year}-${month}-${day}`;
+        }
+        
+        // Crear punchTime directamente sin usar new Date() para evitar problemas de zona horaria
+        punchTime = `${fechaStr}T${horaStr}:00`;
+        console.log('Fecha y hora combinadas directamente:', punchTime);
       } else {
-        punchTime = new Date().toISOString();
+        console.log('Faltan fecha o hora, usando fecha actual');
+        const ahora = new Date();
+        const year = ahora.getFullYear();
+        const month = String(ahora.getMonth() + 1).padStart(2, '0');
+        const day = String(ahora.getDate()).padStart(2, '0');
+        const hours = String(ahora.getHours()).padStart(2, '0');
+        const minutes = String(ahora.getMinutes()).padStart(2, '0');
+        punchTime = `${year}-${month}-${day}T${hours}:${minutes}:00`;
       }
       
       return {
-        abstractexceptionPtrId: 0, // Valor por defecto
+        manualLogId: 0, // ID temporal para nuevas marcaciones
+        abstractexceptionPtrId: 1, // Valor por defecto
         punchTime: punchTime,
         punchState: this.getPunchStateValue(formValue.estadoMarcacion),
         workCode: '', // Valor vacío como especificado
@@ -153,22 +181,25 @@ export class NuevaMarcacionManualComponent implements OnInit {
         applyTime: new Date().toISOString(),
         auditReason: formValue.incidencias || '',
         auditTime: new Date().toISOString(),
-        approvalLevel: null,
+        approvalLevel: 0,
         auditUserId: null,
         approver: '',
-        employeeId: null, // Valor null como especificado
+        employeeId: 0, // Valor null como especificado
         isMask: false, // Valor false como especificado
         temperature: null, // Valor null como especificado
         nroDoc: emp.nroDoc
       };
     });
-
+    console.log(marcacionesManuales);
     // Llamar al servicio para guardar las marcaciones
     this.attManualLogService.createManualLog(marcacionesManuales).subscribe({
       next: (response) => {
         console.log('Marcaciones guardadas exitosamente:', response);
         this.loadingGuardado = false;
         // Aquí puedes agregar un mensaje de éxito o cerrar el modal
+        if (this.modalRef) {
+          this.modalRef.closeModalFromChild(response);
+        } 
       },
       error: (error) => {
         console.error('Error al guardar marcaciones:', error);
@@ -181,15 +212,15 @@ export class NuevaMarcacionManualComponent implements OnInit {
   private getPunchStateValue(estadoMarcacion: string): number {
     switch (estadoMarcacion) {
       case 'entrada':
-        return 1; // Entrada
+        return 0; // Entrada
       case 'salida':
-        return 2; // Salida
+        return 1; // Salida
       case 'salida_descanso':
-        return 3; // Salida a descanso
+        return 2; // Salida a descanso
       case 'entrada_descanso':
-        return 4; // Entrada de descanso
+        return 3; // Entrada de descanso
       default:
-        return 1; // Por defecto entrada
+        return 0; // Por defecto entrada
     }
   }
 }

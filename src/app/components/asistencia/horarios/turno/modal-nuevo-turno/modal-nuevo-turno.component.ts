@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { Component, OnInit, Input } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { AttendanceService } from 'src/app/core/services/attendance.service';
 
@@ -9,6 +8,9 @@ import { AttendanceService } from 'src/app/core/services/attendance.service';
   styleUrls: ['./modal-nuevo-turno.component.css'],
 })
 export class ModalNuevoTurnoComponent implements OnInit {
+  @Input() data: any; // Recibe datos del modal genérico
+  modalRef: any;      // Referencia al modal genérico para cerrarlo
+
   // Propiedades para el turno
   nombreTurno: string = '';
   turnoAutomatico: boolean = false;
@@ -46,8 +48,7 @@ export class ModalNuevoTurnoComponent implements OnInit {
   horariosMesPorFila: any[][][] = [];
 
   constructor(
-    private attendanceService: AttendanceService,
-    public dialogRef: MatDialogRef<ModalNuevoTurnoComponent>
+    private attendanceService: AttendanceService
   ) {}
 
   ngOnInit() {
@@ -176,18 +177,22 @@ export class ModalNuevoTurnoComponent implements OnInit {
   }
 
   guardarTurno() {
-    this.dialogRef.close({
-      nombre: this.nombreTurno,
-      automatico: this.turnoAutomatico,
-      horarios: this.horariosSeleccionados,
-      dia: this.horariosDiaPorFila,
-      semana: this.horariosSemanaPorFila,
-      mes: this.horariosMesPorFila
-    });
+    if (this.modalRef) {
+      this.modalRef.closeModalFromChild({
+        nombre: this.nombreTurno,
+        automatico: this.turnoAutomatico,
+        horarios: this.horariosSeleccionados,
+        dia: this.horariosDiaPorFila,
+        semana: this.horariosSemanaPorFila,
+        mes: this.horariosMesPorFila
+      });
+    }
   }
 
   cancelar() {
-    this.dialogRef.close();
+    if (this.modalRef) {
+      this.modalRef.closeModalFromChild();
+    }
   }
 
   onCicloValorChange() {
@@ -201,21 +206,20 @@ export class ModalNuevoTurnoComponent implements OnInit {
   }
 
   isHorarioCheckedDia(i: number, horario: any): boolean {
-  return this.horariosDiaPorFila[i].some(h => h.idHorio === horario.idHorio);
-}
+    return this.horariosDiaPorFila[i].some(h => h.idHorio === horario.idHorio);
+  }
 
-// Para Semana
-isHorarioCheckedSemana(i: number, dia: string, horario: any): boolean {
-  return this.horariosSemanaPorFila[i][dia].some(h => h.idHorio === horario.idHorio);
-}
+  // Para Semana
+  isHorarioCheckedSemana(i: number, dia: string, horario: any): boolean {
+    return this.horariosSemanaPorFila[i][dia].some(h => h.idHorio === horario.idHorio);
+  }
 
-// Para Mes
-isHorarioCheckedMes(i: number, j: number, horario: any): boolean {
-  return this.horariosMesPorFila[i][j].some(h => h.idHorio === horario.idHorio);
-}
+  // Para Mes
+  isHorarioCheckedMes(i: number, j: number, horario: any): boolean {
+    return this.horariosMesPorFila[i][j].some(h => h.idHorio === horario.idHorio);
+  }
 
   asignarHorariosSeleccionadosASemana(i: number, dia: string) {
-    // Copia los horarios seleccionados actuales a la celda correspondiente
     this.horariosSemanaPorFila[i][dia] = [...this.horariosSeleccionados];
   }
 

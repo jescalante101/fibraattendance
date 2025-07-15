@@ -20,6 +20,7 @@ import { AppUserComponent } from "./components/personal/organizacion/app-user/ap
 import { SedeAreaCostoComponent } from "./components/personal/organizacion/sede-area-costo/sede-area-costo.component";
 import { UsuarioSedeComponent } from "./components/personal/organizacion/usuario-sede/usuario-sede.component";
 import { SedeCcostoComponent } from "./components/personal/organizacion/sede-ccosto/sede-ccosto.component";
+import { MarcacionManualComponent } from "./components/asistencia/aprobaciones/marcacion-manual/marcacion-manual.component";
 
 
 
@@ -47,12 +48,14 @@ const appRoutes: Routes = [
         //TODO:agregar las vistas para el panel de los dispositivos
         {path: 'dispositivo',component: DispositivoComponent},
         {path:'dispositivo/marcaciones',component:MarcacionesComponent},
-
+        
         //TODO: Agregar las vistas para el panel de asistencia
         {path: 'asistencia', component:AsistenciaComponent},
         {path: 'asistencia/descansos', component:DescansoComponent},
         {path: 'asistencia/horarios', component:HorarioComponent},
-        {path: 'asistencia/turno', component:TurnoComponent}
+        {path: 'asistencia/turno', component:TurnoComponent},
+        {path:'asistencia/aprobaciones/marcacion-manual',component:MarcacionManualComponent},
+
 
 
 

@@ -1,27 +1,63 @@
-<mat-card class="w-100">
-  <mat-card-header>
-    <mat-card-title class="text-center w-100">
-      <strong>Horario Semanal</strong>
-    </mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <table class="table table-bordered table-hover mb-0 w-100">
-      <thead class="thead-light">
+
+<div class="card-fiori w-full">
+  <!-- Header -->
+  <div class="text-center mb-6">
+    <span class="text-title flex items-center justify-center gap-2">
+      <i class="fa-solid fa-calendar-week text-fiori-primary"></i>
+      Horario Semanal
+    </span>
+    <div class="h-px bg-fiori-border mt-3"></div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="overflow-hidden rounded-lg border border-fiori-border">
+    <table class="w-full text-sm bg-fiori-surface">
+      <thead class="bg-fiori-muted">
         <tr>
-          <th class="bg-secondary text-dark text-center" style="width: 40%;">Día</th>
-          <th class="bg-secondary text-dark text-center" style="width: 60%;">Horario</th>
+          <th class="py-3 px-4 text-center border-b border-fiori-border text-fiori-text font-semibold" style="width: 40%;">
+            <div class="flex items-center justify-center gap-2">
+              <i class="fa-solid fa-calendar-day text-fiori-primary text-xs"></i>
+              Día
+            </div>
+          </th>
+          <th class="py-3 px-4 text-center border-b border-fiori-border text-fiori-text font-semibold" style="width: 60%;">
+            <div class="flex items-center justify-center gap-2">
+              <i class="fa-solid fa-clock text-fiori-primary text-xs"></i>
+              Horario
+            </div>
+          </th>
         </tr>
       </thead>
-      <tbody>
-        <tr *ngFor="let horarioDia of tablaHorarios">
-          <td class="align-middle text-center" style="padding: 0.5rem;">
-            <small>{{ horarioDia.dia }}</small>
+      <tbody class="divide-y divide-fiori-border">
+        <tr *ngFor="let horarioDia of tablaHorarios; let i = index" 
+            class="hover:bg-fiori-hover transition-colors duration-200"
+            [class.bg-fiori-active]="i % 2 === 0">
+          <td class="py-3 px-4 text-center align-middle">
+            <div class="flex items-center justify-center gap-2">
+              <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-fiori-primary/10 text-fiori-primary font-medium text-xs">
+                {{ horarioDia.dia.charAt(0).toUpperCase() }}
+              </span>
+              <span class="text-fiori-text font-medium">{{ horarioDia.dia }}</span>
+            </div>
           </td>
-          <td class="align-middle text-center" style="padding: 0.5rem;">
-            <small>{{ horarioDia.horario }}</small>
+          <td class="py-3 px-4 text-center align-middle">
+            <div class="flex items-center justify-center">
+              <span class="inline-flex items-center px-3 py-1.5 rounded-full bg-fiori-info/10 text-fiori-info text-sm font-medium border border-fiori-info/20">
+                <i class="fa-solid fa-clock mr-2 text-xs"></i>
+                {{ horarioDia.horario }}
+              </span>
+            </div>
           </td>
         </tr>
       </tbody>
     </table>
-  </mat-card-content>
-</mat-card>
+  </div>
+
+  <!-- Footer informativo -->
+  <div class="mt-4 p-3 bg-fiori-muted rounded-lg border border-fiori-border">
+    <div class="flex items-center justify-center gap-2 text-fiori-subtext text-sm">
+      <i class="fa-solid fa-info-circle text-fiori-info"></i>
+      <span>Total de días configurados: {{ tablaHorarios.length || 0 }}</span>
+    </div>
+  </div>
+</div>

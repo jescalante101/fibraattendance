@@ -1,93 +1,152 @@
-<div class="bg-white rounded shadow p-6 w-full max-w-6xl mx-auto">
-  <h2 class="text-xl font-semibold mb-4">Nuevo Turno</h2>
+<div class="bg-fiori-surface rounded-lg shadow-fiori  w-full max-w-6xl mx-auto border border-fiori-border">
+ 
+  <!-- Formulario Principal -->
+  <div class="card-fiori mb-6">
+    <!-- Nombre del Turno -->
+    <div class="mb-4">
+      <input
+        type="text"
+        [(ngModel)]="nombreTurno"
+        placeholder="Ingrese nombre del turno"
+        class="w-full border border-fiori-border rounded-fiori px-3 py-2 text-sm text-fiori-text bg-fiori-surface focus:outline-none focus:ring-2 focus:ring-fiori-primary/20 focus:border-fiori-primary transition-colors duration-200"
+      />
+    </div>
 
-  <!-- Nombre del Turno -->
-  <div class="mb-4">
-    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Turno</label>
-    <input
-      type="text"
-      [(ngModel)]="nombreTurno"
-      placeholder="Ingrese nombre del turno"
-      class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring focus:border-blue-400"
-    />
-    <label class="inline-flex items-center mt-2 text-sm text-green-700">
-      <input type="checkbox" [(ngModel)]="turnoAutomatico" class="form-checkbox mr-2 text-green-600" /> Turno Automático
-    </label>
+    <!-- Checkbox Turno Automático -->
+    <div class="flex items-center gap-2">
+      <input 
+        type="checkbox" 
+        [(ngModel)]="turnoAutomatico" 
+        id="turnoAutomatico"
+        class="w-4 h-4 text-fiori-primary border-fiori-border rounded focus:ring-fiori-primary focus:ring-2" 
+      />
+      <label for="turnoAutomatico" class="text-sm text-fiori-text cursor-pointer">
+        <span class="flex items-center gap-2">
+          <i class="fa-solid fa-magic-wand-sparkles text-fiori-success text-xs"></i>
+          Turno Automático
+        </span>
+      </label>
+    </div>
   </div>
 
   <!-- Tablas -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Horarios disponibles -->
-    <div>
-      <h3 class="text-sm font-semibold mb-2">Horarios Disponibles</h3>
-      <div class="overflow-x-auto max-h-72 overflow-y-auto border rounded">
-        <table class="min-w-full text-sm border border-gray-200">
-          <thead class="bg-gray-100">
-            <tr>
-              <th class="p-2 border">Seleccionar</th>
-              <th class="p-2 border">Nombre</th>
-              <th class="p-2 border">Entrada</th>
-              <th class="p-2 border">Salida</th>
-              <th class="p-2 border">Descanso</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let horario of dataHorarios" class="hover:bg-gray-50">
-              <td class="p-2 border text-center">
-                <input
-                  type="checkbox"
-                  (click)="$event.stopPropagation()"
-                  (change)="toggleHorarioSelection(horario)"
-                  [checked]="isSelected(horario)"
-                  class="form-checkbox text-blue-600"
-                />
-              </td>
-              <td class="p-2 border">{{ horario.nombre }}</td>
-              <td class="p-2 border">{{ horario.horaEntrada }}</td>
-              <td class="p-2 border">{{ horario.horaSalida }}</td>
-              <td class="p-2 border">{{ horario.descanso }}</td>
-            </tr>
-          </tbody>
-        </table>
+    <div class="card-fiori">
+      <div class="flex items-center gap-2 mb-4">
+        <i class="fa-solid fa-clock text-fiori-primary"></i>
+        <span class="text-label">Horarios Disponibles</span>
+      </div>
+      
+      <div class="overflow-hidden rounded-lg border border-fiori-border">
+        <div class="max-h-72 overflow-y-auto">
+          <table class="min-w-full text-sm bg-fiori-surface">
+            <thead class="bg-fiori-muted sticky top-0">
+              <tr>
+                <th class="p-3 text-center border-b border-fiori-border text-fiori-text font-semibold">
+                  <i class="fa-solid fa-check text-xs"></i>
+                </th>
+                <th class="p-3 text-left border-b border-fiori-border text-fiori-text font-semibold">Nombre</th>
+                <th class="p-3 text-center border-b border-fiori-border text-fiori-text font-semibold">Entrada</th>
+                <th class="p-3 text-center border-b border-fiori-border text-fiori-text font-semibold">Salida</th>
+                <th class="p-3 text-center border-b border-fiori-border text-fiori-text font-semibold">Descanso</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-fiori-border">
+              <tr *ngFor="let horario of dataHorarios" class="hover:bg-fiori-hover transition-colors duration-200">
+                <td class="p-3 text-center">
+                  <input
+                    type="checkbox"
+                    (click)="$event.stopPropagation()"
+                    (change)="toggleHorarioSelection(horario)"
+                    [checked]="isSelected(horario)"
+                    class="w-4 h-4 text-fiori-primary border-fiori-border rounded focus:ring-fiori-primary focus:ring-2"
+                  />
+                </td>
+                <td class="p-3 text-fiori-text font-medium">{{ horario.nombre }}</td>
+                <td class="p-3 text-center">
+                  <span class="inline-flex items-center px-2 py-1 rounded-full bg-fiori-success/10 text-fiori-success text-xs font-medium">
+                    {{ horario.horaEntrada }}
+                  </span>
+                </td>
+                <td class="p-3 text-center">
+                  <span class="inline-flex items-center px-2 py-1 rounded-full bg-fiori-error/10 text-fiori-error text-xs font-medium">
+                    {{ horario.horaSalida }}
+                  </span>
+                </td>
+                <td class="p-3 text-center">
+                  <span class="inline-flex items-center px-2 py-1 rounded-full bg-fiori-warning/10 text-fiori-warning text-xs font-medium">
+                    {{ horario.descanso }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- Horario Semanal -->
-    <div>
-      <h3 class="text-sm font-semibold mb-2">Horario Semanal</h3>
-
-      <div class="flex gap-3 mb-2">
-        <select [(ngModel)]="tipoVistaHorario" class="border rounded px-3 py-2 text-sm">
-          <option value="Dia">Día</option>
-          <option value="Semana">Semana</option>
-          <option value="Mes">Mes</option>
-        </select>
-
-        <input
-          type="number"
-          [(ngModel)]="cicloValor"
-          min="1"
-          (ngModelChange)="onCicloValorChange()"
-          placeholder="1"
-          class="w-20 border rounded px-3 py-2 text-sm"
-        />
+    <div class="card-fiori">
+      <div class="flex items-center gap-2 mb-4">
+        <i class="fa-solid fa-calendar-week text-fiori-primary"></i>
+        <span class="text-label">Horario Semanal</span>
       </div>
 
+      <!-- Controles -->
+      <div class="flex flex-wrap gap-3 mb-4 p-3 bg-fiori-muted rounded-lg">
+        <div class="flex items-center gap-2">
+          <label class="text-sm text-fiori-subtext">Tipo:</label>
+          <select 
+            [(ngModel)]="tipoVistaHorario" 
+            class="border border-fiori-border rounded-fiori px-3 py-2 text-sm text-fiori-text bg-fiori-surface focus:outline-none focus:ring-2 focus:ring-fiori-primary/20 focus:border-fiori-primary">
+            <option value="Dia">Día</option>
+            <option value="Semana">Semana</option>
+            <option value="Mes">Mes</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <label class="text-sm text-fiori-subtext">Ciclo:</label>
+          <input
+            type="number"
+            [(ngModel)]="cicloValor"
+            min="1"
+            (ngModelChange)="onCicloValorChange()"
+            placeholder="1"
+            class="w-20 border border-fiori-border rounded-fiori px-3 py-2 text-sm text-fiori-text bg-fiori-surface focus:outline-none focus:ring-2 focus:ring-fiori-primary/20 focus:border-fiori-primary"
+          />
+        </div>
+      </div>
+
+      <!-- Tablas dinámicas -->
       <div class="overflow-x-auto">
         <ng-container [ngSwitch]="tipoVistaHorario">
           <!-- Vista Día -->
-          <table *ngSwitchCase="'Dia'" class="min-w-full border">
-            <thead>
-              <tr><th class="p-2 text-sm">Horario</th></tr>
+          <table *ngSwitchCase="'Dia'" class="min-w-full border border-fiori-border rounded-lg overflow-hidden">
+            <thead class="bg-fiori-muted">
+              <tr>
+                <th class="p-3 text-sm text-fiori-text font-semibold text-center">
+                  <i class="fa-solid fa-sun mr-2"></i>Horario Diario
+                </th>
+              </tr>
             </thead>
-            <tbody>
-              <tr *ngFor="let row of horariosDiaPorFila; let i = index">
-                <td class="p-2">
-                  <div class="cursor-pointer border rounded p-2" (click)="asignarHorariosSeleccionadosADia(i)" (dblclick)="limpiarHorariosDiaCelda(i)">
-                    <div class="flex flex-wrap gap-1">
-                      <span *ngFor="let horario of row" class="bg-gray-200 px-2 py-1 rounded text-xs">{{ horario.nombre }}</span>
+            <tbody class="divide-y divide-fiori-border">
+              <tr *ngFor="let row of horariosDiaPorFila; let i = index" class="hover:bg-fiori-hover transition-colors duration-200">
+                <td class="p-3">
+                  <div class="cursor-pointer border-2 border-dashed border-fiori-border hover:border-fiori-primary rounded-lg p-3 transition-all duration-200" 
+                       (click)="asignarHorariosSeleccionadosADia(i)" 
+                       (dblclick)="limpiarHorariosDiaCelda(i)">
+                    <div class="flex flex-wrap gap-1 min-h-[1.5rem]">
+                      <span *ngFor="let horario of row" 
+                            class="inline-flex items-center px-2 py-1 rounded-full bg-fiori-primary/10 text-fiori-primary text-xs font-medium border border-fiori-primary/20">
+                        {{ horario.nombre }}
+                      </span>
                     </div>
-                    <p class="text-gray-500 text-xs mt-1">Click para asignar - Doble click para limpiar</p>
+                    <p class="text-fiori-subtext text-xs mt-2 flex items-center gap-1">
+                      <i class="fa-solid fa-mouse-pointer text-xs"></i>
+                      Click para asignar - Doble click para limpiar
+                    </p>
                   </div>
                 </td>
               </tr>
@@ -95,20 +154,30 @@
           </table>
 
           <!-- Vista Semana -->
-          <table *ngSwitchCase="'Semana'" class="min-w-full border">
-            <thead>
+          <table *ngSwitchCase="'Semana'" class="min-w-full border border-fiori-border rounded-lg overflow-hidden">
+            <thead class="bg-fiori-muted">
               <tr>
-                <th *ngFor="let dia of diasSemana" class="p-2 text-sm">{{ dia }}</th>
+                <th *ngFor="let dia of diasSemana" class="p-3 text-sm text-fiori-text font-semibold text-center">
+                  {{ dia }}
+                </th>
               </tr>
             </thead>
-            <tbody>
-              <tr *ngFor="let row of horariosSemanaPorFila; let i = index">
+            <tbody class="divide-y divide-fiori-border">
+              <tr *ngFor="let row of horariosSemanaPorFila; let i = index" class="hover:bg-fiori-hover transition-colors duration-200">
                 <td *ngFor="let dia of diasSemana" class="p-2">
-                  <div class="cursor-pointer border rounded p-2" (click)="asignarHorariosSeleccionadosASemana(i, dia)" (dblclick)="limpiarHorariosSemanaCelda(i, dia)">
-                    <div class="flex flex-wrap gap-1">
-                      <span *ngFor="let horario of row[dia]" class="bg-gray-200 px-2 py-1 rounded text-xs">{{ horario.nombre }}</span>
+                  <div class="cursor-pointer border-2 border-dashed border-fiori-border hover:border-fiori-primary rounded-lg p-2 transition-all duration-200" 
+                       (click)="asignarHorariosSeleccionadosASemana(i, dia)" 
+                       (dblclick)="limpiarHorariosSemanaCelda(i, dia)">
+                    <div class="flex flex-wrap gap-1 min-h-[1.5rem]">
+                      <span *ngFor="let horario of row[dia]" 
+                            class="inline-flex items-center px-2 py-1 rounded-full bg-fiori-primary/10 text-fiori-primary text-xs font-medium border border-fiori-primary/20">
+                        {{ horario.nombre }}
+                      </span>
                     </div>
-                    <p class="text-gray-500 text-xs mt-1">Click para asignar - Doble click para limpiar</p>
+                    <p class="text-fiori-subtext text-xs mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <i class="fa-solid fa-mouse-pointer text-xs"></i>
+                      Click/Doble click
+                    </p>
                   </div>
                 </td>
               </tr>
@@ -116,20 +185,29 @@
           </table>
 
           <!-- Vista Mes -->
-          <table *ngSwitchCase="'Mes'" class="min-w-full border">
-            <thead>
+          <table *ngSwitchCase="'Mes'" class="min-w-full border border-fiori-border rounded-lg overflow-hidden">
+            <thead class="bg-fiori-muted">
               <tr>
-                <th *ngFor="let dia of diasMes; let j = index" class="p-2 text-sm">{{ j + 1 }}</th>
+                <th *ngFor="let dia of diasMes; let j = index" class="p-2 text-sm text-fiori-text font-semibold text-center">
+                  {{ j + 1 }}
+                </th>
               </tr>
             </thead>
-            <tbody>
-              <tr *ngFor="let row of horariosMesPorFila; let i = index">
-                <td *ngFor="let cell of row; let j = index" class="p-2">
-                  <div class="cursor-pointer border rounded p-2" (click)="asignarHorariosSeleccionadosAMes(i, j)" (dblclick)="limpiarHorariosMesCelda(i, j)">
-                    <div class="flex flex-wrap gap-1">
-                      <span *ngFor="let horario of cell" class="bg-gray-200 px-2 py-1 rounded text-xs">{{ horario.nombre }}</span>
+            <tbody class="divide-y divide-fiori-border">
+              <tr *ngFor="let row of horariosMesPorFila; let i = index" class="hover:bg-fiori-hover transition-colors duration-200">
+                <td *ngFor="let cell of row; let j = index" class="p-1">
+                  <div class="cursor-pointer border-2 border-dashed border-fiori-border hover:border-fiori-primary rounded-lg p-2 transition-all duration-200" 
+                       (click)="asignarHorariosSeleccionadosAMes(i, j)" 
+                       (dblclick)="limpiarHorariosMesCelda(i, j)">
+                    <div class="flex flex-wrap gap-1 min-h-[1.5rem]">
+                      <span *ngFor="let horario of cell" 
+                            class="inline-flex items-center px-1 py-0.5 rounded bg-fiori-primary/10 text-fiori-primary text-xs font-medium border border-fiori-primary/20">
+                        {{ horario.nombre }}
+                      </span>
                     </div>
-                    <p class="text-gray-500 text-xs mt-1">Click para asignar - Doble click para limpiar</p>
+                    <p class="text-fiori-subtext text-xs mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <i class="fa-solid fa-mouse-pointer text-xs"></i>
+                    </p>
                   </div>
                 </td>
               </tr>
@@ -140,9 +218,19 @@
     </div>
   </div>
 
-  <!-- Botones acciones -->
-  <div class="mt-6 flex justify-end gap-2">
-    <button (click)="cancelar()" class="px-4 py-2 text-sm border rounded text-gray-600 hover:bg-gray-100">Cancelar</button>
-    <button (click)="guardarTurno()" class="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">Guardar</button>
+  <!-- Botones de acción -->
+  <div class="mt-6 flex justify-end gap-3 pt-4 border-t border-fiori-border">
+    <button 
+      (click)="cancelar()" 
+      class="btn-fiori-secondary">
+      <i class="fa-solid fa-times mr-2"></i>
+      Cancelar
+    </button>
+    <button 
+      (click)="guardarTurno()" 
+      class="btn-fiori">
+      <i class="fa-solid fa-save mr-2"></i>
+      Guardar Turno
+    </button>
   </div>
 </div>

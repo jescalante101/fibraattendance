@@ -1,10 +1,9 @@
 
 
 import { Component, OnInit } from '@angular/core';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { AttendanceService } from 'src/app/core/services/attendance.service';
-import { ModalLoadingComponent } from 'src/app/shared/modal-loading/modal-loading.component';
+import { ShiftsService, Shift } from 'src/app/core/services/shifts.service';
+import { ModalService } from 'src/app/shared/modal/modal.service';
 import { ModalNuevoTurnoComponent } from './modal-nuevo-turno/modal-nuevo-turno.component';
 
 @Component({
@@ -14,44 +13,43 @@ import { ModalNuevoTurnoComponent } from './modal-nuevo-turno/modal-nuevo-turno.
 })
 export class TurnoComponent implements OnInit {
 
-  dataHorarios: any[] = [];
+  dataHorarios: Shift[] = [];
 
   totalRecords: number = 0;
   pageSize: number = 15;
   pageNumber: number = 1;
-  datosSeleccionado: any[]=[];
+  datosSeleccionado: any[] = [];
 
-  constructor(private service: AttendanceService, private dialog: MatDialog) { }
+  constructor(private service: ShiftsService, private modalService: ModalService) { }
 
   ngOnInit() {
     this.loadTurnosData();
   }
 
-   updateThorarioSelect(select:any[]){
+  updateThorarioSelect(select: any[]) {
     console.log(select);
-    this.datosSeleccionado=select;
+    this.datosSeleccionado = select;
   }
 
   loadTurnosData() {
-    const loadingRef = this.dialog.open(ModalLoadingComponent);
-    this.service.getTurnos(this.pageNumber, this.pageSize).subscribe(
+    // Si quieres mostrar un loading, puedes implementar tu propio modal de loading genérico aquí
+    this.service.getShifts(this.pageNumber, this.pageSize).subscribe(
       (data) => {
         console.log(data);
         this.dataHorarios = data.data;
         this.totalRecords = data.totalRecords;
-        loadingRef.close();
       },
       (error) => {
         console.log(error);
-
         alert("Error al cargar los datos");
-        loadingRef.close();
       }
     );
   }
 
-  getAreas(slt:any[]):string{
-    return slt.map(item => item.alias).join(', ');
+  getAreas(horario: any[]): string {
+    // Extrae los alias únicos
+    const aliasUnicos = Array.from(new Set(horario.map(item => item.alias)));
+    return aliasUnicos.join(', ');
   }
 
   timeToMinutes(time: string): number {
@@ -94,19 +92,16 @@ export class TurnoComponent implements OnInit {
   }
 
   openNuevoTurnoModal(): void {
-    const dialogConfig = new MatDialogConfig();
-    // dialogConfig.width = '900px'; // Ancho del modal
-    // dialogConfig.height = '500px'; // Alto del modal
-  // dialogConfig.disableClose = true;  // Evita que se cierre al hacer clic fuera
-    dialogConfig.hasBackdrop = true;   // Asegura que haya un fondo oscuro
-    dialogConfig.backdropClass = 'backdrop-modal'; // Clase personalizada para el fondo
-      const dialogRef = this.dialog.open(ModalNuevoTurnoComponent,dialogConfig);
-
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          console.log('Turno creado:', result);
-          this.loadTurnosData();
-        }
-      });
-    }
+    this.modalService.open({
+      title: 'Nuevo Turno',
+      componentType: ModalNuevoTurnoComponent,
+      componentData: {},
+      width: '900px'
+    }).then(result => {
+      if (result) {
+        console.log('Turno creado:', result);
+        this.loadTurnosData();
+      }
+    });
+  }
 }

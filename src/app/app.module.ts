@@ -75,6 +75,8 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { SpanishPaginatorIntl } from './spanish-paginator-intl.service';
+import { MarcacionManualComponent } from './components/asistencia/aprobaciones/marcacion-manual/marcacion-manual.component';
+import { NuevaMarcacionManualComponent } from './components/asistencia/aprobaciones/marcacion-manual/nueva-marcacion-manual/nueva-marcacion-manual.component';
 registerLocaleData(localeEs);
 @NgModule({ declarations: [
         AppComponent,
@@ -112,7 +114,9 @@ registerLocaleData(localeEs);
         AddNewSacComponent,
         UsuarioSedeComponent,
         SedeCcostoComponent,
-        IclockTransactionComponent
+        IclockTransactionComponent,
+        MarcacionManualComponent,
+        NuevaMarcacionManualComponent
     ],
     exports: [
         TerminalSyncComponent,

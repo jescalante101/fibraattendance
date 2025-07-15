@@ -97,15 +97,6 @@ export class SidebarComponent {
 
   asistenciaMenu: MenuItem[] = [
     {
-      key: 'regla',
-      label: 'Regla',
-      icon: 'fa-registered',
-      submenu: [
-        { label: 'Regla General', link: './panel/asistencia' },
-        { label: 'Regla del Departamento', link: null },
-      ],
-    },
-    {
       key: 'horarioturno',
       label: 'Horario y Turno',
       icon: 'fa-clock',
@@ -131,7 +122,7 @@ export class SidebarComponent {
       label: 'Aprobaciones',
       icon: 'fa-check-to-slot',
       submenu: [
-        { label: 'Marcación Manual', link: null },
+        { label: 'Marcación Manual', link: '/panel/asistencia/aprobaciones/marcacion-manual' },
         { label: 'Permiso Papeleta', link: null },
         { label: 'Horas Extras', link: null },
         { label: 'Entrenamiento', link: null },

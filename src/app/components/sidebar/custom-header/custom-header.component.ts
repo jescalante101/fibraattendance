@@ -53,7 +53,7 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
     {
       key: 'asistencia',
       label: 'Asistencia',
-      route: './panel/asistencia',
+      route: './panel/asistencia/horarios',
       icon: 'fa-solid fa-calendar-check'
     },
     {

@@ -1,51 +1,68 @@
 <div class="mt-8 mx-auto max-w-6xl">
-  <div class="flex items-center gap-2 mb-4">
-    <button mat-stroked-button class="px-3 py-1.5 text-sm border border-red-500 text-red-600 hover:bg-red-50 rounded" (click)="eliminarSeleccionados()">
-      <small>Borrar</small>
-    </button>
-    <button mat-stroked-button class="px-3 py-1.5 text-sm border border-blue-500 text-blue-600 hover:bg-blue-50 rounded" (click)="openModalNuevoDescanso()">
-      <small>Nuevo Descanso</small>
-    </button>
+  <!-- Header de acciones -->
+  <div class="flex items-center justify-between mb-4">
+    <span class="text-title text-fiori-text text-lg font-semibold">Descansos</span>
+    <div class="flex gap-2">
+      <button class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors" (click)="openModalNuevoDescanso()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        <span>Nuevo Descanso</span>
+      </button>
+    </div>
   </div>
 
-  <div class="overflow-x-auto bg-white border rounded shadow-sm">
-    <table class="min-w-full text-sm text-left">
-      <thead class="bg-gray-100">
+  <!-- Tabla de descansos -->
+  <div class="overflow-x-auto bg-white border border-fiori-border rounded-lg shadow-fiori">
+    <table class="min-w-max table-auto w-full text-sm">
+      <thead class="bg-fiori-muted">
         <tr>
-          <th class="px-2 py-2 text-center">
+          <th class="px-3 py-2 text-center">
             <input type="checkbox" aria-label="Seleccionar todos">
           </th>
-          <th class="px-2 py-2">Nombre</th>
-          <th class="px-2 py-2">Hora Inicio</th>
-          <th class="px-2 py-2">Hora Final</th>
-          <th class="px-2 py-2">Duración</th>
-          <th class="px-2 py-2">Tiempo de Cálculo</th>
-          <th class="px-2 py-2"></th>
+          <th class="px-3 py-2 text-start whitespace-nowrap">Nombre</th>
+          <th class="px-3 py-2 text-start whitespace-nowrap">Hora Inicio</th>
+          <th class="px-3 py-2 text-start whitespace-nowrap">Hora Final</th>
+          <th class="px-3 py-2 text-start whitespace-nowrap">Duración</th>
+          <th class="px-3 py-2 text-start whitespace-nowrap">Tiempo de Cálculo</th>
+          <th class="px-3 py-2 text-start whitespace-nowrap">Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of dataDescansos" class="border-t hover:bg-gray-50">
-          <td class="px-2 py-1 text-center">
+        <tr *ngFor="let item of dataDescansos" class="border-t hover:bg-fiori-hover transition-colors duration-200">
+          <td class="px-3 py-2 text-center">
             <input type="checkbox" aria-label="Seleccionar descanso">
           </td>
-          <td class="px-2 py-1">{{item.alias}}</td>
-          <td class="px-2 py-1">{{item.periodStart | date : 'HH:mm:ss'}}</td>
-          <td class="px-2 py-1">{{ calcularHoraFin(extraerHora(item.periodStart), item.duration) }}</td>
-          <td class="px-2 py-1">{{item.duration}}</td>
-          <td class="px-2 py-1">
+          <td class="px-3 py-2">{{item.alias}}</td>
+          <td class="px-3 py-2">{{item.periodStart | date : 'HH:mm:ss'}}</td>
+          <td class="px-3 py-2">{{ calcularHoraFin(extraerHora(item.periodStart), item.duration) }}</td>
+          <td class="px-3 py-2">{{item.duration}}</td>
+          <td class="px-3 py-2">
             <ng-container *ngIf="item.calcType == 0; else manualTemplate">
-              Auto Deducir
+              <span class="inline-flex items-center px-2 py-1 rounded-full bg-fiori-success/10 text-fiori-success text-xs font-medium">
+                <i class="fa-solid fa-magic-wand-sparkles mr-1"></i>
+                Auto Deducir
+              </span>
             </ng-container>
             <ng-template #manualTemplate>
-              Manual
+              <span class="inline-flex items-center px-2 py-1 rounded-full bg-fiori-warning/10 text-fiori-warning text-xs font-medium">
+                <i class="fa-solid fa-hand mr-1"></i>
+                Manual
+              </span>
             </ng-template>
           </td>
-          <td class="px-2 py-1">
-            <button mat-icon-button (click)="openModalEditarDescanso(item.id)">
-              <mat-icon fontIcon="edit" class="text-gray-600 text-base"></mat-icon>
+          <td class="px-3 py-2 flex gap-2">
+            <button (click)="openModalEditarDescanso(item.id)" title="Editar"
+            class="inline-flex items-center p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors" >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487a2.25 2.25 0 113.182 3.182L7.5 20.213 3 21l.787-4.5L16.862 4.487z" />
+              </svg>
             </button>
-            <button mat-icon-button (click)="openConfirmationDialog(item.id)">
-              <mat-icon fontIcon="delete" class="text-red-500 text-base"></mat-icon>
+            <button (click)="openConfirmationDialog(item.id)" title="Eliminar"
+            class="inline-flex items-center p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+              </svg>
             </button>
           </td>
         </tr>
@@ -53,7 +70,8 @@
     </table>
   </div>
 
-  <div class="mt-4">
+  <!-- Paginador -->
+  <div class="mt-6 flex justify-end">
     <mat-paginator
       [length]="totalRecords"
       [pageSize]="pageSize"

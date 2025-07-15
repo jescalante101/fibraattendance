@@ -127,6 +127,7 @@
                     <mat-option [value]="4">Mover al H.E Vacaciones</mat-option>
                   </mat-select>
                 </mat-form-field>
+                
               </div>
               <div>
                 <label for="salidaTarde" class="block text-sm font-medium mb-1">Salida tarde</label>
@@ -142,15 +143,15 @@
               </div>
               <div *ngIf="useMode==0">
                 <label for="minimoEntrada" class="block text-sm font-medium mb-1">Mínimo Entrada temprana</label>
-                <mat-form-field appearance="outline" class="w-full">
-                  <input matInput type="number" id="minimoEntrada" formControlName="minEntradaTemprana" [disabled]="horarioForm.get('entradaTemprana')?.value == 0" min="0" />
+                <mat-form-field appearance="outline" class="w-full" disabled="false">
+                  <input matInput type="number" id="minimoEntrada" formControlName="minEntradaTemprana" min="0" [readonly]="horarioForm.get('entradaTemprana')?.value == 0" />
                   <span matSuffix>Minuto(s)</span>
                 </mat-form-field>
               </div>
               <div>
                 <label for="minimoSalida" class="block text-sm font-medium mb-1">Mínimo Salida tarde</label>
                 <mat-form-field appearance="outline" class="w-full">
-                  <input matInput type="number" id="minimoSalida" formControlName="minSalidaTarde" [disabled]="horarioForm.get('entradaTarde')?.value == 0" min="0" />
+                  <input matInput type="number" id="minimoSalida" formControlName="minSalidaTarde" [readonly]="horarioForm.get('entradaTarde')?.value == 0" min="0" />
                   <span matSuffix>Minuto(s)</span>
                 </mat-form-field>
               </div>
@@ -175,7 +176,7 @@
                   <div>
                     <label for="heNivel2" class="block text-sm font-medium">H.E. Nivel 2</label>
                     <mat-form-field appearance="outline" class="w-full">
-                      <input matInput type="number" id="heNivel2" formControlName="hNivel1" [disabled]="horarioForm.get('hNivel')?.value == 0" />
+                      <input matInput type="number" id="heNivel2" formControlName="hNivel1" [readonly]="horarioForm.get('hNivel')?.value == 0" />
                       <span matSuffix>minutos</span>
                     </mat-form-field>
                   </div>
@@ -188,61 +189,14 @@
                   <div>
                     <label for="heNivel1" class="block text-sm font-medium">H.E. Nivel 1</label>
                     <mat-form-field appearance="outline" class="w-full">
-                      <input matInput type="number" id="heNivel1" formControlName="hNivel2" [disabled]="horarioForm.get('hNivel')?.value == 0" />
+                      <input matInput type="number" id="heNivel1" formControlName="hNivel2" [readonly]="horarioForm.get('hNivel')?.value == 0" />
                       <span matSuffix>minutos</span>
                     </mat-form-field>
                   </div>
                   <div>
                     <label for="heNivel3" class="block text-sm font-medium">H.E. Nivel 3</label>
                     <mat-form-field appearance="outline" class="w-full">
-                      <input matInput type="number" id="heNivel3" formControlName="hNivel3" [disabled]="horarioForm.get('hNivel')?.value == 0" />
-                      <span matSuffix>minutos</span>
-                    </mat-form-field>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </mat-tab>
-
-          <mat-tab label="Ajuste de nivel de H.E">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-              <div class="bg-gray-50 border rounded shadow-sm p-4">
-                <span class="font-semibold text-sm mb-3">Configuración nivel 1</span>
-                <div class="space-y-4">
-                  <div>
-                    <label for="heNivel" class="block text-sm font-medium">H.E. Nivel</label>
-                    <mat-form-field appearance="outline" class="w-full">
-                      <mat-select id="heNivel" formControlName="hNivel">
-                        <mat-option [value]="0">Ignorar</mat-option>
-                        <mat-option [value]="1">Depende del T.Trabajo</mat-option>
-                        <mat-option [value]="2">Depende del H.E</mat-option>
-                      </mat-select>
-                    </mat-form-field>
-                  </div>
-                  <div>
-                    <label for="heNivel2" class="block text-sm font-medium">H.E. Nivel 2</label>
-                    <mat-form-field appearance="outline" class="w-full">
-                      <input matInput type="number" id="heNivel2" formControlName="hNivel1" [disabled]="horarioForm.get('hNivel')?.value == 0" />
-                      <span matSuffix>minutos</span>
-                    </mat-form-field>
-                  </div>
-                </div>
-              </div>
-
-              <div class="bg-gray-50 border rounded shadow-sm p-4">
-                <span class="font-semibold text-sm mb-3">Configuración nivel 2</span>
-                <div class="space-y-4">
-                  <div>
-                    <label for="heNivel1" class="block text-sm font-medium">H.E. Nivel 1</label>
-                    <mat-form-field appearance="outline" class="w-full">
-                      <input matInput type="number" id="heNivel1" formControlName="hNivel2" [disabled]="horarioForm.get('hNivel')?.value == 0" />
-                      <span matSuffix>minutos</span>
-                    </mat-form-field>
-                  </div>
-                  <div>
-                    <label for="heNivel3" class="block text-sm font-medium">H.E. Nivel 3</label>
-                    <mat-form-field appearance="outline" class="w-full">
-                      <input matInput type="number" id="heNivel3" formControlName="hNivel3" [disabled]="horarioForm.get('hNivel')?.value == 0" />
+                      <input matInput type="number" id="heNivel3" formControlName="hNivel3" [readonly]="horarioForm.get('hNivel')?.value == 0" />
                       <span matSuffix>minutos</span>
                     </mat-form-field>
                   </div>

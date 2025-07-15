@@ -3,6 +3,7 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/cor
 interface Registro {
   dayIndex: number;
   inTime: string;
+  workTimeDuration: number;
 }
 
 @Component({
@@ -13,7 +14,7 @@ interface Registro {
 export class ThorassemanalComponent implements OnChanges  {
   
 
- @Input() datos: any[] = [];
+ @Input() datos: Registro[] = [];
   tablaHorarios: { dia: string; horario: string }[] = [];
   diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
@@ -36,14 +37,21 @@ export class ThorassemanalComponent implements OnChanges  {
 
     for (const registro of datosOrdenados) {
       const diaIndex = registro.dayIndex % 7;
-      this.tablaHorarios.push({ dia: this.diasSemana[diaIndex], horario: this.formatTime(registro.inTime) });
+      const horaInicio = this.formatTime(registro.inTime);
+      const horaFin = this.calcularHoraFin(registro.inTime, registro.workTimeDuration);
+      this.tablaHorarios.push({ dia: this.diasSemana[diaIndex], horario: `${horaInicio} - ${horaFin}` });
     }
 
     console.log('Tabla de Horarios generada:', this.tablaHorarios);
   }
 
   formatTime(timeString: string): string {
-    // Aquí puedes agregar lógica para formatear la hora si es necesario
     return timeString.substring(11, 16); // Extrae la parte de la hora (HH:MM)
+  }
+
+  calcularHoraFin(inTime: string, workTimeDuration: number): string {
+    const date = new Date(inTime);
+    date.setMinutes(date.getMinutes() + workTimeDuration);
+    return date.toTimeString().substring(0, 5); // Devuelve HH:MM
   }
 }

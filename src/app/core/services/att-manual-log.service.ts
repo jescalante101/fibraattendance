@@ -43,4 +43,12 @@ export class AttManualLogService {
       `${this.apiUrl}api/attmanuallog/${id}`
     );
   }
+
+  // GET: Obtener una marcación manual por ID
+  getManualLogById(id: number): Observable<ApiResponse<AttManualLog>> {
+    return this.http.get<ApiResponse<AttManualLog>>(
+      `${this.apiUrl}api/attmanuallog/${id}`
+    );
+  }
+  
 }

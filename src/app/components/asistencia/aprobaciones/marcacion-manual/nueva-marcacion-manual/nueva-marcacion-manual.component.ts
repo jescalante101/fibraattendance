@@ -7,6 +7,8 @@ import { PersonService } from 'src/app/core/services/person.service';
 import { Employee } from 'src/app/components/personal/empleado/empleado/model/employeeDto';
 import { AttManualLogService } from 'src/app/core/services/att-manual-log.service';
 import { AttManualLog } from 'src/app/models/att-manual-log/att-maunual-log.model';
+import { EmployeeScheduleAssignmentService } from 'src/app/core/services/employee-schedule-assignment.service';
+import { EmployeeScheduleHours } from 'src/app/models/employee-schedule/employee-schedule-hours.model';
 
 @Component({
   selector: 'app-nueva-marcacion-manual',
@@ -21,8 +23,8 @@ export class NuevaMarcacionManualComponent implements OnInit {
   marcacionForm: FormGroup;
 
   // Datos de empleados y departamentos
-  empleados: MatTableDataSource<any> = new MatTableDataSource<any>([]);
-  empleadosRaw: Employee[] = [];
+  empleados: MatTableDataSource<EmployeeScheduleHours> = new MatTableDataSource<EmployeeScheduleHours>([]);
+  empleadosRaw: EmployeeScheduleHours[] = [];
   departamentos: RhArea[] = [];
 
   // Estados de loading
@@ -36,14 +38,17 @@ export class NuevaMarcacionManualComponent implements OnInit {
   pageNumber: number = 1;
 
   // Selección
-  empleadosSeleccionados: Employee[] = [];
-  displayedColumns: string[] = ['select', 'idEmpleado', 'nombre', 'apellido', 'departamento'];
+  empleadosSeleccionados: EmployeeScheduleHours[] = [];
+  displayedColumns: string[] = ['select', 'nroDoc', 'fullNameEmployee', 'areaName'];
+  expandedElement: EmployeeScheduleHours | null = null;
+  displayedColumnsWithExpand: string[] = [];
 
   constructor(
     private fb: FormBuilder,
     private rhAreaService: RhAreaService,
     private personService: PersonService,
-    private attManualLogService: AttManualLogService
+    private attManualLogService: AttManualLogService,
+    private employeeScheduleAssignmentService: EmployeeScheduleAssignmentService
   ) {
     this.empleadoForm = this.fb.group({
       departamento: [''],
@@ -62,6 +67,7 @@ export class NuevaMarcacionManualComponent implements OnInit {
     this.cargarAreas();
     this.cargarEmpleados();
     this.empleadosSeleccionados = [];
+    this.displayedColumnsWithExpand = ['expand', ...this.displayedColumns];
   }
 
   cargarAreas() {
@@ -82,16 +88,20 @@ export class NuevaMarcacionManualComponent implements OnInit {
     this.loadingEmpleados = true;
     const filtro = this.empleadoForm.value.filtroEmpleado || '';
     const areaId = this.empleadoForm.value.departamento || '';
-    
-    this.personService.getPersonalActivo(this.pageNumber, this.pageSize, filtro, '', areaId).subscribe({
+    // Usar getEmployeeScheduleHours para traer empleados con horarios
+    this.employeeScheduleAssignmentService.getEmployeeScheduleHours('', filtro, this.pageNumber, this.pageSize, areaId).subscribe({
       next: (response) => {
+        console.log('Respuesta empleados con horarios:', response); // <-- Log para depuración
         this.empleadosRaw = response.data.items || [];
         this.totalEmpleados = response.data.totalCount || 0;
         this.updateEmpleadosTable();
         this.loadingEmpleados = false;
       },
       error: (error) => {
-        console.error('Error cargando empleados:', error);
+        this.empleadosRaw = [];
+        this.totalEmpleados = 0;
+        this.updateEmpleadosTable();
+        console.error('Error cargando empleados con horarios:', error);
         this.loadingEmpleados = false;
       }
     });
@@ -112,17 +122,43 @@ export class NuevaMarcacionManualComponent implements OnInit {
     this.empleados.data = this.empleadosRaw;
   }
 
-  isEmpleadoSeleccionado(row: any): boolean {
-    return this.empleadosSeleccionados?.some(e => e.personalId === row.personalId) || false;
+  isEmpleadoSeleccionado(row: EmployeeScheduleHours): boolean {
+    return this.empleadosSeleccionados?.some(e => e.nroDoc === row.nroDoc) || false;
   }
 
-  toggleSeleccionEmpleado(row: any, checked: boolean) {
+  toggleSeleccionEmpleado(row: EmployeeScheduleHours, checked: boolean) {
     if (checked) {
-      if (!this.empleadosSeleccionados.some(e => e.personalId === row.personalId)) {
+      if (!this.empleadosSeleccionados.some(e => e.nroDoc === row.nroDoc)) {
         this.empleadosSeleccionados.push(row);
       }
     } else {
-      this.empleadosSeleccionados = this.empleadosSeleccionados.filter(e => e.personalId !== row.personalId);
+      this.empleadosSeleccionados = this.empleadosSeleccionados.filter(e => e.nroDoc !== row.nroDoc);
+    }
+  }
+
+  // Métodos para selección masiva
+  isAllSelected(): boolean {
+    const empleadosPagina = this.empleados.data;
+    return empleadosPagina.length > 0 && empleadosPagina.every(emp => this.isEmpleadoSeleccionado(emp));
+  }
+
+  isSomeSelected(): boolean {
+    const empleadosPagina = this.empleados.data;
+    return empleadosPagina.some(emp => this.isEmpleadoSeleccionado(emp)) && !this.isAllSelected();
+  }
+
+  toggleSelectAll(checked: boolean) {
+    const empleadosPagina = this.empleados.data;
+    if (checked) {
+      empleadosPagina.forEach(emp => {
+        if (!this.isEmpleadoSeleccionado(emp)) {
+          this.empleadosSeleccionados.push(emp);
+        }
+      });
+    } else {
+      this.empleadosSeleccionados = this.empleadosSeleccionados.filter(empSel =>
+        !empleadosPagina.some(emp => emp.nroDoc === empSel.nroDoc)
+      );
     }
   }
 
@@ -222,5 +258,31 @@ export class NuevaMarcacionManualComponent implements OnInit {
       default:
         return 0; // Por defecto entrada
     }
+  }
+
+  /**
+   * Agrupa los horarios por nameHora y muestra solo los rangos únicos por grupo
+   */
+  getHorariosAgrupados(horarios: any[]): { nameHora: string, inTime: string, outTime: string }[] {
+    if (!horarios) return [];
+    const map = new Map<string, { nameHora: string, inTime: string, outTime: string }>();
+    horarios.forEach(horario => {
+      const key = `${horario.nameHora}|${horario.inTime}|${horario.outTime}`;
+      if (!map.has(key)) {
+        map.set(key, {
+          nameHora: horario.nameHora,
+          inTime: horario.inTime,
+          outTime: horario.outTime
+        });
+      }
+    });
+    return Array.from(map.values());
+  }
+
+  /**
+   * Devuelve el string para el tooltip de empleados seleccionados extra
+   */
+  getEmpleadosTooltip(): string {
+    return this.empleadosSeleccionados.slice(3).map(e => `${e.fullNameEmployee} (${e.nroDoc})`).join('\n');
   }
 }

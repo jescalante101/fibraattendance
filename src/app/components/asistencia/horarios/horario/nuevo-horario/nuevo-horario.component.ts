@@ -52,23 +52,24 @@ export class NuevoHorarioComponent implements OnInit {
       horaSalidaDesde: [''],
       horaSalidaHasta: [''],
       isSelected: [false],
-      breakTimeId: [0],
-      entradaTemprana: [0],
-      entradaTarde: [0],
-      minEntradaTemprana: [60],
-      minSalidaTarde: [60],
-      hNivel: [0],
-      hNivel1: [0],
-      hNivel2: [0],
-      hNivel3: [0],
+      breakTimeId: [0, [Validators.min(0)]],
+      entradaTemprana: [0, [Validators.min(0)]],
+      entradaTarde: [0, [Validators.min(0)]],
+      minEntradaTemprana: [60, [Validators.min(0)]],
+      minSalidaTarde: [60, [Validators.min(0)]],
+      hNivel: [0, [Validators.min(0)]],
+      hNivel1: [0, [Validators.min(0)]],
+      hNivel2: [0, [Validators.min(0)]],
+      hNivel3: [0, [Validators.min(0)]],
       marcarEntrada: [false],
       marcarSalida: [false],
-      permiteLLegarT: [0],
-      permiteSalidaT: [0],
-      periodoMarcacion: [0],
-      tipoIntervalo: [0],
-      basadoM: [0],
+      permiteLLegarT: [0, [Validators.min(0)]],
+      permiteSalidaT: [0, [Validators.min(0)]],
+      periodoMarcacion: [0, [Validators.min(0)]],
+      tipoIntervalo: [0, [Validators.min(0)]],
+      basadoM: [0, [Validators.min(0)]],
       horaCambio: [''],
+      totalMarcaciones: [4, [Validators.min(1)]],
       diasLaboral: [0, [Validators.required, Validators.min(0), Validators.max(1)]],
     });
 
@@ -139,7 +140,9 @@ export class NuevoHorarioComponent implements OnInit {
             basadoM: response.horario.basadoM || 0,
             horaCambio: response.horario.hCambioDia || '',
             diasLaboral: response.horario.diasLaboral || 0,
+            totalMarcaciones: response.horario.totalMarcaciones || 1,
           };
+          
           
           console.log('Datos mapeados para el formulario:', horario);
           
@@ -208,6 +211,7 @@ export class NuevoHorarioComponent implements OnInit {
       hCambioDia: form.horaCambio ? `${baseDate}T${form.horaCambio}` : "",
       basadoM: form.basadoM,
       diasLaboral: form.diasLaboral,
+      totalMarcaciones: form.totalMarcaciones,
     };
 
     if (this.idHorario !== 0) {

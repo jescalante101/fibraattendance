@@ -42,4 +42,4 @@ export interface IClockTransactionParams {
     page_size?: number;
     page?: number;
     start_time?: string;
-} 
+}

@@ -4,6 +4,7 @@ import { AttManualLog } from 'src/app/models/att-manual-log/att-maunual-log.mode
 import { ApiResponse } from 'src/app/core/models/api-response.model';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { NuevaMarcacionManualComponent } from './nueva-marcacion-manual/nueva-marcacion-manual.component';
+import { EditarMarcionManualComponent } from './editar-marcion-manual/editar-marcion-manual.component';
 
 @Component({
   selector: 'app-marcacion-manual',
@@ -28,6 +29,7 @@ export class MarcacionManualComponent implements OnInit {
   Math = Math;
 
   filtroNroDoc: string = '';
+  
   private successTimeout: any;
 
   constructor(
@@ -118,5 +120,19 @@ export class MarcacionManualComponent implements OnInit {
     this.successTimeout = setTimeout(() => {
       this.successMessage = '';
     }, 3000);
+  }
+
+  editarMarcacionManual(id: number) {
+    this.modalService.open({
+      title: 'Editar Marcación Manual',
+      componentType: EditarMarcionManualComponent,
+      componentData: { id },
+      width: '500px',
+      height: 'auto'
+    }).then(result => {
+      if (result) {
+        this.loadMarcacionesManuales();
+      }
+    });
   }
 }

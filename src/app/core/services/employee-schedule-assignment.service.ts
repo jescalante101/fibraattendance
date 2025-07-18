@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { ApiResponse } from '../models/api-response.model';
+import { EmployeeScheduleHours } from 'src/app/models/employee-schedule/employee-schedule-hours.model';
 
 export interface EmployeeScheduleAssignment {
   assignmentId: number;
@@ -80,21 +81,31 @@ export class EmployeeScheduleAssignmentService {
     return this.http.get<ApiResponse<EmployeeScheduleAssignment>>(`${this.apiUrl}api/employee-schedule-assignment/get-by-nrodoc/${employeeDocument}`);
   }
 
-  // obtner sus horarios por nro de documento:
-  //devuelve un array de objetos con los siguientes campos:
-  /*
-  {
-    "id": 31,
-    "fullNameEmployee": "NILSON CALLE NEYRA",
-    "alias": "Turno E (Sólo noche)",
-    "inTime": "1900-01-01T00:00:00"
-  },
-  */
-
   // Obtener horarios del empleado por nro de documento
   getHorariosByNroDocumento(nroDoc: string): Observable<EmployeeHorario[]> {
     return this.http.get<EmployeeHorario[]>(
       `${this.apiUrl}api/employee-schedule-assignment/get-horaio-by-doc/${nroDoc}`
+    );
+  }
+
+
+  getEmployeeScheduleHours(
+    nroDoc: string,
+    fullName: string,
+    pageNumber: number=1,
+    pageSize: number=15,
+    areaId: string,
+  ): Observable<ApiResponse<EmployeeScheduleHours>> {
+    const params = new HttpParams()
+    .set('nroDoc', nroDoc)
+    .set('fullName', fullName)
+    .set('pageNumber', pageNumber)
+    .set('pageSize', pageSize)
+    .set('areaId', areaId);
+
+    return this.http.get<ApiResponse<EmployeeScheduleHours>>(
+      `${this.apiUrl}api/employee-schedule-assignment/get-assignment-with-shift`,
+      { params }
     );
   }
 

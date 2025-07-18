@@ -77,6 +77,8 @@ import localeEs from '@angular/common/locales/es';
 import { SpanishPaginatorIntl } from './spanish-paginator-intl.service';
 import { MarcacionManualComponent } from './components/asistencia/aprobaciones/marcacion-manual/marcacion-manual.component';
 import { NuevaMarcacionManualComponent } from './components/asistencia/aprobaciones/marcacion-manual/nueva-marcacion-manual/nueva-marcacion-manual.component';
+import { EditarMarcionManualComponent } from './components/asistencia/aprobaciones/marcacion-manual/editar-marcion-manual/editar-marcion-manual.component';
+import { AnalisisMarcacionesComponent } from './components/asistencia/marcaciones/analisis-marcaciones/analisis-marcaciones.component';
 registerLocaleData(localeEs);
 @NgModule({ declarations: [
         AppComponent,
@@ -116,7 +118,9 @@ registerLocaleData(localeEs);
         SedeCcostoComponent,
         IclockTransactionComponent,
         MarcacionManualComponent,
-        NuevaMarcacionManualComponent
+        NuevaMarcacionManualComponent,
+        EditarMarcionManualComponent,
+        AnalisisMarcacionesComponent
     ],
     exports: [
         TerminalSyncComponent,
@@ -155,6 +159,7 @@ registerLocaleData(localeEs);
         MatSelectModule,
         MatRadioModule,
         MatSnackBarModule,
+        
         NgxTinymceModule.forRoot({
             baseURL: '../../../assets/tinymce/'
         }),

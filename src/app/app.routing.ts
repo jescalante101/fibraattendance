@@ -21,6 +21,7 @@ import { SedeAreaCostoComponent } from "./components/personal/organizacion/sede-
 import { UsuarioSedeComponent } from "./components/personal/organizacion/usuario-sede/usuario-sede.component";
 import { SedeCcostoComponent } from "./components/personal/organizacion/sede-ccosto/sede-ccosto.component";
 import { MarcacionManualComponent } from "./components/asistencia/aprobaciones/marcacion-manual/marcacion-manual.component";
+import { AnalisisMarcacionesComponent } from "./components/asistencia/marcaciones/analisis-marcaciones/analisis-marcaciones.component";
 
 
 
@@ -55,6 +56,7 @@ const appRoutes: Routes = [
         {path: 'asistencia/horarios', component:HorarioComponent},
         {path: 'asistencia/turno', component:TurnoComponent},
         {path:'asistencia/aprobaciones/marcacion-manual',component:MarcacionManualComponent},
+        {path:'asistencia/marcaciones/analisis',component:AnalisisMarcacionesComponent},
 
 
 

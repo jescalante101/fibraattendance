@@ -19,7 +19,7 @@ export class ModalNuevoTurnoComponent implements OnInit {
   dataHorarios: any[] = [];
   horariosSeleccionados: any[] = [];
   totalRecords: number = 0;
-  pageSize: number = 10;
+  pageSize: number = 50;
   pageNumber: number = 1;
 
   // Vista seleccionada

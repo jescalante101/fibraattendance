@@ -1,125 +1,235 @@
 <mat-horizontal-stepper [linear]="true" #stepper class="bg-fiori-surface">
+
   <!-- Paso 1: Selección de empleado -->
-  <mat-step [stepControl]="empleadoForm" title="Seleccionar Empleado">
-    <form [formGroup]="empleadoForm" class="p-4">
-      <!-- Header del paso -->
-      <div class="mb-4">
-        <div class="text-title text-fiori-text mb-1">Seleccionar Empleado</div>
-        <div class="text-sm text-fiori-subtext">Busca y selecciona el empleado para registrar la marcación</div>
+  <mat-step [stepControl]="empleadoForm" label="Seleccionar Empleado">
+    <form [formGroup]="empleadoForm" class="p-6 max-w-7xl mx-auto">
+      
+      <!-- Header del paso con mejor diseño -->
+      <div class="mb-6 pb-4 border-b border-fiori-border">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 bg-fiori-primary rounded-full flex items-center justify-center">
+            <mat-icon class="text-white text-sm">person_search</mat-icon>
+          </div>
+          <div class="text-title text-fiori-text">Seleccionar Empleado</div>
+        </div>
+        <div class="text-sm text-fiori-subtext ml-11">Busca y selecciona los empleados para registrar la marcación manual</div>
       </div>
 
-      <!-- Filtros de búsqueda -->
-      <div class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-        <mat-form-field appearance="fill" class="w-full">
-          <mat-label>Departamento</mat-label>
-          <mat-select formControlName="departamento">
-            <mat-option value="">Todas las áreas</mat-option>
-            <mat-option *ngFor="let area of departamentos" [value]="area.areaId">{{ area.descripcion }}</mat-option>
-          </mat-select>
-          <mat-icon matSuffix *ngIf="loadingAreas" class="animate-spin text-fiori-primary">refresh</mat-icon>
-        </mat-form-field>
+      <!-- Filtros de búsqueda con mejor layout -->
+      <div class="card-fiori mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <mat-icon class="text-fiori-primary">filter_list</mat-icon>
+          <span class="text-label">Filtros de búsqueda</span>
+        </div>
         
-        <mat-form-field appearance="fill" class="w-full md:col-span-2">
-          <mat-label>Buscar empleado</mat-label>
-          <input matInput placeholder="Nombre, apellido o ID" formControlName="filtroEmpleado">
-          <mat-icon matSuffix class="text-fiori-subtext">search</mat-icon>
-        </mat-form-field>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Departamento</mat-label>
+            <mat-select formControlName="departamento">
+              <mat-option value="">
+                <div class="flex items-center gap-2">
+                  <mat-icon class="text-fiori-subtext">business</mat-icon>
+                  <span>Todas las áreas</span>
+                </div>
+              </mat-option>
+              <mat-option *ngFor="let area of departamentos" [value]="area.areaId">
+                <div class="flex items-center gap-2">
+                  <mat-icon class="text-fiori-subtext">domain</mat-icon>
+                  <span>{{ area.descripcion }}</span>
+                </div>
+              </mat-option>
+            </mat-select>
+            <mat-icon matSuffix *ngIf="!loadingAreas" class="text-fiori-subtext">expand_more</mat-icon>
+            <mat-icon matSuffix *ngIf="loadingAreas" class="animate-spin text-fiori-primary">refresh</mat-icon>
+          </mat-form-field>
+          
+          <mat-form-field appearance="fill" class="w-full lg:col-span-2">
+            <mat-label>Buscar empleado</mat-label>
+            <input matInput placeholder="Ingresa nombre, apellido o número de documento" formControlName="filtroEmpleado">
+            <mat-icon matSuffix class="text-fiori-subtext">search</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-fiori-border">
+          <button mat-flat-button color="primary" type="button" (click)="buscarEmpleados()" 
+                  [disabled]="loadingEmpleados"
+                  class="btn-fiori flex items-center gap-2">
+            <mat-icon *ngIf="!loadingEmpleados">search</mat-icon>
+            <mat-icon *ngIf="loadingEmpleados" class="animate-spin">refresh</mat-icon>
+            <span>{{ loadingEmpleados ? 'Buscando...' : 'Buscar Empleados' }}</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Botón de búsqueda -->
-      <div class="mb-3 flex justify-end">
-        <button mat-flat-button color="primary" type="button" (click)="buscarEmpleados()" 
-                [disabled]="loadingEmpleados"
-                class="btn-fiori flex items-center gap-2">
-          <mat-icon *ngIf="!loadingEmpleados">search</mat-icon>
-          <mat-icon *ngIf="loadingEmpleados" class="animate-spin">refresh</mat-icon>
-          {{ loadingEmpleados ? 'Buscando...' : 'Buscar' }}
-        </button>
-      </div>
+      <!-- Resultados de búsqueda -->
+      <div class="card-fiori mb-6 relative">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <mat-icon class="text-fiori-primary">people</mat-icon>
+            <span class="text-label">Empleados encontrados</span>
+            <span class="bg-fiori-muted text-fiori-text px-2 py-1 rounded-full text-xs">{{ totalEmpleados }}</span>
+          </div>
+          <div *ngIf="empleadosSeleccionados.length > 0" class="flex items-center gap-2">
+            <mat-icon class="text-fiori-success">check_circle</mat-icon>
+            <span class="text-sm text-fiori-success font-medium">{{ empleadosSeleccionados.length }} seleccionados</span>
+          </div>
+        </div>
 
-      <!-- Tabla de empleados -->
-      <div class="card-fiori mb-4">
-        <!-- Loading overlay para la tabla -->
-        <div *ngIf="loadingEmpleados" class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-fiori">
-          <div class="flex flex-col items-center gap-3">
-            <mat-spinner diameter="40"></mat-spinner>
-            <span class="text-fiori-subtext">Cargando empleados...</span>
+        <!-- Loading overlay -->
+        <div *ngIf="loadingEmpleados" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10 rounded-fiori">
+          <div class="flex flex-col items-center gap-4">
+            <mat-spinner diameter="48" color="primary"></mat-spinner>
+            <div class="text-center">
+              <div class="text-fiori-text font-medium">Cargando empleados</div>
+              <div class="text-fiori-subtext text-sm">Por favor espere...</div>
+            </div>
           </div>
         </div>
         
-        <div class="overflow-auto max-h-[60vh] relative">
-          <table mat-table [dataSource]="empleados" class="w-full">
-            <!-- Columna de selección -->
-            <ng-container matColumnDef="select">
-              <th mat-header-cell *matHeaderCellDef class="w-12">
-                <span class="text-label">Seleccionar</span>
-              </th>
-              <td mat-cell *matCellDef="let row" class="w-12">
-                <mat-checkbox 
-                  [checked]="isEmpleadoSeleccionado(row)" 
-                  (change)="toggleSeleccionEmpleado(row, $event.checked)"
-                  color="primary">
-                </mat-checkbox>
-              </td>
-            </ng-container>
+        <div class="overflow-hidden rounded-fiori border border-fiori-border">
+          <div class="overflow-auto max-h-[65vh]">
+            <table mat-table [dataSource]="empleados" class="w-full" multiTemplateDataRows>
+              
+              <!-- Columna de expandir -->
+              <ng-container matColumnDef="expand">
+                <th mat-header-cell *matHeaderCellDef class="w-12 bg-fiori-muted"></th>
+                <td mat-cell *matCellDef="let row" class="w-12">
+                  <button mat-icon-button 
+                          (click)="expandedElement = expandedElement === row ? null : row" 
+                          [attr.aria-label]="'Ver horarios de ' + row.fullNameEmployee"
+                          class="hover:bg-fiori-hover transition-colors">
+                    <mat-icon class="text-fiori-subtext">
+                      {{ expandedElement === row ? 'expand_less' : 'expand_more' }}
+                    </mat-icon>
+                  </button>
+                </td>
+              </ng-container>
 
-            <!-- ID Empleado -->
-            <ng-container matColumnDef="idEmpleado">
-              <th mat-header-cell *matHeaderCellDef>
-                <span class="text-label">ID Empleado</span>
-              </th>
-              <td mat-cell *matCellDef="let row">
-                <span class="font-medium text-fiori-text">{{ row.nroDoc }}</span>
-              </td>
-            </ng-container>
+              <!-- Columna de selección -->
+              <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef class="w-16 bg-fiori-muted">
+                  <div class="flex flex-col items-center gap-1">
+                    <mat-checkbox
+                      [checked]="isAllSelected()"
+                      [indeterminate]="isSomeSelected() && !isAllSelected()"
+                      (change)="toggleSelectAll($event.checked)"
+                      color="primary">
+                    </mat-checkbox>
+                    <span class="text-xs text-fiori-subtext">Todo</span>
+                  </div>
+                </th>
+                <td mat-cell *matCellDef="let row" class="w-16">
+                  <mat-checkbox 
+                    [checked]="isEmpleadoSeleccionado(row)" 
+                    (change)="toggleSeleccionEmpleado(row, $event.checked)"
+                    color="primary">
+                  </mat-checkbox>
+                </td>
+              </ng-container>
 
-            <!-- Nombre -->
-            <ng-container matColumnDef="nombre">
-              <th mat-header-cell *matHeaderCellDef>
-                <span class="text-label">Nombre</span>
-              </th>
-              <td mat-cell *matCellDef="let row">
-                <span class="text-fiori-text">{{ row.nombres }}</span>
-              </td>
-            </ng-container>
+              <!-- Número de Documento -->
+              <ng-container matColumnDef="nroDoc">
+                <th mat-header-cell *matHeaderCellDef class="bg-fiori-muted">
+                  <div class="flex items-center gap-2">
+                    <mat-icon class="text-fiori-subtext text-sm">badge</mat-icon>
+                    <span class="text-label">Documento</span>
+                  </div>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-fiori-primary bg-opacity-10 rounded-full flex items-center justify-center">
+                      <mat-icon class="text-fiori-primary text-sm">person</mat-icon>
+                    </div>
+                    <span class="font-medium text-fiori-text">{{ row.nroDoc }}</span>
+                  </div>
+                </td>
+              </ng-container>
 
-            <!-- Apellido -->
-            <ng-container matColumnDef="apellido">
-              <th mat-header-cell *matHeaderCellDef>
-                <span class="text-label">Apellido</span>
-              </th>
-              <td mat-cell *matCellDef="let row">
-                <span class="text-fiori-text">{{ row.apellidoPaterno }}</span>
-              </td>
-            </ng-container>
+              <!-- Nombre completo -->
+              <ng-container matColumnDef="fullNameEmployee">
+                <th mat-header-cell *matHeaderCellDef class="bg-fiori-muted">
+                  <div class="flex items-center gap-2">
+                    <mat-icon class="text-fiori-subtext text-sm">person</mat-icon>
+                    <span class="text-label">Nombre Completo</span>
+                  </div>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                  <div class="flex flex-col">
+                    <span class="text-fiori-text font-medium">{{ row.fullNameEmployee }}</span>
+                    <span class="text-xs text-fiori-subtext">ID: {{ row.nroDoc }}</span>
+                  </div>
+                </td>
+              </ng-container>
 
-            <!-- Departamento -->
-            <ng-container matColumnDef="departamento">
-              <th mat-header-cell *matHeaderCellDef>
-                <span class="text-label">Departamento</span>
-              </th>
-              <td mat-cell *matCellDef="let row">
-                <span class="inline-block px-2 py-1 bg-fiori-muted text-fiori-text text-xs rounded-fiori border border-fiori-border">
-                  {{ row.areaDescripcion || 'N/A' }}
-                </span>
-              </td>
-            </ng-container>
+              <!-- Área -->
+              <ng-container matColumnDef="areaName">
+                <th mat-header-cell *matHeaderCellDef class="bg-fiori-muted">
+                  <div class="flex items-center gap-2">
+                    <mat-icon class="text-fiori-subtext text-sm">domain</mat-icon>
+                    <span class="text-label">Área</span>
+                  </div>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                  <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-fiori-muted text-fiori-text text-sm rounded-full border border-fiori-border">
+                    <mat-icon class="text-fiori-subtext text-xs">business</mat-icon>
+                    <span>{{ row.areaName || 'Sin área asignada' }}</span>
+                  </div>
+                </td>
+              </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-fiori-muted"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
-                class="hover:bg-fiori-hover transition-colors duration-200 cursor-pointer">
-            </tr>
-          </table>
+              <!-- Fila expandida para horarios -->
+              <ng-container matColumnDef="expandedDetail">
+                <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumnsWithExpand.length">
+                  <div *ngIf="expandedElement === row" class="bg-fiori-muted bg-opacity-50 p-4 animate-fade-in">
+                    <div class="flex items-center gap-2 mb-3">
+                      <mat-icon class="text-fiori-primary">schedule</mat-icon>
+                      <span class="font-semibold text-fiori-text">Horarios asignados</span>
+                    </div>
+                    
+                    <div *ngIf="row.horarios && row.horarios.length > 0; else noHorarios" 
+                         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      <div *ngFor="let horario of getHorariosAgrupados(row.horarios)" 
+                           class="bg-white p-3 rounded-fiori border border-fiori-border">
+                        <div class="flex items-center justify-between">
+                          <div class="flex items-center gap-2">
+                            <mat-icon class="text-fiori-primary text-sm">access_time</mat-icon>
+                            <span class="font-medium text-fiori-text text-sm">{{ horario.nameHora }}</span>
+                          </div>
+                          <div class="text-xs text-fiori-subtext">
+                            {{ horario.inTime }} - {{ horario.outTime }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <ng-template #noHorarios>
+                      <div class="flex items-center gap-2 text-fiori-subtext bg-white p-3 rounded-fiori border border-fiori-border">
+                        <mat-icon class="text-fiori-warning">warning</mat-icon>
+                        <span>No tiene horarios asignados</span>
+                      </div>
+                    </ng-template>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumnsWithExpand" class="bg-fiori-muted"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumnsWithExpand;" 
+                  class="hover:bg-fiori-hover transition-colors duration-200 cursor-pointer border-b border-fiori-border last:border-b-0"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-row"></tr>
+            </table>
+          </div>
           
           <!-- Mensaje cuando no hay datos -->
-          <div *ngIf="!loadingEmpleados && empleados.data.length === 0" class="text-center py-8 text-fiori-subtext">
-            <mat-icon class="mb-2 text-4xl">group_off</mat-icon>
-            <p>No se encontraron empleados</p>
+          <div *ngIf="!loadingEmpleados && empleados.data.length === 0" 
+               class="text-center py-12 text-fiori-subtext bg-fiori-muted bg-opacity-30">
+            <mat-icon class="mb-4 text-6xl text-fiori-subtext opacity-50">people_off</mat-icon>
+            <div class="text-lg font-medium mb-2">No se encontraron empleados</div>
+            <div class="text-sm">Intenta ajustar los filtros de búsqueda</div>
           </div>
         </div>
 
         <!-- Paginación -->
-        <div class="border-t border-fiori-border mt-3 pt-3">
+        <div class="border-t border-fiori-border mt-4 pt-4">
           <mat-paginator 
             [length]="totalEmpleados" 
             [pageSize]="pageSize" 
@@ -127,17 +237,20 @@
             (page)="onEmpleadoPage($event)" 
             [pageSizeOptions]="[5, 10, 20, 50]"
             [disabled]="loadingEmpleados"
-            class="border-0">
+            class="border-0 bg-transparent">
           </mat-paginator>
         </div>
       </div>
 
       <!-- Botones de navegación -->
-      <div class="flex justify-end">
+      <div class="flex justify-between items-center pt-4 border-t border-fiori-border">
+        <div class="text-sm text-fiori-subtext">
+          Paso 1 de 2 - Selección de empleados
+        </div>
         <button mat-flat-button color="primary" (click)="stepper.next()" 
                 [disabled]="empleadosSeleccionados.length === 0"
                 class="btn-fiori flex items-center gap-2">
-          Continuar
+          <span>Continuar</span>
           <mat-icon>arrow_forward</mat-icon>
         </button>
       </div>
@@ -145,95 +258,176 @@
   </mat-step>
 
   <!-- Paso 2: Formulario de marcación -->
-  <mat-step [stepControl]="marcacionForm" title="Registrar Marcación">
-    <form [formGroup]="marcacionForm" class="p-4">
+  <mat-step [stepControl]="marcacionForm" label="Registrar Marcación">
+    <form [formGroup]="marcacionForm" class="p-6 max-w-4xl mx-auto">
+
       <!-- Header del paso -->
-      <div class="mb-4">
-        <div class="text-title text-fiori-text mb-1">Registrar Marcación</div>
-        <div class="text-sm text-fiori-subtext">Complete los detalles de la marcación</div>
+      <div class="mb-6 pb-4 border-b border-fiori-border">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 bg-fiori-primary rounded-full flex items-center justify-center">
+            <mat-icon class="text-white text-sm">access_time</mat-icon>
+          </div>
+          <div class="text-title text-fiori-text">Registrar Marcación</div>
+        </div>
+        <div class="text-sm text-fiori-subtext ml-11">
+          Complete los detalles de la marcación para 
+          <span class="font-medium text-fiori-primary">{{ empleadosSeleccionados.length }}</span> 
+          empleado{{ empleadosSeleccionados.length !== 1 ? 's' : '' }} seleccionado{{ empleadosSeleccionados.length !== 1 ? 's' : '' }}
+        </div>
+      </div>
+
+      <!-- Resumen de empleados seleccionados -->
+      <div class="card-fiori mb-6">
+        <div class="flex items-center gap-2 mb-3">
+          <mat-icon class="text-fiori-primary">group</mat-icon>
+          <span class="text-label">Empleados seleccionados</span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <div *ngFor="let emp of empleadosSeleccionados | slice:0:3" 
+               class="flex items-center gap-2 bg-fiori-primary bg-opacity-10 px-3 py-1.5 rounded-full border border-fiori-primary border-opacity-20">
+            <mat-icon class="text-fiori-primary text-sm">person</mat-icon>
+            <span class="text-sm font-medium text-fiori-text">{{ emp.fullNameEmployee }}</span>
+            <span class="text-xs text-fiori-subtext">({{ emp.nroDoc }})</span>
+          </div>
+          <ng-container *ngIf="empleadosSeleccionados.length > 3">
+            <div
+              class="flex items-center gap-2 bg-fiori-primary bg-opacity-10 px-3 py-1.5 rounded-full border border-fiori-primary border-opacity-20 cursor-pointer"
+              [matTooltip]="getEmpleadosTooltip()"
+              matTooltipClass="max-w-xs whitespace-pre-line text-xs"
+              matTooltipPosition="above">
+              <mat-icon class="text-fiori-primary text-sm">more_horiz</mat-icon>
+              <span class="text-sm font-medium text-fiori-text">+{{ empleadosSeleccionados.length - 3 }} más</span>
+            </div>
+          </ng-container>
+        </div>
       </div>
 
       <!-- Campos del formulario -->
-      <div class="space-y-4">
+      <div class="space-y-6">
+        
         <!-- Fecha y hora -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>Fecha de Marcación</mat-label>
-            <input matInput [matDatepicker]="picker" formControlName="fechaMarcacion">
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-            <mat-icon matPrefix class="text-fiori-subtext mr-2">calendar_today</mat-icon>
-          </mat-form-field>
+        <div class="card-fiori">
+          <div class="flex items-center gap-2 mb-4">
+            <mat-icon class="text-fiori-primary">event</mat-icon>
+            <span class="text-label">Fecha y hora de marcación</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <mat-form-field appearance="fill" class="w-full">
+              <mat-label>Fecha de Marcación</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="fechaMarcacion" readonly>
+              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+              <mat-icon matIconPrefix class="text-fiori-subtext">calendar_today</mat-icon>
+            </mat-form-field>
 
+            <mat-form-field appearance="fill" class="w-full">
+              <mat-label>Hora de Marcación</mat-label>
+              <input matInput type="time" formControlName="horaMarcacion">
+              <mat-icon matIconPrefix class="text-fiori-subtext">schedule</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Tipo de marcación -->
+        <div class="card-fiori">
+          <div class="flex items-center gap-2 mb-4">
+            <mat-icon class="text-fiori-primary">touch_app</mat-icon>
+            <span class="text-label">Tipo de marcación</span>
+          </div>
           <mat-form-field appearance="fill" class="w-full">
-            <mat-label>Hora de Marcación</mat-label>
-            <input matInput type="time" formControlName="horaMarcacion">
-            <mat-icon matPrefix class="text-fiori-subtext mr-2">schedule</mat-icon>
+            <mat-label>Selecciona el tipo de marcación</mat-label>
+            <mat-select formControlName="estadoMarcacion">
+              <mat-option value="entrada">
+                <div class="flex items-center gap-3 py-2">
+                  <div class="w-8 h-8 bg-fiori-success bg-opacity-10 rounded-full flex items-center justify-center">
+                    <mat-icon class="text-fiori-success text-sm">login</mat-icon>
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="font-medium">Marcación de Entrada</span>
+                    <span class="text-xs text-fiori-subtext">Inicio de jornada laboral</span>
+                  </div>
+                </div>
+              </mat-option>
+              <mat-option value="salida">
+                <div class="flex items-center gap-3 py-2">
+                  <div class="w-8 h-8 bg-fiori-error bg-opacity-10 rounded-full flex items-center justify-center">
+                    <mat-icon class="text-fiori-error text-sm">logout</mat-icon>
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="font-medium">Marcación de Salida</span>
+                    <span class="text-xs text-fiori-subtext">Fin de jornada laboral</span>
+                  </div>
+                </div>
+              </mat-option>
+              <mat-option value="salida_descanso">
+                <div class="flex items-center gap-3 py-2">
+                  <div class="w-8 h-8 bg-fiori-warning bg-opacity-10 rounded-full flex items-center justify-center">
+                    <mat-icon class="text-fiori-warning text-sm">coffee</mat-icon>
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="font-medium">Salida a Descanso</span>
+                    <span class="text-xs text-fiori-subtext">Inicio de break o almuerzo</span>
+                  </div>
+                </div>
+              </mat-option>
+              <mat-option value="entrada_descanso">
+                <div class="flex items-center gap-3 py-2">
+                  <div class="w-8 h-8 bg-fiori-info bg-opacity-10 rounded-full flex items-center justify-center">
+                    <mat-icon class="text-fiori-info text-sm">work</mat-icon>
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="font-medium">Entrada de Descanso</span>
+                    <span class="text-xs text-fiori-subtext">Regreso de break o almuerzo</span>
+                  </div>
+                </div>
+              </mat-option>
+            </mat-select>
+            <mat-icon matIconPrefix class="text-fiori-subtext">access_time</mat-icon>
           </mat-form-field>
         </div>
 
-        <!-- Estado de marcación -->
-        <mat-form-field appearance="fill" class="w-full">
-          <mat-label>Tipo de Marcación</mat-label>
-          <mat-select formControlName="estadoMarcacion">
-            <mat-option value="entrada">
-              <div class="flex items-center gap-2">
-                <mat-icon class="text-fiori-success">login</mat-icon>
-                Marcación de Entrada
-              </div>
-            </mat-option>
-            <mat-option value="salida">
-              <div class="flex items-center gap-2">
-                <mat-icon class="text-fiori-error">logout</mat-icon>
-                Marcación de Salida
-              </div>
-            </mat-option>
-            <mat-option value="salida_descanso">
-              <div class="flex items-center gap-2">
-                <mat-icon class="text-fiori-warning">coffee</mat-icon>
-                Salida a Descanso
-              </div>
-            </mat-option>
-            <mat-option value="entrada_descanso">
-              <div class="flex items-center gap-2">
-                <mat-icon class="text-fiori-info">work</mat-icon>
-                Entrada de Descanso
-              </div>
-            </mat-option>
-          </mat-select>
-          <mat-icon matPrefix class="text-fiori-subtext mr-2">access_time</mat-icon>
-        </mat-form-field>
+        <!-- Observaciones -->
+        <div class="card-fiori">
+          <div class="flex items-center gap-2 mb-4">
+            <mat-icon class="text-fiori-primary">note</mat-icon>
+            <span class="text-label">Observaciones y detalles</span>
+          </div>
+          <div class="space-y-4">
+            <mat-form-field appearance="fill" class="w-full">
+              <mat-label>Motivo de la marcación manual</mat-label>
+              <textarea matInput 
+                        formControlName="motivo" 
+                        rows="3" 
+                        placeholder="Describe el motivo por el cual se registra esta marcación manual">
+              </textarea>
+              <mat-icon matIconPrefix class="text-fiori-subtext">edit_note</mat-icon>
+            </mat-form-field>
 
-        <!-- Incidencias -->
-        <mat-form-field appearance="fill" class="w-full">
-          <mat-label>Incidencias</mat-label>
-          <textarea matInput 
-                    formControlName="incidencias" 
-                    rows="2" 
-                    placeholder="Describe cualquier incidencia o situación especial">
-          </textarea>
-          <mat-icon matPrefix class="text-fiori-subtext mr-2">report_problem</mat-icon>
-        </mat-form-field>
-
-        <!-- Motivo -->
-        <mat-form-field appearance="fill" class="w-full">
-          <mat-label>Motivo/Observaciones</mat-label>
-          <textarea matInput 
-                    formControlName="motivo" 
-                    rows="2" 
-                    placeholder="Motivo o observaciones adicionales">
-          </textarea>
-          <mat-icon matPrefix class="text-fiori-subtext mr-2">note</mat-icon>
-        </mat-form-field>
+            <mat-form-field appearance="fill" class="w-full">
+              <mat-label>Incidencias (opcional)</mat-label>
+              <textarea matInput 
+                        formControlName="incidencias" 
+                        rows="2" 
+                        placeholder="Describe cualquier incidencia o situación especial relacionada">
+              </textarea>
+              <mat-icon matIconPrefix class="text-fiori-subtext">report_problem</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
       </div>
 
       <!-- Botones de navegación -->
-      <div class="flex justify-between pt-4 border-t border-fiori-border mt-4">
-        <button mat-stroked-button type="button" (click)="stepper.previous()" 
-                class="btn-fiori-secondary flex items-center gap-2">
-          <mat-icon>arrow_back</mat-icon>
-          Atrás
-        </button>
+      <div class="flex justify-between items-center pt-6 border-t border-fiori-border mt-6">
+        <div class="flex items-center gap-4">
+          <button mat-stroked-button type="button" (click)="stepper.previous()" 
+                  class="btn-fiori-secondary flex items-center gap-2">
+            <mat-icon>arrow_back</mat-icon>
+            <span>Atrás</span>
+          </button>
+          <div class="text-sm text-fiori-subtext">
+            Paso 2 de 2 - Detalles de marcación
+          </div>
+        </div>
         
         <button mat-flat-button color="primary" type="submit" 
                 (click)="guardarMarcacion()" 
@@ -241,9 +435,10 @@
                 class="btn-fiori flex items-center gap-2">
           <mat-icon *ngIf="!loadingGuardado">save</mat-icon>
           <mat-icon *ngIf="loadingGuardado" class="animate-spin">refresh</mat-icon>
-          {{ loadingGuardado ? 'Guardando...' : 'Guardar Marcación' }}
+          <span>{{ loadingGuardado ? 'Guardando...' : 'Guardar Marcación' }}</span>
         </button>
       </div>
     </form>
   </mat-step>
+
 </mat-horizontal-stepper>

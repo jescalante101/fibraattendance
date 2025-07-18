@@ -1,0 +1,55 @@
+<form [formGroup]="editForm" class="p-6 w-full max-w-md mx-auto">
+  <!-- Empleado (deshabilitado) -->
+  <mat-form-field appearance="fill" class="w-full mb-4">
+    <mat-label>Empleado*</mat-label>
+    <input matInput [value]="empleadoLabel" disabled>
+  </mat-form-field>
+
+  <!-- Tiempo de Marcación: Fecha y Hora -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Fecha*</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="fecha" required>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-icon matIconPrefix class="text-fiori-subtext">calendar_today</mat-icon>
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Hora*</mat-label>
+      <input matInput type="time" formControlName="hora" required>
+      <mat-icon matIconPrefix class="text-fiori-subtext">schedule</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <!-- Estado de Marcación -->
+  <mat-form-field appearance="fill" class="w-full mb-4">
+    <mat-label>Estado de Marcación*</mat-label>
+    <mat-select formControlName="estadoMarcacion" required>
+      <mat-option value="entrada">Entrada</mat-option>
+      <mat-option value="salida">Salida</mat-option>
+      <mat-option value="salida_descanso">Salida Descanso</mat-option>
+      <mat-option value="entrada_descanso">Entrada Descanso</mat-option>
+      <mat-option value="entrada_he">Entrada H.E</mat-option>
+      <mat-option value="salida_he">Salida H.E</mat-option>
+      <mat-option value="sin_estado">Sin Estado</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Incidencias -->
+  <mat-form-field appearance="fill" class="w-full mb-4">
+    <mat-label>Incidencias</mat-label>
+    <input matInput formControlName="incidencias">
+  </mat-form-field>
+
+  <!-- Motivo -->
+  <mat-form-field appearance="fill" class="w-full mb-6">
+    <mat-label>Aplicar Motivo</mat-label>
+    <textarea matInput formControlName="motivo" rows="3"></textarea>
+  </mat-form-field>
+
+  <!-- Botones -->
+  <div class="flex justify-end gap-3 mt-2">
+    <button mat-flat-button color="primary" type="submit" [disabled]="editForm.invalid">Confirmar</button>
+    <button mat-stroked-button type="button" (click)="onCancel()">Cancelar</button>
+  </div>
+</form>

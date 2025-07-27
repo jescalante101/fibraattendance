@@ -22,6 +22,7 @@ import { UsuarioSedeComponent } from "./components/personal/organizacion/usuario
 import { SedeCcostoComponent } from "./components/personal/organizacion/sede-ccosto/sede-ccosto.component";
 import { MarcacionManualComponent } from "./components/asistencia/aprobaciones/marcacion-manual/marcacion-manual.component";
 import { AnalisisMarcacionesComponent } from "./components/asistencia/marcaciones/analisis-marcaciones/analisis-marcaciones.component";
+import { ReporteAsistenciaExcelComponent } from "./components/asistencia/marcaciones/reporte-asistencia-excel/reporte-asistencia-excel.component";
 
 
 
@@ -57,8 +58,7 @@ const appRoutes: Routes = [
         {path: 'asistencia/turno', component:TurnoComponent},
         {path:'asistencia/aprobaciones/marcacion-manual',component:MarcacionManualComponent},
         {path:'asistencia/marcaciones/analisis',component:AnalisisMarcacionesComponent},
-
-
+        {path:'asistencia/marcaciones/reporte-asistencia-excel',component:ReporteAsistenciaExcelComponent},
 
 
     ]},

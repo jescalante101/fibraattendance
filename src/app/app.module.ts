@@ -79,6 +79,7 @@ import { MarcacionManualComponent } from './components/asistencia/aprobaciones/m
 import { NuevaMarcacionManualComponent } from './components/asistencia/aprobaciones/marcacion-manual/nueva-marcacion-manual/nueva-marcacion-manual.component';
 import { EditarMarcionManualComponent } from './components/asistencia/aprobaciones/marcacion-manual/editar-marcion-manual/editar-marcion-manual.component';
 import { AnalisisMarcacionesComponent } from './components/asistencia/marcaciones/analisis-marcaciones/analisis-marcaciones.component';
+import { ReporteAsistenciaExcelComponent } from './components/asistencia/marcaciones/reporte-asistencia-excel/reporte-asistencia-excel.component';
 registerLocaleData(localeEs);
 @NgModule({ declarations: [
         AppComponent,
@@ -120,7 +121,8 @@ registerLocaleData(localeEs);
         MarcacionManualComponent,
         NuevaMarcacionManualComponent,
         EditarMarcionManualComponent,
-        AnalisisMarcacionesComponent
+        AnalisisMarcacionesComponent,
+        ReporteAsistenciaExcelComponent
     ],
     exports: [
         TerminalSyncComponent,

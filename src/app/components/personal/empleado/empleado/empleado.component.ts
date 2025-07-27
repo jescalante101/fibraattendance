@@ -28,7 +28,6 @@ export class EmpleadoComponent implements OnInit {
     private rhAreaService: RhAreaService,
     private route: ActivatedRoute,
     private snackBar: MatSnackBar,
-    private iClockTransactionService: IClockTransactionService
   )
      { }
   mostrarBotonAsignar = false;
@@ -39,7 +38,7 @@ export class EmpleadoComponent implements OnInit {
 
   allSelected = false;
   totalCount = 0;
-  pageNumber = 1;
+  page = 1;
   pageSize = 10;
   filtro = '';
 
@@ -69,14 +68,14 @@ export class EmpleadoComponent implements OnInit {
 
   getEmployees() {
     this.loading = true;
-    this.personalService.getPersonalActivo(this.pageNumber, this.pageSize, this.filtro,this.selectedCategoriaAuxiliar,this.selectedRhArea)
+    this.personalService.getPersonalActivo(this.page, this.pageSize, this.filtro,this.selectedCategoriaAuxiliar,this.selectedRhArea)
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: res => {
           if (res.exito && res.data) {
             this.employees = res.data.items.map(emp => ({ ...emp, selected: this.mostrarBotonAsignar ? false : undefined }));
             this.totalCount = res.data.totalCount;
-            this.pageNumber = res.data.pageNumber;
+            this.page = res.data.pageNumber;
             this.pageSize = res.data.pageSize;
           } else {
             this.employees = [];
@@ -113,7 +112,7 @@ export class EmpleadoComponent implements OnInit {
   }
 
   buscarEmpleado() {
-    this.pageNumber = 1;
+    this.page = 1;
     this.getEmployees();
   }
 
@@ -123,24 +122,24 @@ export class EmpleadoComponent implements OnInit {
 
   changePage(nuevaPagina: number) {
     if (nuevaPagina > 0 && (nuevaPagina - 1) * this.pageSize < this.totalCount) {
-      this.pageNumber = nuevaPagina;
+      this.page = nuevaPagina;
       this.getEmployees();
     }
   }
 
   onPageChange(event: PageEvent) {
-    this.pageNumber = event.pageIndex + 1;
+    this.page = event.pageIndex + 1;
     this.pageSize = event.pageSize;
     this.getEmployees();
   }
 
   onCategoriaAuxiliarChange() {
-    this.pageNumber = 1;
+    this.page = 1;
     this.getEmployees();
   }
 
   onRhAreaChange() {
-    this.pageNumber = 1;
+    this.page = 1;
     this.getEmployees();
   }
 

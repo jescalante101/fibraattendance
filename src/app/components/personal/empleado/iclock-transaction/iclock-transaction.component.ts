@@ -1,9 +1,9 @@
 import { Component, Input, OnInit, Inject } from '@angular/core';
-import { IClockTransactionService } from 'src/app/core/services/iclock-transaction.service';
-import { IClockTransaction } from 'src/app/core/models/iclock-transaction.model';
+import { IClockTransaction, IClockTransactionResponse2 } from 'src/app/core/models/iclock-transaction.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Employee } from '../empleado/model/employeeDto';
 import { EmployeeScheduleAssignmentService, EmployeeHorario } from 'src/app/core/services/employee-schedule-assignment.service';
+import { TransactionService } from 'src/app/core/services/transaction.service';
 
 @Component({
   selector: 'app-iclock-transaction',
@@ -37,7 +37,7 @@ export class IclockTransactionComponent implements OnInit {
   horarios: EmployeeHorario[] = [];
 
   constructor(
-    private iclockService: IClockTransactionService,
+    private transactionService: TransactionService,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<IclockTransactionComponent>,
     private employeeScheduleAssignmentService: EmployeeScheduleAssignmentService
@@ -65,7 +65,7 @@ export class IclockTransactionComponent implements OnInit {
 
     this.cargando = true;
     this.mensajeSinMarcaciones = '';
-
+    
     // Formatear fechas a yyyy-MM-dd
     const start = this.formatDate(this.fechaInicio);
     const end = this.formatDate(this.fechaFin);
@@ -93,6 +93,68 @@ export class IclockTransactionComponent implements OnInit {
     });
   }
 
+  private mapToIClockTransaction(data: IClockTransactionResponse2): IClockTransaction {
+    return {
+      id: data.id,
+      emp_code: data.empCode,
+      punch_time: data.punchTime,
+      punch_state: data.punchState,
+      verify_type: data.verifyType,
+      work_code: data.workCode,
+      terminal_sn: data.terminalSn,
+      terminal_alias: data.terminalAlias,
+      area_alias: data.areaAlias,
+      longitude: data.longitude,
+      latitude: data.latitude,
+      gps_location: data.gpsLocation,
+      mobile: data.mobile,
+      source: data.source,
+      purpose: data.purpose,
+      crc: data.crc,
+      is_attendance: data.isAttendance,
+      reserved: null, // O el valor que corresponda
+      upload_time: data.uploadTime,
+      sync_status: data.syncStatus,
+      sync_time: data.syncTime,
+      is_mask: data.isMask,
+      temperature: data.temperature.toString(),
+      emp: data.empId,
+      terminal: data.terminalId,
+      llegoATiempo: 'sin_horario' // Valor por defecto
+    };
+  }
+
+  private aplicarLogicaHorarios() {
+    if (!this.tieneHorarios || !this.horarios || this.horarios.length === 0) {
+      this.marcaciones.forEach(m => m.llegoATiempo = 'sin_horario');
+      return;
+    }
+
+    this.marcaciones = this.marcaciones.map(m => {
+      let llegoATiempo: 'a_tiempo' | 'tarde' | 'sin_horario' = 'sin_horario';
+      
+      let horarioComparar = this.getHorarioAsignado();
+
+      if (horarioComparar && m.punch_state === '0') { // Solo comparar en entradas
+        const horaMarcacion = new Date(m.punch_time);
+        let [h, min, s] = horarioComparar.inTime.split(':');
+        if (typeof s === 'undefined') s = '00';
+        
+        const horaEntrada = new Date(horaMarcacion);
+        horaEntrada.setHours(Number(h), Number(min), Number(s), 0);
+        
+        if (!isNaN(horaEntrada.getTime())) {
+          if (horaMarcacion <= horaEntrada) {
+            llegoATiempo = 'a_tiempo';
+          } else {
+            llegoATiempo = 'tarde';
+          }
+        }
+      }
+      return { ...m, llegoATiempo };
+    });
+  }
+
   setDisplayedColumns(tieneHorarios: boolean) {
     this.displayedColumns = [
       'id',
@@ -109,28 +171,33 @@ export class IclockTransactionComponent implements OnInit {
   }
 
   private cargarMarcacionesSinHorarios(start: string, end: string) {
-    this.iclockService.getTransactions({
-      emp_code: this.empCode,
-      start_time: start,
-      page_size: 50,
+    this.transactionService.getTransactions({
+      empCode: this.empCode,
+      personalId: this.empleado?.personalId,
+      startDate: start,
+      endDate: end,
+      pageSize: 50,
       page: 1
     }).subscribe({
       next: (resp) => {
-        let marcacionesFiltradas = resp.data.filter(m => 
-          m.punch_time >= start && m.punch_time <= end + ' 23:59:59'
-        );
-        if (this.filtroTipo !== '') {
-          marcacionesFiltradas = marcacionesFiltradas.filter(m => 
-            m.punch_state === this.filtroTipo
-          );
-        }
-        // Todas sin horario
-        this.marcaciones = marcacionesFiltradas.map(m => ({ ...m, llegoATiempo: 'sin_horario' }));
-        this.cargando = false;
-        if (this.marcaciones.length === 0) {
-          this.mensajeSinMarcaciones = 'No se encontraron marcaciones para el rango seleccionado.';
+        if(resp.exito && resp.data && resp.data.items) {
+          let marcacionesFiltradas = resp.data.items.map(this.mapToIClockTransaction);
+
+          if (this.filtroTipo !== '') {
+            marcacionesFiltradas = marcacionesFiltradas.filter(m => 
+              m.punch_state === this.filtroTipo
+            );
+          }
+          // Todas sin horario
+          this.marcaciones = marcacionesFiltradas.map(m => ({ ...m, llegoATiempo: 'sin_horario' }));
         } else {
-          this.mensajeSinMarcaciones = '';
+          this.marcaciones = [];
+          this.mensajeSinMarcaciones = resp.mensaje || 'No se encontraron marcaciones.';
+        }
+        
+        this.cargando = false;
+        if (this.marcaciones.length === 0 && !this.mensajeSinMarcaciones) {
+          this.mensajeSinMarcaciones = 'No se encontraron marcaciones para el rango seleccionado.';
         }
       },
       error: () => {
@@ -142,57 +209,32 @@ export class IclockTransactionComponent implements OnInit {
   }
 
   private cargarMarcacionesConHorarios(start: string, end: string) {
-    this.iclockService.getTransactions({
-      emp_code: this.empCode,
-      start_time: start,
-      page_size: 50,
+    this.transactionService.getTransactions({
+      empCode: this.empCode,
+      personalId: this.empleado?.personalId,
+      startDate: start,
+      endDate: end,
+      pageSize: 50,
       page: 1
     }).subscribe({
       next: (resp) => {
-        let marcacionesFiltradas = resp.data.filter(m => 
-          m.punch_time >= start && m.punch_time <= end + ' 23:59:59'
-        );
-        if (this.filtroTipo !== '') {
-          marcacionesFiltradas = marcacionesFiltradas.filter(m => 
-            m.punch_state === this.filtroTipo
-          );
-        }
-        // Lógica para comparar con horarios
-        this.marcaciones = marcacionesFiltradas.map(m => {
-          let llegoATiempo: 'a_tiempo' | 'tarde' | 'sin_horario' = 'sin_horario';
-          if (this.horarios && this.horarios.length > 0) {
-            // Buscar el horario a comparar
-            let horarioComparar = this.horarios[0];
-            // Aceptar tanto "00:00" como "00:00:00" para detectar horario nulo
-            if ((horarioComparar.inTime === '00:00' || horarioComparar.inTime === '00:00:00') && this.horarios.length > 1) {
-              horarioComparar = this.horarios[1];
-            }
-            // Obtener hora de marcación y hora de entrada
-            const horaMarcacion = new Date(m.punch_time);
-            // Parsear inTime (puede venir como HH:mm o HH:mm:ss)
-            let [h, min, s] = horarioComparar.inTime.split(':');
-            if (typeof s === 'undefined') s = '00';
-            const horaEntrada = new Date(horaMarcacion);
-            horaEntrada.setHours(Number(h), Number(min), Number(s), 0);
-            // Comparar solo la hora y minutos
-            if (!isNaN(horaEntrada.getTime())) {
-              if (
-                horaMarcacion.getHours() < horaEntrada.getHours() ||
-                (horaMarcacion.getHours() === horaEntrada.getHours() && horaMarcacion.getMinutes() <= horaEntrada.getMinutes())
-              ) {
-                llegoATiempo = 'a_tiempo';
-              } else {
-                llegoATiempo = 'tarde';
-              }
-            }
+        if (resp.exito && resp.data && resp.data.items) {
+          let marcacionesFiltradas = resp.data.items.map(this.mapToIClockTransaction);
+
+          if (this.filtroTipo !== '') {
+            marcacionesFiltradas = marcacionesFiltradas.filter(m => 
+              m.punch_state === this.filtroTipo
+            );
           }
-          return { ...m, llegoATiempo };
-        });
-        this.cargando = false;
-        if (this.marcaciones.length === 0) {
-          this.mensajeSinMarcaciones = 'No se encontraron marcaciones para el rango seleccionado.';
+          this.marcaciones = marcacionesFiltradas;
+          this.aplicarLogicaHorarios();
         } else {
-          this.mensajeSinMarcaciones = '';
+          this.marcaciones = [];
+          this.mensajeSinMarcaciones = resp.mensaje || 'No se encontraron marcaciones.';
+        }
+        this.cargando = false;
+        if (this.marcaciones.length === 0 && !this.mensajeSinMarcaciones) {
+          this.mensajeSinMarcaciones = 'No se encontraron marcaciones para el rango seleccionado.';
         }
       },
       error: () => {

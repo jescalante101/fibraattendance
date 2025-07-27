@@ -143,6 +143,7 @@ export class SidebarComponent {
       icon: 'fa-file-pdf',
       submenu: [
         { label: 'Análisis de Marcaciones', link: '/panel/asistencia/marcaciones/analisis' },
+        { label: 'Reporte de Marcaciones', link: '/panel/asistencia/marcaciones/reporte-asistencia-excel' },
         { label: 'Marcación', link: null },
         { label: 'Cartilla de Tiempo', link: null },
         { label: 'Primero & Último', link: null },

@@ -641,6 +641,19 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy {
     // Implement edit logic
   }
 
+  // ===== Download excel =====
+  downloadExcel() {
+    this.attendanceAnalysisService.exportAttendanceReport(this.filterForm.value).subscribe(response => {
+      const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `analisis_marcaciones_${new Date().toISOString().split('T')[0]}.xlsx`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
+  }
+
   // ===== EXPORT =====
   exportToExcel() {
     this.performExcelExport(this.dataSource.data);

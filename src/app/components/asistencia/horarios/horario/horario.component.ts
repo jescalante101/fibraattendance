@@ -68,8 +68,6 @@ export class HorarioComponent implements OnInit {
       title: mode == 0 ? 'Nuevo Horario Normal' : 'Nuevo Horario Flexible',
       componentType: NuevoHorarioComponent,
       componentData: { use_mode: mode },
-      width: '800px',
-      height: '550px'
     }).then(result => {
       if (result?.id) {
         this.loadHoraiosData();
@@ -91,8 +89,6 @@ export class HorarioComponent implements OnInit {
       title: 'Editar Horario',
       componentType: NuevoHorarioComponent,
       componentData: { idHorario: idHorario, use_mode: use_mode },
-      width: '800px',
-      height: '550px'
     }).then(result => {
       if (result) {
         if(result.id){

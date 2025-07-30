@@ -86,9 +86,7 @@
                 matInput 
                 formControlName="sedeFilter"
                 [matAutocomplete]="sedeAuto"
-                placeholder="Buscar sede..."
-                (input)="form.get('siteId')?.setValue('')"
-                (focus)="onSedeFieldFocus(sedeAuto)">
+                placeholder="Buscar sede...">
               <mat-autocomplete #sedeAuto="matAutocomplete" [displayWith]="displaySedeFunction">
                 <mat-option 
                   *ngFor="let sede of filteredSedes | async" 

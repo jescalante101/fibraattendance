@@ -25,6 +25,8 @@ export class NuevoHorarioComponent implements OnInit {
   pageSize: number = 10;
   totalRecords: number = 0;
   useMode:number=0;
+  isEditMode: boolean = false;
+  loading = false;
 
   constructor(
     @Optional() public dialogRef: MatDialogRef<NuevoHorarioComponent>,
@@ -41,7 +43,7 @@ export class NuevoHorarioComponent implements OnInit {
     
     if (data2) {
       this.useMode = data2.use_mode;
-      
+      this.isEditMode= data2.idHorario !== 0;
       this.loadEdit(data2.idHorario);
     }
 
@@ -169,17 +171,17 @@ export class NuevoHorarioComponent implements OnInit {
   }
 
   guardarTurno() {
+    this.loading = true;
     // Si el formulario es inválido, marca todos los campos como tocados y no continúa
     if (this.horarioForm.invalid) {
       this.horarioForm.markAllAsTouched();
       console.log('formulario invalido', this.horarioForm);
       console.log('Errores del formulario:', this.getFormErrors());
+      this.loading = false;
       return;
     }
 
-    // abrir el modal de loading
-    const loadinngRef = this.dialogLoading.open(ModalLoadingComponent);
-
+    
     const form = this.horarioForm.value;
     const baseDate = '2000-01-01';
 
@@ -219,7 +221,7 @@ export class NuevoHorarioComponent implements OnInit {
     if (this.idHorario !== 0) {
       this.attendanceService.updateHorario(horarioApi).subscribe({
         next: (response) => {
-          loadinngRef.close();
+          
           // Cerrar el modal padre con los datos de respuesta
           if (this.modalRef) {
             this.modalRef.closeModalFromChild(response);
@@ -229,13 +231,11 @@ export class NuevoHorarioComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error al actualizar horario:', error);
-          loadinngRef.close();
         }
       });
     } else {
       this.attendanceService.saveHorario(horarioApi).subscribe({
         next: (response) => {
-          loadinngRef.close();
           // Cerrar el modal padre con los datos de respuesta
           if (this.modalRef) {
             this.modalRef.closeModalFromChild(response);
@@ -245,7 +245,6 @@ export class NuevoHorarioComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error al guardar horario:', error);
-          loadinngRef.close();
         }
       });
     }

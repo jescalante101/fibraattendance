@@ -228,7 +228,7 @@ export class UsuarioSedeComponent implements OnInit {
     if (usuario && usuario.userId) {
       this.form.patchValue({
         userId: usuario.userId,
-        //usuarioFilter: usuario
+        usuarioFilter: usuario
       });
      
     }

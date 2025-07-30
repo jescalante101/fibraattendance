@@ -258,7 +258,7 @@ export class AddNewSacComponent implements OnInit {
     if (sede && sede.categoriaAuxiliarId) {
       this.form.patchValue({
         siteId: sede.categoriaAuxiliarId,
-        //siteName: sede.descripcion
+        siteName: sede.descripcion
       });
       console.log('Sede selected:', sede);
     }
@@ -268,7 +268,7 @@ export class AddNewSacComponent implements OnInit {
     if (area && area.areaId) {
       this.form.patchValue({
         areaId: area.areaId,
-        //areaName: area.descripcion
+        areaName: area.descripcion
       });
       console.log('Area selected:', area);
     }
@@ -278,7 +278,7 @@ export class AddNewSacComponent implements OnInit {
     if (cc && cc.ccostoId) {
       this.form.patchValue({
         costCenterId: cc.ccostoId,
-        //costCenterName: cc.descripcion
+        costCenterName: cc.descripcion
       });
       console.log('Cost center selected:', cc);
     }

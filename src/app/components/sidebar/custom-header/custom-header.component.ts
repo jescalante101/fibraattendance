@@ -41,7 +41,7 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
     {
       key: 'personal',
       label: 'Personal',
-      route: './panel/personal/organizacion',
+      route: './panel/personal/empleado/empleado',
       icon: 'fa-solid fa-user-group'
     },
     {

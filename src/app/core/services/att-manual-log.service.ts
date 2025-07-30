@@ -10,7 +10,7 @@ import { ApiResponse } from '../models/api-response.model';
   providedIn: 'root'
 })
 export class AttManualLogService {
-  private apiUrl = `${environment.apiUrl}`;
+  private apiUrl = `${environment.apiUrlPro}`;
 
   constructor(private http: HttpClient) { }
 

@@ -4,6 +4,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { AttendanceService } from 'src/app/core/services/attendance.service';
 import { NuevoDescansoComponent } from './nuevo-descanso/nuevo-descanso.component';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
+import { ModalService } from 'src/app/shared/modal/modal.service';
 
 @Component({
   selector: 'app-descanso',
@@ -19,7 +20,11 @@ export class DescansoComponent implements OnInit {
   pageSize: number = 10;
   pageNumber: number = 1;
 
-  constructor(private attendanceService: AttendanceService,private dialog:MatDialog) { }
+  constructor(
+    private attendanceService: AttendanceService,
+    private dialog:MatDialog,
+    private modalService: ModalService
+  ) { }
 
   ngOnInit() {
     this.loadDescansos();
@@ -100,7 +105,6 @@ calcularHoraFin(horaInicio: string, duracionEnMinutos: number): string {
   //vamos a abrir NuevoDescansoComponent
   openModalNuevoDescanso() {
     this.dialog.open(NuevoDescansoComponent, {
-     
       hasBackdrop: true,
       backdropClass: 'backdrop-modal', // Clase personalizada para el fondo
       
@@ -115,6 +119,30 @@ calcularHoraFin(horaInicio: string, duracionEnMinutos: number): string {
     });
     console.log('Abrir modal para nuevo descanso');
   }
+  //Metodo para abrir un modal y registrar un nuevo descanso
+  //vamos a abrir NuevoDescansoComponent
+  openModalNuevoDescanso2() {
+    this.modalService.open({
+      title: 'Nuevo Descanso',
+      componentType: NuevoDescansoComponent,
+       // Clase personalizada para el fondo
+    }).then(result => {
+      if (result) {
+        // Aquí puedes manejar el resultado del modal
+        console.log('Resultado del modal:', result);
+        // Recargar los descansos después de cerrar el modal
+        this.loadDescansos();
+        this.dialog.open(ModalConfirmComponent, {
+          data: {
+            tipo: 'success',
+            mensaje: 'El Descanso se guardó correctamente.'
+          }
+        });
+      }
+    });
+    console.log('Abrir modal para nuevo descanso');
+  }
+
 
   //Metodo para abrir un modal y editar un descanso
   //vamos a abrir NuevoDescansoComponent
@@ -127,7 +155,7 @@ calcularHoraFin(horaInicio: string, duracionEnMinutos: number): string {
       }
     }).afterClosed().subscribe(result => {
       if (result) {
-        if (result.mensaje) {
+        if (result) {
           console.log('Resultado del modal:', result);
           this.loadDescansos();
            this.dialog.open(ModalConfirmComponent, {
@@ -147,6 +175,37 @@ calcularHoraFin(horaInicio: string, duracionEnMinutos: number): string {
         
       }
       
+    });
+    console.log('Abrir modal para editar descanso');
+  }
+  //Metodo para abrir un modal y editar un descanso
+  //vamos a abrir NuevoDescansoComponent
+  openModalEditarDescanso2(idDescanso: number) {
+    this.modalService.open({
+      title: 'Editar Descanso',
+      componentType: NuevoDescansoComponent,
+      componentData: { id: idDescanso },
+      // Clase personalizada para el fondo
+    }).then(result => {
+      if (result) {
+        if (result) {
+          console.log('Resultado del modal:', result);
+          this.loadDescansos();
+          this.dialog.open(ModalConfirmComponent, {
+            data: {
+              tipo: 'success',
+              mensaje: 'El Descanso se guardó correctamente.'
+            }
+          });
+        } else {  
+          this.dialog.open(ModalConfirmComponent, {
+            data: {
+              tipo: 'error',
+              mensaje: 'Error al guardar el descanso.'
+            }
+          });
+        }
+      }
     });
     console.log('Abrir modal para editar descanso');
   }

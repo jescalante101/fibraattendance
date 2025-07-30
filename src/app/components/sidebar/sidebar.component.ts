@@ -144,6 +144,10 @@ export class SidebarComponent {
       submenu: [
         { label: 'Análisis de Marcaciones', link: '/panel/asistencia/marcaciones/analisis' },
         { label: 'Reporte de Marcaciones', link: '/panel/asistencia/marcaciones/reporte-asistencia-excel' },
+        {label: 'Catalogos',link: 'panel/asistencia/marcaciones/reportes-excel/config-catalogos'},
+        {label: 'Centros Costo',link: 'panel/asistencia/marcaciones/reportes-excel/centro-costos'},
+        {label: 'Reporte Marcación Mensual',link: 'panel/asistencia/marcaciones/reportes-excel/asistencia-mensual'},
+        {label: 'Reporte Marcación Detalle',link: 'panel/asistencia/marcaciones/reportes-excel/marcaciones-detalle'},
         { label: 'Marcación', link: null },
         { label: 'Cartilla de Tiempo', link: null },
         { label: 'Primero & Último', link: null },

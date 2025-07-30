@@ -25,20 +25,21 @@ export interface EmployeeScheduleAssignment {
 }
 
 export interface EmployeeScheduleAssignmentInsert {
-  employeeId: string;
-  scheduleId: number;
-  startDate: string;
-  endDate: string;
-  remarks: string;
-  createdAt: string;
-  crearteBY: string;
-  fullName: string;
+  assignmentId:     number;
+  employeeId:       string;
+  shiftId:          number;
+  startDate:        String;
+  endDate:          String;
+  remarks:          string;
+  createdAt:        string;
+  createdBy:        string;
+  fullNameEmployee: string;
   shiftDescription: string;
-  nroDoc: string;
-  areaId: string;
-  areaDescription: string;
-  locationId: string;
-  locationName: string;
+  nroDoc:           string;
+  areaId:           string;
+  areaDescription:  string;
+  locationId:       string;
+  locationName:     string;
 }
 
 export interface EmployeeHorario {
@@ -54,7 +55,7 @@ export interface EmployeeHorario {
   providedIn: 'root'
 })
 export class EmployeeScheduleAssignmentService {
-  private apiUrl = `${environment.apiUrl}`;
+  private apiUrl = `${environment.apiUrlPro}`;
 
   constructor(private http: HttpClient) { }
 
@@ -86,6 +87,19 @@ export class EmployeeScheduleAssignmentService {
     return this.http.get<EmployeeHorario[]>(
       `${this.apiUrl}api/employee-schedule-assignment/get-horaio-by-doc/${nroDoc}`
     );
+  }
+
+  //update employee schedule assignment
+  updateEmployeeScheduleAssignment( body: EmployeeScheduleAssignment[]): Observable<ApiResponse<EmployeeScheduleAssignment>> {
+    return this.http.put<ApiResponse<EmployeeScheduleAssignment>>(
+      `${this.apiUrl}api/employee-schedule-assignment/update/`,
+      body
+    );
+  }
+
+  // get employee schedule by id
+  getEmployeeScheduleById(id:number):Observable<ApiResponse<EmployeeScheduleAssignment>>{
+    return this.http.get<ApiResponse<EmployeeScheduleAssignment>>(`${this.apiUrl}api/employee-schedule-assignment/get-by-id/${id}`)
   }
 
 

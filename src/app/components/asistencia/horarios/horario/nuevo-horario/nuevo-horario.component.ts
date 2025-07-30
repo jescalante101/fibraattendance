@@ -38,11 +38,13 @@ export class NuevoHorarioComponent implements OnInit {
     console.log('componentData nuevo horario',this.componentData);
     console.log('data nuevo horario',this.data);
     const data2 = this.data;
+    
     if (data2) {
       this.useMode = data2.use_mode;
       
       this.loadEdit(data2.idHorario);
     }
+
     this.horarioForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(50)]],
       horaEntrada: ['', Validators.required],

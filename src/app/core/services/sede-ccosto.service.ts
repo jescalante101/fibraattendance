@@ -8,7 +8,7 @@ import { SedeCcosto } from '../models/sede-ccosto.model';
   providedIn: 'root'
 })
 export class SedeCcostoService {
-  private apiUrl = environment.apiUrl;
+  private apiUrl = environment.apiUrlPro;
   private resource = this.apiUrl + 'api/SiteCostCenter';
 
   constructor(private http: HttpClient) { }

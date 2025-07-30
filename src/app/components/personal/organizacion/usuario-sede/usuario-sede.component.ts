@@ -7,6 +7,7 @@ import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/servic
 import { AppUserService, User } from 'src/app/core/services/app-user.services';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 import { MatDialog } from '@angular/material/dialog';
+import { Observable, map, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-usuario-sede',
@@ -16,11 +17,17 @@ import { MatDialog } from '@angular/material/dialog';
 export class UsuarioSedeComponent implements OnInit {
   form: FormGroup;
   userSites: UserSite[] = [];
+  filteredUserSites: UserSite[] = [];
   editing: boolean = false;
   selectedUserSite?: UserSite;
   loading = false;
   sedes: CategoriaAuxiliar[] = [];
   usuarios: User[] = [];
+  searchTerm = '';
+
+  // Filtered observables for autocomplete
+  filteredUsuarios!: Observable<User[]>;
+  filteredSedes!: Observable<CategoriaAuxiliar[]>;
 
   constructor(
     private fb: FormBuilder,
@@ -33,6 +40,8 @@ export class UsuarioSedeComponent implements OnInit {
     this.form = this.fb.group({
       userId: ['', Validators.required],
       siteId: ['', Validators.required],
+      usuarioFilter: [''],
+      sedeFilter: [''],
       observation: [''],
       creationDate: [{ value: new Date().toISOString().substring(0, 16), disabled: true }, Validators.required],
     });
@@ -42,18 +51,11 @@ export class UsuarioSedeComponent implements OnInit {
     this.loadUserSites();
     this.loadSedes();
     this.loadUsuarios();
-    this.form.get('userId')?.valueChanges.subscribe(id => {
-      const user = this.usuarios.find(u => u.userId == id);
-      if (user) {
-        this.form.patchValue({ userName: user.userName }, { emitEvent: false });
-      }
-    });
-    this.form.get('siteId')?.valueChanges.subscribe(id => {
-      const sede = this.sedes.find(s => s.categoriaAuxiliarId === id);
-      if (sede) {
-        this.form.patchValue({ siteName: sede.descripcion }, { emitEvent: false });
-      }
-    });
+    
+    // Setup autocomplete after data is loaded
+    setTimeout(() => {
+      this.setupAutocomplete();
+    }, 100);
   }
 
   loadUserSites() {
@@ -61,6 +63,7 @@ export class UsuarioSedeComponent implements OnInit {
     this.userSiteService.getAll().subscribe({
       next: (data) => {
         this.userSites = data;
+        this.filteredUserSites = [...this.userSites];
         this.loading = false;
       },
       error: () => {
@@ -121,9 +124,16 @@ export class UsuarioSedeComponent implements OnInit {
   onEdit(userSite: UserSite) {
     this.editing = true;
     this.selectedUserSite = userSite;
+    
+    // Find the objects for autocomplete
+    const usuario = this.usuarios.find(u => u.userId === userSite.userId);
+    const sede = this.sedes.find(s => s.categoriaAuxiliarId === userSite.siteId);
+    
     this.form.patchValue({
       userId: userSite.userId,
       siteId: userSite.siteId,
+      usuarioFilter: usuario,
+      sedeFilter: sede,
       observation: userSite.observation,
       creationDate: userSite.creationDate?.substring(0, 16)
     });
@@ -186,5 +196,105 @@ export class UsuarioSedeComponent implements OnInit {
         });
       }
     });
+  }
+
+  // Setup autocomplete filtering
+  private setupAutocomplete(): void {
+    this.filteredUsuarios = this.form.get('usuarioFilter')!.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filterUsuarios(value || ''))
+    );
+
+    this.filteredSedes = this.form.get('sedeFilter')!.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filterSedes(value || ''))
+    );
+  }
+
+  private _filterUsuarios(value: string | User): User[] {
+    if (typeof value === 'object') return this.usuarios;
+    const filterValue = value.toLowerCase();
+    return this.usuarios.filter(usuario => usuario.userName.toLowerCase().includes(filterValue));
+  }
+
+  private _filterSedes(value: string | CategoriaAuxiliar): CategoriaAuxiliar[] {
+    if (typeof value === 'object') return this.sedes;
+    const filterValue = value.toLowerCase();
+    return this.sedes.filter(sede => sede.descripcion.toLowerCase().includes(filterValue));
+  }
+
+  // Selection handlers for autocomplete
+  onUsuarioSelected(usuario: User): void {
+    if (usuario && usuario.userId) {
+      this.form.patchValue({
+        userId: usuario.userId,
+        //usuarioFilter: usuario
+      });
+     
+    }
+  }
+
+  onSedeSelected(sede: CategoriaAuxiliar): void {
+    if (sede && sede.categoriaAuxiliarId) {
+      this.form.patchValue({
+        siteId: sede.categoriaAuxiliarId
+      });
+    }
+  }
+
+  // Display functions for autocomplete
+  displayUsuarioFunction = (usuario: User): string => {
+    return usuario && usuario.userName ? usuario.userName : '';
+  }
+
+  displaySedeFunction = (sede: CategoriaAuxiliar): string => {
+    return sede && sede.descripcion ? sede.descripcion : '';
+  }
+
+  // Focus handlers to open autocomplete panels automatically
+  onUsuarioFieldFocus(autocomplete: any): void {
+    if (this.usuarios.length > 0) {
+      //this.form.get('usuarioFilter')?.setValue('');
+      setTimeout(() => {
+        if (autocomplete && autocomplete.openPanel) {
+          autocomplete.openPanel();
+        }
+      }, 100);
+    }
+  }
+
+  onSedeFieldFocus(autocomplete: any): void {
+    if (this.sedes.length > 0) {
+      //this.form.get('sedeFilter')?.setValue('');
+      setTimeout(() => {
+        if (autocomplete && autocomplete.openPanel) {
+          autocomplete.openPanel();
+        }
+      }, 100);
+    }
+  }
+
+  // Search functionality for table
+  onSearchChange() {
+    if (!this.searchTerm.trim()) {
+      this.filteredUserSites = [...this.userSites];
+      return;
+    }
+
+    const term = this.searchTerm.toLowerCase();
+    this.filteredUserSites = this.userSites.filter(us => 
+      us.userName.toLowerCase().includes(term) ||
+      us.siteName.toLowerCase().includes(term) ||
+      us.observation?.toLowerCase().includes(term)
+    );
+  }
+
+  // Helper methods for statistics
+  getActiveCount(): number {
+    return this.userSites.filter(us => us.active === 'Y').length;
+  }
+
+  getInactiveCount(): number {
+    return this.userSites.filter(us => us.active !== 'Y').length;
   }
 }

@@ -80,6 +80,13 @@ import { NuevaMarcacionManualComponent } from './components/asistencia/aprobacio
 import { EditarMarcionManualComponent } from './components/asistencia/aprobaciones/marcacion-manual/editar-marcion-manual/editar-marcion-manual.component';
 import { AnalisisMarcacionesComponent } from './components/asistencia/marcaciones/analisis-marcaciones/analisis-marcaciones.component';
 import { ReporteAsistenciaExcelComponent } from './components/asistencia/marcaciones/reporte-asistencia-excel/reporte-asistencia-excel.component';
+import { ConfigCatalogosComponent } from './components/asistencia/marcaciones/reportes-excel/config-catalogos/config-catalogos.component';
+import { ReporteCentroCostosComponent } from './components/asistencia/marcaciones/reportes-excel/reporte-centro-costos/reporte-centro-costos.component';
+import { ReporteAsistenciaMensualComponent } from './components/asistencia/marcaciones/reportes-excel/reporte-asistencia-mensual/reporte-asistencia-mensual.component';
+import { ReporteMarcacionesDetalleComponent } from './components/asistencia/marcaciones/reportes-excel/reporte-marcaciones-detalle/reporte-marcaciones-detalle.component';
+import { ModalVerHorarioComponent } from './components/personal/empleado/asignar-horario-empleado/modal-ver-horario/modal-ver-horario.component';
+import { ModalEditarAsignacionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-editar-asignacion/modal-editar-asignacion.component';
+import { ModalRegistrarExcepcionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-registrar-excepcion/modal-registrar-excepcion.component';
 registerLocaleData(localeEs);
 @NgModule({ declarations: [
         AppComponent,
@@ -122,7 +129,14 @@ registerLocaleData(localeEs);
         NuevaMarcacionManualComponent,
         EditarMarcionManualComponent,
         AnalisisMarcacionesComponent,
-        ReporteAsistenciaExcelComponent
+        ReporteAsistenciaExcelComponent,
+        ConfigCatalogosComponent,
+        ReporteCentroCostosComponent,
+        ReporteAsistenciaMensualComponent,
+        ReporteMarcacionesDetalleComponent,
+        ModalVerHorarioComponent,
+        ModalEditarAsignacionComponent,
+        ModalRegistrarExcepcionComponent,
     ],
     exports: [
         TerminalSyncComponent,

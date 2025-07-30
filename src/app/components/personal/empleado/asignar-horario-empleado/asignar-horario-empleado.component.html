@@ -1,127 +1,235 @@
-<div class="max-w-7xl mx-auto  space-y-6">
-  <!-- Cabecera y botón -->
-  <div class="flex justify-between items-center">
-    <span class="text-title">Personal con Turno</span>
-    <button class="btn-fiori" (click)="irAEmpleados()">
-      + Asignar Turno
-    </button>
-  </div>
-
-  <!-- Campo de filtro -->
-  <div class="flex items-center gap-2 bg-white border rounded-lg shadow-sm p-3">
-    <div class="relative flex-1 max-w-sm">
-      <input
-        type="text"
-        [(ngModel)]="filtro"
-        
-        placeholder="Buscar por nombre..."
-        class="w-full px-3 py-2 pr-10 text-sm border border-fiori-border rounded focus:outline-none focus:ring-2 focus:ring-fiori-primary"
-      />
+<div class="w-full mx-auto p-6 bg-gray-50 min-h-screen">
+  
+  <!-- Header compacto -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 mb-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-blue-600">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+          </svg>
+        </div>
+        <div>
+          <div class="text-lg font-semibold text-gray-900">Personal con Turno</div>
+          <div class="text-xs text-gray-500">{{ totalCount }} empleados registrados</div>
+        </div>
+      </div>
       <button 
-        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-fiori-subtext hover:text-fiori-primary"
-        (click)="aplicarFiltro()"
-      >
-        <span class="material-icons text-base">search</span>
+        (click)="irAEmpleados()"
+        class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Asignar Turno
       </button>
     </div>
-    <input
-      type="date"
-      [(ngModel)]="startDate"
-      placeholder="Fecha inicio"
-      class="px-3 py-2 text-sm border border-fiori-border rounded focus:outline-none focus:ring-2 focus:ring-fiori-primary"
-    />
-    <input
-      type="date"
-      [(ngModel)]="endDate"
-      placeholder="Fecha fin"
-      class="px-3 py-2 text-sm border border-fiori-border rounded focus:outline-none focus:ring-2 focus:ring-fiori-primary"
-    />
-    <button 
-      class="btn-fiori-secondary"
-      (click)="aplicarFiltroFechas()"
-    >
-      Filtrar Fechas
-    </button>
   </div>
 
-  <!-- Tabla empleados -->
-<div class="relative card-fiori overflow-x-auto h-[550px] lg:h-[900px] xl:h-full flex flex-col">
-  <!-- Overlay de loading -->
-  <div *ngIf="loading" class="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
-    <mat-progress-spinner mode="indeterminate" color="primary" diameter="50"></mat-progress-spinner>
-  </div>
-  <!-- Contenedor con scroll horizontal y vertical -->
-  <div class="flex-1 overflow-y-auto">
-    <table mat-table [dataSource]="employees" class="min-w-full w-max text-sm" matSort>
-      <!-- Columnas aquí (igual que antes) -->
-      <ng-container matColumnDef="employeeId">
-        <th mat-header-cell *matHeaderCellDef>ID Empleado</th>
-        <td mat-cell *matCellDef="let emp">{{ emp.employeeId }}</td>
-      </ng-container>
-      <ng-container matColumnDef="nroDoc">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nro. Doc. Identidad</th>
-        <td mat-cell *matCellDef="let emp">{{ emp.nroDoc }}</td>
-      </ng-container>
-      <ng-container matColumnDef="fullNameEmployee">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre Completo</th>
-        <td mat-cell *matCellDef="let emp">{{ emp.fullNameEmployee }}</td>
-      </ng-container>
-      <ng-container matColumnDef="scheduleName">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Turno</th>
-        <td mat-cell *matCellDef="let emp">{{ emp.scheduleName }}</td>
-      </ng-container>
-      <ng-container matColumnDef="createdWeek">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Semana Creada</th>
-        <td mat-cell *matCellDef="let emp">{{ emp.createdWeek }}</td>
-      </ng-container>
-      <ng-container matColumnDef="locationName">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Ubicación</th>
-        <td mat-cell *matCellDef="let emp">{{ emp.locationName }}</td>
-      </ng-container>
-      <ng-container matColumnDef="areaName">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Área</th>
-        <td mat-cell *matCellDef="let emp">{{ emp.areaName }}</td>
-      </ng-container>
-      <ng-container matColumnDef="startDate">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha Inicio</th>
-        <td mat-cell *matCellDef="let emp">{{ emp.startDate }}</td>
-      </ng-container>
-      <ng-container matColumnDef="endDate">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha Fin</th>
-        <td mat-cell *matCellDef="let emp">{{ emp.endDate }}</td>
-      </ng-container>
-      <ng-container matColumnDef="remarks">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Observaciones</th>
-        <td mat-cell *matCellDef="let emp">{{ emp.remarks }}</td>
-      </ng-container>
-      <ng-container matColumnDef="acciones">
-        <th mat-header-cell *matHeaderCellDef class="text-right">Acciones</th>
-        <td mat-cell *matCellDef="let emp" class="text-right space-x-1">
-          <button class="text-fiori-primary hover:underline" (click)="editar(emp)" title="Editar">✏️</button>
-          <button class="text-fiori-error hover:underline" (click)="eliminar(emp)" title="Eliminar">🗑️</button>
-        </td>
-      </ng-container>
-      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      <tr *ngIf="employees.length === 0 && !loading">
-        <td [attr.colspan]="displayedColumns.length" class="text-center py-8 text-fiori-subtext">
-          <div class="flex flex-col items-center justify-center">
-            <mat-icon class="mb-2" style="font-size: 48px;">group_off</mat-icon>
-            <span class="text-lg font-medium mb-2">No se encontraron empleados</span>
-            <span>Prueba con diferentes filtros o añade un nuevo empleado</span>
+  <!-- Panel de filtros compacto -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-3">
+    <div class="p-4">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+        <!-- Campo de búsqueda -->
+        <div class="md:col-span-2">
+          <label class="block text-xs font-medium text-gray-600 mb-1">Buscar Empleado</label>
+          <div class="relative">
+            <input
+              type="text"
+              [(ngModel)]="filtro"
+              placeholder="Nombre, documento o ID..."
+              class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+            />
+            <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3 text-gray-400">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607z" />
+              </svg>
+            </div>
+            <button 
+              (click)="aplicarFiltro()"
+              class="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607z" />
+              </svg>
+            </button>
           </div>
-        </td>
-      </tr>
-    </table>
+        </div>
+        
+        <!-- Fecha inicio -->
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Fecha Inicio</label>
+          <input
+            type="date"
+            [(ngModel)]="startDate"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+        
+        <!-- Fecha fin -->
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Fecha Fin</label>
+          <input
+            type="date"
+            [(ngModel)]="endDate"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <!-- Botón filtrar -->
+        <div>
+          <button 
+            (click)="aplicarFiltroFechas()"
+            class="w-full inline-flex items-center justify-center px-3 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+            </svg>
+            Filtrar
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
-  <!-- Paginador siempre visible debajo de la tabla -->
-  <mat-paginator
-    [length]="totalCount"
-    [pageSize]="pageSize"
-    [pageIndex]="pageNumber - 1"
-    [pageSizeOptions]="[5, 10, 15, 25, 50]"
-    (page)="onPageChange($event)"
-    class="bg-white sticky bottom-0 z-20"
-    showFirstLastButtons>
-  </mat-paginator>
+
+  <!-- Tabla de empleados -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+      <div class="flex items-center justify-between">
+        <div class="text-lg font-semibold text-gray-900">Lista de Empleados</div>
+        <div class="flex items-center space-x-2 text-sm text-gray-600">
+          <span>Mostrando {{ employees.length }} de {{ totalCount }} empleados</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay de loading -->
+    <div *ngIf="loading" class="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
+      <div class="text-center p-4">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
+        <p class="text-sm text-gray-500">Cargando empleados...</p>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full" *ngIf="!loading">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empleado</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turno</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ubicación</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Área</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Inicio</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Fin</th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let emp of employees" class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <div class="flex items-center">
+                  <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                    <span class="text-xs font-medium text-blue-600">#{{ emp.employeeId }}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ emp.nroDoc }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-sm font-medium text-gray-900">{{ emp.fullNameEmployee }}</div>
+                    <div class="text-sm text-gray-500">Empleado</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  {{ emp.scheduleName }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ emp.locationName }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ emp.areaName }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ emp.startDate | date:'dd/MM/yyyy' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ emp.endDate | date:'dd/MM/yyyy' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="flex items-center justify-end space-x-2">
+                  <button 
+                    (click)="getHorario(emp)" 
+                    class="inline-flex items-center px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors" 
+                    title="Ver Horario">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3 mr-1">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Horario
+                  </button>
+                  <button 
+                    (click)="editar(emp)" 
+                    class="inline-flex items-center p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors" 
+                    title="Editar">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487a2.25 2.25 0 113.182 3.182L7.5 20.213 3 21l.787-4.5L16.862 4.487z" />
+                    </svg>
+                  </button>
+                  <button 
+                    (click)="eliminar(emp)" 
+                    class="inline-flex items-center p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors" 
+                    title="Eliminar">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <!-- Estado vacío -->
+        <div *ngIf="!employees || employees.length === 0" class="text-center py-12">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-gray-400 mx-auto mb-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+          </svg>
+          <div class="text-lg font-medium text-gray-900 mb-2">No hay empleados registrados</div>
+          <p class="text-gray-500">Los empleados que tengan turnos asignados aparecerán aquí</p>
+        </div>
+    </div>
+    
+    <!-- Paginador -->
+    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+      <div class="flex items-center justify-between">
+        <div class="text-sm text-gray-700">
+          Mostrando {{ (pageNumber - 1) * pageSize + 1 }} a {{ Math.min(pageNumber * pageSize, totalCount) }} de {{ totalCount }} empleados
+        </div>
+        <div class="flex items-center space-x-2">
+          <button 
+            (click)="onPageChange({pageIndex: pageNumber - 2, pageSize: pageSize, length: totalCount})"
+            [disabled]="pageNumber <= 1"
+            class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            Anterior
+          </button>
+          <span class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md">{{ pageNumber }}</span>
+          <button 
+            (click)="onPageChange({pageIndex: pageNumber, pageSize: pageSize, length: totalCount})"
+            [disabled]="pageNumber * pageSize >= totalCount"
+            class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            Siguiente
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

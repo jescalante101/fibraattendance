@@ -86,13 +86,17 @@
                 </div>
               </div>
             </div>
-            <div class="flex-shrink-0 pt-4 border-t border-gray-200 mt-auto flex justify-end" >
-              <button mat-raised-button color="primary" 
-              matStepperNext [disabled]="!filtroForm.valid"
-              (click)="cargarPersonal()"
-              >
+            <div class="flex-shrink-0 pt-4 border-t border-gray-200 mt-auto flex justify-end">
+              <button type="button"
+                      matStepperNext 
+                      [disabled]="!filtroForm.valid"
+                      (click)="cargarPersonal()"
+                      class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
                 Siguiente
-            </button>
+              </button>
             </div>
           </form>
         </mat-step>
@@ -109,7 +113,40 @@
                 </div>
               </div>
               <div *ngIf="!loadingPersonal" class="flex-1 flex flex-col min-h-0">
-                <div class="flex-1 overflow-auto border rounded-lg mb-4" style="max-height: 400px;">
+                <!-- Campo de búsqueda compacto -->
+                <div class="mb-4 bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                  <div class="flex items-center gap-4">
+                    <div class="flex-1 max-w-md">
+                      
+                      <div class="relative flex-1 max-w-sm">
+                        <input
+                          type="text"
+                          [(ngModel)]="filtro"
+                          placeholder="Nombre, documento, etc."
+                          [ngModelOptions]="{standalone: true}"
+                          (keyup.enter)="buscarEmpleado()"
+                          class="w-full pl-3 pr-10 py-2 border border-fiori-border rounded-lg focus:outline-none focus:ring-1 focus:ring-fiori-primary text-sm"
+                        />
+                        <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-fiori-primary cursor-pointer"
+                              (click)="buscarEmpleado()">search</span>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-4 text-sm text-gray-600 px-3">
+                      <span>{{ personalFiltrado.length }}/{{ personalTotal.length }} empleados</span>
+                      <span>Seleccionados: {{ getSelectedCount() }}</span>
+                      <button type="button" 
+                              mat-stroked-button 
+                              color="primary" 
+                              (click)="clearSelection()"
+                              [disabled]="getSelectedCount() === 0"
+                              class="text-xs py-1 px-2">
+                        Limpiar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="flex-1 overflow-auto bg-white rounded-lg shadow-sm border border-gray-200 mb-4" style="max-height: 350px;">
                   <table mat-elevation-z8 mat-table [dataSource]="personalFiltrado" class="w-full min-w-[600px] tabla-personal-scroll">
                     <!-- Checkbox -->
                     <ng-container matColumnDef="select">
@@ -162,9 +199,25 @@
                 </mat-paginator>
               </div>
             </div>
-            <div class="flex-shrink-0 pt-4 border-t border-gray-200 mt-auto flex justify-end">
-              <button mat-button matStepperPrevious>Anterior</button>
-              <button mat-raised-button color="primary" matStepperNext [disabled]="!personalForm.valid" (click)="cargarTurnos()">Siguiente</button>
+            <div class="flex-shrink-0 pt-4 border-t border-gray-200 mt-auto flex justify-end gap-3">
+              <button type="button"
+                      matStepperPrevious
+                      class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Anterior
+              </button>
+              <button type="button"
+                      matStepperNext 
+                      [disabled]="!personalForm.valid" 
+                      (click)="cargarTurnos()"
+                      class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+                Siguiente
+              </button>
             </div>
           </form>
         </mat-step>
@@ -183,66 +236,146 @@
               <div *ngIf="!loadingTurnos && turnos.length > 0" class="flex-1 flex flex-col md:flex-row gap-6">
                 <!-- Columna izquierda: Lista de turnos -->
                 <div class="md:w-1/2 w-full">
-                  <div class="flex-1 overflow-auto border rounded-lg" style="max-height: 350px;">
-                    <table mat-table [dataSource]="turnos" class="w-full tabla-turnos-scroll">
-                      <!-- Radio button para selección -->
-                      <ng-container matColumnDef="select">
-                        <th mat-header-cell *matHeaderCellDef class="w-12"></th>
-                        <td mat-cell *matCellDef="let turno">
-                          <mat-radio-button
-                            name="turnoRadio"
-                            [value]="turno.id"
-                            (change)="turnoForm.patchValue({turno: turno.id})"
-                            [checked]="turnoForm.get('turno')?.value === turno.id"
-                            aria-label="Seleccionar turno">
-                          </mat-radio-button>
-                        </td>
-                      </ng-container>
-                      <!-- Alias del turno -->
-                      <ng-container matColumnDef="alias">
-                        <th mat-header-cell *matHeaderCellDef>Turno</th>
-                        <td mat-cell *matCellDef="let turno">{{ turno.alias }}</td>
-                      </ng-container>
-                      <!-- Resumen del horario -->
-                      <ng-container matColumnDef="horarioResumen">
-                        <th mat-header-cell *matHeaderCellDef>Horario</th>
-                        <td mat-cell *matCellDef="let turno">
-                          <ng-container *ngIf="getPrimerHorarioValido(turno) as horario">
-                            <span>
-                              {{ formatHora(horario.inTime) }} - {{ getHoraFin(horario.inTime, horario.workTimeDuration) }}
-                            </span>
-                          </ng-container>
-                        </td>
-                      </ng-container>
-                      <tr mat-header-row *matHeaderRowDef="['select', 'alias', 'horarioResumen']; sticky: true"></tr>
-                      <tr mat-row *matRowDef="let row; columns: ['select', 'alias', 'horarioResumen'];"
-                          [ngClass]="{'bg-fiori-hover border-l-4 border-fiori-primary': turnoForm.get('turno')?.value === row.id}"
-                          (click)="turnoForm.patchValue({turno: row.id})"
-                          style="cursor:pointer"></tr>
-                    </table>
+                  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                      <div class="text-lg font-semibold text-gray-900">Turnos Disponibles</div>
+                      <div class="text-sm text-gray-600">Selecciona un turno para ver sus horarios</div>
+                    </div>
+                    
+                    <div class="max-h-[600px] overflow-auto">
+                      <div *ngFor="let turno of turnos; let i = index" class="border-b border-gray-100 last:border-b-0">
+                        <!-- Header del turno -->
+                        <div class="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                             [class.bg-blue-50]="turnoForm.get('turno')?.value === turno.id"
+                             (click)="onTurnoSelected(turno)">
+                          <div class="flex items-center space-x-3">
+                            <mat-radio-button
+                              name="turnoRadio"
+                              [value]="turno.id"
+                              [checked]="turnoForm.get('turno')?.value === turno.id"
+                              (click)="$event.stopPropagation()"
+                              (change)="onTurnoSelected(turno)">
+                            </mat-radio-button>
+                            <div class="flex-1">
+                              <div class="font-medium text-gray-900">{{ turno.alias }}</div>
+                              <div class="text-sm text-gray-500">
+                                {{ getHorariosCount(turno) }} horario(s) configurado(s)
+                              </div>
+                            </div>
+                            <div class="flex items-center">
+                              <button type="button" 
+                                      mat-icon-button 
+                                      (click)="toggleTurnoExpansion(turno.id.toString()); $event.stopPropagation()"
+                                      [disabled]="turnoForm.get('turno')?.value !== turno.id">
+                                <mat-icon>{{ isTurnoExpanded(turno.id.toString()) ? 'expand_less' : 'expand_more' }}</mat-icon>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- Horarios expandidos -->
+                        <div *ngIf="isTurnoExpanded(turno.id.toString()) && turnoForm.get('turno')?.value === turno.id" 
+                             class="bg-gray-50 border-t border-gray-200">
+                          <div class="p-4">
+                            <div class="text-sm font-medium text-gray-700 mb-3">Horarios del Turno:</div>
+                            <div class="space-y-2">
+                              <div *ngFor="let horario of getHorariosValidos(turno)" 
+                                   class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                                <div class="flex items-center space-x-3">
+                                  <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <span class="text-xs font-medium text-blue-600">{{ getDayAbbreviation(horario.dayIndex) }}</span>
+                                  </div>
+                                  <div>
+                                    <div class="font-medium text-gray-900">
+                                      {{ getDayName(horario.dayIndex) }}
+                                    </div>
+                                    <div class="text-sm text-gray-600">
+                                      {{ formatHora(horario.inTime) }} - {{ getHoraFin(horario.inTime, horario.workTimeDuration) }}
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                      Duración: {{ formatDuracion(horario.workTimeDuration) }}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="text-xs text-gray-500 text-right">
+                                  <div>ID: {{ horario.id }}</div>
+                                  <div>Día: {{ horario.dayIndex }}</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <!-- Columna derecha: Formulario -->
-                <div class="md:w-1/2 w-full flex flex-col gap-4">
-                  <mat-card class="h-full flex flex-col p-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <mat-form-field appearance="fill" class="w-full">
-                        <mat-label>Fecha de Inicio</mat-label>
-                        <input matInput [matDatepicker]="pickerInicio" formControlName="fechaInicio" placeholder="Selecciona fecha">
-                        <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
-                        <mat-datepicker #pickerInicio></mat-datepicker>
-                      </mat-form-field>
-                      <mat-form-field appearance="fill" class="w-full">
-                        <mat-label>Fecha de Fin</mat-label>
-                        <input matInput [matDatepicker]="pickerFin" formControlName="fechaFin" placeholder="Selecciona fecha">
-                        <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
-                        <mat-datepicker #pickerFin></mat-datepicker>
-                      </mat-form-field>
+                <div class="md:w-1/2 w-full">
+                  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                      <div class="text-lg font-semibold text-gray-900">Configuración de Asignación</div>
+                      <div class="text-sm text-gray-600">Define las fechas y observaciones</div>
                     </div>
-                    <mat-form-field appearance="fill" >
-                      <textarea matInput formControlName="observaciones" rows="3" placeholder="Observaciones adicionales..."></textarea>
-                    </mat-form-field>
-                  </mat-card>
+                    
+                    <div class="p-6">
+                      <!-- Resumen de selección -->
+                      <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div class="text-sm font-medium text-blue-900 mb-2">Resumen de Asignación:</div>
+                        <div class="text-sm text-blue-800">
+                          <div>Personal seleccionado: <strong>{{ getSelectedCount() }} empleado(s)</strong></div>
+                          <div *ngIf="turnoForm.get('turno')?.value" class="mt-1">
+                            Turno: <strong>{{ getTurnoSeleccionado()?.alias }}</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <mat-form-field appearance="fill" class="w-full">
+                            <mat-label>Fecha de Inicio *</mat-label>
+                            <input matInput [matDatepicker]="pickerInicio" formControlName="fechaInicio" placeholder="Selecciona fecha">
+                            <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+                            <mat-datepicker #pickerInicio></mat-datepicker>
+                           
+                            <mat-error *ngIf="turnoForm.get('fechaInicio')?.hasError('required')">
+                              La fecha de inicio es obligatoria
+                            </mat-error>
+                          </mat-form-field>
+                          
+                          <mat-form-field appearance="fill" class="w-full">
+                            <mat-label>Fecha de Fin</mat-label>
+                            <input matInput [matDatepicker]="pickerFin" formControlName="fechaFin" placeholder="Selecciona fecha (opcional)">
+                            <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+                            <mat-datepicker #pickerFin></mat-datepicker>
+                           
+                          </mat-form-field>
+                        </div>
+                        
+                        <mat-form-field appearance="fill" class="w-full">
+                          <mat-label>Observaciones</mat-label>
+                          <textarea matInput 
+                                    formControlName="observaciones" 
+                                    rows="4" 
+                                    placeholder="Ingrese observaciones adicionales sobre esta asignación..."></textarea>
+                          <mat-icon matSuffix>note</mat-icon>
+                        </mat-form-field>
+
+                        <!-- Información adicional -->
+                        <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                          <div class="text-xs text-gray-600">
+                            <div class="flex items-center space-x-2 mb-1">
+                              <mat-icon class="text-gray-400" style="font-size: 16px; width: 16px; height: 16px;">info</mat-icon>
+                              <span>Esta asignación se aplicará a todos los empleados seleccionados</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                              <mat-icon class="text-gray-400" style="font-size: 16px; width: 16px; height: 16px;">schedule</mat-icon>
+                              <span>Si no se especifica fecha de fin, la asignación será indefinida</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <!-- Mensaje cuando no hay turnos -->
@@ -252,9 +385,24 @@
                 </div>
               </div>
             </div>
-            <div class="flex-shrink-0 pt-4 border-t border-gray-200 mt-auto flex justify-end">
-              <button mat-button matStepperPrevious>Anterior</button>
-              <button mat-raised-button color="primary" (click)="guardarAsignacion()" [disabled]="!turnoForm.valid">Guardar</button>
+            <div class="flex-shrink-0 pt-4 border-t border-gray-200 mt-auto flex justify-end gap-3">
+              <button type="button"
+                      matStepperPrevious
+                      class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Anterior
+              </button>
+              <button type="button"
+                      (click)="guardarAsignacion()" 
+                      [disabled]="!turnoForm.valid"
+                      class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75a.75.75 0 01.75-.75h7.5a.75.75 0 01.75.75z" />
+                </svg>
+                Guardar Asignación
+              </button>
             </div>
           </form>
         </mat-step>

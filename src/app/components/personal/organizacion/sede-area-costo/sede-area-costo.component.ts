@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddNewSacComponent } from './add-new-sac/add-new-sac.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
+import { ModalService } from 'src/app/shared/modal/modal.service';
 
 
 @Component({
@@ -21,11 +22,13 @@ export class SedeAreaCostoComponent implements OnInit {
   filteredSites: SedeAreaCosto[] = [];
   loading = false;
   error = '';
+  lastUpdate: string = new Date().toLocaleString('es-ES');
 
   constructor(
     private sedeAreaCostoService: SedeAreaCostoService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private modalService: ModalService
   ) {}
 
   ngOnInit() {
@@ -66,11 +69,12 @@ export class SedeAreaCostoComponent implements OnInit {
   }
 
   onAddNew() {
-    const dialogRef = this.dialog.open(AddNewSacComponent, {
-      width: '500px',
-      data: null
-    });
-    dialogRef.afterClosed().subscribe((result: SedeAreaCosto | undefined) => {
+    this.modalService.open({
+      title: 'Registrar Nueva Relación',
+      componentType: AddNewSacComponent,
+      componentData: null,
+      width: '700px'
+    }).then((result: SedeAreaCosto | null) => {
       if (result) {
         this.sedeAreaCostoService.create(result).subscribe({
           next: () => {
@@ -102,11 +106,12 @@ export class SedeAreaCostoComponent implements OnInit {
   }
 
   onEdit(site: SedeAreaCosto) {
-    const dialogRef = this.dialog.open(AddNewSacComponent, {
-      width: '500px',
-      data: site
-    });
-    dialogRef.afterClosed().subscribe((result: SedeAreaCosto | undefined) => {
+    this.modalService.open({
+      title: 'Editar Relación',
+      componentType: AddNewSacComponent,
+      componentData: site,
+      width: '700px'
+    }).then((result: SedeAreaCosto | null) => {
       if (result) {
         this.sedeAreaCostoService.update(site.siteId, site.areaId, result).subscribe({
           next: (data) => {
@@ -235,5 +240,13 @@ export class SedeAreaCostoComponent implements OnInit {
 
   trackBySiteId(index: number, site: SedeAreaCosto): string {
     return site.siteId;
+  }
+
+  getActiveCount(): number {
+    return this.sites.filter(site => site.active === 'Y').length;
+  }
+
+  getInactiveCount(): number {
+    return this.sites.filter(site => site.active !== 'Y').length;
   }
 }

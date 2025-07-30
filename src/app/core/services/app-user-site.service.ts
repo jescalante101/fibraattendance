@@ -9,7 +9,7 @@ import { environment } from 'src/environments/environment';
 })
 export class AppUserSiteService {
 
-  private apiUrl = environment.apiUrl;
+  private apiUrl = environment.apiUrlPro;
   private resource = this.apiUrl + 'api/AppUserSite';
 
   constructor(private http: HttpClient) { }

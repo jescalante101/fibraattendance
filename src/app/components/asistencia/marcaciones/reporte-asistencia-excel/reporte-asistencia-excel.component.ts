@@ -12,7 +12,6 @@ import {
 } from 'src/app/core/models/attendance-resport.model';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
-import * as XLSX from 'xlsx-js-style';
 
 @Component({
   selector: 'app-reporte-asistencia-excel',

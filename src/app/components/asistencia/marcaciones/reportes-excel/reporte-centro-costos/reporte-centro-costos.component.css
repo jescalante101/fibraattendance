@@ -1,0 +1,92 @@
+/* Estilos específicos para el reporte centro de costos */
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scroll sincronizado para headers */
+.table-container {
+  position: relative;
+}
+
+/* Sticky columns con z-index escalonado */
+.sticky-col-1 { z-index: 35; }
+.sticky-col-2 { z-index: 34; }
+.sticky-col-3 { z-index: 33; }
+.sticky-col-4 { z-index: 32; }
+.sticky-col-5 { z-index: 31; }
+
+/* Hover effects mejorados */
+tbody tr:hover td {
+  background-color: rgba(249, 250, 251, 0.8);
+}
+
+tbody tr:hover td.sticky {
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Colores específicos para valores de horas */
+.hora-normal {
+  background-color: #f0f9ff;
+  color: #1e40af;
+}
+
+.hora-extra {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+.hora-reducida {
+  background-color: #fefce8;
+  color: #a16207;
+}
+
+.falta {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .sticky {
+    position: relative;
+  }
+  
+  table {
+    font-size: 0.75rem;
+  }
+}
+
+/* Mejoras de performance para scroll */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

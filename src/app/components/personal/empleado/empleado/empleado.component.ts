@@ -48,6 +48,9 @@ export class EmpleadoComponent implements OnInit {
   rhAreaList: RhArea[] = [];
   selectedRhArea: string = '';
 
+  // Exponer Math para usar en el template
+  Math = Math;
+
   displayedColumns: string[] = [];
 
   ngOnInit() {

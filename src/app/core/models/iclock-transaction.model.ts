@@ -6,24 +6,24 @@ export interface IClockTransaction {
     verify_type: number;
     work_code: string;
     terminal_sn: string;
-    terminal_alias: string;
-    area_alias: string;
+    terminal_alias: string | null;
+    area_alias: string | null;
     longitude: number | null;
     latitude: number | null;
     gps_location: string | null;
     mobile: string | null;
     source: number;
     purpose: number;
-    crc: string;
+    crc: string | null;
     is_attendance: boolean | null;
     reserved: string | null;
     upload_time: string;
     sync_status: string | null;
     sync_time: string | null;
     is_mask: number;
-    temperature: string;
-    emp: number;
-    terminal: number;
+    temperature: string | null;
+    emp: number | null;
+    terminal: number | 0;
     // Nuevo campo para indicar si llegó a tiempo ("a_tiempo", "tarde", "sin_horario")
     llegoATiempo?: 'a_tiempo' | 'tarde' | 'sin_horario';
 }
@@ -64,23 +64,23 @@ export interface IClockTransactionResponse2 {
     verifyType: number;
     workCode: string;
     terminalSn: string;
-    terminalAlias: string;
-    areaAlias: string;
-    longitude: number | null;
-    latitude: number | null;
+    terminalAlias: string | null;
+    areaAlias: string | null;
+    longitude: number | 0;
+    latitude: number | 0;
     gpsLocation: string | null;
     mobile: string | null;
-    source: number;
-    purpose: number;
-    crc: string;
+    source: number | 0;
+    purpose: number | 0;
+    crc: string | null;
     isAttendance: boolean | null;
     uploadTime: string;
     syncStatus: string | null;
     syncTime: string | null;
-    empId: number;
-    terminalId: number;
-    isMask: number;
-    temperature: number;
+    empId: number | 0;
+    terminalId: number | 0;
+    isMask: number | 0;
+    temperature: string | null;
 }
 
 

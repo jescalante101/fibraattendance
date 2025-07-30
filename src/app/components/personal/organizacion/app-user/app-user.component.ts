@@ -12,8 +12,10 @@ import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confir
 export class AppUserComponent implements OnInit {
   userForm!: FormGroup;
   users: User[] = [];
+  filteredUsers: User[] = [];
   editingUser: User | null = null;
   loading = false;
+  searchTerm = '';
 
   constructor(
     private appUserService: AppUserService, 
@@ -33,10 +35,12 @@ export class AppUserComponent implements OnInit {
     this.appUserService.getAllUsers().subscribe({
       next: users => {
         this.users = users;
+        this.filteredUsers = [...this.users];
         this.loading = false;
       },
       error: _ => {
         this.users = [];
+        this.filteredUsers = [];
         this.loading = false;
       }
     });
@@ -95,5 +99,23 @@ export class AppUserComponent implements OnInit {
   cancelEdit() {
     this.editingUser = null;
     this.userForm.reset();
+  }
+
+  // Search functionality for table
+  onSearchChange() {
+    if (!this.searchTerm.trim()) {
+      this.filteredUsers = [...this.users];
+      return;
+    }
+
+    const term = this.searchTerm.toLowerCase();
+    this.filteredUsers = this.users.filter(user => 
+      user.userName.toLowerCase().includes(term)
+    );
+  }
+
+  // Helper methods for statistics
+  getActiveCount(): number {
+    return this.users.length; // Assuming all users are active for now
   }
 }

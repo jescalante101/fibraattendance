@@ -5,6 +5,8 @@ import { PageEvent } from '@angular/material/paginator';
 import { ShiftsService, Shift } from 'src/app/core/services/shifts.service';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { ModalNuevoTurnoComponent } from './modal-nuevo-turno/modal-nuevo-turno.component';
+import { MatDialog } from '@angular/material/dialog';
+import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 
 @Component({
   selector: 'app-turno',
@@ -14,13 +16,15 @@ import { ModalNuevoTurnoComponent } from './modal-nuevo-turno/modal-nuevo-turno.
 export class TurnoComponent implements OnInit {
 
   dataHorarios: Shift[] = [];
+  isLoading: boolean = false;
+  errorMessage: string = '';
 
   totalRecords: number = 0;
   pageSize: number = 15;
   pageNumber: number = 1;
   datosSeleccionado: any[] = [];
 
-  constructor(private service: ShiftsService, private modalService: ModalService) { }
+  constructor(private service: ShiftsService, private modalService: ModalService,  private dialog: MatDialog,) { }
 
   ngOnInit() {
     this.loadTurnosData();
@@ -32,16 +36,22 @@ export class TurnoComponent implements OnInit {
   }
 
   loadTurnosData() {
-    // Si quieres mostrar un loading, puedes implementar tu propio modal de loading genérico aquí
+    this.isLoading = true;
+    this.errorMessage = '';
+    
     this.service.getShifts(this.pageNumber, this.pageSize).subscribe(
       (data) => {
         console.log(data);
         this.dataHorarios = data.data;
         this.totalRecords = data.totalRecords;
+        this.isLoading = false;
       },
       (error) => {
-        console.log(error);
-        alert("Error al cargar los datos");
+        console.error('Error al cargar turnos:', error);
+        this.errorMessage = 'No se pudieron cargar los turnos. Por favor, intente nuevamente.';
+        this.isLoading = false;
+        this.dataHorarios = [];
+        this.totalRecords = 0;
       }
     );
   }
@@ -104,4 +114,70 @@ export class TurnoComponent implements OnInit {
       }
     });
   }
+
+  openEditTurnoModal(turno: Shift): void {
+    this.modalService.open({
+      title: 'Editar Turno',
+      componentType: ModalNuevoTurnoComponent,
+      componentData: { turno: turno },
+      width: '900px'
+    }).then(result => {
+      if (result) {
+        console.log('Turno actualizado:', result);
+        this.loadTurnosData();
+      }
+    });
+  }
+
+  // Métodos para estadísticas
+  getTurnosAutomaticos(): number {
+    return this.dataHorarios.filter(turno => turno.autoShift).length;
+  }
+
+  getTurnosManuales(): number {
+    return this.dataHorarios.filter(turno => !turno.autoShift).length;
+  }
+
+  // Método para recargar datos en caso de error
+  retryLoadData(): void {
+    this.loadTurnosData();
+  }
+
+  // Método para eliminar turno
+  deleteTurno(turno: Shift): void {
+    const dialogRef = this.dialog.open(ModalConfirmComponent, {
+        width: '400px',
+        height: '200px',
+        hasBackdrop: true,
+        data: {
+          tipo: 'danger',
+          titulo: '¿Eliminar horario?',
+          mensaje: '¿Estás seguro de que deseas eliminar este horario? Esta acción no se puede deshacer.',
+          confirmacion: true,
+          textoConfirmar: 'Eliminar'
+        }
+      });
+  
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          // El usuario confirmó
+          this.service.deleteShift(turno.id).subscribe(
+        (response) => {
+          console.log('Turno eliminado exitosamente:', response);
+          this.loadTurnosData();
+          // Resetear el error message si existía
+          this.errorMessage = '';
+        },
+        (error) => {
+          console.error('Error al eliminar turno:', error);
+          this.errorMessage = `No se pudo eliminar el turno "${turno.alias}". Por favor, intente nuevamente.`;
+        }
+      );
+        }
+      });
+
+    
+  }
+
+
 }

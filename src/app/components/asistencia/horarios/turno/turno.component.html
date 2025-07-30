@@ -2,96 +2,180 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Columna izquierda -->
     <div class="lg:col-span-2">
-      <!-- Header con botones -->
-      <div class="card-fiori mb-6">
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-title">Gestión de Turnos</span>
-          <div class="flex gap-3">
-            <button class="btn-fiori flex items-center gap-2" (click)="openNuevoTurnoModal()">
-              <i class="fa-solid fa-plus text-sm"></i>
-              Nuevo
-            </button>
-            <button class="btn-fiori-secondary flex items-center gap-2 text-fiori-error border-fiori-error hover:bg-fiori-error hover:text-white">
-              <i class="fa-solid fa-trash text-sm"></i>
-              Borrar
-            </button>
+      <!-- Header con estadísticas y botones -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-blue-600">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-gray-900">Gestión de Turnos</div>
+              <p class="text-sm text-gray-600">Administra los turnos de trabajo de la organización</p>
+            </div>
           </div>
+          
+          <!-- Estadísticas rápidas -->
+          <div class="flex space-x-4 mt-4 md:mt-0">
+            <div class="text-center">
+              <div class="text-2xl font-bold text-blue-600">{{ totalRecords }}</div>
+              <div class="text-xs text-gray-500">Total Turnos</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-green-600">{{ getTurnosAutomaticos() }}</div>
+              <div class="text-xs text-gray-500">Automáticos</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-orange-600">{{ getTurnosManuales() }}</div>
+              <div class="text-xs text-gray-500">Manuales</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra de acciones -->
+        <div class="flex flex-wrap gap-3">
+          <button 
+            (click)="openNuevoTurnoModal()" 
+            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Nuevo Turno
+          </button>
+          
+          <button 
+            class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+            </svg>
+            Eliminar Seleccionados
+          </button>
+          
+          <button 
+            class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            Exportar
+          </button>
         </div>
       </div>
 
       <!-- Tabla mejorada -->
-      <div class="card-fiori">
-        <div class="overflow-hidden rounded-lg border border-fiori-border">
-          <table class="min-w-full text-sm bg-fiori-surface">
-            <thead class="bg-fiori-muted">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden" *ngIf="dataHorarios && dataHorarios.length > 0">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <div class="flex items-center justify-between">
+            <div class="text-lg font-semibold text-gray-900">Lista de Turnos</div>
+            <div class="flex items-center space-x-2">
+              <div class="relative">
+                <input 
+                  type="text" 
+                  placeholder="Buscar turnos..." 
+                  class="pl-8 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 absolute left-2.5 top-2.5 text-gray-400">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50">
               <tr>
-                <th class="p-4 text-center border-b border-fiori-border">
-                  <input type="checkbox" class="w-4 h-4 text-fiori-primary rounded focus:ring-fiori-primary focus:ring-2" />
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                 </th>
-                <th class="p-4 text-left border-b border-fiori-border text-fiori-text font-semibold">
-                  Nombre de Turno
-                </th>
-                <th class="p-4 text-left border-b border-fiori-border text-fiori-text font-semibold">
-                  Horario
-                </th>
-                <th class="p-4 text-center border-b border-fiori-border text-fiori-text font-semibold">
-                  Unidad
-                </th>
-                <th class="p-4 text-center border-b border-fiori-border text-fiori-text font-semibold">
-                  Ciclo
-                </th>
-                <th class="p-4 text-center border-b border-fiori-border text-fiori-text font-semibold">
-                  Turno Automático
-                </th>
-                <th class="p-4 text-center border-b border-fiori-border text-fiori-text font-semibold">
-                  Acciones
-                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Horarios</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ciclo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-fiori-border">
+            <tbody class="bg-white divide-y divide-gray-200">
               <tr *ngFor="let item of dataHorarios" 
-                  class="hover:bg-fiori-hover transition-colors duration-200 cursor-pointer group"
+                  class="hover:bg-gray-50 transition-colors cursor-pointer"
                   (click)="updateThorarioSelect(item.horario)">
-                <td class="p-4 text-center">
-                  <input type="checkbox" class="w-4 h-4 text-fiori-primary rounded focus:ring-fiori-primary focus:ring-2" />
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                 </td>
-                <td class="p-4 text-fiori-text font-medium">
-                  {{ item.alias }}
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-blue-600">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-gray-900">{{ item.alias }}</div>
+                      <div class="text-xs text-gray-500">ID: {{ item.id }}</div>
+                    </div>
+                  </div>
                 </td>
-                <td class="p-4 text-fiori-subtext">
-                  {{ getAreas(item.horario) }}
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ getAreas(item.horario) }}</div>
                 </td>
-                <td class="p-4 text-center">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                        [class]="item.cycleUnit == 1 ? 'bg-fiori-info/10 text-fiori-info' : 'bg-fiori-accent/10 text-fiori-accent'">
-                    <ng-container *ngIf="item.cycleUnit == 1; else noUnidad">Semanal</ng-container>
-                    <ng-template #noUnidad>Diario</ng-template>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span *ngIf="item.cycleUnit == 1; else tipoDiario" 
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3 mr-1">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5a2.25 2.25 0 002.25-2.25m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5a2.25 2.25 0 012.25 2.25v7.5" />
+                    </svg>
+                    Semanal
+                  </span>
+                  <ng-template #tipoDiario>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3 mr-1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Diario
+                    </span>
+                  </ng-template>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    {{ item.shiftCycle }} {{ item.cycleUnit == 1 ? 'semanas' : 'días' }}
                   </span>
                 </td>
-                <td class="p-4 text-center text-fiori-text font-medium">
-                  {{ item.shiftCycle }}
-                </td>
-                <td class="p-4 text-center">
+                <td class="px-6 py-4 whitespace-nowrap">
                   <span *ngIf="item.autoShift" 
-                        class="inline-flex items-center px-2 py-1 rounded-full bg-fiori-success/10 text-fiori-success text-xs font-medium">
-                    <i class="fa-solid fa-check-circle mr-1"></i>
-                    Activo
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3 mr-1">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Automático
                   </span>
                   <span *ngIf="!item.autoShift" 
-                        class="inline-flex items-center px-2 py-1 rounded-full bg-fiori-error/10 text-fiori-error text-xs font-medium">
-                    <i class="fa-solid fa-minus-circle mr-1"></i>
-                    Inactivo
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3 mr-1">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Manual
                   </span>
                 </td>
-                <td class="p-4 text-center">
-                  <div class="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <button class="p-2 text-fiori-subtext hover:text-fiori-info hover:bg-fiori-info/10 rounded-md transition-colors duration-200"
-                            title="Editar">
-                      <i class="fa-solid fa-pen text-sm"></i>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <div class="flex items-center justify-end space-x-2">
+                    <button 
+                      (click)="openEditTurnoModal(item)"
+                      class="inline-flex items-center p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors" 
+                      title="Editar turno">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487a2.25 2.25 0 113.182 3.182L7.5 20.213 3 21l.787-4.5L16.862 4.487z" />
+                      </svg>
                     </button>
-                    <button class="p-2 text-fiori-subtext hover:text-fiori-error hover:bg-fiori-error/10 rounded-md transition-colors duration-200"
-                            title="Eliminar">
-                      <i class="fa-solid fa-trash text-sm"></i>
+                    <button 
+                      (click)="deleteTurno(item)"
+                      class="inline-flex items-center p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors" 
+                      title="Eliminar turno">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                      </svg>
                     </button>
                   </div>
                 </td>
@@ -101,7 +185,7 @@
         </div>
 
         <!-- Paginador mejorado -->
-        <div class="mt-6 flex items-center justify-between border-t border-fiori-border pt-4">
+        <div class="bg-white px-6 py-3 border-t border-gray-200">
           <mat-paginator
             [length]="totalRecords"
             [pageSize]="pageSize"
@@ -110,9 +194,68 @@
             [pageSizeOptions]="[5, 10, 20, 50]"
             showFirstLastButtons
             aria-label="Seleccione la página"
-            class="custom-paginator"
-          ></mat-paginator>
+            class="w-full">
+          </mat-paginator>
         </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-blue-600 animate-spin">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+          </svg>
+        </div>
+        <div class="text-lg font-medium text-gray-900 mb-2">Cargando turnos...</div>
+        <p class="text-gray-500">Por favor espere mientras se cargan los datos</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="errorMessage && !isLoading" class="bg-white rounded-lg shadow-sm border border-red-200 p-12 text-center">
+        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-red-600">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+        </div>
+        <div class="text-lg font-medium text-gray-900 mb-2">Error al cargar los datos</div>
+        <p class="text-gray-500 mb-6 max-w-sm mx-auto">{{ errorMessage }}</p>
+        <div class="flex justify-center gap-3">
+          <button 
+            (click)="retryLoadData()" 
+            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            Reintentar
+          </button>
+          <button 
+            (click)="openNuevoTurnoModal()" 
+            class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Crear turno
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoading && !errorMessage && (!dataHorarios || dataHorarios.length === 0)" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-gray-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div class="text-lg font-medium text-gray-900 mb-2">No hay turnos registrados</div>
+        <p class="text-gray-500 mb-6 max-w-sm mx-auto">Comienza creando tu primer turno de trabajo para organizar los horarios de tu equipo</p>
+        <button 
+          (click)="openNuevoTurnoModal()" 
+          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Crear primer turno
+        </button>
       </div>
     </div>
 

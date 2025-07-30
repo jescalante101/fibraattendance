@@ -1,4 +1,4 @@
-<div class="p-4 max-w-full">
+<div class="p-4 max-w-full h-screen flex flex-col">
   <!-- Header compacto -->
   <div class="mb-4 flex items-center justify-between bg-white p-3 rounded-lg shadow-sm border">
     <div class="flex items-center gap-2">
@@ -60,16 +60,10 @@
         </button>
         <div class="ml-auto flex items-center gap-2">
           <button 
-            (click)="showFilters = !showFilters; showColumnsConfig = false"
+            (click)="showFilters = !showFilters"
             class="inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-600 hover:text-blue-600 transition-colors">
             <mat-icon class="text-sm">tune</mat-icon>
             Filtros
-          </button>
-          <button 
-            (click)="showColumnsConfig = !showColumnsConfig; showFilters = false"
-            class="inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-600 hover:text-blue-600 transition-colors">
-            <mat-icon class="text-sm">view_column</mat-icon>
-            Columnas
           </button>
         </div>
       </div>
@@ -140,271 +134,463 @@
         </div>
       </form>
     </div>
+  </div>
 
-    <!-- Panel de columnas -->
-    <div *ngIf="showColumnsConfig" class="p-4 border-t border-gray-100 fade-in">
-      <div class="flex items-center justify-between mb-3">
-        <span class="text-sm font-medium text-gray-700">Configurar Columnas</span>
-        <div class="flex gap-2">
-          <button 
-            (click)="showAllColumns()"
-            class="text-xs text-blue-600 hover:text-blue-800">Mostrar todas</button>
-          <button 
-            (click)="hideAllColumns()"
-            class="text-xs text-gray-500 hover:text-gray-700">Ocultar todas</button>
-        </div>
+  <!-- Tabla compacta con scroll horizontal -->
+  <div class="flex-1 bg-white rounded-lg shadow-sm border overflow-hidden flex flex-col">
+    
+    <!-- Header con configuración de columnas -->
+    <div class="bg-gray-50 border-b border-gray-200 px-4 py-2 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="text-sm font-semibold text-gray-900">Registros de Asistencia Agrupados</div>
+        <div class="text-xs text-gray-500">{{ totalCount }} registros</div>
       </div>
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-        <label 
-          *ngFor="let col of columns" 
-          class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 p-1 rounded">
+      <div class="flex items-center gap-2">
+        <button 
+          (click)="showColumnsConfig = !showColumnsConfig"
+          class="inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-600 hover:text-blue-600 transition-colors">
+          <mat-icon class="text-sm">view_column</mat-icon>
+          Columnas
+        </button>
+      </div>
+    </div>
+
+    <!-- Configuración de columnas -->
+    <div *ngIf="showColumnsConfig" class="border-b border-gray-200 p-3 bg-gray-50">
+      <div class="flex flex-wrap gap-2 mb-2">
+        <button 
+          (click)="showAllColumns()"
+          class="px-2 py-1 text-xs bg-blue-50 text-blue-700 border border-blue-200 rounded hover:bg-blue-100">
+          Mostrar Todas
+        </button>
+        <button 
+          (click)="hideAllColumns()"
+          class="px-2 py-1 text-xs bg-gray-50 text-gray-700 border border-gray-200 rounded hover:bg-gray-100">
+          Ocultar Todas
+        </button>
+      </div>
+      <div class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-1">
+        <label *ngFor="let col of columns" class="flex items-center gap-1 text-xs">
           <input 
             type="checkbox" 
             [(ngModel)]="col.visible"
-            class="rounded text-blue-600">
+            class="w-3 h-3 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
           <span class="truncate">{{ col.label }}</span>
         </label>
       </div>
     </div>
-  </div>
 
-  <!-- Estadísticas + Header sticky como una unidad -->
-  <div class="sticky top-0 z-30 bg-gray-50 border-b border-gray-200">
-    <!-- Estadísticas compactas -->
-    <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 py-3 px-4" id="statsSection">
-      <div 
-        (click)="applyQuickStatsFilter(null)"
-        [class]="getStatsCardClass(null)"
-        class="bg-white border border-gray-200 rounded-lg p-3 text-center cursor-pointer hover:shadow-md transition-all">
-        <div class="text-lg font-bold text-gray-900">{{ quickStats.total }}</div>
-        <div class="text-xs text-gray-500">Total</div>
-      </div>
-      <div 
-        (click)="applyQuickStatsFilter('puntuales')"
-        [class]="getStatsCardClass('puntuales')"
-        class="bg-green-50 border border-green-200 rounded-lg p-3 text-center cursor-pointer hover:shadow-md transition-all">
-        <div class="text-lg font-bold text-green-700">{{ quickStats.puntuales }}</div>
-        <div class="text-xs text-green-600">Puntuales</div>
-      </div>
-      <div 
-        (click)="applyQuickStatsFilter('tardanzas')"
-        [class]="getStatsCardClass('tardanzas')"
-        class="bg-orange-50 border border-orange-200 rounded-lg p-3 text-center cursor-pointer hover:shadow-md transition-all">
-        <div class="text-lg font-bold text-orange-700">{{ quickStats.tardanzas }}</div>
-        <div class="text-xs text-orange-600">Tardanzas</div>
-      </div>
-      <div 
-        (click)="applyQuickStatsFilter('faltas')"
-        [class]="getStatsCardClass('faltas')"
-        class="bg-red-50 border border-red-200 rounded-lg p-3 text-center cursor-pointer hover:shadow-md transition-all">
-        <div class="text-lg font-bold text-red-700">{{ quickStats.faltas }}</div>
-        <div class="text-xs text-red-600">Faltas</div>
-      </div>
-      <div 
-        (click)="applyQuickStatsFilter('manuales')"
-        [class]="getStatsCardClass('manuales')"
-        class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center cursor-pointer hover:shadow-md transition-all">
-        <div class="text-lg font-bold text-yellow-700">{{ quickStats.manuales }}</div>
-        <div class="text-xs text-yellow-600">Manuales</div>
-      </div>
-      <div 
-        (click)="applyQuickStatsFilter('noLaborable')"
-        [class]="getStatsCardClass('noLaborable')"
-        class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center cursor-pointer hover:shadow-md transition-all">
-        <div class="text-lg font-bold text-gray-700">{{ quickStats.noLaborable }}</div>
-        <div class="text-xs text-gray-600">No Laborable</div>
-      </div>
-    </div>
-
-    <!-- Header de tabla como parte del sticky -->
-    <div class="bg-white border-t border-gray-200">
-      <div class="overflow-x-auto" id="tableHeaderContainer">
-        <table class="min-w-full">
-          <thead>
-            <tr class="bg-gray-50">
-              <!-- Columna Empleado (Sticky horizontal) -->
-              <th *ngIf="isColumnVisible('fullNameEmployee')" 
-                  class="sticky left-0 bg-gray-50 z-40 border-r border-gray-300 px-3 py-2 text-left">
-                <div class="flex items-center gap-2">
-                  <input 
-                    type="checkbox" 
-                    [checked]="selectAllChecked"
-                    [indeterminate]="isIndeterminate()"
-                    (change)="toggleSelectAll()"
-                    class="rounded text-blue-600">
-                  <span class="text-xs font-medium text-gray-700">Empleado</span>
-                  <button (click)="onSort('fullNameEmployee')" class="text-gray-400 hover:text-gray-600">
-                    <mat-icon class="text-sm">{{ getSortIcon('fullNameEmployee') }}</mat-icon>
-                  </button>
-                </div>
-              </th>
-
-              <!-- Resto de columnas dinámicas -->
-              <th *ngFor="let col of visibleColumnsFiltered()" class="px-3 py-2 text-left bg-gray-50">
-                <div class="flex items-center gap-1">
-                  <span class="text-xs font-medium text-gray-700">{{ col.label }}</span>
-                  <button (click)="onSort(col.id)" class="text-gray-400 hover:text-gray-600">
-                    <mat-icon class="text-sm">{{ getSortIcon(col.id) }}</mat-icon>
-                  </button>
-                </div>
-              </th>
-
-              <!-- Columna de Acciones -->
-              <th *ngIf="isColumnVisible('actions')" 
-                  class="px-3 py-2 text-center bg-gray-50">
-                <span class="text-xs font-medium text-gray-700">Acciones</span>
-              </th>
-            </tr>
-          </thead>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Filtro activo indicator -->
-  <div *ngIf="quickFilter !== null" class="mb-4 flex items-center gap-2">
-    <button 
-      (click)="clearQuickStatsFilter()" 
-      class="px-3 py-1 rounded bg-blue-100 text-blue-800 hover:bg-blue-200 transition text-xs">
-      Limpiar filtro de estadística
-    </button>
-    <span class="text-xs text-gray-500">Mostrando solo: <strong>{{ getQuickFilterLabel(quickFilter) }}</strong></span>
-  </div>
-
-  <!-- Acciones masivas -->
-  <div *ngIf="selectedRows.size > 0" class="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3 fade-in">
-    <div class="flex items-center justify-between">
+    <!-- Loading state -->
+    <div *ngIf="loading" class="flex-1 flex items-center justify-center">
       <div class="flex items-center gap-2">
-        <mat-icon class="text-blue-600 text-lg">check_circle</mat-icon>
-        <span class="text-sm font-medium text-blue-900">
-          {{ selectedRows.size }} elemento{{ selectedRows.size > 1 ? 's' : '' }} seleccionado{{ selectedRows.size > 1 ? 's' : '' }}
-        </span>
-      </div>
-      <div class="flex gap-2">
-        <button 
-          (click)="exportSelectedToExcel()"
-          class="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-white text-blue-700 border border-blue-200 rounded-md hover:bg-blue-50 transition-colors">
-          <mat-icon class="text-sm">download</mat-icon>
-          Exportar
-        </button>
-        <button 
-          (click)="clearSelection()"
-          class="text-sm text-blue-600 hover:text-blue-800 px-2">Limpiar selección</button>
+        <mat-spinner diameter="20"></mat-spinner>
+        <span class="text-gray-500 text-sm">Cargando datos...</span>
       </div>
     </div>
-  </div>
 
-  <!-- Body de la tabla separado -->
-  <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
-    <div class="overflow-x-auto" id="tableContainer">
-      <table class="min-w-full">
-        <!-- Solo el body de la tabla -->
-        <tbody class="divide-y divide-gray-100">
-          <!-- Loading state -->
-          <tr *ngIf="loading">
-            <td [attr.colspan]="displayedColumns.length" class="text-center py-8">
-              <div class="flex items-center justify-center gap-2">
-                <mat-spinner diameter="20"></mat-spinner>
-                <span class="text-gray-500 text-sm">Cargando datos...</span>
-              </div>
-            </td>
-          </tr>
+    <!-- Empty state -->
+    <div *ngIf="!loading && groupedDataSource.data.length === 0" class="flex-1 flex items-center justify-center">
+      <div class="flex flex-col items-center gap-2">
+        <mat-icon class="text-gray-300 text-4xl">description</mat-icon>
+        <span class="text-gray-500 text-sm">No hay datos para mostrar</span>
+        <button 
+          (click)="filterForm.reset(); getData();"
+          class="text-xs text-blue-600 hover:text-blue-800 mt-2">
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
 
-          <!-- Empty state -->
-          <tr *ngIf="!loading && dataSource.data.length === 0">
-            <td [attr.colspan]="displayedColumns.length" class="text-center py-8">
-              <div class="flex flex-col items-center gap-2">
-                <mat-icon class="text-gray-300 text-4xl">description</mat-icon>
-                <span class="text-gray-500 text-sm">No hay datos para mostrar</span>
-                <button 
-                  *ngIf="hasFilters()"
-                  (click)="clearAllFilters()"
-                  class="text-xs text-blue-600 hover:text-blue-800 mt-2">
-                  Limpiar filtros
+    <!-- Tabla con scroll horizontal y vertical -->
+    <div *ngIf="!loading && groupedDataSource.data.length > 0" class="flex-1 overflow-auto">
+      <table class="w-full text-xs divide-y divide-gray-200" style="min-width: 2000px;">
+        <!-- Header sticky -->
+        <thead class="bg-gray-50 sticky top-0 z-10">
+          <tr>
+            <!-- Empleado -->
+            <th *ngIf="isColumnVisible('fullNameEmployee')" 
+                class="px-2 py-2 text-left font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 sticky left-0 bg-gray-50 z-20" 
+                style="min-width: 180px;">
+              <div class="flex items-center gap-1">
+                <span>Empleado</span>
+                <button (click)="onSort('fullNameEmployee')" class="ml-1">
+                  <mat-icon class="text-xs">{{ getSortIcon('fullNameEmployee') }}</mat-icon>
                 </button>
               </div>
-            </td>
-          </tr>
+            </th>
 
-          <!-- Filas de datos -->
-          <tr *ngFor="let item of dataSource.data; trackBy: trackByFn" 
-              [ngClass]="getRowClass(item)"
-              class="transition-colors duration-200 hover:bg-gray-50">
+            <!-- Documento -->
+            <th *ngIf="isColumnVisible('nroDoc')" 
+                class="px-2 py-2 text-left font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 100px;">
+              <div class="flex items-center gap-1">
+                <span>Doc</span>
+                <button (click)="onSort('nroDoc')" class="ml-1">
+                  <mat-icon class="text-xs">{{ getSortIcon('nroDoc') }}</mat-icon>
+                </button>
+              </div>
+            </th>
+
+            <!-- Área -->
+            <th *ngIf="isColumnVisible('areaDescription')" 
+                class="px-2 py-2 text-left font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 120px;">
+              <div class="flex items-center gap-1">
+                <span>Área</span>
+                <button (click)="onSort('areaDescription')" class="ml-1">
+                  <mat-icon class="text-xs">{{ getSortIcon('areaDescription') }}</mat-icon>
+                </button>
+              </div>
+            </th>
+
+            <!-- Sede -->
+            <th *ngIf="isColumnVisible('locationName')" 
+                class="px-2 py-2 text-left font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 120px;">
+              <div class="flex items-center gap-1">
+                <span>Sede</span>
+                <button (click)="onSort('locationName')" class="ml-1">
+                  <mat-icon class="text-xs">{{ getSortIcon('locationName') }}</mat-icon>
+                </button>
+              </div>
+            </th>
+
+            <!-- Fecha -->
+            <th *ngIf="isColumnVisible('fechaFormateada')" 
+                class="px-2 py-2 text-left font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 90px;">
+              <div class="flex items-center gap-1">
+                <span>Fecha</span>
+                <button (click)="onSort('fechaFormateada')" class="ml-1">
+                  <mat-icon class="text-xs">{{ getSortIcon('fechaFormateada') }}</mat-icon>
+                </button>
+              </div>
+            </th>
+
+            <!-- Turno -->
+            <th *ngIf="isColumnVisible('shiftName')" 
+                class="px-2 py-2 text-left font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 120px;">
+              <div class="flex items-center gap-1">
+                <span>Turno</span>
+                <button (click)="onSort('shiftName')" class="ml-1">
+                  <mat-icon class="text-xs">{{ getSortIcon('shiftName') }}</mat-icon>
+                </button>
+              </div>
+            </th>
+
+            <!-- Entrada - Horario -->
+            <th *ngIf="isColumnVisible('intervalAlias')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 100px;">
+              Entrada Horario
+            </th>
+
+            <!-- Entrada - Esperado -->
+            <th *ngIf="isColumnVisible('horaEsperada')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 80px;">
+              Entrada Esperado
+            </th>
+
+            <!-- Entrada - Real -->
+            <th *ngIf="isColumnVisible('horaMarcacionReal')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 80px;">
+              Entrada Real
+            </th>
+
+            <!-- Entrada - Estado -->
+            <th *ngIf="isColumnVisible('estadoMarcacion')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 90px;">
+              Entrada Estado
+            </th>
+
+            <!-- Entrada - Tardanza -->
+            <th *ngIf="isColumnVisible('minutosTardanza')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 80px;">
+              Tardanza (min)
+            </th>
+
+            <!-- Salida - Horario -->
+            <th *ngIf="isColumnVisible('intervalAlias')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 100px;">
+              Salida Horario
+            </th>
+
+            <!-- Salida - Esperado -->
+            <th *ngIf="isColumnVisible('horaEsperada')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 80px;">
+              Salida Esperado
+            </th>
+
+            <!-- Salida - Real -->
+            <th *ngIf="isColumnVisible('horaMarcacionReal')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 80px;">
+              Salida Real
+            </th>
+
+            <!-- Salida - Estado -->
+            <th *ngIf="isColumnVisible('estadoMarcacion')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 90px;">
+              Salida Estado
+            </th>
+
+            <!-- Salida - Adelanto -->
+            <th *ngIf="isColumnVisible('minutosAdelanto')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 80px;">
+              Adelanto (min)
+            </th>
+
+            <!-- Tipo Horario -->
+            <th *ngIf="isColumnVisible('tipoMarcacion')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 100px;">
+              Tipo Horario
+            </th>
+
+            <!-- Observaciones -->
+            <th *ngIf="isColumnVisible('exceptionRemarks')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 150px;">
+              Observaciones
+            </th>
+
+            <!-- Tipo Permiso -->
+            <th *ngIf="isColumnVisible('tipoPermiso')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 120px;">
+              Tipo Permiso
+            </th>
+
+            <!-- Días Info -->
+            <th *ngIf="isColumnVisible('diasInfo')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 100px;">
+              Días Info
+            </th>
+
+            <!-- Razón Manual -->
+            <th *ngIf="isColumnVisible('razonManual')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 120px;">
+              Razón Manual
+            </th>
+
+            <!-- Validación Rango -->
+            <th *ngIf="isColumnVisible('validacionRango')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 120px;">
+              Validación
+            </th>
+
+            <!-- Información Adicional -->
+            <th *ngIf="isColumnVisible('informacionAdicional')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 150px;">
+              Info Adicional
+            </th>
+
+            <!-- Origen -->
+            <th *ngIf="isColumnVisible('origenMarcacion')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200" 
+                style="min-width: 100px;">
+              Origen
+            </th>
+
+            <!-- Acciones -->
+            <th *ngIf="isColumnVisible('actions')" 
+                class="px-2 py-2 text-center font-medium text-gray-500 uppercase tracking-wider" 
+                style="min-width: 80px;">
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        
+        <!-- Body -->
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let record of groupedDataSource.data; trackBy: trackByGroupedRecord" 
+              [class]="getGroupedRowClass(record) + ' transition-colors'">
             
-            <!-- Columna Empleado (Sticky horizontal) -->
+            <!-- Empleado -->
             <td *ngIf="isColumnVisible('fullNameEmployee')" 
-                class="sticky left-0 bg-white z-10 border-r border-gray-200 px-3 py-2"
-                [ngClass]="getRowClass(item)">
-              <div class="flex items-center gap-2">
-                <input 
-                  type="checkbox" 
-                  [checked]="isRowSelected(item)"
-                  (change)="toggleRowSelection(item)"
-                  class="rounded text-blue-600">
-                <div>
-                  <div class="text-sm font-medium text-gray-900">{{ getColumnValue(item, 'fullNameEmployee') }}</div>
-                  <div class="text-xs text-gray-500">{{ item.areaDescription }}</div>
-                </div>
+                [class]="'px-2 py-1 border-r border-gray-200 sticky left-0 z-10 ' + getGroupedRowClass(record)">
+              <div class="text-xs font-medium text-gray-900 truncate">{{ record.fullNameEmployee }}</div>
+            </td>
+
+            <!-- Documento -->
+            <td *ngIf="isColumnVisible('nroDoc')" class="px-2 py-1 border-r border-gray-200">
+              <div class="text-xs text-gray-900">{{ record.nroDoc }}</div>
+            </td>
+
+            <!-- Área -->
+            <td *ngIf="isColumnVisible('areaDescription')" class="px-2 py-1 border-r border-gray-200">
+              <div class="text-xs text-gray-900 truncate">{{ record.areaDescription }}</div>
+            </td>
+
+            <!-- Sede -->
+            <td *ngIf="isColumnVisible('locationName')" class="px-2 py-1 border-r border-gray-200">
+              <div class="text-xs text-gray-900 truncate">{{ record.locationName }}</div>
+            </td>
+
+            <!-- Fecha -->
+            <td *ngIf="isColumnVisible('fechaFormateada')" class="px-2 py-1 border-r border-gray-200">
+              <div class="text-xs text-gray-900">{{ record.fechaFormateada }}</div>
+            </td>
+
+            <!-- Turno -->
+            <td *ngIf="isColumnVisible('shiftName')" class="px-2 py-1 border-r border-gray-200">
+              <div class="text-xs text-gray-900 truncate">{{ record.shiftName }}</div>
+            </td>
+
+            <!-- Entrada - Horario -->
+            <td *ngIf="isColumnVisible('intervalAlias')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div class="text-xs text-gray-900">
+                {{ record.marcaciones.entrada?.intervalAlias || '-' }}
               </div>
             </td>
 
-            <!-- Resto de columnas dinámicas -->
-            <td *ngFor="let col of visibleColumnsFiltered()" class="px-3 py-2 text-sm text-gray-700">
-              
-              <!-- Fecha formateada -->
-              <ng-container *ngIf="col.id === 'fechaFormateada'">
-                <span *ngIf="getColumnValue(item, 'fechaFormateada'); else formatFecha">
-                  {{ getColumnValue(item, 'fechaFormateada') }}
-                </span>
-                <ng-template #formatFecha>
-                  {{ getColumnValue(item, 'fecha') | date:'dd-MM-yyyy' }}
-                </ng-template>
-              </ng-container>
-              
-              <!-- Campos booleanos con badges -->
-              <ng-container *ngIf="col.id !== 'fechaFormateada'">
-                <span *ngIf="col.id === 'esFalta' || col.id === 'esMarcacionManual' || col.id === 'esTardanza' || col.id === 'esPuntual'" 
-                      class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
-                      [ngClass]="getBadgeClass(col.id, getColumnValue(item, col.id))">
-                  {{ getColumnValue(item, col.id) ? 'Sí' : 'No' }}
-                </span>
-                
-                <!-- Estado con badge especial -->
-                <span *ngIf="col.id === 'estadoMarcacion'" 
-                      class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
-                      [ngClass]="getEstadoBadgeClass(getColumnValue(item, col.id))">
-                  {{ getColumnValue(item, col.id) }}
-                </span>
-                
-                <!-- Horas formateadas -->
-                <span *ngIf="col.id === 'horaEsperada' || col.id === 'horaMarcacionReal'">
-                  {{ formatTime(getColumnValue(item, col.id)) }}
-                </span>
-                
-                <!-- Diferencia en minutos -->
-                <span *ngIf="col.id === 'diferenciaMinutos' || col.id === 'minutosTardanza' || col.id === 'minutosAdelanto'">
-                  {{ formatMinutes(getColumnValue(item, col.id)) }}
-                </span>
-                
-                <!-- Otros campos -->
-                <span *ngIf="!['esFalta', 'esMarcacionManual', 'esTardanza', 'esPuntual', 'estadoMarcacion', 'horaEsperada', 'horaMarcacionReal', 'diferenciaMinutos', 'minutosTardanza', 'minutosAdelanto'].includes(col.id)">
-                  {{ getColumnValue(item, col.id) || '-' }}
-                </span>
-              </ng-container>
+            <!-- Entrada - Esperado -->
+            <td *ngIf="isColumnVisible('horaEsperada')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div class="text-xs text-gray-900">
+                {{ record.marcaciones.entrada?.horaEsperada || '-' }}
+              </div>
             </td>
 
-            <!-- Columna de Acciones -->
-            <td *ngIf="isColumnVisible('actions')" class="px-3 py-2 text-center">
-              <div class="flex justify-center gap-1">
+            <!-- Entrada - Real -->
+            <td *ngIf="isColumnVisible('horaMarcacionReal')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div class="text-xs font-medium text-gray-900">
+                {{ record.marcaciones.entrada?.horaMarcacionReal || 'Sin marcar' }}
+              </div>
+            </td>
+
+            <!-- Entrada - Estado -->
+            <td *ngIf="isColumnVisible('estadoMarcacion')" class="px-2 py-1 text-center border-r border-gray-200">
+              <span *ngIf="record.marcaciones.entrada" 
+                    [class]="getEstadoBadgeClass(record.marcaciones.entrada.estadoMarcacion)"
+                    class="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium">
+                {{ record.marcaciones.entrada.estadoMarcacion }}
+              </span>
+              <span *ngIf="!record.marcaciones.entrada" class="text-xs text-gray-400">-</span>
+            </td>
+
+            <!-- Entrada - Tardanza -->
+            <td *ngIf="isColumnVisible('minutosTardanza')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div *ngIf="record.marcaciones.entrada && record.marcaciones.entrada.minutosTardanza > 0" 
+                   class="text-xs text-red-600 font-medium">
+                +{{ record.marcaciones.entrada.minutosTardanza }}
+              </div>
+              <div *ngIf="!record.marcaciones.entrada || record.marcaciones.entrada.minutosTardanza <= 0" 
+                   class="text-xs text-gray-400">-</div>
+            </td>
+
+            <!-- Salida - Horario -->
+            <td *ngIf="isColumnVisible('intervalAlias')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div class="text-xs text-gray-900">
+                {{ record.marcaciones.salida?.intervalAlias || '-' }}
+              </div>
+            </td>
+
+            <!-- Salida - Esperado -->
+            <td *ngIf="isColumnVisible('horaEsperada')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div class="text-xs text-gray-900">
+                {{ record.marcaciones.salida?.horaEsperada || '-' }}
+              </div>
+            </td>
+
+            <!-- Salida - Real -->
+            <td *ngIf="isColumnVisible('horaMarcacionReal')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div class="text-xs font-medium text-gray-900">
+                {{ record.marcaciones.salida?.horaMarcacionReal || 'Sin marcar' }}
+              </div>
+            </td>
+
+            <!-- Salida - Estado -->
+            <td *ngIf="isColumnVisible('estadoMarcacion')" class="px-2 py-1 text-center border-r border-gray-200">
+              <span *ngIf="record.marcaciones.salida" 
+                    [class]="getEstadoBadgeClass(record.marcaciones.salida.estadoMarcacion)"
+                    class="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium">
+                {{ record.marcaciones.salida.estadoMarcacion }}
+              </span>
+              <span *ngIf="!record.marcaciones.salida" class="text-xs text-gray-400">-</span>
+            </td>
+
+            <!-- Salida - Adelanto -->
+            <td *ngIf="isColumnVisible('minutosAdelanto')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div *ngIf="record.marcaciones.salida && record.marcaciones.salida.minutosAdelanto > 0" 
+                   class="text-xs text-green-600 font-medium">
+                -{{ record.marcaciones.salida.minutosAdelanto }}
+              </div>
+              <div *ngIf="!record.marcaciones.salida || record.marcaciones.salida.minutosAdelanto <= 0" 
+                   class="text-xs text-gray-400">-</div>
+            </td>
+
+            <!-- Tipo Horario -->
+            <td *ngIf="isColumnVisible('tipoMarcacion')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div class="text-xs text-gray-900">{{ record.tipoHorario || '-' }}</div>
+            </td>
+
+            <!-- Observaciones (exceptionRemarks) -->
+            <td *ngIf="isColumnVisible('exceptionRemarks')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div *ngIf="record.exceptionRemarks" class="text-xs text-orange-700 bg-orange-100 px-2 py-1 rounded">
+                {{ record.exceptionRemarks }}
+              </div>
+              <div *ngIf="!record.exceptionRemarks" class="text-xs text-gray-400">-</div>
+            </td>
+
+            <!-- Tipo Permiso -->
+            <td *ngIf="isColumnVisible('tipoPermiso')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div class="text-xs text-gray-900">{{ record.tipoPermiso || '-' }}</div>
+            </td>
+
+            <!-- Días Info -->
+            <td *ngIf="isColumnVisible('diasInfo')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div class="text-xs text-gray-900">{{ record.diasInfo || '-' }}</div>
+            </td>
+
+            <!-- Razón Manual -->
+            <td *ngIf="isColumnVisible('razonManual')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div class="text-xs text-gray-900">{{ record.razonManual || '-' }}</div>
+            </td>
+
+            <!-- Validación Rango -->
+            <td *ngIf="isColumnVisible('validacionRango')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div class="text-xs text-gray-900">{{ record.validacionRango || '-' }}</div>
+            </td>
+
+            <!-- Información Adicional -->
+            <td *ngIf="isColumnVisible('informacionAdicional')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div class="text-xs text-gray-900 truncate">
+                {{ (record.marcaciones.entrada?.informacionAdicional || record.marcaciones.salida?.informacionAdicional) || '-' }}
+              </div>
+            </td>
+
+            <!-- Origen -->
+            <td *ngIf="isColumnVisible('origenMarcacion')" class="px-2 py-1 text-center border-r border-gray-200">
+              <div class="text-xs text-gray-900">
+                {{ (record.marcaciones.entrada?.origenMarcacion || record.marcaciones.salida?.origenMarcacion) || '-' }}
+              </div>
+            </td>
+
+            <!-- Acciones -->
+            <td *ngIf="isColumnVisible('actions')" class="px-2 py-1 text-center">
+              <div class="flex items-center justify-center gap-1">
                 <button 
-                  (click)="viewDetails(item)"
-                  class="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors" 
+                  (click)="viewDetails(record)"
+                  class="p-1 text-blue-600 hover:text-blue-800 transition-colors"
                   title="Ver detalles">
                   <mat-icon class="text-sm">visibility</mat-icon>
                 </button>
                 <button 
-                  (click)="editItem(item)"
-                  class="p-1 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded transition-colors" 
+                  (click)="editItem(record)"
+                  class="p-1 text-green-600 hover:text-green-800 transition-colors"
                   title="Editar">
                   <mat-icon class="text-sm">edit</mat-icon>
                 </button>

@@ -1,0 +1,250 @@
+<div class="w-full max-w-6xl mx-auto p-2 bg-gray-50 min-h-screen">
+  <!-- Header del modal -->
+ <!--  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-blue-600">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487a2.25 2.25 0 113.182 3.182L7.5 20.213 3 21l.787-4.5L16.862 4.487z" />
+          </svg>
+        </div>
+        <div>
+          <div class="text-xl font-semibold text-gray-900">
+            {{ isMultipleEdit ? 'Editar Asignaciones Masivas' : 'Editar Asignación' }}
+          </div>
+          <div class="text-sm text-gray-600">
+            {{ isMultipleEdit ? datat.assignmentIds.length + ' asignaciones seleccionadas' : (datat.employeeName || 'Empleado') }}
+          </div>
+        </div>
+      </div>
+      <button 
+        (click)="onCancel()"
+        class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div> -->
+
+  <!-- Mensaje de carga -->
+  <div *ngIf="loading" class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+    <div class="flex items-center justify-center">
+      <div class="text-center">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-3"></div>
+        <p class="text-sm text-gray-500">Cargando turnos...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div *ngIf="!loading" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    
+    <!-- Panel izquierdo: Lista de turnos -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-lg font-semibold text-gray-900">Turnos Disponibles</div>
+            <div class="text-sm text-gray-600">Selecciona un turno para la asignación</div>
+          </div>
+          <div class="text-sm text-gray-500">
+            {{ turnos.length }} turno(s)
+          </div>
+        </div>
+      </div>
+
+      <div class="max-h-96 overflow-y-auto">
+        <div *ngFor="let turno of turnos; let i = index" class="border-b border-gray-100 last:border-b-0">
+          <!-- Header del turno -->
+          <div class="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+               [class.bg-blue-50]="editForm.get('scheduleId')?.value === turno.id"
+               [class.border-l-4]="editForm.get('scheduleId')?.value === turno.id"
+               [class.border-blue-500]="editForm.get('scheduleId')?.value === turno.id"
+               (click)="onTurnoSelected(turno)">
+            <div class="flex items-center space-x-3">
+              <div class="flex-shrink-0">
+                <div class="w-4 h-4 rounded-full border-2 transition-colors"
+                     [class.border-blue-500]="editForm.get('scheduleId')?.value === turno.id"
+                     [class.bg-blue-500]="editForm.get('scheduleId')?.value === turno.id"
+                     [class.border-gray-300]="editForm.get('scheduleId')?.value !== turno.id">
+                  <div *ngIf="editForm.get('scheduleId')?.value === turno.id" 
+                       class="w-2 h-2 bg-white rounded-full mt-0.5 ml-0.5"></div>
+                </div>
+              </div>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">{{ turno.alias }}</div>
+                <div class="text-sm text-gray-600">
+                  {{ getHorariosValidos(turno).length }} horario(s) configurado(s)
+                </div>
+                <div class="text-xs text-gray-500 mt-1">
+                  ID: {{ turno.id }}
+                </div>
+              </div>
+              <div *ngIf="editForm.get('scheduleId')?.value === turno.id" 
+                   class="flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-blue-600">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Horarios del turno seleccionado -->
+          <div *ngIf="editForm.get('scheduleId')?.value === turno.id && getHorariosValidos(turno).length > 0" 
+               class="bg-gray-50 border-t border-gray-200">
+            <div class="p-4">
+              <div class="text-sm font-medium text-gray-700 mb-3">Horarios del Turno:</div>
+              <div class="space-y-2">
+                <div *ngFor="let horario of getHorariosValidos(turno)" 
+                     class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <span class="text-xs font-medium text-blue-600">{{ getDayAbbreviation(horario.dayIndex) }}</span>
+                    </div>
+                    <div>
+                      <div class="font-medium text-gray-900">
+                        {{ getDayName(horario.dayIndex) }}
+                      </div>
+                      <div class="text-sm text-gray-600">
+                        {{ formatHora(horario.inTime) }} - {{ getHoraFin(horario.inTime, horario.workTimeDuration) }}
+                      </div>
+                      <div class="text-xs text-gray-500">
+                        Duración: {{ formatDuracion(horario.workTimeDuration) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado vacío -->
+        <div *ngIf="turnos.length === 0" class="p-8 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-gray-400 mx-auto mb-3">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div class="text-gray-600 font-medium">No hay turnos disponibles</div>
+          <div class="text-sm text-gray-500 mt-1">No se encontraron turnos para asignar</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel derecho: Formulario -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+        <div class="text-lg font-semibold text-gray-900">Configuración de Asignación</div>
+        <div class="text-sm text-gray-600">Define fechas y observaciones</div>
+      </div>
+
+      <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="p-6">
+        <!-- Resumen -->
+        <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div class="text-sm font-medium text-blue-900 mb-2">Resumen de Edición:</div>
+          <div class="text-sm text-blue-800 space-y-1">
+            <div *ngIf="isMultipleEdit">
+              Asignaciones a editar: <strong>{{ datat.assignmentIds.length }}</strong>
+            </div>
+            <div *ngIf="!isMultipleEdit && datat.employeeName">
+              Empleado: <strong>{{ datat.employeeName }}</strong>
+            </div>
+            <div *ngIf="getTurnoSeleccionado()">
+              Turno seleccionado: <strong>{{ getTurnoSeleccionado()?.alias }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Validación de turno -->
+        <div *ngIf="editForm.get('scheduleId')?.hasError('required') && editForm.get('scheduleId')?.touched" 
+             class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div class="text-sm text-red-800">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline mr-1">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+            Debes seleccionar un turno
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <!-- Fechas -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Fecha de Inicio <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                formControlName="startDate"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+              />
+              <div *ngIf="editForm.get('startDate')?.hasError('required') && editForm.get('startDate')?.touched" 
+                   class="text-red-500 text-xs mt-1">
+                La fecha de inicio es obligatoria
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Fin</label>
+              <input
+                type="date"
+                formControlName="endDate"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+              />
+              <div class="text-xs text-gray-500 mt-1">Opcional - Si no se especifica será indefinida</div>
+            </div>
+          </div>
+
+          <!-- Observaciones -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Observaciones</label>
+            <textarea
+              formControlName="remarks"
+              rows="4"
+              placeholder="Ingrese observaciones adicionales sobre esta asignación..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent resize-none"
+            ></textarea>
+          </div>
+
+          <!-- Información adicional -->
+          <div class="p-4 bg-gray-50 rounded-lg">
+            <div class="text-xs text-gray-600 space-y-2">
+              <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-gray-400">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                </svg>
+                <span>Los cambios se aplicarán a las asignaciones seleccionadas</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-gray-400">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>El turno seleccionado reemplazará el turno actual</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex justify-end space-x-3 mt-8 pt-6 border-t border-gray-200">
+          <button
+            type="button"
+            (click)="onCancel()"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="!editForm.valid || loading"
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <svg *ngIf="loading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ loading ? 'Guardando...' : (isMultipleEdit ? 'Actualizar Asignaciones' : 'Actualizar Asignación') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

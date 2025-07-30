@@ -1,0 +1,158 @@
+/* Estilos específicos para el reporte asistencia mensual */
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Celdas de asistencia con animación hover */
+tbody td[class*="bg-"] {
+  transition: all 0.2s ease-in-out;
+}
+
+tbody td[class*="bg-"]:hover {
+  transform: scale(1.1);
+  z-index: 20;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+/* Colores específicos para cada tipo de asistencia */
+.asistencia-presente {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #22c55e;
+}
+
+.asistencia-falta {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #ef4444;
+}
+
+.asistencia-tardanza {
+  background-color: #fed7aa;
+  color: #ea580c;
+  border: 1px solid #f97316;
+}
+
+.asistencia-vacaciones {
+  background-color: #dbeafe;
+  color: #2563eb;
+  border: 1px solid #3b82f6;
+}
+
+.asistencia-descanso-medico {
+  background-color: #e9d5ff;
+  color: #9333ea;
+  border: 1px solid #a855f7;
+}
+
+.asistencia-permiso {
+  background-color: #fef3c7;
+  color: #d97706;
+  border: 1px solid #f59e0b;
+}
+
+.asistencia-descanso {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #9ca3af;
+}
+
+/* Scroll sincronizado mejorado */
+.table-scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.table-scroll-container::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.table-scroll-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Sticky columns con mejor z-index */
+.sticky-col {
+  position: sticky;
+  background: white;
+  z-index: 10;
+}
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+/* Mejoras responsive */
+@media (max-width: 768px) {
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  table {
+    font-size: 0.75rem;
+  }
+  
+  .px-3 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  .py-3 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+/* Animación para las estadísticas */
+.stat-card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Tooltip personalizado para celdas */
+[title] {
+  position: relative;
+}
+
+/* Resumen por empleado compacto */
+.resumen-empleado {
+  font-size: 0.625rem;
+  line-height: 1.2;
+}
+
+.resumen-empleado .metric {
+  padding: 1px 4px;
+  border-radius: 2px;
+  display: inline-block;
+  margin: 1px;
+}

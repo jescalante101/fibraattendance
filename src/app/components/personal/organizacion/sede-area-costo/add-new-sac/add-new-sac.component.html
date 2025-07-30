@@ -1,54 +1,144 @@
-<div class="min-h-[300px] bg-fiori-background rounded-lg shadow-lg p-0">
-  <div class="max-w-lg mx-auto">
-    <!-- Título -->
-    <div class="flex items-center gap-3 px-6 pt-6 pb-2">
-      <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-fiori-primary/10 text-fiori-primary">
-        <mat-icon>add_circle</mat-icon>
-      </span>
-      <span class="text-xl font-semibold text-fiori-text">{{ isEdit ? 'Editar Relación Sede - Área - Centro de Costo' : 'Registrar Relación Sede - Área - Centro de Costo' }}</span>
+<div class="w-full max-w-2xl mx-auto p-6 bg-gray-50">
+  
+ 
+
+  <!-- Formulario -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+      <div class="text-lg font-semibold text-gray-900">Información de la Relación</div>
     </div>
-    <div class="px-6 pb-6">
-      <div class="card-fiori">
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4 p-6">
-          <mat-form-field appearance="fill" class="w-full" *ngIf="!isEdit">
-            <mat-label>Sede</mat-label>
-            <mat-select formControlName="siteId" required>
-              <mat-option *ngFor="let sede of sedes" [value]="sede.categoriaAuxiliarId">{{ sede.descripcion }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="w-full" *ngIf="!isEdit">
-            <mat-label>Área</mat-label>
-            <mat-select formControlName="areaId" required>
-              <mat-option *ngFor="let area of areas" [value]="area.areaId">{{ area.descripcion }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-
+    
+    <div class="p-6">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+          <!-- Sede Field with Autocomplete -->
           <mat-form-field appearance="fill" class="w-full">
-            <mat-label>Centro de Costo</mat-label>
-            <mat-select formControlName="costCenterId" required>
-              <mat-option *ngFor="let cc of costCenters" [value]="cc.ccostoId">{{ cc.descripcion }}</mat-option>
-            </mat-select>
+            <mat-label>Sede *</mat-label>
+            <input 
+              type="text" 
+              matInput 
+              formControlName="sedeFilter"
+              [matAutocomplete]="sedeAuto"
+              placeholder="Buscar sede..."
+              (input)="form.get('siteId')?.setValue('')"
+              (focus)="onSedeFieldFocus(sedeAuto)">
+            <mat-autocomplete #sedeAuto="matAutocomplete" [displayWith]="displaySedeFunction">
+              <mat-option 
+                *ngFor="let sede of filteredSedes | async" 
+                [value]="sede"
+                (onSelectionChange)="onSedeSelected(sede)">
+                <div class="flex flex-col">
+                  <span class="font-medium text-fiori-text">{{ sede.descripcion }}</span>
+                  <span class="text-sm text-fiori-subtext">ID: {{ sede.categoriaAuxiliarId }}</span>
+                </div>
+              </mat-option>
+            </mat-autocomplete>
+            <mat-icon matSuffix>location_on</mat-icon>
+            <mat-error *ngIf="form.get('siteId')?.hasError('required')">
+              Debe seleccionar una sede
+            </mat-error>
           </mat-form-field>
 
+          <!-- Área Field with Autocomplete -->
+          <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Área *</mat-label>
+            <input 
+              type="text" 
+              matInput 
+              formControlName="areaFilter"
+              [matAutocomplete]="areaAuto"
+              placeholder="Buscar área..."
+              (input)="form.get('areaId')?.setValue('')"
+              (focus)="onAreaFieldFocus(areaAuto)">
+            <mat-autocomplete #areaAuto="matAutocomplete" [displayWith]="displayAreaFunction">
+              <mat-option 
+                *ngFor="let area of filteredAreas | async" 
+                [value]="area"
+                (onSelectionChange)="onAreaSelected(area)">
+                <div class="flex flex-col">
+                  <span class="font-medium text-fiori-text">{{ area.descripcion }}</span>
+                  <span class="text-sm text-fiori-subtext">ID: {{ area.areaId }}</span>
+                </div>
+              </mat-option>
+            </mat-autocomplete>
+            <mat-icon matSuffix>business</mat-icon>
+            <mat-error *ngIf="form.get('areaId')?.hasError('required')">
+              Debe seleccionar un área
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Centro de Costo Field with Autocomplete -->
+          <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Centro de Costo *</mat-label>
+            <input 
+              type="text" 
+              matInput 
+              formControlName="costCenterFilter"
+              [matAutocomplete]="ccAuto"
+              placeholder="Buscar centro de costo..."
+              (input)="form.get('costCenterId')?.setValue('')"
+              (focus)="onCostCenterFieldFocus(ccAuto)">
+            <mat-autocomplete #ccAuto="matAutocomplete" [displayWith]="displayCostCenterFunction">
+              <mat-option 
+                *ngFor="let cc of filteredCostCenters | async" 
+                [value]="cc"
+                (onSelectionChange)="onCostCenterSelected(cc)">
+                <div class="flex flex-col">
+                  <span class="font-medium text-fiori-text">{{ cc.descripcion }}</span>
+                  <span class="text-sm text-fiori-subtext">ID: {{ cc.ccostoId }}</span>
+                </div>
+              </mat-option>
+            </mat-autocomplete>
+            <mat-icon matSuffix>account_balance</mat-icon>
+            <mat-error *ngIf="form.get('costCenterId')?.hasError('required')">
+              Debe seleccionar un centro de costo
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Observación Field -->
           <mat-form-field appearance="fill" class="w-full">
             <mat-label>Observación</mat-label>
-            <textarea matInput formControlName="observation" rows="2"></textarea>
+            <textarea 
+              matInput 
+              formControlName="observation" 
+              rows="3"
+              placeholder="Agregar comentarios adicionales..."></textarea>
+            <mat-icon matSuffix>note</mat-icon>
           </mat-form-field>
 
+          <!-- Fecha Field -->
           <mat-form-field appearance="fill" class="w-full">
             <mat-label>Fecha de creación</mat-label>
-            <input matInput type="datetime-local" formControlName="creationDate">
+            <input 
+              matInput 
+              type="datetime-local" 
+              formControlName="creationDate"
+              required>
+            <mat-icon matSuffix>event</mat-icon>
           </mat-form-field>
 
-          <div class="flex justify-end gap-2 mt-4">
-            <button mat-stroked-button type="button" (click)="onCancel()">Cancelar</button>
-            <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || loading">
-              {{ isEdit ? 'Actualizar' : 'Guardar' }}
-            </button>
-          </div>
-        </form>
-      </div>
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
+          <button 
+            type="button" 
+            (click)="onCancel()"
+            class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            [disabled]="form.invalid || loading"
+            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <svg *ngIf="!loading" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75a.75.75 0 01.75-.75h7.5a.75.75 0 01.75.75z" />
+            </svg>
+            <div *ngIf="loading" class="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            {{ isEdit ? 'Actualizar' : 'Guardar' }}
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

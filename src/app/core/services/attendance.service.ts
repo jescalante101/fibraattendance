@@ -7,51 +7,51 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class AttendanceService {
-  private apiUrl = `${environment.apiUrl}`;
+  private apiUrl = `${environment.apiUrlPro}`+ 'api/';
 
   constructor(private http: HttpClient) { }
 
 
    getDescansos(page:number=1,pageSize:number=10):Observable<any[]>{
-    return this.http.get<any[]>(`${this.apiUrl}Attendance/lstDescansos?page=${page}&pageSize=${pageSize}`);
+    return this.http.get<any[]>(`${this.apiUrl}AttBreakTime/lstDescansos?page=${page}&pageSize=${pageSize}`);
   }
 
   getDescansoByID(id:number):Observable<any>{
-    return this.http.get<any>(`${this.apiUrl}Attendance/descansoPorId/${id}`,);
+    return this.http.get<any>(`${this.apiUrl}AttBreakTime/descansoPorId/${id}`,);
   }
 
   saveDescanso(descanso:any):Observable<any>{
-    return this.http.post<any>(`${this.apiUrl}Attendance/nuevoDescanso`,descanso);
+    return this.http.post<any>(`${this.apiUrl}AttBreakTime/nuevoDescanso`,descanso);
   }
 
   updateDescanso(descanso:any):Observable<any>{
-    return this.http.put<any>(`${this.apiUrl}Attendance/actualizarDescanso`,descanso);
+    return this.http.put<any>(`${this.apiUrl}AttBreakTime/actualizarDescanso`,descanso);
   }
   deleteDescanso(id:number):Observable<any>{
-    return this.http.delete<any>(`${this.apiUrl}Attendance/eliminarDescanso/${id}`,);
+    return this.http.delete<any>(`${this.apiUrl}AttBreakTime/eliminarDescanso/${id}`,);
   }
 
   getHorarios(page:number=1,pageSize:number=15):Observable<any>{
-    return this.http.get<any>(`${this.apiUrl}Attendance/lstHoraiosMap?page=${page}&pageSize=${pageSize}`,);
+    return this.http.get<any>(`${this.apiUrl}AttTimeInterval/lstHoraiosMap?page=${page}&pageSize=${pageSize}`,);
   }
 
   saveHorario(horario:any):Observable<any>{
-    return this.http.post<any>(`${this.apiUrl}Attendance/nuevoHorario`,horario);
+    return this.http.post<any>(`${this.apiUrl}AttTimeInterval/nuevoHorario`,horario);
   }
 
   updateHorario(horario:any):Observable<any>{
-    return this.http.put<any>(`${this.apiUrl}Attendance/actualizarHorario/`,horario);
+    return this.http.put<any>(`${this.apiUrl}AttTimeInterval/actualizarHorario/`,horario);
   }
   deleteHorario(id:number):Observable<any>{
-    return this.http.delete<any>(`${this.apiUrl}Attendance/eliminarHorario/${id}`,);
+    return this.http.delete<any>(`${this.apiUrl}AttTimeInterval/eliminarHorario/${id}`,);
   }
 
   getHorarioByID(id:number):Observable<any>{
-    return this.http.get<any>(`${this.apiUrl}Attendance/horarioPorId/${id}`,);
+    return this.http.get<any>(`${this.apiUrl}AttTimeInterval/horarioPorId/${id}`,);
   }
   
   getTurnos(page:number=1,pageSize:number=15):Observable<any>{
-    return this.http.get<any>(`${this.apiUrl}Attendance/lstShifts?page=${page}&pageSize=${pageSize}`,);
+    return this.http.get<any>(`${this.apiUrl}AttTimeInterval/lstShifts?page=${page}&pageSize=${pageSize}`,);
   }
 
  

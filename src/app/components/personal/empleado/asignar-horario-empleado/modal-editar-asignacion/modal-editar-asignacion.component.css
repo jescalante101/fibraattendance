@@ -1,0 +1,63 @@
+/* Estilos específicos para el modal de editar asignación */
+.modal-container {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Animaciones suaves para las transiciones */
+.transition-colors {
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+/* Scroll personalizado para listas largas */
+.max-h-96::-webkit-scrollbar {
+  width: 6px;
+}
+
+.max-h-96::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.max-h-96::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.max-h-96::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Mejoras visuales para inputs */
+input:focus, textarea:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Estado hover para los turnos */
+.cursor-pointer:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Indicador visual para turno seleccionado */
+.border-l-4 {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Animación para el spinner de carga */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}

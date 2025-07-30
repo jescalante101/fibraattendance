@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { ModalConfirmComponent } from './modal-confirm/modal-confirm.component';
 import { ModalLoadingComponent } from './modal-loading/modal-loading.component';
 import { MatCardModule } from '@angular/material/card';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @NgModule({
   declarations: [
@@ -20,13 +21,15 @@ import { MatCardModule } from '@angular/material/card';
     FormsModule,
     MatDialogModule,
     MatButtonModule,
-    MatCardModule
+    MatCardModule,
+    MatAutocompleteModule
   ],
   exports: [
     ModalAlertaComponent,
     ModalConfirmComponent,
     ModalLoadingComponent,
-    MatCardModule
+    MatCardModule,
+    MatAutocompleteModule
   ]
 })
 export class SharedModule { }

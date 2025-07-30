@@ -1,0 +1,77 @@
+/* Estilos específicos para el modal de registrar excepción */
+
+.horario-item {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.horario-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.horario-item.selected {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+/* Animación para el loading spinner */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Estilos para el scroll personalizado */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Estilos para campos de formulario con error */
+.ng-invalid.ng-touched {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Estilos para botones deshabilitados */
+.disabled\:bg-gray-400:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Transiciones suaves */
+* {
+  transition: all 0.2s ease;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .grid-cols-1.lg\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .max-w-4xl {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+}

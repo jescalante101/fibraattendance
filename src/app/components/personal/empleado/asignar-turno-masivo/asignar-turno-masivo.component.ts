@@ -45,6 +45,16 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   hayMasPaginas = false;
   totalCount = 0;
 
+  // Nuevas propiedades para las mejoras
+  searchTermPersonal = '';
+  personalTotal: any[] = [];
+  filtro=''
+  expandedTurnos = new Set<string>();
+  
+  // Array de días de la semana como en thorassemanal
+  diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  diasAbreviados = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
   constructor(
     private fb: FormBuilder,
     private personService: PersonService,
@@ -82,7 +92,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     this.datosListos = false;
     
     // Usar el nuevo servicio para obtener sedes y áreas
-    this.appUserService.getSedesAreas(3).subscribe({
+    this.appUserService.getSedesAreas(1).subscribe({
       next: (sedesAreas) => {
         this.sedesAreas = sedesAreas;
         
@@ -151,6 +161,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     
     return `${diasLaborables.length} días, ${horaInicio}`;
   }
+  
   getPrimerHorarioValido(turno: Shift): any {
     if (!turno.horario || turno.horario.length === 0) return null;
     // Busca el primer horario con duración > 0
@@ -174,13 +185,16 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     this.loadingPersonal = true;
     const categoriaAuxiliarId = this.filtroForm.value.sede;
     const rhAreaId = this.filtroForm.value.area;
-    this.personService.getPersonalActivo(this.paginaActual, this.pageSize, '', categoriaAuxiliarId, rhAreaId).subscribe({
+    console.log("filtro",this.filtro)
+    this.personService.getPersonalActivo(this.paginaActual, this.pageSize, this.filtro, categoriaAuxiliarId, rhAreaId).subscribe({
       next: res => {
         if (res.exito && res.data && res.data.items) {
-          this.personalFiltrado = res.data.items;
+          this.personalTotal = res.data.items;
+          this.personalFiltrado = [...this.personalTotal];
           this.totalCount = res.data.totalCount || 0;
           this.hayMasPaginas = (res.data.pageNumber * res.data.pageSize) < res.data.totalCount;
         } else {
+          this.personalTotal = [];
           this.personalFiltrado = [];
           this.totalCount = 0;
           this.hayMasPaginas = false;
@@ -276,13 +290,13 @@ export class AsignarTurnoMasivoComponent implements OnInit {
       const empleado = this.personalFiltrado.find(e => e.personalId === employeeId);
       return {
         employeeId: employeeId,
-        scheduleId: turnoSeleccionado ? turnoSeleccionado.id : 0,
+        shiftId: turnoSeleccionado ? turnoSeleccionado.id : 0,
         startDate: turno.fechaInicio,
         endDate: turno.fechaFin,
         remarks: turno.observaciones || '',
         createdAt: now,
         crearteBY: createdBy,
-        fullName: empleado ? `${empleado.nombres} ${empleado.apellidoPaterno} ${empleado.apellidoMaterno}` : '',
+        fullNameEmployee: empleado ? `${empleado.nombres} ${empleado.apellidoPaterno} ${empleado.apellidoMaterno}` : '',
         shiftDescription: turnoSeleccionado ? turnoSeleccionado.alias : '',
         nroDoc: empleado ? empleado.nroDoc : '',
         areaId: area ? area.areaId : '',
@@ -399,5 +413,80 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   
     inicio.setMinutes(inicio.getMinutes() + workTimeDuration);
     return inicio.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Métodos para la búsqueda de personal
+  onSearchPersonalChange(): void {
+    this.paginaActual=1
+    this.cargarPersonal()
+
+
+  }
+  buscarEmpleado(){
+    this.paginaActual=1
+    this.cargarPersonal()
+  }
+
+  // Método para obtener el número de seleccionados
+  getSelectedCount(): number {
+    return this.seleccionados.size;
+  }
+
+  // Método para limpiar la selección
+  clearSelection(): void {
+    this.seleccionados.clear();
+    this.empleados.clear();
+  }
+
+  // Métodos para expansión de turnos
+  onTurnoSelected(turno: Shift): void {
+    this.turnoForm.patchValue({ turno: turno.id });
+    // Auto-expandir el turno seleccionado
+    this.expandedTurnos.add(turno.id.toString());
+  }
+
+  toggleTurnoExpansion(turnoId: string): void {
+    if (this.expandedTurnos.has(turnoId)) {
+      this.expandedTurnos.delete(turnoId);
+    } else {
+      this.expandedTurnos.add(turnoId);
+    }
+  }
+
+  isTurnoExpanded(turnoId: string): boolean {
+    return this.expandedTurnos.has(turnoId);
+  }
+
+  // Métodos para obtener información de horarios
+  getHorariosCount(turno: Shift): number {
+    return turno.horario ? turno.horario.length : 0;
+  }
+
+  getHorariosValidos(turno: Shift): any[] {
+    if (!turno.horario) return [];
+    return turno.horario.filter(h => h.workTimeDuration > 0);
+  }
+
+  formatDuracion(minutos: number): string {
+    const horas = Math.floor(minutos / 60);
+    const mins = minutos % 60;
+    return `${horas}h ${mins}m`;
+  }
+
+  // Método para obtener el turno seleccionado
+  getTurnoSeleccionado(): Shift | null {
+    const turnoId = this.turnoForm.get('turno')?.value;
+    if (!turnoId) return null;
+    return this.turnos.find(t => t.id === turnoId) || null;
+  }
+
+  getDayName(dayIndex:number):string{
+    const dia = dayIndex % 7;
+    return this.diasSemana[dia]
+  }
+
+  getDayAbbreviation(dayIndex:number):string{
+    const dia = dayIndex % 7;
+    return this.diasAbreviados[dia]
   }
 }

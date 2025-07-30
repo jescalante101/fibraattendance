@@ -23,6 +23,10 @@ import { SedeCcostoComponent } from "./components/personal/organizacion/sede-cco
 import { MarcacionManualComponent } from "./components/asistencia/aprobaciones/marcacion-manual/marcacion-manual.component";
 import { AnalisisMarcacionesComponent } from "./components/asistencia/marcaciones/analisis-marcaciones/analisis-marcaciones.component";
 import { ReporteAsistenciaExcelComponent } from "./components/asistencia/marcaciones/reporte-asistencia-excel/reporte-asistencia-excel.component";
+import { ConfigCatalogosComponent } from "./components/asistencia/marcaciones/reportes-excel/config-catalogos/config-catalogos.component";
+import { ReporteCentroCostosComponent } from "./components/asistencia/marcaciones/reportes-excel/reporte-centro-costos/reporte-centro-costos.component";
+import { ReporteAsistenciaMensualComponent } from "./components/asistencia/marcaciones/reportes-excel/reporte-asistencia-mensual/reporte-asistencia-mensual.component";
+import { ReporteMarcacionesDetalleComponent } from "./components/asistencia/marcaciones/reportes-excel/reporte-marcaciones-detalle/reporte-marcaciones-detalle.component";
 
 
 
@@ -59,6 +63,10 @@ const appRoutes: Routes = [
         {path:'asistencia/aprobaciones/marcacion-manual',component:MarcacionManualComponent},
         {path:'asistencia/marcaciones/analisis',component:AnalisisMarcacionesComponent},
         {path:'asistencia/marcaciones/reporte-asistencia-excel',component:ReporteAsistenciaExcelComponent},
+        {path:'asistencia/marcaciones/reportes-excel/config-catalogos',component:ConfigCatalogosComponent},
+        {path:'asistencia/marcaciones/reportes-excel/centro-costos',component:ReporteCentroCostosComponent},
+        {path:'asistencia/marcaciones/reportes-excel/asistencia-mensual',component:ReporteAsistenciaMensualComponent},
+        {path:'asistencia/marcaciones/reportes-excel/marcaciones-detalle',component:ReporteMarcacionesDetalleComponent},
 
 
     ]},

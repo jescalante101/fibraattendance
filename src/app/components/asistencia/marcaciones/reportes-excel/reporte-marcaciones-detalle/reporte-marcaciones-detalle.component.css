@@ -1,0 +1,186 @@
+/* Estilos específicos para el reporte marcaciones detalle */
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Celdas de tiempo con resaltado especial */
+.time-cell {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.time-cell:hover {
+  transform: scale(1.05);
+  background-color: rgba(147, 51, 234, 0.1);
+  border-radius: 4px;
+}
+
+/* Estados específicos con colores mejorados */
+.estado-puntual {
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  color: #15803d;
+  border: 1px solid #22c55e;
+}
+
+.estado-tardanza {
+  background: linear-gradient(135deg, #fed7aa, #fdba74);
+  color: #ea580c;
+  border: 1px solid #f97316;
+}
+
+.estado-falta {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #dc2626;
+  border: 1px solid #ef4444;
+}
+
+.estado-incompleto {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #d97706;
+  border: 1px solid #f59e0b;
+}
+
+/* Efectos hover mejorados para filas */
+tbody tr:hover {
+  background-color: rgba(147, 51, 234, 0.05);
+  box-shadow: 0 2px 8px rgba(147, 51, 234, 0.1);
+}
+
+tbody tr:hover td.sticky {
+  background-color: rgba(255, 255, 255, 0.98);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Sticky columns con gradiente */
+.sticky {
+  background: linear-gradient(90deg, white 90%, rgba(255, 255, 255, 0.8) 100%);
+}
+
+/* Header con gradiente púrpura */
+thead tr {
+  background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+}
+
+/* Observaciones con tooltip mejorado */
+.observaciones-cell {
+  position: relative;
+  cursor: help;
+}
+
+.observaciones-cell:hover::after {
+  content: attr(title);
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 1000;
+}
+
+/* Scroll personalizado */
+.overflow-x-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #a855f7 #f3f4f6;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #a855f7, #8b5cf6);
+  border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, #9333ea, #7c3aed);
+}
+
+/* Animaciones para estadísticas */
+.stat-card {
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.stat-card:hover::before {
+  left: 100%;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .sticky {
+    position: relative;
+  }
+  
+  table {
+    font-size: 0.7rem;
+  }
+  
+  .px-3 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+/* Badge de planilla con animación */
+.planilla-badge {
+  transition: all 0.2s ease-in-out;
+}
+
+.planilla-badge:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Efecto de carga para las celdas */
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.loading-cell {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite ease-out;
+}

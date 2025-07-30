@@ -1,0 +1,347 @@
+<div class="p-4 max-w-full">
+  <!-- Header -->
+  <div class="mb-6 flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border">
+    <div class="flex items-center gap-3">
+      <div class="w-1 h-8 bg-purple-600 rounded-full"></div>
+      <div>
+        <h6 class="text-xl font-semibold text-gray-900">Reporte Marcaciones Detalle</h6>
+        <p class="text-sm text-gray-500">Control de horarios de ingreso y salida por fecha específica</p>
+      </div>
+      <div class="ml-4 flex items-center gap-1 text-sm text-gray-500">
+        <mat-icon class="text-base">access_time</mat-icon>
+        <span>{{ filteredEmpleados.length }}</span> empleados
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button 
+        (click)="toggleViewMode()" 
+        class="inline-flex items-center gap-2 px-3 py-2 text-sm border rounded-md transition-colors"
+        [class]="viewMode === 'detalle' 
+          ? 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100' 
+          : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'">
+        <mat-icon class="text-sm">{{ viewMode === 'detalle' ? 'summarize' : 'list' }}</mat-icon>
+        Vista {{ viewMode === 'detalle' ? 'Resumen' : 'Detalle' }}
+      </button>
+      <button 
+        (click)="toggleBreakTimes()" 
+        class="inline-flex items-center gap-2 px-3 py-2 text-sm border rounded-md transition-colors"
+        [class]="showBreakTimes 
+          ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' 
+          : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'">
+        <mat-icon class="text-sm">{{ showBreakTimes ? 'visibility_off' : 'visibility' }}</mat-icon>
+        {{ showBreakTimes ? 'Ocultar' : 'Mostrar' }} Breaks
+      </button>
+      <button 
+        (click)="exportToExcel()" 
+        class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-green-50 text-green-700 border border-green-200 rounded-md hover:bg-green-100 transition-colors">
+        <mat-icon class="text-sm">download</mat-icon>
+        Exportar Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="mb-6 bg-white rounded-lg shadow-sm border p-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+      <div class="lg:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Buscar Empleado</label>
+        <div class="relative">
+          <input 
+            type="text" 
+            [(ngModel)]="filterText"
+            placeholder="Nombre, documento, cargo..." 
+            class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+          <mat-icon class="absolute left-3 top-2.5 text-gray-400 text-sm">search</mat-icon>
+        </div>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Área</label>
+        <select 
+          [(ngModel)]="selectedArea"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all bg-white">
+          <option value="">Todas</option>
+          <option *ngFor="let area of areas" [value]="area">{{ area }}</option>
+        </select>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+        <select 
+          [(ngModel)]="selectedEstado"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all bg-white">
+          <option value="">Todos</option>
+          <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
+        </select>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Fecha Inicio</label>
+        <input 
+          type="date" 
+          [(ngModel)]="fechaInicio"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Fecha Fin</label>
+        <input 
+          type="date" 
+          [(ngModel)]="fechaFin"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+      </div>
+    </div>
+    
+    <div class="mt-4 flex justify-between items-center">
+      <div class="text-sm text-gray-600">
+        Periodo: <strong>{{ formatDate(fechasReporte[0]) }} - {{ formatDate(fechasReporte[fechasReporte.length - 1]) }}</strong>
+      </div>
+      <button 
+        (click)="clearFilters()"
+        class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+        <mat-icon class="text-sm">refresh</mat-icon>
+        Limpiar Filtros
+      </button>
+    </div>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+      <div class="text-2xl font-bold text-blue-700">{{ totalEmpleados }}</div>
+      <div class="text-sm text-blue-600">Total Empleados</div>
+    </div>
+    <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+      <div class="text-2xl font-bold text-green-700">{{ marcacionesPuntuales }}</div>
+      <div class="text-sm text-green-600">Marcaciones Puntuales</div>
+    </div>
+    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
+      <div class="text-2xl font-bold text-orange-700">{{ marcacionesTardanza }}</div>
+      <div class="text-sm text-orange-600">Tardanzas</div>
+    </div>
+    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center">
+      <div class="text-2xl font-bold text-purple-700">{{ promedioHorasTrabajadas | number:'1.1-1' }}</div>
+      <div class="text-sm text-purple-600">Promedio Horas</div>
+    </div>
+  </div>
+
+  <!-- Tabla principal -->
+  <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+    <!-- Header sticky -->
+    <div class="sticky top-0 z-30 bg-purple-600 text-white">
+      <div class="overflow-x-auto">
+        <table class="min-w-full table-fixed">
+          <thead>
+            <tr class="bg-purple-600">
+              <!-- Columnas fijas -->
+              <th class="sticky left-0 bg-purple-600 z-40 border-r border-purple-500 px-3 py-3 text-left w-20">
+                <span class="text-xs font-medium">ITEM</span>
+              </th>
+              <th class="sticky left-20 bg-purple-600 z-40 border-r border-purple-500 px-3 py-3 text-left w-24">
+                <span class="text-xs font-medium">PLANILLA</span>
+              </th>
+              <th class="sticky left-44 bg-purple-600 z-40 border-r border-purple-500 px-3 py-3 text-left w-28">
+                <span class="text-xs font-medium">NRO DOC</span>
+              </th>
+              <th class="sticky left-72 bg-purple-600 z-40 border-r border-purple-500 px-3 py-3 text-left w-64">
+                <span class="text-xs font-medium">APELLIDOS Y NOMBRES</span>
+              </th>
+              <th class="sticky left-80 bg-purple-600 z-40 border-r border-purple-500 px-3 py-3 text-left w-32">
+                <span class="text-xs font-medium">ÁREA</span>
+              </th>
+              <th class="sticky left-96 bg-purple-600 z-40 border-r border-purple-500 px-3 py-3 text-left w-24">
+                <span class="text-xs font-medium">CARGO</span>
+              </th>
+              <th class="sticky left-120 bg-purple-600 z-40 border-r border-purple-500 px-3 py-3 text-left w-24">
+                <span class="text-xs font-medium">SEDE</span>
+              </th>
+              <th class="sticky left-144 bg-purple-600 z-40 border-r border-purple-500 px-3 py-3 text-left w-28">
+                <span class="text-xs font-medium">F. INGRESO</span>
+              </th>
+              <th class="sticky left-172 bg-purple-600 z-40 border-r border-purple-500 px-3 py-3 text-left w-28">
+                <span class="text-xs font-medium">F. CESE</span>
+              </th>
+              
+              <!-- Headers por fecha -->
+              <th 
+                *ngFor="let fecha of fechasReporte"
+                [attr.colspan]="showBreakTimes ? 7 : 5"
+                class="px-2 py-3 text-center border-l border-purple-500">
+                <div class="text-xs font-medium">
+                  {{ getDayName(fecha).toUpperCase() }}<br>
+                  <span class="text-purple-100">{{ formatDate(fecha) }}</span>
+                </div>
+              </th>
+            </tr>
+            
+            <!-- Sub-headers -->
+            <tr class="bg-purple-500">
+              <!-- Espaciadores para columnas fijas -->
+              <th class="sticky left-0 bg-purple-500 z-40 border-r border-purple-400 px-1 py-1"></th>
+              <th class="sticky left-20 bg-purple-500 z-40 border-r border-purple-400 px-1 py-1"></th>
+              <th class="sticky left-44 bg-purple-500 z-40 border-r border-purple-400 px-1 py-1"></th>
+              <th class="sticky left-72 bg-purple-500 z-40 border-r border-purple-400 px-1 py-1"></th>
+              <th class="sticky left-80 bg-purple-500 z-40 border-r border-purple-400 px-1 py-1"></th>
+              <th class="sticky left-96 bg-purple-500 z-40 border-r border-purple-400 px-1 py-1"></th>
+              <th class="sticky left-120 bg-purple-500 z-40 border-r border-purple-400 px-1 py-1"></th>
+              <th class="sticky left-144 bg-purple-500 z-40 border-r border-purple-400 px-1 py-1"></th>
+              <th class="sticky left-172 bg-purple-500 z-40 border-r border-purple-400 px-1 py-1"></th>
+              
+              <!-- Sub-columnas por fecha -->
+              <ng-container *ngFor="let fecha of fechasReporte">
+                <th class="px-1 py-1 text-center border-l border-purple-400 min-w-[60px]">
+                  <div class="text-xs font-medium text-white">INGRESO</div>
+                </th>
+                <th class="px-1 py-1 text-center min-w-[60px]">
+                  <div class="text-xs font-medium text-white">SALIDA</div>
+                </th>
+                <th *ngIf="showBreakTimes" class="px-1 py-1 text-center min-w-[60px]">
+                  <div class="text-xs font-medium text-white">E.BREAK</div>
+                </th>
+                <th *ngIf="showBreakTimes" class="px-1 py-1 text-center min-w-[60px]">
+                  <div class="text-xs font-medium text-white">S.BREAK</div>
+                </th>
+                <th class="px-1 py-1 text-center min-w-[50px]">
+                  <div class="text-xs font-medium text-white">HORAS</div>
+                </th>
+                <th class="px-1 py-1 text-center min-w-[60px]">
+                  <div class="text-xs font-medium text-white">ESTADO</div>
+                </th>
+                <th class="px-1 py-1 text-center min-w-[80px]">
+                  <div class="text-xs font-medium text-white">OBS.</div>
+                </th>
+              </ng-container>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+
+    <!-- Body scrollable -->
+    <div class="overflow-x-auto max-h-96 overflow-y-auto">
+      <table class="min-w-full table-fixed">
+        <tbody class="divide-y divide-gray-100">
+          <!-- Loading state -->
+          <tr *ngIf="loading">
+            <td [attr.colspan]="9 + (fechasReporte.length * (showBreakTimes ? 7 : 5))" class="text-center py-8">
+              <div class="flex items-center justify-center gap-2">
+                <mat-spinner diameter="20"></mat-spinner>
+                <span class="text-gray-500 text-sm">Cargando datos...</span>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Empty state -->
+          <tr *ngIf="!loading && filteredEmpleados.length === 0">
+            <td [attr.colspan]="9 + (fechasReporte.length * (showBreakTimes ? 7 : 5))" class="text-center py-8">
+              <div class="flex flex-col items-center gap-3">
+                <mat-icon class="text-gray-300 text-4xl">person_off</mat-icon>
+                <div class="text-gray-500">
+                  <p class="text-sm font-medium">No se encontraron empleados</p>
+                  <p class="text-xs">Intenta ajustar los filtros</p>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Filas de empleados -->
+          <tr *ngFor="let empleado of filteredEmpleados; trackBy: trackByEmpleado" 
+              class="hover:bg-gray-50 transition-colors">
+            
+            <!-- Columnas fijas -->
+            <td class="sticky left-0 bg-white z-10 border-r border-gray-200 px-3 py-2 text-center w-20">
+              <div class="text-sm font-medium text-gray-900">{{ empleado.item }}</div>
+            </td>
+            <td class="sticky left-20 bg-white z-10 border-r border-gray-200 px-3 py-2 text-center w-24">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                    [ngClass]="{
+                      'bg-blue-100 text-blue-800': empleado.planilla === 'EMPLEADOS',
+                      'bg-green-100 text-green-800': empleado.planilla === 'OBREROS'
+                    }">
+                {{ empleado.planilla }}
+              </span>
+            </td>
+            <td class="sticky left-44 bg-white z-10 border-r border-gray-200 px-3 py-2 text-center w-28">
+              <div class="text-sm text-gray-900">{{ empleado.nroDoc }}</div>
+            </td>
+            <td class="sticky left-72 bg-white z-10 border-r border-gray-200 px-3 py-2 w-64">
+              <div class="text-sm font-medium text-gray-900 truncate" [title]="empleado.apellidosNombres">
+                {{ empleado.apellidosNombres }}
+              </div>
+            </td>
+            <td class="sticky left-80 bg-white z-10 border-r border-gray-200 px-3 py-2 w-32">
+              <div class="text-xs text-gray-700 truncate" [title]="empleado.area">{{ empleado.area }}</div>
+            </td>
+            <td class="sticky left-96 bg-white z-10 border-r border-gray-200 px-3 py-2 text-center w-24">
+              <div class="text-xs text-gray-700">{{ empleado.cargo }}</div>
+            </td>
+            <td class="sticky left-120 bg-white z-10 border-r border-gray-200 px-3 py-2 text-center w-24">
+              <div class="text-xs text-gray-700">{{ empleado.sede }}</div>
+            </td>
+            <td class="sticky left-144 bg-white z-10 border-r border-gray-200 px-3 py-2 text-center w-28">
+              <div class="text-xs text-gray-700">{{ formatDate(empleado.fechaIngreso) }}</div>
+            </td>
+            <td class="sticky left-172 bg-white z-10 border-r border-gray-200 px-3 py-2 text-center w-28">
+              <div class="text-xs text-gray-700">{{ empleado.fechaCese ? formatDate(empleado.fechaCese) : '-' }}</div>
+            </td>
+
+            <!-- Celdas de marcaciones por fecha -->
+            <ng-container *ngFor="let fecha of fechasReporte">
+              <ng-container *ngTemplateOutlet="marcacionCells; context: { empleado: empleado, fecha: fecha }"></ng-container>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Template para celdas de marcación -->
+<ng-template #marcacionCells let-empleado="empleado" let-fecha="fecha">
+  <ng-container *ngIf="getMarcacion(empleado, fecha) as marcacion; else emptyMarcacion">
+    <!-- Ingreso -->
+    <td class="px-1 py-1 text-xs text-center border-l border-gray-200 min-w-[60px]">
+      {{ formatTime(marcacion.ingreso) }}
+    </td>
+    <!-- Salida -->
+    <td class="px-1 py-1 text-xs text-center min-w-[60px]">
+      {{ formatTime(marcacion.salida) }}
+    </td>
+    <!-- Break In (si está habilitado) -->
+    <td *ngIf="showBreakTimes" class="px-1 py-1 text-xs text-center min-w-[60px]">
+      {{ formatTime(marcacion.ingresoBreak) }}
+    </td>
+    <!-- Break Out (si está habilitado) -->
+    <td *ngIf="showBreakTimes" class="px-1 py-1 text-xs text-center min-w-[60px]">
+      {{ formatTime(marcacion.salidaBreak) }}
+    </td>
+    <!-- Horas -->
+    <td class="px-1 py-1 text-xs text-center min-w-[50px]">
+      {{ marcacion.horasReales ? (marcacion.horasReales | number:'1.1-1') : '-' }}
+    </td>
+    <!-- Estado -->
+    <td class="px-1 py-1 text-xs text-center min-w-[60px]">
+      <span class="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium"
+            [ngClass]="getEstadoClass(marcacion.estado)">
+        {{ marcacion.estado }}
+      </span>
+    </td>
+    <!-- Observaciones -->
+    <td class="px-1 py-1 text-xs text-center min-w-[80px]">
+      <div class="truncate max-w-[80px]" [title]="marcacion.observaciones">
+        {{ marcacion.observaciones || '-' }}
+      </div>
+    </td>
+  </ng-container>
+  
+  <!-- Template para cuando no hay marcación -->
+  <ng-template #emptyMarcacion>
+    <td class="px-1 py-1 text-xs text-center border-l border-gray-200 min-w-[60px] bg-gray-100">-</td>
+    <td class="px-1 py-1 text-xs text-center min-w-[60px] bg-gray-100">-</td>
+    <td *ngIf="showBreakTimes" class="px-1 py-1 text-xs text-center min-w-[60px] bg-gray-100">-</td>
+    <td *ngIf="showBreakTimes" class="px-1 py-1 text-xs text-center min-w-[60px] bg-gray-100">-</td>
+    <td class="px-1 py-1 text-xs text-center min-w-[50px] bg-gray-100">-</td>
+    <td class="px-1 py-1 text-xs text-center min-w-[60px] bg-gray-100">-</td>
+    <td class="px-1 py-1 text-xs text-center min-w-[80px] bg-gray-100">-</td>
+  </ng-template>
+</ng-template>

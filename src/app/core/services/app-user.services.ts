@@ -31,7 +31,7 @@ export interface User {
     providedIn: 'root'
 })
 export class AppUserService{
-    private apiUrl = `${environment.apiUrl}`;
+    private apiUrl = `${environment.apiUrlPro}`;
     
     constructor(private http: HttpClient){}
 

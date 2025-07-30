@@ -117,7 +117,7 @@ export class IclockTransactionComponent implements OnInit {
       sync_status: data.syncStatus,
       sync_time: data.syncTime,
       is_mask: data.isMask,
-      temperature: data.temperature.toString(),
+      temperature: data.temperature,
       emp: data.empId,
       terminal: data.terminalId,
       llegoATiempo: 'sin_horario' // Valor por defecto

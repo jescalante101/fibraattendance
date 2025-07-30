@@ -9,7 +9,7 @@ import { SedeAreaCosto } from 'src/app/models/site-area-ccost.model';
   providedIn: 'root'
 })
 export class SedeAreaCostoService {
-  private apiUrl = environment.apiUrl;
+  private apiUrl = environment.apiUrlPro;
   private resource = this.apiUrl + 'api/SiteAreaCostCenter';
 
   constructor(private http: HttpClient) {}

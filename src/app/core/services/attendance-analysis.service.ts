@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
 import { ApiData, ApiResponse } from '../models/api-response.model';
-import { AttendanceAnalysis } from 'src/app/models/attendance-analysis/attendance-analysis.model';
+import { AttendanceAnalysis, ParamsReport, ReportResponse } from 'src/app/models/attendance-analysis/attendance-analysis.model';
 import { HttpParams } from '@angular/common/http';
 import { AsistenciaResponse, ParametrosConsulta } from '../models/attendance-resport.model';
 
@@ -11,8 +11,10 @@ import { AsistenciaResponse, ParametrosConsulta } from '../models/attendance-res
   providedIn: 'root'
 })
 export class AttendanceAnalysisService {
-  private readonly apiUrl = environment.apiUrl;
+  private readonly apiUrl = environment.apiUrlPro;
   private readonly apiUrlAttendanceAnalysis = `${this.apiUrl}api/AttendanceAnalysis`;
+  ///api/AttendanceAnalysis/detailed/paginated
+  //api/AttendanceAnalysis/detailed/paginated
 
   constructor(private http: HttpClient) { }
   
@@ -38,6 +40,10 @@ export class AttendanceAnalysisService {
       this.apiUrlAttendanceAnalysis,
       { params: httpParams }
     );
+  }
+
+  getAttendanceAnalysisV2(params: ParamsReport): Observable<ReportResponse> {
+    return this.http.post<ReportResponse>(`${this.apiUrlAttendanceAnalysis}/detailed/paginated`, params);
   }
 
  
@@ -117,5 +123,9 @@ export class AttendanceAnalysisService {
     const httpParams = this.buildHttpParams(params);
     return this.http.get(`${this.apiUrlAttendanceAnalysis}/export/excel`, { params: httpParams, responseType: 'blob' });
   }
+
+
+
+
 
 }

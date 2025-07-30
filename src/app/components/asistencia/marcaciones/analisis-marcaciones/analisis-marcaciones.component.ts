@@ -1,31 +1,86 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { AttendanceAnalysisService } from 'src/app/core/services/attendance-analysis.service';
-import { AttendanceAnalysis } from 'src/app/models/attendance-analysis/attendance-analysis.model';
+import { AttendanceAnalysis, ReportResponse, Datum, ParamsReport } from 'src/app/models/attendance-analysis/attendance-analysis.model';
 import { ApiResponse } from 'src/app/core/models/api-response.model';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 import * as XLSX from 'xlsx-js-style';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+
+// Interfaz para datos agrupados por empleado y fecha
+interface GroupedAttendanceRecord {
+  employeeId: string;
+  fullNameEmployee: string;
+  nroDoc: string;
+  areaDescription: string;
+  locationName: string;
+  areaId: string;
+  locationId: string;
+  fecha: Date;
+  fechaFormateada: string;
+  shiftName: string;
+  tipoHorario: string;
+  exceptionRemarks: string | null;
+  tipoPermiso: string | null;
+  diasInfo: string | null;
+  razonManual: string | null;
+  validacionRango: string;
+  // Indicadores calculados
+  esPuntual: boolean;
+  esTardanza: boolean;
+  esFalta: boolean;
+  esMarcacionManual: boolean;
+  marcaciones: {
+    entrada?: {
+      intervalAlias: string;
+      horaEsperada: string;
+      horaMarcacionReal: string;
+      estadoMarcacion: string;
+      tipoMarcacion: string;
+      diferenciaMinutos: number;
+      minutosTardanza: number;
+      minutosAdelanto: number;
+      origenMarcacion: string;
+      informacionAdicional: string;
+    };
+    salida?: {
+      intervalAlias: string;
+      horaEsperada: string;
+      horaMarcacionReal: string;
+      estadoMarcacion: string;
+      tipoMarcacion: string;
+      diferenciaMinutos: number;
+      minutosTardanza: number;
+      minutosAdelanto: number;
+      origenMarcacion: string;
+      informacionAdicional: string;
+    };
+  };
+}
 
 @Component({
   selector: 'app-analisis-marcaciones',
   templateUrl: './analisis-marcaciones.component.html',
   styleUrls: ['./analisis-marcaciones.component.css']
 })
-export class AnalisisMarcacionesComponent implements OnInit, OnDestroy {
+export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterViewInit {
   // Reactive forms
   filterForm!: FormGroup;
   
   // Table data
   dataSource = new MatTableDataSource<AttendanceAnalysis>([]);
+  // Nueva estructura para datos agrupados
+  groupedDataSource = new MatTableDataSource<GroupedAttendanceRecord>([]);
+  reportResponse: ReportResponse | null = null;
   loading = false;
   totalCount = 0;
   page = 1;
-  pageSize = 20;
+  pageSize = 50;
+  totalPages = 0;
   
   // Master data
   sedes: CategoriaAuxiliar[] = [];
@@ -40,32 +95,24 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy {
   columns = [
     { id: 'fullNameEmployee', label: 'Empleado', visible: true },
     { id: 'nroDoc', label: 'Documento', visible: true },
-    { id: 'employeeId', label: 'ID Empleado', visible: false },
     { id: 'areaDescription', label: 'Área', visible: true },
     { id: 'locationName', label: 'Sede', visible: true },
-    { id: 'areaId', label: 'ID Área', visible: false },
-    { id: 'locationId', label: 'ID Sede', visible: false },
     { id: 'fechaFormateada', label: 'Fecha', visible: true },
-    { id: 'fecha', label: 'Fecha (ISO)', visible: false },
     { id: 'shiftName', label: 'Turno', visible: true },
     { id: 'intervalAlias', label: 'Horario', visible: true },
-    { id: 'tipoMarcacion', label: 'Tipo', visible: true },
     { id: 'horaEsperada', label: 'Esperado', visible: true },
     { id: 'horaMarcacionReal', label: 'Real', visible: true },
-    { id: 'diferenciaMinutos', label: 'Diferencia', visible: false },
-    { id: 'minutosTardanza', label: 'Min. Tardanza', visible: false },
-    { id: 'minutosAdelanto', label: 'Min. Adelanto', visible: false },
     { id: 'estadoMarcacion', label: 'Estado', visible: true },
-    { id: 'origenMarcacion', label: 'Origen', visible: false },
-    { id: 'informacionAdicional', label: 'Info Adicional', visible: false },
+    { id: 'minutosTardanza', label: 'Tardanza', visible: false },
+    { id: 'minutosAdelanto', label: 'Adelanto', visible: false },
+    { id: 'tipoMarcacion', label: 'Tipo Horario', visible: false },
+    { id: 'exceptionRemarks', label: 'Observaciones', visible: true },
+    { id: 'tipoPermiso', label: 'Tipo Permiso', visible: false },
+    { id: 'diasInfo', label: 'Días Info', visible: false },
     { id: 'razonManual', label: 'Razón Manual', visible: false },
     { id: 'validacionRango', label: 'Validación', visible: false },
-    { id: 'esTardanza', label: 'Tardanza', visible: false },
-    { id: 'esFalta', label: 'Falta', visible: false },
-    { id: 'esPuntual', label: 'Puntual', visible: false },
-    { id: 'esMarcacionManual', label: 'Manual', visible: false },
-    { id: 'diaSemana', label: 'Día (nro)', visible: false },
-    { id: 'nombreDia', label: 'Día', visible: false },
+    { id: 'informacionAdicional', label: 'Info Adicional', visible: false },
+    { id: 'origenMarcacion', label: 'Origen', visible: false },
     { id: 'actions', label: 'Acciones', visible: true }
   ];
 
@@ -229,20 +276,36 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy {
   // ===== DATA MANAGEMENT =====
   getData() {
     this.loading = true;
-    const filters = {
-      ...this.filterForm.value,
-      page: this.page,
+    const formValues = this.filterForm.value;
+    
+    // Construir parámetros para la nueva API
+    const params: ParamsReport = {
+      fechaInicio: formValues.fechaInicio ? new Date(formValues.fechaInicio) : new Date(),
+      fechaFin: formValues.fechaFin ? new Date(formValues.fechaFin) : new Date(),
+      employeeId: formValues.filter || null,
+      areaId: formValues.areaId || null,
+      locationId: formValues.locationId || null,
+      pageNumber: this.page,
       pageSize: this.pageSize
     };
-
-    this.attendanceAnalysisService.getAttendanceAnalysis(filters)
+    console.log("params",params);
+    
+    this.attendanceAnalysisService.getAttendanceAnalysisV2(params)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (res: ApiResponse<AttendanceAnalysis>) => {
-          const data = res.data?.items || [];
-          this.allData = data;
+        next: (response: ReportResponse) => {
+          console.log('Nueva API Response:', response);
+          this.reportResponse = response;
+          this.totalCount = response.totalRecords;
+          this.totalPages = response.totalPages;
+          
+          // Procesar y agrupar los datos
+          const groupedData = this.groupAttendanceData(response.data);
+          this.groupedDataSource.data = groupedData;
+          
+          // Mantener compatibilidad con el código existente
+          this.allData = response.data as any[];
           this.applyCurrentFilters();
-          this.totalCount = res.data?.totalCount || 0;
           this.loading = false;
           this.updateQuickStats();
         },
@@ -257,9 +320,130 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy {
     this.allData = [];
     this.filteredData = [];
     this.dataSource.data = [];
+    this.groupedDataSource.data = [];
     this.totalCount = 0;
     this.loading = false;
     this.updateQuickStats();
+  }
+
+  /**
+   * Agrupa los datos de marcaciones por empleado y fecha, 
+   * combinando entrada y salida en una sola fila
+   */
+  private groupAttendanceData(data: Datum[]): GroupedAttendanceRecord[] {
+    const grouped = new Map<string, GroupedAttendanceRecord>();
+
+    data.forEach(item => {
+      // Crear clave única por empleado y fecha
+      const dateKey = new Date(item.fecha).toISOString().split('T')[0];
+      const key = `${item.employeeId}-${dateKey}`;
+
+      // Si no existe el registro, crearlo
+      if (!grouped.has(key)) {
+        grouped.set(key, {
+          employeeId: item.employeeId,
+          fullNameEmployee: item.fullNameEmployee,
+          nroDoc: item.nroDoc,
+          areaDescription: item.areaDescription,
+          locationName: item.locationName,
+          areaId: item.areaId,
+          locationId: item.locationId,
+          fecha: new Date(item.fecha),
+          fechaFormateada: this.formatDate(new Date(item.fecha)),
+          shiftName: item.shiftName,
+          tipoHorario: item.tipoHorario || '',
+          exceptionRemarks: item.exceptionRemarks,
+          tipoPermiso: item.tipoPermiso,
+          diasInfo: item.diasInfo,
+          razonManual: item.razonManual,
+          validacionRango: item.validacionRango || '',
+          // Inicializar indicadores
+          esPuntual: false,
+          esTardanza: false,
+          esFalta: false,
+          esMarcacionManual: false,
+          marcaciones: {}
+        });
+      }
+
+      const record = grouped.get(key)!;
+
+      // Determinar si es entrada o salida basado en el tipo de marcación
+      const isEntrada = item.tipoMarcacion?.toLowerCase().includes('entrada') || 
+                       item.tipoMarcacion?.toLowerCase().includes('in') ||
+                       item.intervalAlias?.toLowerCase().includes('entrada');
+
+      if (isEntrada) {
+        record.marcaciones.entrada = {
+          intervalAlias: item.intervalAlias,
+          horaEsperada: item.horaEsperada,
+          horaMarcacionReal: item.horaMarcacionReal,
+          estadoMarcacion: item.estadoMarcacion,
+          tipoMarcacion: item.tipoMarcacion,
+          diferenciaMinutos: item.diferenciaMinutos,
+          minutosTardanza: item.minutosTardanza,
+          minutosAdelanto: item.minutosAdelanto,
+          origenMarcacion: item.origenMarcacion,
+          informacionAdicional: item.informacionAdicional
+        };
+      } else {
+        record.marcaciones.salida = {
+          intervalAlias: item.intervalAlias,
+          horaEsperada: item.horaEsperada,
+          horaMarcacionReal: item.horaMarcacionReal,
+          estadoMarcacion: item.estadoMarcacion,
+          tipoMarcacion: item.tipoMarcacion,
+          diferenciaMinutos: item.diferenciaMinutos,
+          minutosTardanza: item.minutosTardanza,
+          minutosAdelanto: item.minutosAdelanto,
+          origenMarcacion: item.origenMarcacion,
+          informacionAdicional: item.informacionAdicional
+        };
+      }
+    });
+
+    // Calcular indicadores para cada registro agrupado
+    const groupedArray = Array.from(grouped.values());
+    groupedArray.forEach(record => {
+      this.calculateIndicators(record);
+    });
+
+    return groupedArray.sort((a, b) => {
+      // Ordenar por fecha descendente, luego por empleado
+      const dateCompare = b.fecha.getTime() - a.fecha.getTime();
+      if (dateCompare !== 0) return dateCompare;
+      return a.fullNameEmployee.localeCompare(b.fullNameEmployee);
+    });
+  }
+
+  /**
+   * Calcula los indicadores de puntualidad para un registro agrupado
+   */
+  private calculateIndicators(record: GroupedAttendanceRecord) {
+    const entrada = record.marcaciones.entrada;
+    const salida = record.marcaciones.salida;
+
+    // Es falta si no hay entrada ni salida marcada
+    record.esFalta = !entrada?.horaMarcacionReal && !salida?.horaMarcacionReal;
+
+    // Es tardanza si hay tardanza en la entrada
+    record.esTardanza = !!(entrada && entrada.minutosTardanza > 0);
+
+    // Es puntual si tiene marcaciones y no es tardanza ni falta
+    record.esPuntual = !record.esFalta && !record.esTardanza && 
+                      (!!entrada?.horaMarcacionReal || !!salida?.horaMarcacionReal);
+
+    // Es marcación manual si el origen es manual
+    record.esMarcacionManual = !!(entrada?.origenMarcacion?.toLowerCase().includes('manual') ||
+                                salida?.origenMarcacion?.toLowerCase().includes('manual'));
+  }
+
+  private formatDate(date: Date): string {
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   }
 
   private applyCurrentFilters() {
@@ -287,9 +471,9 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy {
     return this.columns.filter(c => c.visible && c.id !== 'fullNameEmployee' && c.id !== 'actions');
   }
 
-  get totalPages(): number {
+  /* get totalPages(): number {
     return this.totalCount > 0 ? Math.ceil(this.totalCount / this.pageSize) : 1;
-  }
+  } */
 
   // ===== UI HELPERS =====
   isColumnVisible(id: string): boolean {
@@ -305,6 +489,14 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy {
     if (item.esMarcacionManual && !item.esFalta) return 'bg-yellow-50';
     if (item.esTardanza) return 'bg-orange-50';
     return '';
+  }
+
+  getGroupedRowClass(record: GroupedAttendanceRecord): string {
+    if (record.esFalta) return 'bg-red-50 hover:bg-red-100';
+    if (record.esMarcacionManual && !record.esFalta) return 'bg-yellow-50 hover:bg-yellow-100';
+    if (record.esTardanza) return 'bg-orange-50 hover:bg-orange-100';
+    if (record.esPuntual) return 'bg-green-50 hover:bg-green-100';
+    return 'hover:bg-gray-50';
   }
 
   getBadgeClass(field: string, value: boolean): string {
@@ -490,7 +682,7 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy {
       this.sortColumn = '';
     }
     
-    this.applySort();
+    this.applySortToGroupedData();
   }
 
   private applySort() {
@@ -517,6 +709,79 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy {
     this.dataSource.data = sortedData;
   }
 
+  private applySortToGroupedData() {
+    if (!this.sortColumn || !this.sortDirection) {
+      return;
+    }
+
+    const sortedData = [...this.groupedDataSource.data].sort((a, b) => {
+      let aValue: any, bValue: any;
+      
+      // Obtener valor según la columna
+      switch (this.sortColumn) {
+        case 'fullNameEmployee':
+          aValue = a.fullNameEmployee;
+          bValue = b.fullNameEmployee;
+          break;
+        case 'nroDoc':
+          aValue = a.nroDoc;
+          bValue = b.nroDoc;
+          break;
+        case 'areaDescription':
+          aValue = a.areaDescription;
+          bValue = b.areaDescription;
+          break;
+        case 'locationName':
+          aValue = a.locationName;
+          bValue = b.locationName;
+          break;
+        case 'fechaFormateada':
+          aValue = a.fecha.getTime();
+          bValue = b.fecha.getTime();
+          break;
+        case 'shiftName':
+          aValue = a.shiftName;
+          bValue = b.shiftName;
+          break;
+        case 'exceptionRemarks':
+          aValue = a.exceptionRemarks;
+          bValue = b.exceptionRemarks;
+          break;
+        case 'tipoPermiso':
+          aValue = a.tipoPermiso;
+          bValue = b.tipoPermiso;  
+          break;
+        case 'diasInfo':
+          aValue = a.diasInfo;
+          bValue = b.diasInfo;
+          break;
+        case 'razonManual':
+          aValue = a.razonManual;
+          bValue = b.razonManual;
+          break;
+        case 'validacionRango':
+          aValue = a.validacionRango;
+          bValue = b.validacionRango;
+          break;
+        default:
+          aValue = a[this.sortColumn as keyof GroupedAttendanceRecord];
+          bValue = b[this.sortColumn as keyof GroupedAttendanceRecord];
+      }
+      
+      if (aValue == null) return 1;
+      if (bValue == null) return -1;
+      
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return this.sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+      }
+      
+      const comparison = String(aValue).localeCompare(String(bValue), 'es', { numeric: true });
+      return this.sortDirection === 'asc' ? comparison : -comparison;
+    });
+    
+    this.groupedDataSource.data = sortedData;
+  }
+
   getSortIcon(column: string): string {
     if (this.sortColumn !== column) return 'sort';
     if (this.sortDirection === 'asc') return 'expand_less';
@@ -527,6 +792,10 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy {
   // ===== TRACK BY =====
   trackByFn(index: number, item: AttendanceAnalysis): any {
     return item.employeeId + '_' + item.fecha + '_' + item.tipoMarcacion;
+  }
+
+  trackByGroupedRecord(index: number, item: GroupedAttendanceRecord): any {
+    return item.employeeId + '_' + item.fecha.toISOString().split('T')[0];
   }
   private updateQuickStats() {
     const data = this.allData;
@@ -631,12 +900,12 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy {
   }
 
   // ===== ACTIONS =====
-  viewDetails(item: AttendanceAnalysis) {
+  viewDetails(item: AttendanceAnalysis | GroupedAttendanceRecord) {
     console.log('View details:', item);
     // Implement view details logic
   }
 
-  editItem(item: AttendanceAnalysis) {
+  editItem(item: AttendanceAnalysis | GroupedAttendanceRecord) {
     console.log('Edit item:', item);
     // Implement edit logic
   }
@@ -831,7 +1100,7 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy {
       styles: { fontSize: 7 },
       headStyles: { fillColor: [37, 99, 235], textColor: 255 },
       theme: 'grid',
-      didParseCell: (data) => {
+      didParseCell: (data: any) => {
         if (data.section === 'body') {
           const rowData = this.dataSource.data[data.row.index];
           const rowType = this.getRowType(rowData);

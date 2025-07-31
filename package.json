@@ -32,6 +32,7 @@
     "devexpress-gantt": "^3.0.20",
     "dhtmlx-gantt": "^9.0.7",
     "file-saver": "^2.0.5",
+    "flowbite": "^3.1.2",
     "jquery": "^3.7.0",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",

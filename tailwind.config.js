@@ -4,6 +4,7 @@ const plugin = require('tailwindcss/plugin');
 module.exports = {
   content: [
     "./src/**/*.{html,ts}",
+    "./node_modules/flowbite/**/*.js"  // ← Agregado para Flowbite
   ],
   
   theme: {
@@ -22,9 +23,9 @@ module.exports = {
           warning: '#e9730c',
           success: '#107e3e',
           info: '#0a6ed1',
-          hover: '#f5f5f5',        // Nuevo color hover
-          active: '#e3f2fd',       // Nuevo color active
-          muted: '#f8f9fa',        // Nuevo color muted
+          hover: '#f5f5f5',        
+          active: '#e3f2fd',       
+          muted: '#f8f9fa',        
         },
       },
       fontFamily: {
@@ -33,7 +34,7 @@ module.exports = {
       borderRadius: {
         lg: '12px',
         xl: '16px',
-        fiori: '0.25rem',          // Actualizado para ser más sutil
+        fiori: '0.25rem',          
       },
       boxShadow: {
         fiori: '0 1px 3px rgba(0,0,0,0.06)',
@@ -78,6 +79,7 @@ module.exports = {
   
   plugins: [
     require('@tailwindcss/forms'),
+    require('flowbite/plugin'),  // ← Agregado plugin de Flowbite
     plugin(function ({ addComponents, theme }) {
       addComponents({
         '.btn-fiori': {

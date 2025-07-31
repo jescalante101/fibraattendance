@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Subject } from 'rxjs';
+import { initFlowbite } from 'flowbite';
 
 interface NavigationItem {
   key: string;
@@ -23,58 +24,24 @@ interface UserMenuOption {
 export class CustomHeaderComponent implements OnInit, OnDestroy {
   
   @Output() collapsedChange = new EventEmitter<boolean>();
-  @Output() sectionSelected = new EventEmitter<string>();
+  // Ya no necesitamos sectionSelected
   @Output() userMenuAction = new EventEmitter<string>();
 
   // Estados del componente
-  activeItem: string = 'personal';
   isCollapsed: boolean = false;
   showUserMenu: boolean = false;
+
+  // Estados para los dropdowns
+  selectedEmpresa: string = '';
+  selectedSede: string = '';
+  selectedPeriodo: string = '';
 
   // Datos del usuario (estos deberían venir de un servicio)
   userName: string = 'Manager';
   userRole: string = 'Administrador';
   userInitial: string = 'M';
 
-  // Configuración de navegación
-  navigationItems: NavigationItem[] = [
-    {
-      key: 'personal',
-      label: 'Personal',
-      route: './panel/personal/empleado/empleado',
-      icon: 'fa-solid fa-user-group'
-    },
-    {
-      key: 'dispositivo',
-      label: 'Dispositivo',
-      route: './panel/dispositivo',
-      icon: 'fa-solid fa-mobile-retro'
-    },
-    {
-      key: 'asistencia',
-      label: 'Asistencia',
-      route: './panel/asistencia/horarios',
-      icon: 'fa-solid fa-calendar-check'
-    },
-    {
-      key: 'acceso',
-      label: 'Acceso',
-      route: '#',
-      icon: 'fa-solid fa-door-open'
-    },
-    {
-      key: 'temperatura',
-      label: 'Temperatura',
-      route: '#',
-      icon: 'fa-solid fa-temperature-half'
-    },
-    {
-      key: 'sistema',
-      label: 'Sistema',
-      route: '#',
-      icon: 'fa-solid fa-gears'
-    }
-  ];
+  // Ya no necesitamos navigationItems
 
   // Opciones del menú de usuario
   userMenuOptions: UserMenuOption[] = [
@@ -122,6 +89,13 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Inicializar el componente
     this.initializeUserData();
+    
+    // Inicializar Flowbite para dropdowns
+    if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        initFlowbite();
+      }, 100);
+    }
   }
 
   ngOnDestroy(): void {
@@ -184,18 +158,7 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
     this.collapsedChange.emit(this.isCollapsed);
   }
 
-  /**
-   * Selecciona un elemento de navegación
-   */
-  selectItem(itemKey: string): void {
-    this.activeItem = itemKey;
-    this.sectionSelected.emit(itemKey);
-    
-    // Cerrar menú de usuario si está abierto
-    if (this.showUserMenu) {
-      this.closeUserMenu();
-    }
-  }
+  // Ya no necesitamos selectItem
 
   /**
    * Maneja las acciones del menú de usuario
@@ -254,17 +217,51 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
     this.userMenuAction.emit('about');
   }
 
-  /**
-   * Obtiene el item de navegación actualmente seleccionado
-   */
-  get currentNavigationItem(): NavigationItem | undefined {
-    return this.navigationItems.find(item => item.key === this.activeItem);
-  }
+  // Ya no necesitamos currentNavigationItem
 
   /**
    * Verifica si el sidebar está colapsado
    */
   get sidebarCollapsed(): boolean {
     return this.isCollapsed;
+  }
+
+  /**
+   * Selecciona una empresa
+   */
+  selectEmpresa(empresa: string): void {
+    this.selectedEmpresa = empresa;
+    // Reinicializar Flowbite después del cambio
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        initFlowbite();
+      }
+    }, 100);
+  }
+
+  /**
+   * Selecciona una sede
+   */
+  selectSede(sede: string): void {
+    this.selectedSede = sede;
+    // Reinicializar Flowbite después del cambio
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        initFlowbite();
+      }
+    }, 100);
+  }
+
+  /**
+   * Selecciona un periodo
+   */
+  selectPeriodo(periodo: string): void {
+    this.selectedPeriodo = periodo;
+    // Reinicializar Flowbite después del cambio
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        initFlowbite();
+      }
+    }, 100);
   }
 }

@@ -3,7 +3,10 @@ import {
   Output,
   EventEmitter,
   Input,
+  OnInit,
+  OnDestroy
 } from '@angular/core';
+import { initFlowbite } from 'flowbite';
 import { Router } from '@angular/router';
 
 export interface SubMenuItem {
@@ -23,82 +26,53 @@ export interface MenuItem {
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit, OnDestroy {
   @Output() collapsedChange = new EventEmitter<boolean>();
   @Input() isCollapsed: boolean = false;
-  @Input() activeItem: string = 'personal'; // ← viene del componente padre
+  // Ya no necesitamos activeItem porque mostramos todas las secciones
 
   openMenus: { [level: number]: string | null } = {};
+  activePopovers: { [key: string]: boolean } = {};
 
   constructor(private router: Router) {}
 
-  dispositivoMenu: MenuItem[] = [
-    {
-      key: 'dispositivo',
-      label: 'Dispositivo',
-      icon: 'fa-mobile-retro',
-      submenu: [
-        { label: 'Dispositivos', link: '/panel/dispositivo' },
-        { label: 'Comandos de Dispositivo', link: null },
-      ],
-    },
-    {
-      key: 'mensaje',
-      label: 'Mensajes',
-      icon: 'fa-comment',
-      submenu: [
-        { label: 'Público', link: null },
-        { label: 'Privado', link: null },
-      ],
-    },
-    {
-      key: 'menudato',
-      label: 'Datos',
-      icon: 'fa-database',
-      submenu: [
-        { label: 'Incidencias', link: null },
-        { label: 'Plantilla Biométrica', link: null },
-        { label: 'Foto Biométrica', link: null },
-        { label: 'Marcaciones', link: '/panel/dispositivo/marcaciones' },
-      ],
-    },
-    {
-      key: 'eventos',
-      label: 'Eventos',
-      icon: 'fa-clock-rotate-left',
-      submenu: [
-        { label: 'Evento de Operación', link: null },
-        { label: 'Evento de Errores', link: null },
-        { label: 'Cargar Registros', link: null },
-      ],
-    },
-    {
-      key: 'apmovil',
-      label: 'Aplicación móvil',
-      icon: 'fa-mobile',
-      submenu: [
-        { label: 'Límite GPS del empleado', link: null },
-        { label: 'Límite GPS de Departamento', link: null },
-        { label: 'Cuentas', link: null },
-        { label: 'Aviso', link: null },
-        { label: 'Notificación', link: null },
-        { label: 'Operación de registros', link: null },
-      ],
-    },
-    {
-      key: 'devicesetting',
-      label: 'Configuraciones',
-      icon: 'fa-gear',
-      submenu: [
-        { label: 'Configuración', link: null },
-      ],
-    },
-  ];
+  ngOnInit(): void {
+    // Inicializar Flowbite para componentes como popovers y collapses
+    if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        initFlowbite();
+        // Forzar reinicialización de popovers después de un tiempo
+        setTimeout(() => {
+          initFlowbite();
+        }, 500);
+      }, 100);
+    }
+  }
 
+  ngOnDestroy(): void {
+    // Cleanup si es necesario
+  }
+
+  toggleCollapse(): void {
+    this.isCollapsed = !this.isCollapsed;
+    this.collapsedChange.emit(this.isCollapsed);
+    
+    // Cerrar todos los menús abiertos cuando se colapsa
+    if (this.isCollapsed) {
+      this.openMenus = {};
+    }
+    
+    // Reinicializar Flowbite después del cambio de estado
+    this.reinitializeFlowbite();
+  }
+
+  // Ya no necesitamos dispositivoMenu - solo Personal y Asistencia según HEADER.MD
+
+  // Menú de Asistencia según especificación HEADER.MD
   asistenciaMenu: MenuItem[] = [
     {
       key: 'horarioturno',
-      label: 'Horario y Turno',
+      label: 'Horario-Turno',
       icon: 'fa-clock',
       submenu: [
         { label: 'Descanso', link: '/panel/asistencia/descansos' },
@@ -107,96 +81,23 @@ export class SidebarComponent {
       ],
     },
     {
-      key: 'calendario',
-      label: 'Calendario',
-      icon: 'fa-calendar-days',
-      submenu: [
-        { label: 'Por Departamento', link: null },
-        { label: 'Por Empleado', link: null },
-        { label: 'Calendario Temporal', link: null },
-        { label: 'Ver Calendario', link: null },
-      ],
-    },
-    {
-      key: 'maprobaciones',
+      key: 'aprobaciones',
       label: 'Aprobaciones',
       icon: 'fa-check-to-slot',
       submenu: [
-        { label: 'Marcación Manual', link: '/panel/asistencia/aprobaciones/marcacion-manual' },
-        { label: 'Permiso Papeleta', link: null },
-        { label: 'Horas Extras', link: null },
-        { label: 'Entrenamiento', link: null },
-        { label: 'Ajuste de Calendario', link: null },
+        { label: 'Marcaciones Manuales', link: '/panel/asistencia/aprobaciones/marcacion-manual' },
       ],
     },
     {
-      key: 'menufestivo',
-      label: 'Festivo',
-      icon: 'fa-file-circle-plus',
-      submenu: [
-        { label: 'Festivo', link: null },
-      ],
-    },
-    {
-      key: 'menumarcaciones',
+      key: 'marcaciones',
       label: 'Marcaciones',
       icon: 'fa-file-pdf',
       submenu: [
         { label: 'Análisis de Marcaciones', link: '/panel/asistencia/marcaciones/analisis' },
-        { label: 'Reporte de Marcaciones', link: '/panel/asistencia/marcaciones/reporte-asistencia-excel' },
-        {label: 'Catalogos',link: 'panel/asistencia/marcaciones/reportes-excel/config-catalogos'},
-        {label: 'Centros Costo',link: 'panel/asistencia/marcaciones/reportes-excel/centro-costos'},
-        {label: 'Reporte Marcación Mensual',link: 'panel/asistencia/marcaciones/reportes-excel/asistencia-mensual'},
-        {label: 'Reporte Marcación Detalle',link: 'panel/asistencia/marcaciones/reportes-excel/marcaciones-detalle'},
-        { label: 'Marcación', link: null },
-        { label: 'Cartilla de Tiempo', link: null },
-        { label: 'Primero & Último', link: null },
-        { label: 'Primera Entrada Última Entrada', link: null },
-      ],
-    },
-    {
-      key: 'menucalculo',
-      label: 'Cálculo',
-      icon: 'fa-calculator',
-      submenu: [
-        { label: 'Cálculo', link: null },
-      ],
-    },
-    {
-      key: 'repocalendario',
-      label: 'Reporte Calendario',
-      icon: 'fa-file-pdf',
-      submenu: [
-        { label: 'Registros del Calendario', link: null },
-        { label: 'Asistencia Diaria', link: null },
-        { label: 'Asistencia Total', link: null },
-        { label: 'Excepciones', link: null },
-        { label: 'Tardanza', link: null },
-        { label: 'Salidas Temporales', link: null },
-        { label: 'Horas Extras', link: null },
-        { label: 'Ausencias', link: null },
-        { label: 'Marcaciones Múltiples', link: null },
-        { label: 'Descanso Múltiple', link: null },
-      ],
-    },
-    {
-      key: 'reportresumen',
-      label: 'Reporte Resumen',
-      icon: 'fa-file-pdf',
-      submenu: [
-        { label: 'Empleado', link: null },
-        { label: 'Permisos', link: null },
-        { label: 'Departamentos', link: null },
-      ],
-    },
-    {
-      key: 'settingasistencia',
-      label: 'Configuraciones',
-      icon: 'fa-gear',
-      submenu: [
-        { label: 'Tipo de Permiso Papeleta', link: null },
-        { label: 'Tipo de Entrenamiento', link: null },
-        { label: 'Configuración Reporte', link: null },
+        { label: 'Reporte Marcaciones', link: '/panel/asistencia/marcaciones/reporte-asistencia-excel' },
+        { label: 'Reporte Marcación Mensual', link: 'panel/asistencia/marcaciones/reportes-excel/asistencia-mensual' },
+        { label: 'Reporte Ccosto', link: 'panel/asistencia/marcaciones/reportes-excel/centro-costos' },
+        { label: 'Reporte Detalle', link: 'panel/asistencia/marcaciones/reportes-excel/marcaciones-detalle' },
       ],
     },
   ];
@@ -207,11 +108,14 @@ export class SidebarComponent {
   }
 
   toggleMenu(level: number, menuName: string): void {
-    this.openMenus[level] = this.openMenus[level] === menuName ? null : menuName;
-    Object.keys(this.openMenus).forEach((key) => {
-      const k = +key;
-      if (k > level) this.openMenus[k] = null;
-    });
+    // Solo permitir toggle si no está colapsado
+    if (!this.isCollapsed) {
+      this.openMenus[level] = this.openMenus[level] === menuName ? null : menuName;
+      Object.keys(this.openMenus).forEach((key) => {
+        const k = +key;
+        if (k > level) this.openMenus[k] = null;
+      });
+    }
   }
 
   isOpen(level: number, menuName: string): boolean {
@@ -227,43 +131,61 @@ export class SidebarComponent {
     const currentUrl = this.router.url;
     
     // Para la sección personal
-    if (this.activeItem === 'personal') {
-      switch (menuKey) {
-        case 'organizacion':
-          return currentUrl.includes('/panel/personal/organizacion');
-        case 'empleado':
-          return currentUrl.includes('/panel/personal/empleado');
-        case 'pamenu':
-          return currentUrl.includes('/panel/personal/proceso') || 
-                 currentUrl.includes('/panel/personal/aprobacion');
-        case 'configuracion':
-          return currentUrl.includes('/panel/personal/configuracion');
-        default:
-          return false;
-      }
-    }
-    
-    // Para la sección dispositivo
-    if (this.activeItem === 'dispositivo') {
-      const menuItem = this.dispositivoMenu.find(item => item.key === menuKey);
-      if (menuItem) {
-        return menuItem.submenu.some(sub => 
-          sub.link && currentUrl.includes(sub.link)
-        );
-      }
+    switch (menuKey) {
+      case 'organizacion':
+        return currentUrl.includes('/panel/personal/organizacion');
+      case 'empleado':
+        return currentUrl.includes('/panel/personal/empleado');
+      default:
+        break;
     }
     
     // Para la sección asistencia
-    if (this.activeItem === 'asistencia') {
-      const menuItem = this.asistenciaMenu.find(item => item.key === menuKey);
-      if (menuItem) {
-        return menuItem.submenu.some(sub => 
-          sub.link && currentUrl.includes(sub.link)
-        );
-      }
+    const menuItem = this.asistenciaMenu.find(item => item.key === menuKey);
+    if (menuItem) {
+      return menuItem.submenu.some(sub => 
+        sub.link && currentUrl.includes(sub.link)
+      );
     }
     
     return false;
+  }
+
+  /**
+   * Reinicializa Flowbite después de cambios en el DOM
+   */
+  private reinitializeFlowbite(): void {
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        initFlowbite();
+      }
+    }, 300);
+  }
+
+  /**
+   * Muestra un popover manualmente
+   */
+  showPopover(key: string): void {
+    if (this.isCollapsed) {
+      const popoverElement = document.getElementById(key + '-popover');
+      if (popoverElement) {
+        popoverElement.classList.remove('invisible', 'opacity-0');
+        popoverElement.classList.add('visible', 'opacity-100');
+        this.activePopovers[key] = true;
+      }
+    }
+  }
+
+  /**
+   * Oculta un popover manualmente
+   */
+  hidePopover(key: string): void {
+    const popoverElement = document.getElementById(key + '-popover');
+    if (popoverElement) {
+      popoverElement.classList.remove('visible', 'opacity-100');
+      popoverElement.classList.add('invisible', 'opacity-0');
+      this.activePopovers[key] = false;
+    }
   }
 
   /**

@@ -14,7 +14,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is an Angular 18 attendance management application (FIBRAWEB 2.0) for Fibrafil company with the following structure:
 
 ### Core Architecture
-- **Angular Material**: Primary UI component library
+- **Angular Material**: Primary UI component library (Azure Blue theme)
+- **Tailwind CSS**: Utility-first CSS framework for styling
+- **Kendo UI**: Advanced data grid and date input components
 - **Reactive Forms**: Form handling throughout the application
 - **RxJS**: Async operations and state management
 - **Proxy Configuration**: API calls proxied to `http://192.168.10.67:8090` via `/iclock/api`
@@ -48,11 +50,12 @@ Services in `core/services/` handle:
 
 ### Key Features
 - Time clock device integration
-- Employee schedule management
+- Employee schedule management with Gantt chart visualization
 - Attendance tracking and analysis
 - Manual time entry workflows
 - Organizational hierarchy management
-- Excel report generation
+- Excel report generation with custom styling
+- PDF report generation using jsPDF
 
 ### Development Notes
 - Uses Spanish locale (`es`) for date/time formatting

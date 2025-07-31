@@ -1,120 +1,307 @@
-<header
-  class="bg-fiori-surface border-b border-fiori-border text-fiori-text sticky top-0 z-50 h-16 flex items-center"
->
-  <div class="flex items-center flex-1 px-6">
-    <!-- Sección izquierda: Botón hamburguesa + logo -->
-    <div class="flex items-center gap-4 min-w-[200px]">
-      <button
-        (click)="toggleSidebar()"
-        class="lg:hidden p-2 rounded-fiori border border-fiori-border hover:bg-fiori-hover active:bg-fiori-active transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-fiori-primary/30"
-        [attr.aria-label]="isCollapsed ? 'Abrir menú lateral' : 'Cerrar menú lateral'"
-        [attr.aria-expanded]="!isCollapsed"
-      >
-        <i 
-          class="fa-solid transition-transform duration-300"
-          [ngClass]="isCollapsed ? 'fa-bars' : 'fa-xmark'"
-        ></i>
-      </button>
-      
-      <a 
-        class="text-xl font-semibold tracking-wide text-fiori-primary hover:text-fiori-secondary transition-colors duration-200 focus:outline-none focus:underline" 
-        routerLink="/"
-        role="banner"
-      >
-        FIBRA ASISTENCIA
-      </a>
+<nav class="bg-fiori-surface border-b border-fiori-border text-fiori-text sticky top-0 z-50">
+  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+    
+    <!-- Logo y título -->
+    <div class="flex items-center space-x-3 rtl:space-x-reverse">
+      <span class="self-center text-2xl font-semibold whitespace-nowrap text-fiori-primary">
+        Fibra Asistencia
+      </span>
     </div>
 
-    <!-- Sección centro: Navegación -->
-    <nav 
-      class="hidden lg:flex items-center gap-6 text-sm font-medium flex-1 justify-center max-w-4xl"
-      role="navigation"
-      aria-label="Navegación principal"
-    >
-      <a
-        *ngFor="let item of navigationItems"
-        [routerLink]="item.route"
-        (click)="selectItem(item.key)"
-        [ngClass]="{ 
-          'text-fiori-primary bg-fiori-active border-b-2 border-fiori-primary': activeItem === item.key,
-          'text-fiori-text hover:text-fiori-primary hover:bg-fiori-hover': activeItem !== item.key
-        }"
-        class="px-4 py-2 rounded-t-fiori transition-all duration-200 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-fiori-primary/30 whitespace-nowrap"
-        [attr.aria-current]="activeItem === item.key ? 'page' : null"
-      >
-        <i [class]="item.icon" class="text-sm"></i>
-        <span>{{ item.label }}</span>
-      </a>
-    </nav>
-  </div>
-
-  <!-- Sección derecha: Usuario -->
-  <div class="min-w-[140px] flex justify-end">
-    <button
-      (click)="toggleUserMenu()"
-      class="flex items-center gap-3 px-4 py-2 rounded-fiori hover:bg-fiori-hover transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-fiori-primary/30"
-      [attr.aria-expanded]="showUserMenu"
-      aria-haspopup="true"
-      aria-label="Menú de usuario"
-    >
-      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-fiori-primary to-fiori-secondary text-white font-bold flex items-center justify-center uppercase shadow-fioriSm">
-        {{ userInitial }}
-      </div>
-      <div class="hidden sm:flex flex-col items-start">
-        <span class="text-sm font-medium text-fiori-text">{{ userName }}</span>
-        <span class="text-xs text-fiori-subtext">{{ userRole }}</span>
-      </div>
-      <i 
-        class="fa-solid fa-caret-down text-fiori-subtext transition-transform duration-200"
-        [ngClass]="{ 'rotate-180': showUserMenu }"
-      ></i>
-    </button>
-
-    <!-- Menú desplegable del usuario -->
-    <div
-      *ngIf="showUserMenu"
-      class="fixed right-0 top-16 bg-fiori-surface text-fiori-text rounded-lg shadow-xl w-80 z-50 border border-fiori-border overflow-hidden animate-fade-in user-menu"
-      role="menu"
-      aria-label="Opciones de usuario"
-      (clickOutside)="closeUserMenu()"
-    >
-      <!-- Header del menú -->
-      <div class="px-6 py-4 border-b border-fiori-border bg-fiori-muted">
-        <div class="flex items-start gap-4">
-          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-fiori-primary to-fiori-secondary text-white font-bold flex items-center justify-center uppercase">
-            {{ userInitial }}
+    <!-- Controles centrales (Empresa, Sede, Periodo) -->
+    <div class="hidden md:flex items-center space-x-4 flex-1 justify-center max-w-2xl">
+      
+      <!-- Dropdown Empresa -->
+      <div class="relative">
+        <button 
+          id="dropdownEmpresaButton" 
+          data-dropdown-toggle="dropdownEmpresa"
+          class="text-fiori-text bg-fiori-surface hover:bg-fiori-hover focus:ring-4 focus:outline-none focus:ring-fiori-primary/30 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-fiori-border transition-colors"
+          type="button">
+          <i class="fa-solid fa-building text-fiori-primary mr-2"></i>
+          {{ selectedEmpresa || 'Seleccionar Empresa' }}
+          <i class="fa-solid fa-chevron-down w-2.5 h-2.5 ms-3"></i>
+        </button>
+        
+        <!-- Dropdown menu Empresa -->
+        <div id="dropdownEmpresa" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-64 border border-fiori-border">
+          <div class="px-4 py-3 text-sm text-fiori-text">
+            <div class="font-medium">Seleccionar Empresa</div>
+            <div class="text-fiori-subtext">Elige la empresa activa</div>
           </div>
-          <div class="text-left">
-            <p class="font-semibold text-fiori-text text-base">{{ userName }}</p>
-            <p class="text-sm text-fiori-subtext">{{ userRole }}</p>
-          </div>
+          <ul class="py-2 text-sm text-fiori-text" aria-labelledby="dropdownEmpresaButton">
+            <li>
+              <a href="#" 
+                 (click)="selectEmpresa('Fibrafil S.A.')"
+                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
+                <i class="fa-solid fa-building text-fiori-primary mr-2"></i>
+                Fibrafil S.A.
+              </a>
+            </li>
+            <li>
+              <a href="#" 
+                 (click)="selectEmpresa('Textiles del Norte')"
+                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
+                <i class="fa-solid fa-building text-fiori-primary mr-2"></i>
+                Textiles del Norte
+              </a>
+            </li>
+            <li>
+              <a href="#" 
+                 (click)="selectEmpresa('Confecciones Sur')"
+                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
+                <i class="fa-solid fa-building text-fiori-primary mr-2"></i>
+                Confecciones Sur
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
 
-      <!-- Opciones del menú -->
-      <div class="py-3">
-        <button
-          *ngFor="let option of userMenuOptions"
-          (click)="handleUserMenuAction(option.action)"
-          class="w-full text-left px-6 py-3 hover:bg-fiori-hover transition-colors duration-200 flex items-center gap-4 focus:outline-none focus:bg-fiori-hover"
-          [ngClass]="{ 
-            'text-red-600 hover:bg-red-50': option.action === 'logout',
-            'border-t border-fiori-border mt-2 pt-4': option.separator
-          }"
-          role="menuitem"
-        >
-          <i [class]="option.icon" class="w-5 text-center text-fiori-subtext"></i>
-          <span class="text-sm font-medium">{{ option.label }}</span>
+      <!-- Dropdown Sede -->
+      <div class="relative">
+        <button 
+          id="dropdownSedeButton" 
+          data-dropdown-toggle="dropdownSede"
+          class="text-fiori-text bg-fiori-surface hover:bg-fiori-hover focus:ring-4 focus:outline-none focus:ring-fiori-primary/30 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-fiori-border transition-colors"
+          type="button">
+          <i class="fa-solid fa-map-marker-alt text-fiori-primary mr-2"></i>
+          {{ selectedSede || 'Seleccionar Sede' }}
+          <i class="fa-solid fa-chevron-down w-2.5 h-2.5 ms-3"></i>
         </button>
+        
+        <!-- Dropdown menu Sede -->
+        <div id="dropdownSede" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-56 border border-fiori-border">
+          <div class="px-4 py-3 text-sm text-fiori-text">
+            <div class="font-medium">Seleccionar Sede</div>
+            <div class="text-fiori-subtext">Elige la sede activa</div>
+          </div>
+          <ul class="py-2 text-sm text-fiori-text" aria-labelledby="dropdownSedeButton">
+            <li>
+              <a href="#" 
+                 (click)="selectSede('Sede Lima')"
+                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
+                <i class="fa-solid fa-map-marker-alt text-fiori-primary mr-2"></i>
+                Sede Lima
+              </a>
+            </li>
+            <li>
+              <a href="#" 
+                 (click)="selectSede('Sede Arequipa')"
+                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
+                <i class="fa-solid fa-map-marker-alt text-fiori-primary mr-2"></i>
+                Sede Arequipa
+              </a>
+            </li>
+            <li>
+              <a href="#" 
+                 (click)="selectSede('Sede Cusco')"
+                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
+                <i class="fa-solid fa-map-marker-alt text-fiori-primary mr-2"></i>
+                Sede Cusco
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Dropdown Periodo -->
+      <div class="relative">
+        <button 
+          id="dropdownPeriodoButton" 
+          data-dropdown-toggle="dropdownPeriodo"
+          class="text-fiori-text bg-fiori-surface hover:bg-fiori-hover focus:ring-4 focus:outline-none focus:ring-fiori-primary/30 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-fiori-border transition-colors"
+          type="button">
+          <i class="fa-solid fa-calendar text-fiori-primary mr-2"></i>
+          {{ selectedPeriodo || 'Seleccionar Periodo' }}
+          <i class="fa-solid fa-chevron-down w-2.5 h-2.5 ms-3"></i>
+        </button>
+        
+        <!-- Dropdown menu Periodo -->
+        <div id="dropdownPeriodo" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-56 border border-fiori-border">
+          <div class="px-4 py-3 text-sm text-fiori-text">
+            <div class="font-medium">Seleccionar Periodo</div>
+            <div class="text-fiori-subtext">Elige el periodo activo</div>
+          </div>
+          <ul class="py-2 text-sm text-fiori-text" aria-labelledby="dropdownPeriodoButton">
+            <li>
+              <a href="#" 
+                 (click)="selectPeriodo('Enero 2025')"
+                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
+                <i class="fa-solid fa-calendar text-fiori-primary mr-2"></i>
+                Enero 2025
+              </a>
+            </li>
+            <li>
+              <a href="#" 
+                 (click)="selectPeriodo('Febrero 2025')"
+                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
+                <i class="fa-solid fa-calendar text-fiori-primary mr-2"></i>
+                Febrero 2025
+              </a>
+            </li>
+            <li>
+              <a href="#" 
+                 (click)="selectPeriodo('Marzo 2025')"
+                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
+                <i class="fa-solid fa-calendar text-fiori-primary mr-2"></i>
+                Marzo 2025
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Menu hamburguesa para móvil -->
+    <button 
+      data-collapse-toggle="navbar-dropdown" 
+      type="button" 
+      class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-fiori-subtext rounded-lg md:hidden hover:bg-fiori-hover focus:outline-none focus:ring-2 focus:ring-fiori-primary/30" 
+      aria-controls="navbar-dropdown" 
+      aria-expanded="false">
+      <span class="sr-only">Abrir menú principal</span>
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <!-- Avatar y menú de usuario -->
+    <div class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+      <button 
+        type="button" 
+        class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-fiori-primary/30" 
+        id="user-menu-button" 
+        aria-expanded="false" 
+        data-dropdown-toggle="user-dropdown" 
+        data-dropdown-placement="bottom">
+        <span class="sr-only">Abrir menú de usuario</span>
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-fiori-primary to-fiori-secondary text-white font-bold flex items-center justify-center uppercase">
+          {{ userInitial }}
+        </div>
+      </button>
+      
+      <!-- Dropdown menu Usuario -->
+      <div class="z-50 hidden my-4 text-base list-none bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-64 border border-fiori-border" id="user-dropdown">
+        <!-- Header del menú -->
+        <div class="px-4 py-3 bg-fiori-muted">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-fiori-primary to-fiori-secondary text-white font-bold flex items-center justify-center uppercase">
+              {{ userInitial }}
+            </div>
+            <div>
+              <span class="block text-sm font-semibold text-fiori-text">{{ userName }}</span>
+              <span class="block text-sm text-fiori-subtext truncate">{{ userRole }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Opciones del menú -->
+        <ul class="py-2" aria-labelledby="user-menu-button">
+          <li>
+            <a href="#" 
+               (click)="handleUserMenuAction('profile')"
+               class="block px-4 py-2 text-sm text-fiori-text hover:bg-fiori-hover transition-colors">
+              <i class="fa-solid fa-user text-fiori-primary mr-3"></i>
+              Mi Perfil
+            </a>
+          </li>
+          <li>
+            <a href="#" 
+               (click)="handleUserMenuAction('settings')"
+               class="block px-4 py-2 text-sm text-fiori-text hover:bg-fiori-hover transition-colors">
+              <i class="fa-solid fa-cog text-fiori-primary mr-3"></i>
+              Configuración
+            </a>
+          </li>
+          <li>
+            <hr class="my-2 border-fiori-border">
+          </li>
+          <li>
+            <a href="#" 
+               (click)="handleUserMenuAction('logout')"
+               class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+              <i class="fa-solid fa-sign-out-alt text-red-600 mr-3"></i>
+              Cerrar Sesión
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
 
-  <!-- Overlay para cerrar menú en mobile -->
-  <div
-    *ngIf="showUserMenu"
-    class="fixed inset-0 z-40 bg-black/20 lg:hidden"
-    (click)="closeUserMenu()"
-    aria-hidden="true"
-  ></div>
-</header>
+  <!-- Menú colapsable para móvil -->
+  <div class="hidden w-full md:hidden" id="navbar-dropdown">
+    <div class="px-4 py-3 border-t border-fiori-border bg-fiori-muted">
+      <div class="space-y-3">
+        
+        <!-- Dropdown Empresa móvil -->
+        <div class="relative">
+          <button 
+            id="dropdownEmpresaButtonMobile" 
+            data-dropdown-toggle="dropdownEmpresaMobile"
+            class="w-full text-fiori-text bg-fiori-surface hover:bg-fiori-hover focus:ring-4 focus:outline-none focus:ring-fiori-primary/30 font-medium rounded-lg text-sm px-4 py-2.5 text-left inline-flex items-center justify-between border border-fiori-border transition-colors"
+            type="button">
+            <span class="flex items-center">
+              <i class="fa-solid fa-building text-fiori-primary mr-2"></i>
+              {{ selectedEmpresa || 'Seleccionar Empresa' }}
+            </span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          
+          <div id="dropdownEmpresaMobile" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-full border border-fiori-border mt-1">
+            <ul class="py-2 text-sm text-fiori-text">
+              <li><a href="#" (click)="selectEmpresa('Fibrafil S.A.')" class="block px-4 py-2 hover:bg-fiori-hover">Fibrafil S.A.</a></li>
+              <li><a href="#" (click)="selectEmpresa('Textiles del Norte')" class="block px-4 py-2 hover:bg-fiori-hover">Textiles del Norte</a></li>
+              <li><a href="#" (click)="selectEmpresa('Confecciones Sur')" class="block px-4 py-2 hover:bg-fiori-hover">Confecciones Sur</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Dropdown Sede móvil -->
+        <div class="relative">
+          <button 
+            id="dropdownSedeButtonMobile" 
+            data-dropdown-toggle="dropdownSedeMobile"
+            class="w-full text-fiori-text bg-fiori-surface hover:bg-fiori-hover focus:ring-4 focus:outline-none focus:ring-fiori-primary/30 font-medium rounded-lg text-sm px-4 py-2.5 text-left inline-flex items-center justify-between border border-fiori-border transition-colors"
+            type="button">
+            <span class="flex items-center">
+              <i class="fa-solid fa-map-marker-alt text-fiori-primary mr-2"></i>
+              {{ selectedSede || 'Seleccionar Sede' }}
+            </span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          
+          <div id="dropdownSedeMobile" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-full border border-fiori-border mt-1">
+            <ul class="py-2 text-sm text-fiori-text">
+              <li><a href="#" (click)="selectSede('Sede Lima')" class="block px-4 py-2 hover:bg-fiori-hover">Sede Lima</a></li>
+              <li><a href="#" (click)="selectSede('Sede Arequipa')" class="block px-4 py-2 hover:bg-fiori-hover">Sede Arequipa</a></li>
+              <li><a href="#" (click)="selectSede('Sede Cusco')" class="block px-4 py-2 hover:bg-fiori-hover">Sede Cusco</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Dropdown Periodo móvil -->
+        <div class="relative">
+          <button 
+            id="dropdownPeriodoButtonMobile" 
+            data-dropdown-toggle="dropdownPeriodoMobile"
+            class="w-full text-fiori-text bg-fiori-surface hover:bg-fiori-hover focus:ring-4 focus:outline-none focus:ring-fiori-primary/30 font-medium rounded-lg text-sm px-4 py-2.5 text-left inline-flex items-center justify-between border border-fiori-border transition-colors"
+            type="button">
+            <span class="flex items-center">
+              <i class="fa-solid fa-calendar text-fiori-primary mr-2"></i>
+              {{ selectedPeriodo || 'Seleccionar Periodo' }}
+            </span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          
+          <div id="dropdownPeriodoMobile" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-full border border-fiori-border mt-1">
+            <ul class="py-2 text-sm text-fiori-text">
+              <li><a href="#" (click)="selectPeriodo('Enero 2025')" class="block px-4 py-2 hover:bg-fiori-hover">Enero 2025</a></li>
+              <li><a href="#" (click)="selectPeriodo('Febrero 2025')" class="block px-4 py-2 hover:bg-fiori-hover">Febrero 2025</a></li>
+              <li><a href="#" (click)="selectPeriodo('Marzo 2025')" class="block px-4 py-2 hover:bg-fiori-hover">Marzo 2025</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

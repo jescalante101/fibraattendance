@@ -32,13 +32,13 @@ import { ReporteMarcacionesDetalleComponent } from "./components/asistencia/marc
 
 const appRoutes: Routes = [
     {path : '', redirectTo:'inicio', pathMatch : 'full'},
-    {path:'',component:PersonalComponent,},
+    {path:'',component:EmpleadoComponent,},
     {path: 'panel', children:[
        
 
         
         //TODO: Agregar las vistas para el panel de personal
-        {path: 'personal/organizacion',component:PersonalComponent},
+        {path: 'personal/organizacion',component:EmpleadoComponent},
         {path:'personal/organizacion/app-user',component:AppUserComponent},
         {path:'personal/organizacion/sede-area-costo',component:SedeAreaCostoComponent},
         {path:'personal/organizacion/departamento',component:DepartamentoComponent},

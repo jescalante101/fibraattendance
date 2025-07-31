@@ -73,7 +73,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     {
       key: 'horarioturno',
       label: 'Horario-Turno',
-      icon: 'fa-clock',
+      icon: 'clock',
       submenu: [
         { label: 'Descanso', link: '/panel/asistencia/descansos' },
         { label: 'Horario', link: '/panel/asistencia/horarios' },
@@ -83,7 +83,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     {
       key: 'aprobaciones',
       label: 'Aprobaciones',
-      icon: 'fa-check-to-slot',
+      icon: 'check-square',
       submenu: [
         { label: 'Marcaciones Manuales', link: '/panel/asistencia/aprobaciones/marcacion-manual' },
       ],
@@ -91,7 +91,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     {
       key: 'marcaciones',
       label: 'Marcaciones',
-      icon: 'fa-file-pdf',
+      icon: 'file-text',
       submenu: [
         { label: 'Análisis de Marcaciones', link: '/panel/asistencia/marcaciones/analisis' },
         { label: 'Reporte Marcaciones', link: '/panel/asistencia/marcaciones/reporte-asistencia-excel' },

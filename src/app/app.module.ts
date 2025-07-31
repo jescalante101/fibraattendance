@@ -87,6 +87,7 @@ import { ReporteMarcacionesDetalleComponent } from './components/asistencia/marc
 import { ModalVerHorarioComponent } from './components/personal/empleado/asignar-horario-empleado/modal-ver-horario/modal-ver-horario.component';
 import { ModalEditarAsignacionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-editar-asignacion/modal-editar-asignacion.component';
 import { ModalRegistrarExcepcionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-registrar-excepcion/modal-registrar-excepcion.component';
+import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, Layers, Menu, Info } from 'lucide-angular';
 registerLocaleData(localeEs);
 @NgModule({ declarations: [
         AppComponent,
@@ -182,7 +183,8 @@ registerLocaleData(localeEs);
         BrowserAnimationsModule,
         MatSlideToggleModule,
         ReactiveFormsModule,
-        MatTooltipModule
+        MatTooltipModule,
+        LucideAngularModule.pick({ Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, Layers, Menu, Info })
     ], providers: [
         provideHttpClient(withInterceptorsFromDi()),
         { provide: LOCALE_ID, useValue: 'es' },

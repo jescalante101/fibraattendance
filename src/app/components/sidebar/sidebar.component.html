@@ -1,27 +1,25 @@
-<!-- sidebar.component.html -->
+<!-- Sidebar dinámico - modo expandido/dock -->
 <aside 
-  [ngClass]="{ 'w-24': isCollapsed, 'w-64': !isCollapsed }"
-  class="fiori-sidebar bg-fiori-surface border-r transition-all duration-300 flex flex-col h-full relative"
-  [class.border-fiori-border]="!isCollapsed"
-  [class.border-2]="isCollapsed"
-  [class.border-fiori-primary]="isCollapsed"
-  [class.shadow-lg]="isCollapsed">
+  [ngClass]="{ 'w-24': isCollapsed, 'w-64': !isCollapsed, 'pl-3': isCollapsed, 'pl-2': !isCollapsed }"
+  class="fiori-sidebar bg-fiori-surface border-r border-fiori-border transition-all duration-300 flex flex-col h-full relative shadow-lg">
   
-  <!-- Header del sidebar -->
-  <div class="px-4 py-3 border-b border-fiori-border bg-gradient-to-r from-fiori-surface to-fiori-hover">
-    <div class="flex items-center gap-3" *ngIf="!isCollapsed">
+  <!-- Header del sidebar expandido -->
+  <div class="px-4 py-3 border-b border-fiori-border bg-gradient-to-r from-fiori-surface to-fiori-hover" *ngIf="!isCollapsed">
+    <div class="flex items-center gap-3">
       <div class="w-8 h-8 bg-fiori-primary rounded-fiori flex items-center justify-center">
-        <i class="fa-solid fa-layer-group text-white text-sm"></i>
+        <lucide-icon name="layers" class="text-white" size="16" [strokeWidth]="1"></lucide-icon>
       </div>
       <div>
         <span class="text-lg font-semibold text-fiori-text">Navegación</span>
         <p class="text-xs text-fiori-subtext">Sistema de Asistencia</p>
       </div>
     </div>
-    <div class="flex justify-center" *ngIf="isCollapsed">
-      <div class="w-8 h-8 bg-fiori-primary rounded-fiori flex items-center justify-center">
-        <i class="fa-solid fa-layer-group text-white text-sm"></i>
-      </div>
+  </div>
+
+  <!-- Logo pequeño para modo dock -->
+  <div class="flex justify-center py-4" *ngIf="isCollapsed">
+    <div class="w-10 h-10 bg-fiori-primary rounded-fiori flex items-center justify-center">
+      <lucide-icon name="layers" class="text-white" size="24"></lucide-icon>
     </div>
   </div>
 
@@ -30,81 +28,84 @@
     <button 
       (click)="toggleCollapse()"
       class="w-6 h-6 bg-fiori-surface border border-fiori-border rounded-full flex items-center justify-center hover:bg-fiori-hover transition-colors shadow-lg">
-      <i class="fa-solid fa-chevron-left text-xs text-fiori-subtext transition-transform" 
-         [class.rotate-180]="isCollapsed"></i>
+      <lucide-icon name="chevron-left" class="text-fiori-subtext transition-transform" 
+                   [class.rotate-180]="isCollapsed" size="12"></lucide-icon>
     </button>
   </div>
 
-  <!-- Contenido del menú con scroll -->
-  <div class="flex-1 overflow-y-auto py-2" 
+  <!-- Contenido del menú -->
+  <div class="flex-1  py-2" 
        [ngClass]="{ 'px-2': isCollapsed, 'px-4': !isCollapsed }">
     
-    <!-- Sección Personal -->
-    <div class="section-divider">
-      <div class="px-4 py-2" *ngIf="!isCollapsed">
+    <!-- SECCIÓN PERSONAL -->
+    <div class="mb-6">
+      <!-- Título de sección (solo expandido) -->
+      <div class="px-4 py-2 mb-2" *ngIf="!isCollapsed">
         <span class="text-sm font-bold uppercase tracking-wider text-fiori-subtext">Personal</span>
       </div>
-      
-      <nav class="space-y-1">
+
+      <!-- Separador para modo dock -->
+      <div *ngIf="isCollapsed" class="w-8 h-px bg-fiori-border mx-auto my-3"></div>
+
+      <!-- Items de Personal -->
+      <nav class="space-y-2">
         <!-- Organización -->
-        <div class="menu-item relative" [class.active]="isMenuActive('organizacion')">
+        <div class="relative">
           <button 
-            id="organizacion-button"
-            data-collapse-toggle="organizacion-collapse"
             type="button"
             class="w-full flex items-center text-left hover:bg-fiori-hover transition-colors group"
             [ngClass]="{
-              'justify-between px-4 py-2.5': !isCollapsed,
-              'justify-center w-12 h-12 mx-auto mb-2 rounded-lg bg-fiori-surface shadow-sm border border-fiori-border': isCollapsed
+              'justify-between px-4 py-2.5 rounded-fiori': !isCollapsed,
+              'justify-center w-12 h-12 mx-auto rounded-lg bg-fiori-surface shadow-sm border border-fiori-border': isCollapsed
             }"
-            (click)="toggleMenu(1, 'organizacion')"
-            [attr.title]="isCollapsed ? 'Organización' : null"
             [attr.data-popover-target]="isCollapsed ? 'organizacion-popover' : null"
             [attr.data-popover-placement]="isCollapsed ? 'right' : null"
             [attr.data-popover-trigger]="isCollapsed ? 'hover' : null"
-            (mouseenter)="isCollapsed && showPopover('organizacion')"
-            (mouseleave)="isCollapsed && hidePopover('organizacion')">
+            (click)="toggleMenu(1, 'organizacion')"
+            [class.bg-fiori-active]="isMenuActive('organizacion')">
+            
             <div class="flex items-center" [ngClass]="{ 'gap-3': !isCollapsed }">
               <div class="w-6 h-6 flex items-center justify-center">
-                <i class="fa-regular fa-building text-fiori-primary text-sm"></i>
+                <lucide-icon name="building" class="text-fiori-primary" [strokeWidth]="1.5" [attr.size]="isCollapsed ? '20' : '14'"></lucide-icon>
               </div>
               <span class="text-sm font-medium text-fiori-text" *ngIf="!isCollapsed">Organización</span>
             </div>
-            <i class="fa-solid fa-chevron-right text-xs text-fiori-subtext chevron-icon transition-transform" 
-               [class.rotate-90]="isOpen(1, 'organizacion')"
-               *ngIf="!isCollapsed"></i>
+            
+            <lucide-icon name="chevron-right" class="text-fiori-subtext transition-transform" 
+                         [class.rotate-90]="isOpen(1, 'organizacion')"
+                         *ngIf="!isCollapsed" size="12"></lucide-icon>
           </button>
-          
-          <!-- Popover para modo dock con subitems -->
+
+          <!-- Popover para modo dock -->
           <div *ngIf="isCollapsed" 
                id="organizacion-popover" 
                role="tooltip" 
-              class="absolute z-[9999] invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-xl opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800" style="left: calc(100% + 8px); top: 0;">
-            
+               class="absolute z-50 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-xl opacity-0"
+               style="left: calc(100% + 8px); top: 0;">
             <div class="px-3 py-2">
-              <div class="font-semibold text-gray-900 dark:text-white mb-2 text-xs uppercase tracking-wider">Organización</div>
+              <div class="font-semibold text-gray-900 mb-2 text-xs uppercase tracking-wider">Organización</div>
               <ul class="space-y-1">
                 <li>
                   <a [routerLink]="['panel/personal/organizacion/app-user']" 
-                     class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded dark:text-gray-400 dark:hover:bg-gray-600">
+                     class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded">
                     Usuario
                   </a>
                 </li>
                 <li>
                   <a [routerLink]="['panel/personal/organizacion/usuario-sede']" 
-                     class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded dark:text-gray-400 dark:hover:bg-gray-600">
+                     class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded">
                     Usuario-Sede
                   </a>
                 </li>
                 <li>
                   <a [routerLink]="['panel/personal/organizacion/sede-area-costo']" 
-                     class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded dark:text-gray-400 dark:hover:bg-gray-600">
+                     class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded">
                     Sede-Area-Ccosto
                   </a>
                 </li>
                 <li>
                   <a [routerLink]="['panel/personal/organizacion/sede-ccosto']" 
-                     class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded dark:text-gray-400 dark:hover:bg-gray-600">
+                     class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded">
                     Sede-CCosto
                   </a>
                 </li>
@@ -112,86 +113,86 @@
             </div>
             <div data-popper-arrow></div>
           </div>
-          
-          <div id="organizacion-collapse" 
-               class="overflow-hidden transition-all duration-200" 
+
+          <!-- Submenu expandido -->
+          <div class="overflow-hidden transition-all duration-200" 
                [class.max-h-0]="!isOpen(1, 'organizacion')"
                [class.max-h-96]="isOpen(1, 'organizacion')"
                *ngIf="!isCollapsed">
             <div class="pl-8 py-1 space-y-0.5">
-              <a 
-                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
-                [class.active]="isRouteActive('panel/personal/organizacion/app-user')"
-                [routerLink]="['panel/personal/organizacion/app-user']"
-                routerLinkActive="active">
+              <a class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                 [class.bg-fiori-active]="isRouteActive('panel/personal/organizacion/app-user')"
+                 [routerLink]="['panel/personal/organizacion/app-user']"
+                 routerLinkActive="bg-fiori-active">
                 Usuario
               </a>
-              <a 
-                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
-                [class.active]="isRouteActive('panel/personal/organizacion/usuario-sede')"
-                [routerLink]="['panel/personal/organizacion/usuario-sede']"
-                routerLinkActive="active">
+              <a class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                 [class.bg-fiori-active]="isRouteActive('panel/personal/organizacion/usuario-sede')"
+                 [routerLink]="['panel/personal/organizacion/usuario-sede']"
+                 routerLinkActive="bg-fiori-active">
                 Usuario-Sede
               </a>
-              <a 
-                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
-                [class.active]="isRouteActive('panel/personal/organizacion/sede-area-costo')"
-                [routerLink]="['panel/personal/organizacion/sede-area-costo']"
-                routerLinkActive="active">
+              <a class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                 [class.bg-fiori-active]="isRouteActive('panel/personal/organizacion/sede-area-costo')"
+                 [routerLink]="['panel/personal/organizacion/sede-area-costo']"
+                 routerLinkActive="bg-fiori-active">
                 Sede-Area-Ccosto
               </a>
-              <a 
-                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
-                [class.active]="isRouteActive('panel/personal/organizacion/sede-ccosto')"
-                [routerLink]="['panel/personal/organizacion/sede-ccosto']"
-                routerLinkActive="active">
+              <a class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                 [class.bg-fiori-active]="isRouteActive('panel/personal/organizacion/sede-ccosto')"
+                 [routerLink]="['panel/personal/organizacion/sede-ccosto']"
+                 routerLinkActive="bg-fiori-active">
                 Sede-CCosto
-              </a>              
+              </a>
             </div>
           </div>
         </div>
 
         <!-- Empleados -->
-        <div class="menu-item relative" [class.active]="isMenuActive('empleado')">
+        <div class="relative">
           <button 
-            id="empleado-button"
-            data-collapse-toggle="empleado-collapse"
             type="button"
             class="w-full flex items-center text-left hover:bg-fiori-hover transition-colors group"
             [ngClass]="{
-              'justify-between px-4 py-2.5': !isCollapsed,
-              'justify-center w-12 h-12 mx-auto mb-2 rounded-lg bg-fiori-surface shadow-sm border border-fiori-border': isCollapsed
+              'justify-between px-4 py-2.5 rounded-fiori': !isCollapsed,
+              'justify-center w-12 h-12 mx-auto rounded-lg bg-fiori-surface shadow-sm border border-fiori-border': isCollapsed
             }"
-            (click)="toggleMenu(1, 'empleado')"
-            [attr.title]="isCollapsed ? 'Empleados' : null"
             [attr.data-popover-target]="isCollapsed ? 'empleado-popover' : null"
             [attr.data-popover-placement]="isCollapsed ? 'right' : null"
             [attr.data-popover-trigger]="isCollapsed ? 'hover' : null"
-            (mouseenter)="isCollapsed && showPopover('empleado')"
-            (mouseleave)="isCollapsed && hidePopover('empleado')">
+            (click)="toggleMenu(1, 'empleado')"
+            [class.bg-fiori-active]="isMenuActive('empleado')">
+            
             <div class="flex items-center" [ngClass]="{ 'gap-3': !isCollapsed }">
               <div class="w-6 h-6 flex items-center justify-center">
-                <i class="fa-solid fa-id-badge text-fiori-primary text-sm"></i>
+                <lucide-icon name="id-card" class="text-fiori-primary" [attr.size]="isCollapsed ? '20' : '16'"></lucide-icon>
               </div>
               <span class="text-sm font-medium text-fiori-text" *ngIf="!isCollapsed">Empleados</span>
             </div>
-            <i class="fa-solid fa-chevron-right text-xs text-fiori-subtext chevron-icon transition-transform" 
-               [class.rotate-90]="isOpen(1, 'empleado')"
-               *ngIf="!isCollapsed"></i>
+            
+            <lucide-icon name="chevron-right" class="text-fiori-subtext transition-transform" 
+                         [class.rotate-90]="isOpen(1, 'empleado')"
+                         *ngIf="!isCollapsed" size="12"></lucide-icon>
           </button>
-          
-          <!-- Popover para modo dock con subitems -->
+
+          <!-- Popover para modo dock -->
           <div *ngIf="isCollapsed" 
                id="empleado-popover" 
                role="tooltip" 
-               class="absolute z-[9999] invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-xl opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800" 
+               class="absolute z-50 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-xl opacity-0"
                style="left: calc(100% + 8px); top: 0;">
             <div class="px-3 py-2">
-              <div class="font-semibold text-gray-900 dark:text-white mb-2 text-xs uppercase tracking-wider">Empleados</div>
+              <div class="font-semibold text-gray-900 mb-2 text-xs uppercase tracking-wider">Empleados</div>
               <ul class="space-y-1">
                 <li>
+                  <a [routerLink]="['panel/personal/empleado/empleado']" 
+                     class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded">
+                    Empleados
+                  </a>
+                </li>
+                <li>
                   <a [routerLink]="['panel/personal/empleado/asignar-horario']" 
-                     class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded dark:text-gray-400 dark:hover:bg-gray-600">
+                     class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded">
                     Empleados con Turnos
                   </a>
                 </li>
@@ -199,17 +200,26 @@
             </div>
             <div data-popper-arrow></div>
           </div>
-          
-          <div id="empleado-collapse" 
-               class="overflow-hidden transition-all duration-200" 
+
+          <!-- Submenu expandido -->
+          <div class="overflow-hidden transition-all duration-200" 
                [class.max-h-0]="!isOpen(1, 'empleado')"
                [class.max-h-96]="isOpen(1, 'empleado')"
                *ngIf="!isCollapsed">
+               <div class="pl-8 py-1 space-y-0.5">
+              <a class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                 [class.bg-fiori-active]="isRouteActive('panel/personal/empleado/empleado')"
+                 [routerLink]="['panel/personal/empleado/empleado']"
+                 routerLinkActive="bg-fiori-active">
+                Empleados
+              </a>
+            </div>
+
             <div class="pl-8 py-1 space-y-0.5">
-              <a 
-                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
-                [routerLink]="['panel/personal/empleado/asignar-horario']"
-                routerLinkActive="active">
+              <a class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                 [class.bg-fiori-active]="isRouteActive('panel/personal/empleado/asignar-horario')"
+                 [routerLink]="['panel/personal/empleado/asignar-horario']"
+                 routerLinkActive="bg-fiori-active">
                 Empleados con Turnos
               </a>
             </div>
@@ -218,56 +228,58 @@
       </nav>
     </div>
 
-    <!-- Sección Asistencia -->
-    <div class="section-divider">
-      <div class="px-4 py-2" *ngIf="!isCollapsed">
+    <!-- SECCIÓN ASISTENCIA -->
+    <div class="mb-6">
+      <!-- Título de sección (solo expandido) -->
+      <div class="px-4 py-2 mb-2" *ngIf="!isCollapsed">
         <span class="text-sm font-bold uppercase tracking-wider text-fiori-subtext">Asistencia</span>
       </div>
-      <!-- Separador en modo dock -->
+
+      <!-- Separador para modo dock -->
       <div *ngIf="isCollapsed" class="w-8 h-px bg-fiori-border mx-auto my-3"></div>
-      
-      <nav class="space-y-1">
-        <div class="menu-item relative" *ngFor="let item of asistenciaMenu" [class.active]="isMenuActive(item.key)">
+
+      <!-- Items de Asistencia -->
+      <nav class="space-y-2">
+        <div class="relative" *ngFor="let item of asistenciaMenu">
           <button 
-            [id]="item.key + '-button'"
-            [attr.data-collapse-toggle]="item.key + '-collapse'"
             type="button"
             class="w-full flex items-center text-left hover:bg-fiori-hover transition-colors group"
             [ngClass]="{
-              'justify-between px-4 py-2.5': !isCollapsed,
-              'justify-center w-12 h-12 mx-auto mb-2 rounded-lg bg-fiori-surface shadow-sm border border-fiori-border': isCollapsed
+              'justify-between px-4 py-2.5 rounded-fiori': !isCollapsed,
+              'justify-center w-12 h-12 mx-auto rounded-lg bg-fiori-surface shadow-sm border border-fiori-border': isCollapsed
             }"
-            (click)="toggleMenu(1, item.key)"
-            [attr.title]="isCollapsed ? item.label : null"
             [attr.data-popover-target]="isCollapsed ? item.key + '-popover' : null"
             [attr.data-popover-placement]="isCollapsed ? 'right' : null"
             [attr.data-popover-trigger]="isCollapsed ? 'hover' : null"
-            (mouseenter)="isCollapsed && showPopover(item.key)"
-            (mouseleave)="isCollapsed && hidePopover(item.key)">
+            (click)="toggleMenu(1, item.key)"
+            [class.bg-fiori-active]="isMenuActive(item.key)">
+            
             <div class="flex items-center" [ngClass]="{ 'gap-3': !isCollapsed }">
               <div class="w-6 h-6 flex items-center justify-center">
-                <i class="fa-solid text-fiori-primary text-sm" [ngClass]="item.icon"></i>
+                <lucide-icon [name]="item.icon" class="text-fiori-primary" [attr.size]="isCollapsed ? '20' : '16'"></lucide-icon>
               </div>
               <span class="text-sm font-medium text-fiori-text" *ngIf="!isCollapsed">{{ item.label }}</span>
             </div>
-            <i class="fa-solid fa-chevron-right text-xs text-fiori-subtext chevron-icon transition-transform" 
-               [class.rotate-90]="isOpen(1, item.key)"
-               *ngIf="!isCollapsed"></i>
+            
+            <lucide-icon name="chevron-right" class="text-fiori-subtext transition-transform" 
+                         [class.rotate-90]="isOpen(1, item.key)"
+                         *ngIf="!isCollapsed" size="12"></lucide-icon>
           </button>
-          
-          <!-- Popover para modo dock con subitems -->
+
+          <!-- Popover para modo dock -->
           <div *ngIf="isCollapsed" 
                [id]="item.key + '-popover'"
-               class="absolute z-[9999] invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-xl opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800" 
+               role="tooltip" 
+               class="absolute z-50 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-xl opacity-0"
                style="left: calc(100% + 8px); top: 0;">
             <div class="px-3 py-2">
-              <div class="font-semibold text-gray-900 dark:text-white mb-2 text-xs uppercase tracking-wider">{{ item.label }}</div>
+              <div class="font-semibold text-gray-900 mb-2 text-xs uppercase tracking-wider">{{ item.label }}</div>
               <ul class="space-y-1">
                 <li *ngFor="let sub of item.submenu">
                   <a [routerLink]="sub.link || '#'" 
                      [class.text-gray-400]="!sub.link"
                      [class.cursor-default]="!sub.link"
-                     class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded dark:text-gray-400 dark:hover:bg-gray-600">
+                     class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded">
                     {{ sub.label }}
                   </a>
                 </li>
@@ -275,21 +287,20 @@
             </div>
             <div data-popper-arrow></div>
           </div>
-          
-          <div [id]="item.key + '-collapse'"
-               class="overflow-hidden transition-all duration-200" 
+
+          <!-- Submenu expandido -->
+          <div class="overflow-hidden transition-all duration-200" 
                [class.max-h-0]="!isOpen(1, item.key)"
                [class.max-h-96]="isOpen(1, item.key)"
                *ngIf="!isCollapsed">
             <div class="pl-8 py-1 space-y-0.5">
-              <a 
-                *ngFor="let sub of item.submenu"
-                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
-                [class.active]="sub.link && isRouteActive(sub.link)"
-                [routerLink]="sub.link || '#'"
-                [class.text-fiori-subtext]="!sub.link"
-                [class.cursor-default]="!sub.link"
-                routerLinkActive="active">
+              <a *ngFor="let sub of item.submenu"
+                 class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                 [class.bg-fiori-active]="sub.link && isRouteActive(sub.link)"
+                 [routerLink]="sub.link || '#'"
+                 [class.text-fiori-subtext]="!sub.link"
+                 [class.cursor-default]="!sub.link"
+                 routerLinkActive="bg-fiori-active">
                 {{ sub.label }}
               </a>
             </div>
@@ -297,43 +308,41 @@
         </div>
       </nav>
     </div>
-
   </div>
 
-  <!-- Footer fijo: Configuración/Soporte -->
+  <!-- Footer: Configuración -->
   <div class="border-t border-fiori-border mt-auto">
-    <!-- Separador en modo dock -->
+    <!-- Separador para modo dock -->
     <div *ngIf="isCollapsed" class="w-8 h-px bg-fiori-border mx-auto my-3"></div>
-    <div class="menu-item relative">
+    
+    <div class="relative">
       <button 
-        id="configuracion-button"
+        type="button"
         class="w-full flex items-center text-left hover:bg-fiori-hover transition-colors group"
         [ngClass]="{
           'px-4 py-3': !isCollapsed,
           'justify-center w-12 h-12 mx-auto rounded-lg bg-fiori-surface shadow-sm border border-fiori-border': isCollapsed
         }"
-        [attr.title]="isCollapsed ? 'Configuración/Soporte' : null"
         [attr.data-popover-target]="isCollapsed ? 'configuracion-popover' : null"
         [attr.data-popover-placement]="isCollapsed ? 'right' : null"
-        [attr.data-popover-trigger]="isCollapsed ? 'hover' : null"
-        (mouseenter)="isCollapsed && showPopover('configuracion')"
-        (mouseleave)="isCollapsed && hidePopover('configuracion')">
+        [attr.data-popover-trigger]="isCollapsed ? 'hover' : null">
+        
         <div class="flex items-center" [ngClass]="{ 'gap-3': !isCollapsed }">
           <div class="w-6 h-6 flex items-center justify-center">
-            <i class="fa-solid fa-cog text-fiori-primary text-sm"></i>
+            <lucide-icon name="settings" class="text-fiori-primary" [attr.size]="isCollapsed ? '20' : '16'"></lucide-icon>
           </div>
           <span class="text-sm font-medium text-fiori-text" *ngIf="!isCollapsed">Configuración/Soporte</span>
         </div>
       </button>
-      
+
       <!-- Popover para modo dock -->
       <div *ngIf="isCollapsed" 
            id="configuracion-popover" 
            role="tooltip" 
-           class="absolute z-[9999] invisible inline-block w-48 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-xl opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800" 
+           class="absolute z-50 invisible inline-block w-48 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-xl opacity-0"
            style="left: calc(100% + 8px); bottom: 0;">
         <div class="px-3 py-2">
-          <div class="font-semibold text-gray-900 dark:text-white text-xs uppercase tracking-wider">Configuración/Soporte</div>
+          <div class="font-semibold text-gray-900 text-xs uppercase tracking-wider">Configuración/Soporte</div>
         </div>
         <div data-popper-arrow></div>
       </div>
@@ -343,7 +352,7 @@
   <!-- Version info (solo cuando no está colapsado) -->
   <div class="border-t border-fiori-border p-3" *ngIf="!isCollapsed">
     <div class="flex items-center gap-2 text-xs text-fiori-subtext">
-      <i class="fa-solid fa-info-circle"></i>
+      <lucide-icon name="info" size="12"></lucide-icon>
       <span>Sistema v2.1.0</span>
     </div>
   </div>

@@ -36,6 +36,7 @@
     "jquery": "^3.7.0",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
+    "lucide-angular": "^0.534.0",
     "ngx-pagination": "^6.0.3",
     "ngx-tinymce": "^16.0.0",
     "rxjs": "~7.8.0",

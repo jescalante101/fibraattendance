@@ -34,6 +34,7 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
   // Estados para los dropdowns
   selectedEmpresa: string = '';
   selectedSede: string = '';
+  selectedAno: string = '';
   selectedPeriodo: string = '';
 
   // Datos del usuario (estos deberían venir de un servicio)
@@ -244,6 +245,19 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
    */
   selectSede(sede: string): void {
     this.selectedSede = sede;
+    // Reinicializar Flowbite después del cambio
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        initFlowbite();
+      }
+    }, 100);
+  }
+
+  /**
+   * Selecciona un año
+   */
+  selectAno(ano: string): void {
+    this.selectedAno = ano;
     // Reinicializar Flowbite después del cambio
     setTimeout(() => {
       if (typeof window !== 'undefined') {

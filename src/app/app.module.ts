@@ -87,7 +87,7 @@ import { ReporteMarcacionesDetalleComponent } from './components/asistencia/marc
 import { ModalVerHorarioComponent } from './components/personal/empleado/asignar-horario-empleado/modal-ver-horario/modal-ver-horario.component';
 import { ModalEditarAsignacionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-editar-asignacion/modal-editar-asignacion.component';
 import { ModalRegistrarExcepcionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-registrar-excepcion/modal-registrar-excepcion.component';
-import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, Layers, Menu, Info, FileSpreadsheet, Search, RefreshCcw, RefreshCw } from 'lucide-angular';
+import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, ChevronUp, Layers, Menu, Info, FileSpreadsheet, Search, RefreshCcw, RefreshCw, Save, Plus, X, AlertCircle, UserPen, UserPlus, Table, Edit, Trash2, CheckCircle, XCircle, Eye, EyeOff, Play, Square, ArrowRight, Timer, Zap, Hand } from 'lucide-angular';
 registerLocaleData(localeEs);
 @NgModule({ declarations: [
         AppComponent,
@@ -196,11 +196,31 @@ registerLocaleData(localeEs);
             ChevronRight,
             ChevronDown,
             ChevronLeft,
+            ChevronUp,
             Layers,
             Menu, Info,
             FileSpreadsheet,
             Search,
-            RefreshCw
+            RefreshCw,
+            Save,
+            Plus,
+            X,
+            AlertCircle,
+            UserPen,
+            UserPlus,
+            Table,
+            Edit,
+            Trash2,
+            CheckCircle,
+            XCircle,
+            Eye,
+            EyeOff,
+            Play,
+            Square,
+            ArrowRight,
+            Timer,
+            Zap,
+            Hand
         })
     ], providers: [
         provideHttpClient(withInterceptorsFromDi()),

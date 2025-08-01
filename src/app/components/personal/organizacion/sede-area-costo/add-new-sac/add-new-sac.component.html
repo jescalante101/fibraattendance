@@ -1,140 +1,206 @@
-<div class="w-full max-w-2xl mx-auto p-6 bg-gray-50">
+<div class="w-full max-w-2xl mx-auto p-6 bg-fiori-background">
   
- 
-
-  <!-- Formulario -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-      <div class="text-lg font-semibold text-gray-900">Información de la Relación</div>
+  <!-- Formulario compacto con Fiori theme -->
+  <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden">
+    <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+          <lucide-icon [name]="isEdit ? 'edit' : 'plus'" class="w-4 h-4 text-fiori-primary"></lucide-icon>
+        </div>
+        <div class="text-lg font-semibold text-fiori-text">
+          {{ isEdit ? 'Editar Relación' : 'Nueva Relación' }}
+        </div>
+      </div>
     </div>
     
     <div class="p-6">
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
-          <!-- Sede Field with Autocomplete -->
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>Sede *</mat-label>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+        
+        <!-- Sede Field with Flowbite Autocomplete -->
+        <div class="relative">
+          <label for="sedeFilter" class="block text-xs font-medium text-fiori-subtext mb-1">
+            Sede <span class="text-fiori-error">*</span>
+          </label>
+          <div class="relative">
             <input 
               type="text" 
-              matInput 
+              id="sedeFilter"
               formControlName="sedeFilter"
-              [matAutocomplete]="sedeAuto"
+              (input)="onSedeFilterChange($event); form.get('siteId')?.setValue('')"
+              (focus)="showSedeDropdown = true"
+              (blur)="onSedeBlur()"
               placeholder="Buscar sede..."
-              (input)="form.get('siteId')?.setValue('')"
-              (focus)="onSedeFieldFocus(sedeAuto)">
-            <mat-autocomplete #sedeAuto="matAutocomplete" [displayWith]="displaySedeFunction">
-              <mat-option 
-                *ngFor="let sede of filteredSedes | async" 
-                [value]="sede"
-                (onSelectionChange)="onSedeSelected(sede)">
-                <div class="flex flex-col">
-                  <span class="font-medium text-fiori-text">{{ sede.descripcion }}</span>
-                  <span class="text-sm text-fiori-subtext">ID: {{ sede.categoriaAuxiliarId }}</span>
+              class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors"
+              [class.border-fiori-error]="form.get('siteId')?.hasError('required') && form.get('siteId')?.touched">
+            <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+              <lucide-icon name="building" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+            </div>
+            
+            <!-- Dropdown de sedes -->
+            <div *ngIf="showSedeDropdown && filteredSedesArray && filteredSedesArray.length > 0" 
+                 class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover max-h-60 overflow-y-auto">
+              <div *ngFor="let sede of filteredSedesArray; trackBy: trackBySedeId" 
+                   (mousedown)="onSedeSelected(sede)"
+                   class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border last:border-b-0 transition-colors">
+                <div class="flex items-center space-x-3">
+                  <div class="w-6 h-6 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+                    <lucide-icon name="building" class="w-3 h-3 text-fiori-primary"></lucide-icon>
+                  </div>
+                  <div>
+                    <div class="text-sm font-medium text-fiori-text">{{ sede.descripcion }}</div>
+                    <div class="text-xs text-fiori-subtext">ID: {{ sede.categoriaAuxiliarId }}</div>
+                  </div>
                 </div>
-              </mat-option>
-            </mat-autocomplete>
-            <mat-icon matSuffix>location_on</mat-icon>
-            <mat-error *ngIf="form.get('siteId')?.hasError('required')">
-              Debe seleccionar una sede
-            </mat-error>
-          </mat-form-field>
+              </div>
+            </div>
+          </div>
+          <p *ngIf="form.get('siteId')?.hasError('required') && form.get('siteId')?.touched" 
+             class="mt-1 text-xs text-fiori-error">
+            <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+            Debe seleccionar una sede
+          </p>
+        </div>
 
-          <!-- Área Field with Autocomplete -->
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>Área *</mat-label>
+        <!-- Área Field with Flowbite Autocomplete -->
+        <div class="relative">
+          <label for="areaFilter" class="block text-xs font-medium text-fiori-subtext mb-1">
+            Área <span class="text-fiori-error">*</span>
+          </label>
+          <div class="relative">
             <input 
               type="text" 
-              matInput 
+              id="areaFilter"
               formControlName="areaFilter"
-              [matAutocomplete]="areaAuto"
+              (input)="onAreaFilterChange($event); form.get('areaId')?.setValue('')"
+              (focus)="showAreaDropdown = true"
+              (blur)="onAreaBlur()"
               placeholder="Buscar área..."
-              (input)="form.get('areaId')?.setValue('')"
-              (focus)="onAreaFieldFocus(areaAuto)">
-            <mat-autocomplete #areaAuto="matAutocomplete" [displayWith]="displayAreaFunction">
-              <mat-option 
-                *ngFor="let area of filteredAreas | async" 
-                [value]="area"
-                (onSelectionChange)="onAreaSelected(area)">
-                <div class="flex flex-col">
-                  <span class="font-medium text-fiori-text">{{ area.descripcion }}</span>
-                  <span class="text-sm text-fiori-subtext">ID: {{ area.areaId }}</span>
+              class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors"
+              [class.border-fiori-error]="form.get('areaId')?.hasError('required') && form.get('areaId')?.touched">
+            <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+              <lucide-icon name="layers" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+            </div>
+            
+            <!-- Dropdown de áreas -->
+            <div *ngIf="showAreaDropdown && filteredAreasArray && filteredAreasArray.length > 0" 
+                 class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover max-h-60 overflow-y-auto">
+              <div *ngFor="let area of filteredAreasArray; trackBy: trackByAreaId" 
+                   (mousedown)="onAreaSelected(area)"
+                   class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border last:border-b-0 transition-colors">
+                <div class="flex items-center space-x-3">
+                  <div class="w-6 h-6 bg-fiori-success/10 rounded-lg flex items-center justify-center">
+                    <lucide-icon name="layers" class="w-3 h-3 text-fiori-success"></lucide-icon>
+                  </div>
+                  <div>
+                    <div class="text-sm font-medium text-fiori-text">{{ area.descripcion }}</div>
+                    <div class="text-xs text-fiori-subtext">ID: {{ area.areaId }}</div>
+                  </div>
                 </div>
-              </mat-option>
-            </mat-autocomplete>
-            <mat-icon matSuffix>business</mat-icon>
-            <mat-error *ngIf="form.get('areaId')?.hasError('required')">
-              Debe seleccionar un área
-            </mat-error>
-          </mat-form-field>
+              </div>
+            </div>
+          </div>
+          <p *ngIf="form.get('areaId')?.hasError('required') && form.get('areaId')?.touched" 
+             class="mt-1 text-xs text-fiori-error">
+            <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+            Debe seleccionar un área
+          </p>
+        </div>
 
-          <!-- Centro de Costo Field with Autocomplete -->
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>Centro de Costo *</mat-label>
+        <!-- Centro de Costo Field with Flowbite Autocomplete -->
+        <div class="relative">
+          <label for="costCenterFilter" class="block text-xs font-medium text-fiori-subtext mb-1">
+            Centro de Costo <span class="text-fiori-error">*</span>
+          </label>
+          <div class="relative">
             <input 
               type="text" 
-              matInput 
+              id="costCenterFilter"
               formControlName="costCenterFilter"
-              [matAutocomplete]="ccAuto"
+              (input)="onCostCenterFilterChange($event); form.get('costCenterId')?.setValue('')"
+              (focus)="showCostCenterDropdown = true"
+              (blur)="onCostCenterBlur()"
               placeholder="Buscar centro de costo..."
-              (input)="form.get('costCenterId')?.setValue('')"
-              (focus)="onCostCenterFieldFocus(ccAuto)">
-            <mat-autocomplete #ccAuto="matAutocomplete" [displayWith]="displayCostCenterFunction">
-              <mat-option 
-                *ngFor="let cc of filteredCostCenters | async" 
-                [value]="cc"
-                (onSelectionChange)="onCostCenterSelected(cc)">
-                <div class="flex flex-col">
-                  <span class="font-medium text-fiori-text">{{ cc.descripcion }}</span>
-                  <span class="text-sm text-fiori-subtext">ID: {{ cc.ccostoId }}</span>
+              class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors"
+              [class.border-fiori-error]="form.get('costCenterId')?.hasError('required') && form.get('costCenterId')?.touched">
+            <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+              <lucide-icon name="file-text" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+            </div>
+            
+            <!-- Dropdown de centros de costo -->
+            <div *ngIf="showCostCenterDropdown && filteredCostCentersArray && filteredCostCentersArray.length > 0" 
+                 class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover max-h-60 overflow-y-auto">
+              <div *ngFor="let cc of filteredCostCentersArray; trackBy: trackByCostCenterId" 
+                   (mousedown)="onCostCenterSelected(cc)"
+                   class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border last:border-b-0 transition-colors">
+                <div class="flex items-center space-x-3">
+                  <div class="w-6 h-6 bg-fiori-info/10 rounded-lg flex items-center justify-center">
+                    <lucide-icon name="file-text" class="w-3 h-3 text-fiori-info"></lucide-icon>
+                  </div>
+                  <div>
+                    <div class="text-sm font-medium text-fiori-text">{{ cc.descripcion }}</div>
+                    <div class="text-xs text-fiori-subtext">ID: {{ cc.ccostoId }}</div>
+                  </div>
                 </div>
-              </mat-option>
-            </mat-autocomplete>
-            <mat-icon matSuffix>account_balance</mat-icon>
-            <mat-error *ngIf="form.get('costCenterId')?.hasError('required')">
-              Debe seleccionar un centro de costo
-            </mat-error>
-          </mat-form-field>
+              </div>
+            </div>
+          </div>
+          <p *ngIf="form.get('costCenterId')?.hasError('required') && form.get('costCenterId')?.touched" 
+             class="mt-1 text-xs text-fiori-error">
+            <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+            Debe seleccionar un centro de costo
+          </p>
+        </div>
 
-          <!-- Observación Field -->
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>Observación</mat-label>
+        <!-- Observación Field -->
+        <div>
+          <label for="observation" class="block text-xs font-medium text-fiori-subtext mb-1">
+            Observación
+          </label>
+          <div class="relative">
             <textarea 
-              matInput 
+              id="observation"
               formControlName="observation" 
-              rows="3"
-              placeholder="Agregar comentarios adicionales..."></textarea>
-            <mat-icon matSuffix>note</mat-icon>
-          </mat-form-field>
+              rows="3" 
+              placeholder="Agregar comentarios adicionales..."
+              class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors resize-none"></textarea>
+            <div class="absolute left-2 top-3">
+              <lucide-icon name="file-text" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+            </div>
+          </div>
+        </div>
 
-          <!-- Fecha Field -->
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>Fecha de creación</mat-label>
+        <!-- Fecha Field -->
+        <div>
+          <label for="creationDate" class="block text-xs font-medium text-fiori-subtext mb-1">
+            Fecha de creación
+          </label>
+          <div class="relative">
             <input 
-              matInput 
               type="datetime-local" 
+              id="creationDate"
               formControlName="creationDate"
-              required>
-            <mat-icon matSuffix>event</mat-icon>
-          </mat-form-field>
+              class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors">
+            <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+              <lucide-icon name="calendar" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+            </div>
+          </div>
+        </div>
 
-        <!-- Action Buttons -->
-        <div class="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
+        <!-- Botones de acción compactos -->
+        <div class="flex justify-end gap-2 pt-4 border-t border-fiori-border">
           <button 
             type="button" 
             (click)="onCancel()"
-            class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            class="inline-flex items-center px-3 py-1.5 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-lg hover:bg-fiori-hover transition-colors">
+            <lucide-icon name="x" class="w-3 h-3 mr-1"></lucide-icon>
             Cancelar
           </button>
           <button 
             type="submit" 
             [disabled]="form.invalid || loading"
-            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-            <svg *ngIf="!loading" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75a.75.75 0 01.75-.75h7.5a.75.75 0 01.75.75z" />
-            </svg>
-            <div *ngIf="loading" class="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <div *ngIf="loading" class="w-3 h-3 mr-1 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <lucide-icon *ngIf="!loading" name="save" class="w-3 h-3 mr-1"></lucide-icon>
             {{ isEdit ? 'Actualizar' : 'Guardar' }}
           </button>
         </div>

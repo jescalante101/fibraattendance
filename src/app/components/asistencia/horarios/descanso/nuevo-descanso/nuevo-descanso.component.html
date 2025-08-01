@@ -1,89 +1,340 @@
-<div class="max-w-4xl mx-auto mt-2 bg-white rounded shadow p-6">
-
-  <form [formGroup]="descansoForm" (ngSubmit)="onConfirm()">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-      <div>
-        <label class="block text-sm font-medium mb-1">Nombre</label>
-        <input type="text" formControlName="alias" name="nombre" class="w-full border rounded px-3 py-2" required />
+<div class="w-full max-w-4xl mx-auto p-6 bg-fiori-background">
+  
+  <!-- Header compacto -->
+  <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border p-4 mb-4">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+        <lucide-icon [name]="isEditMode ? 'edit' : 'plus'" class="w-5 h-5 text-fiori-primary"></lucide-icon>
       </div>
       <div>
-        <label class="block text-sm font-medium mb-1">Tipo de Cálculo</label>
-        <mat-form-field appearance="fill" class="w-full">
-          <mat-select required formControlName="calcType" name="tipoCalculo">
-            <mat-option [value]="0">Auto Deducir</mat-option>
-            <mat-option [value]="1">Requiere marcación</mat-option>
-          </mat-select>
-        </mat-form-field>
+        <div class="text-xl font-semibold text-fiori-text">{{ isEditMode ? 'Editar Descanso' : 'Nuevo Descanso' }}</div>
+        <div class="text-sm text-fiori-subtext">Configure los horarios y reglas del descanso</div>
+      </div>
+    </div>
+  </div>
+
+  <form [formGroup]="descansoForm" (ngSubmit)="onConfirm()" class="space-y-6">
+    
+    <!-- Información básica -->
+    <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden">
+      <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
+        <div class="flex items-center space-x-2">
+          <lucide-icon name="info" class="w-4 h-4 text-fiori-primary"></lucide-icon>
+          <div class="text-lg font-semibold text-fiori-text">Información Básica</div>
+        </div>
+      </div>
+      
+      <div class="p-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Nombre Field -->
+          <div>
+            <label for="alias" class="block text-xs font-medium text-fiori-subtext mb-1">
+              Nombre <span class="text-fiori-error">*</span>
+            </label>
+            <div class="relative">
+              <input 
+                type="text" 
+                id="alias"
+                formControlName="alias"
+                placeholder="Nombre del descanso"
+                class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors"
+                [class.border-fiori-error]="descansoForm.get('alias')?.hasError('required') && descansoForm.get('alias')?.touched">
+              <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+                <lucide-icon name="clock" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+              </div>
+            </div>
+            <p *ngIf="descansoForm.get('alias')?.hasError('required') && descansoForm.get('alias')?.touched" 
+               class="mt-1 text-xs text-fiori-error">
+              <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+              El nombre es obligatorio
+            </p>
+          </div>
+
+          <!-- Tipo de Cálculo Field -->
+          <div class="relative">
+            <label for="calcTypeSelect" class="block text-xs font-medium text-fiori-subtext mb-1">
+              Tipo de Cálculo <span class="text-fiori-error">*</span>
+            </label>
+            <div class="relative">
+              <button 
+                type="button"
+                id="calcTypeSelect"
+                (click)="showCalcTypeDropdown = !showCalcTypeDropdown"
+                class="w-full pl-8 pr-8 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text text-left transition-colors"
+                [class.border-fiori-error]="descansoForm.get('calcType')?.hasError('required') && descansoForm.get('calcType')?.touched">
+                {{ getCalcTypeName() || 'Seleccionar tipo...' }}
+              </button>
+              <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+                <lucide-icon name="zap" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+              </div>
+              <div class="absolute right-2 top-1/2 transform -translate-y-1/2">
+                <lucide-icon [name]="showCalcTypeDropdown ? 'chevron-up' : 'chevron-down'" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+              </div>
+              
+              <!-- Dropdown de tipos -->
+              <div *ngIf="showCalcTypeDropdown" 
+                   class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover">
+                <div (click)="onCalcTypeSelected(0)"
+                     class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border transition-colors">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-6 h-6 bg-fiori-success/10 rounded-lg flex items-center justify-center">
+                      <lucide-icon name="zap" class="w-3 h-3 text-fiori-success"></lucide-icon>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-fiori-text">Auto Deducir</div>
+                      <div class="text-xs text-fiori-subtext">Se deduce automáticamente</div>
+                    </div>
+                  </div>
+                </div>
+                <div (click)="onCalcTypeSelected(1)"
+                     class="px-4 py-3 hover:bg-fiori-hover cursor-pointer transition-colors">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-6 h-6 bg-fiori-warning/10 rounded-lg flex items-center justify-center">
+                      <lucide-icon name="hand" class="w-3 h-3 text-fiori-warning"></lucide-icon>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-fiori-text">Requiere marcación</div>
+                      <div class="text-xs text-fiori-subtext">Marcación manual necesaria</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p *ngIf="descansoForm.get('calcType')?.hasError('required') && descansoForm.get('calcType')?.touched" 
+               class="mt-1 text-xs text-fiori-error">
+              <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+              Debe seleccionar un tipo de cálculo
+            </p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <mat-tab-group>
-      <mat-tab label="Configuración básica">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-          <div>
-            <label class="block text-sm font-medium mb-1">Hora de Inicio</label>
-            <input type="time" formControlName="periodStart" name="horaInicio" class="w-full border rounded px-3 py-2" required />
+    <!-- Tabs con Flowbite -->
+    <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden">
+      
+      <!-- Tab Headers -->
+      <div class="flex border-b border-fiori-border bg-fiori-muted">
+        <button 
+          type="button"
+          [class]="activeTab === 'basic' ? 
+            'flex items-center px-4 py-3 text-sm font-medium border-b-2 border-fiori-primary text-fiori-primary bg-fiori-surface' : 
+            'flex items-center px-4 py-3 text-sm font-medium border-b-2 border-transparent text-fiori-subtext hover:text-fiori-text hover:border-fiori-border transition-colors'"
+          (click)="activeTab = 'basic'">
+          <lucide-icon name="settings" class="w-4 h-4 mr-2"></lucide-icon>
+          Configuración Básica
+        </button>
+        <button 
+          type="button"
+          [class]="activeTab === 'rules' ? 
+            'flex items-center px-4 py-3 text-sm font-medium border-b-2 border-fiori-primary text-fiori-primary bg-fiori-surface' : 
+            'flex items-center px-4 py-3 text-sm font-medium border-b-2 border-transparent text-fiori-subtext hover:text-fiori-text hover:border-fiori-border transition-colors'"
+          (click)="activeTab = 'rules'">
+          <lucide-icon name="check-square" class="w-4 h-4 mr-2"></lucide-icon>
+          Configuración de Reglas
+        </button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="p-4">
+        
+        <!-- Configuración Básica Tab -->
+        <div *ngIf="activeTab === 'basic'" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Hora de Inicio -->
+            <div>
+              <label for="periodStart" class="block text-xs font-medium text-fiori-subtext mb-1">
+                Hora de Inicio <span class="text-fiori-error">*</span>
+              </label>
+              <div class="relative">
+                <input 
+                  type="time" 
+                  id="periodStart"
+                  formControlName="periodStart"
+                  class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors"
+                  [class.border-fiori-error]="descansoForm.get('periodStart')?.hasError('required') && descansoForm.get('periodStart')?.touched">
+                <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+                  <lucide-icon name="play" class="w-3 h-3 text-fiori-success"></lucide-icon>
+                </div>
+              </div>
+              <p *ngIf="descansoForm.get('periodStart')?.hasError('required') && descansoForm.get('periodStart')?.touched" 
+                 class="mt-1 text-xs text-fiori-error">
+                <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+                La hora de inicio es obligatoria
+              </p>
+            </div>
+
+            <!-- Hora Final -->
+            <div>
+              <label for="endMargin" class="block text-xs font-medium text-fiori-subtext mb-1">
+                Hora Final <span class="text-fiori-error">*</span>
+              </label>
+              <div class="relative">
+                <input 
+                  type="time" 
+                  id="endMargin"
+                  formControlName="endMargin"
+                  class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors"
+                  [class.border-fiori-error]="descansoForm.get('endMargin')?.hasError('required') && descansoForm.get('endMargin')?.touched">
+                <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+                  <lucide-icon name="square" class="w-3 h-3 text-fiori-error"></lucide-icon>
+                </div>
+              </div>
+              <p *ngIf="descansoForm.get('endMargin')?.hasError('required') && descansoForm.get('endMargin')?.touched" 
+                 class="mt-1 text-xs text-fiori-error">
+                <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+                La hora final es obligatoria
+              </p>
+            </div>
           </div>
+
+          <!-- Duración -->
           <div>
-            <label class="block text-sm font-medium mb-1">Hora Final</label>
-            <input type="time" formControlName="endMargin" name="horaFin" class="w-full border rounded px-3 py-2" required />
-          </div>
-          <div class="md:col-span-2">
-            <label class="block text-sm font-medium mb-1">Duración (minutos)</label>
-            <input type="number" formControlName="duration" name="duracion" class="w-full border rounded px-3 py-2" required />
+            <label for="duration" class="block text-xs font-medium text-fiori-subtext mb-1">
+              Duración (minutos) <span class="text-fiori-error">*</span>
+            </label>
+            <div class="relative">
+              <input 
+                type="number" 
+                id="duration"
+                formControlName="duration"
+                placeholder="Duración en minutos"
+                min="1"
+                class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors"
+                [class.border-fiori-error]="descansoForm.get('duration')?.hasError('required') && descansoForm.get('duration')?.touched">
+              <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+                <lucide-icon name="timer" class="w-3 h-3 text-fiori-info"></lucide-icon>
+              </div>
+            </div>
+            <p *ngIf="descansoForm.get('duration')?.hasError('required') && descansoForm.get('duration')?.touched" 
+               class="mt-1 text-xs text-fiori-error">
+              <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+              La duración es obligatoria
+            </p>
           </div>
         </div>
-      </mat-tab>
 
-      <mat-tab label="Configuración reglas">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-          <div>
-            <label class="block text-sm font-medium mb-1">Marcación Duplicada</label>
-            <mat-form-field appearance="fill" class="w-full">
-              <mat-select formControlName="multiplePunch" name="marcacionDuplicada">
-                <mat-option [value]="0">Acorde a la regla</mat-option>
-                <mat-option [value]="1">Usuario Definido</mat-option>
-              </mat-select>
-            </mat-form-field>
+        <!-- Configuración de Reglas Tab -->
+        <div *ngIf="activeTab === 'rules'" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Marcación Duplicada -->
+            <div class="relative">
+              <label for="multiplePunchSelect" class="block text-xs font-medium text-fiori-subtext mb-1">
+                Marcación Duplicada
+              </label>
+              <div class="relative">
+                <button 
+                  type="button"
+                  id="multiplePunchSelect"
+                  (click)="showMultiplePunchDropdown = !showMultiplePunchDropdown"
+                  class="w-full pl-8 pr-8 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text text-left transition-colors">
+                  {{ getMultiplePunchName() || 'Seleccionar opción...' }}
+                </button>
+                <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+                  <lucide-icon name="layers" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                </div>
+                <div class="absolute right-2 top-1/2 transform -translate-y-1/2">
+                  <lucide-icon [name]="showMultiplePunchDropdown ? 'chevron-up' : 'chevron-down'" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                </div>
+                
+                <!-- Dropdown -->
+                <div *ngIf="showMultiplePunchDropdown" 
+                     class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover">
+                  <div (click)="onMultiplePunchSelected(0)"
+                       class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border transition-colors">
+                    <div class="text-sm font-medium text-fiori-text">Acorde a la regla</div>
+                  </div>
+                  <div (click)="onMultiplePunchSelected(1)"
+                       class="px-4 py-3 hover:bg-fiori-hover cursor-pointer transition-colors">
+                    <div class="text-sm font-medium text-fiori-text">Usuario Definido</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Intervalo Efectivo -->
+            <div>
+              <label for="availableInterval" class="block text-xs font-medium text-fiori-subtext mb-1">
+                Intervalo Efectivo
+              </label>
+              <div class="relative">
+                <input 
+                  type="number" 
+                  id="availableInterval"
+                  formControlName="availableInterval"
+                  placeholder="Intervalo en minutos"
+                  min="0"
+                  class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors">
+                <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+                  <lucide-icon name="clock" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">Intervalo efectivo</label>
-            <input type="number" formControlName="availableInterval" name="intervaloEfectivo" class="w-full border rounded px-3 py-2" />
-          </div>
-          <div class="md:col-span-2">
-            <label class="block text-sm font-medium mb-1">Basado en Marcación</label>
-            <mat-form-field appearance="fill" class="w-full">
-              <mat-select formControlName="availableIntervalType" name="basadoMarcacion">
-                <mat-option [value]="1">Si</mat-option>
-                <mat-option [value]="0">No</mat-option>
-              </mat-select>
-            </mat-form-field>
+
+          <!-- Basado en Marcación -->
+          <div class="relative">
+            <label for="availableIntervalTypeSelect" class="block text-xs font-medium text-fiori-subtext mb-1">
+              Basado en Marcación
+            </label>
+            <div class="relative">
+              <button 
+                type="button"
+                id="availableIntervalTypeSelect"
+                (click)="showAvailableIntervalTypeDropdown = !showAvailableIntervalTypeDropdown"
+                class="w-full pl-8 pr-8 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text text-left transition-colors">
+                {{ getAvailableIntervalTypeName() || 'Seleccionar opción...' }}
+              </button>
+              <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+                <lucide-icon name="check-square" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+              </div>
+              <div class="absolute right-2 top-1/2 transform -translate-y-1/2">
+                <lucide-icon [name]="showAvailableIntervalTypeDropdown ? 'chevron-up' : 'chevron-down'" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+              </div>
+              
+              <!-- Dropdown -->
+              <div *ngIf="showAvailableIntervalTypeDropdown" 
+                   class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover">
+                <div (click)="onAvailableIntervalTypeSelected(1)"
+                     class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border transition-colors">
+                  <div class="flex items-center space-x-2">
+                    <lucide-icon name="check-circle" class="w-4 h-4 text-fiori-success"></lucide-icon>
+                    <div class="text-sm font-medium text-fiori-text">Sí</div>
+                  </div>
+                </div>
+                <div (click)="onAvailableIntervalTypeSelected(0)"
+                     class="px-4 py-3 hover:bg-fiori-hover cursor-pointer transition-colors">
+                  <div class="flex items-center space-x-2">
+                    <lucide-icon name="x-circle" class="w-4 h-4 text-fiori-error"></lucide-icon>
+                    <div class="text-sm font-medium text-fiori-text">No</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </mat-tab>
-    </mat-tab-group>
-
-    <div class="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
-          <button 
-            type="button" 
-            (click)="cancelar()"
-            class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-            Cancelar
-          </button>
-          <button 
-            type="submit" 
-            [disabled]="descansoForm.invalid || loading"
-            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-            <svg *ngIf="!loading" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75a.75.75 0 01.75-.75h7.5a.75.75 0 01.75.75z" />
-            </svg>
-            <div *ngIf="loading" class="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            {{ isEditMode ? 'Actualizar' : 'Guardar' }}
-          </button>
+      </div>
     </div>
 
+    <!-- Botones de acción -->
+    <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border p-4">
+      <div class="flex justify-end gap-3">
+        <button 
+          type="button" 
+          (click)="cancelar()"
+          class="inline-flex items-center px-4 py-2 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-lg hover:bg-fiori-hover transition-colors">
+          <lucide-icon name="x" class="w-4 h-4 mr-2"></lucide-icon>
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          [disabled]="descansoForm.invalid || loading"
+          class="inline-flex items-center px-4 py-2 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          <div *ngIf="loading" class="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          <lucide-icon *ngIf="!loading" name="save" class="w-4 h-4 mr-2"></lucide-icon>
+          {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
   </form>
 </div>

@@ -1,109 +1,304 @@
-<div class="flex flex-col md:flex-row gap-6">
-  <!-- Formulario de registro/edición -->
-  <div class="md:w-1/3 w-full">
-    <div class="card-fiori">
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4 p-6">
-        <span class="text-lg font-semibold mb-2 block">{{ editing ? 'Editar' : 'Registrar' }} Sede - Centro de Costo</span>
-        <mat-form-field appearance="fill" class="w-full">
-          <mat-label>Sede</mat-label>
-          <mat-select formControlName="siteId" required>
-            <mat-option *ngFor="let sede of sedes" [value]="sede.categoriaAuxiliarId">{{ sede.descripcion }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="fill" class="w-full">
-          <mat-label>Centro de Costo</mat-label>
-          <mat-select formControlName="costCenterId" required>
-            <mat-option *ngFor="let cc of ccostos" [value]="cc.ccostoId">{{ cc.descripcion }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="fill" class="w-full">
-          <mat-label>Fecha de creación</mat-label>
-          <input matInput formControlName="creationDate" type="datetime-local" readonly>
-        </mat-form-field>
-        <mat-form-field appearance="fill" class="w-full">
-          <mat-label>Observación</mat-label>
-          <textarea matInput formControlName="observation" rows="2"></textarea>
-        </mat-form-field>
-        <div class="flex gap-2 justify-end">
-          <button mat-stroked-button type="button" (click)="cancelEdit()" *ngIf="editing">Cancelar</button>
-          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || loading">
-            {{ editing ? 'Actualizar' : 'Registrar' }}
-          </button>
+<div class="w-full mx-auto p-6 bg-fiori-background min-h-screen">
+  
+  <!-- Header compacto -->
+  <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border p-3 mb-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+          <lucide-icon name="building" class="w-4 h-4 text-fiori-primary"></lucide-icon>
         </div>
-      </form>
+        <div>
+          <div class="text-lg font-semibold text-fiori-text">Gestión Sede - Centro de Costo</div>
+          <div class="text-xs text-fiori-subtext">{{ sedeCcostoList.length }} relaciones registradas</div>
+        </div>
+      </div>
+      
+      <!-- Estadísticas compactas -->
+      <div class="flex gap-4">
+        <div class="text-center bg-fiori-surface border border-fiori-border rounded-lg px-3 py-2 shadow-fioriSm">
+          <div class="text-lg font-bold text-fiori-success mb-1">{{ getActiveCount() }}</div>
+          <div class="text-xs text-fiori-subtext font-medium">Activas</div>
+        </div>
+        <div class="text-center bg-fiori-surface border border-fiori-border rounded-lg px-3 py-2 shadow-fioriSm">
+          <div class="text-lg font-bold text-fiori-warning mb-1">{{ getInactiveCount() }}</div>
+          <div class="text-xs text-fiori-subtext font-medium">Inactivas</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Tabla de registros -->
-  <div class="md:w-2/3 w-full">
-    <div class="card-fiori p-4">
-      <span class="text-lg font-semibold mb-4 block">Sedes y Centros de Costo</span>
-      <div *ngIf="loading" class="text-center py-8 text-fiori-subtext flex flex-col items-center justify-center">
-        <mat-spinner></mat-spinner>
-        <span class="text-fiori-subtext">Cargando...</span>
-      </div>
-      <table mat-table [dataSource]="sedeCcostoList" class="w-full" *ngIf="!loading">
-        <!-- Columnas -->
-        <ng-container matColumnDef="siteName">
-          <th mat-header-cell *matHeaderCellDef>Sede</th>
-          <td mat-cell *matCellDef="let item">{{ item.siteName }}</td>
-        </ng-container>
-        <ng-container matColumnDef="costCenterName">
-          <th mat-header-cell *matHeaderCellDef>Centro de Costo</th>
-          <td mat-cell *matCellDef="let item">{{ item.costCenterName }}</td>
-        </ng-container>
-        <ng-container matColumnDef="observation">
-          <th mat-header-cell *matHeaderCellDef>Observación</th>
-          <td mat-cell *matCellDef="let item">{{ item.observation }}</td>
-        </ng-container>
-        <ng-container matColumnDef="active">
-          <th mat-header-cell *matHeaderCellDef>Estado</th>
-          <td mat-cell *matCellDef="let item">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                  [ngClass]="item.active === 'Y' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-              {{ item.active === 'Y' ? 'Activo' : 'Inactivo' }}
-            </span>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Acciones</th>
-          <td mat-cell *matCellDef="let item">
-            <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Acciones">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #menu="matMenu">
-              <button mat-menu-item (click)="onEdit(item)">
-                <mat-icon>edit</mat-icon>
-                <span>Editar</span>
-              </button>
-              <button mat-menu-item (click)="onDelete(item)">
-                <mat-icon>delete</mat-icon>
-                <span>Eliminar</span>
-              </button>
-              <button mat-menu-item (click)="onToggleActive(item)">
-                <mat-icon>{{ item.active === 'Y' ? 'block' : 'check_circle' }}</mat-icon>
-                <span>{{ item.active === 'Y' ? 'Desactivar' : 'Activar' }}</span>
-              </button>
-            </mat-menu>
-          </td>
-        </ng-container>
-        <!-- Header y filas -->
-        <tr mat-header-row *matHeaderRowDef="['siteName','costCenterName','observation','active','actions']"></tr>
-        <tr mat-row *matRowDef="let row; columns: ['siteName','costCenterName','observation','active','actions']"></tr>
-        <!-- Estado vacío -->
-        <tr *ngIf="sedeCcostoList.length === 0 && !loading && !error">
-          <td colspan="5" class="py-8 text-center">
-            <div class="text-fiori-subtext">
-              <svg class="w-12 h-12 mx-auto mb-4 text-fiori-border" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
-              </svg>
-              <p class="text-lg font-medium mb-2">No se encontraron registros</p>
-              <p>Comienza añadiendo tu primer registro</p>
+  <div class="flex flex-col lg:flex-row gap-6">
+    <!-- Formulario compacto -->
+    <div class="lg:w-1/3 w-full">
+      <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden">
+        <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+              <lucide-icon [name]="editing ? 'edit' : 'plus'" class="w-4 h-4 text-fiori-primary"></lucide-icon>
             </div>
-          </td>
-        </tr>
-      </table>
+            <div class="text-lg font-semibold text-fiori-text">{{ editing ? 'Editar' : 'Registrar' }} Relación</div>
+          </div>
+        </div>
+        
+        <!-- Formulario compacto -->
+        <div class="p-4">
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+            <!-- Sede Field with Flowbite Autocomplete -->
+            <div class="relative">
+              <label for="sedeFilter" class="block text-xs font-medium text-fiori-subtext mb-1">
+                Sede <span class="text-fiori-error">*</span>
+              </label>
+              <div class="relative">
+                <input 
+                  type="text" 
+                  id="sedeFilter"
+                  formControlName="sedeFilter"
+                  (input)="onSedeFilterChange($event); form.get('siteId')?.setValue('')"
+                  (focus)="showSedeDropdown = true"
+                  (blur)="onSedeBlur()"
+                  placeholder="Buscar sede..."
+                  class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors"
+                  [class.border-fiori-error]="form.get('siteId')?.hasError('required') && form.get('siteId')?.touched">
+                <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+                  <lucide-icon name="building" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                </div>
+                
+                <!-- Dropdown de sedes -->
+                <div *ngIf="showSedeDropdown && filteredSedes && filteredSedes.length > 0" 
+                     class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover max-h-60 overflow-y-auto">
+                  <div *ngFor="let sede of filteredSedes; trackBy: trackBySedeId" 
+                       (mousedown)="onSedeSelected(sede)"
+                       class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border last:border-b-0 transition-colors">
+                    <div class="flex items-center space-x-3">
+                      <div class="w-6 h-6 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+                        <lucide-icon name="building" class="w-3 h-3 text-fiori-primary"></lucide-icon>
+                      </div>
+                      <div>
+                        <div class="text-sm font-medium text-fiori-text">{{ sede.descripcion }}</div>
+                        <div class="text-xs text-fiori-subtext">ID: {{ sede.categoriaAuxiliarId }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p *ngIf="form.get('siteId')?.hasError('required') && form.get('siteId')?.touched" 
+                 class="mt-1 text-xs text-fiori-error">
+                <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+                Debe seleccionar una sede
+              </p>
+            </div>
+
+            <!-- Centro de Costo Field with Flowbite Autocomplete -->
+            <div class="relative">
+              <label for="ccostoFilter" class="block text-xs font-medium text-fiori-subtext mb-1">
+                Centro de Costo <span class="text-fiori-error">*</span>
+              </label>
+              <div class="relative">
+                <input 
+                  type="text" 
+                  id="ccostoFilter"
+                  formControlName="ccostoFilter"
+                  (input)="onCcostoFilterChange($event); form.get('costCenterId')?.setValue('')"
+                  (focus)="showCcostoDropdown = true"
+                  (blur)="onCcostoBlur()"
+                  placeholder="Buscar centro de costo..."
+                  class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors"
+                  [class.border-fiori-error]="form.get('costCenterId')?.hasError('required') && form.get('costCenterId')?.touched">
+                <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+                  <lucide-icon name="file-text" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                </div>
+                
+                <!-- Dropdown de centros de costo -->
+                <div *ngIf="showCcostoDropdown && filteredCcostos && filteredCcostos.length > 0" 
+                     class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover max-h-60 overflow-y-auto">
+                  <div *ngFor="let ccosto of filteredCcostos; trackBy: trackByCcostoId" 
+                       (mousedown)="onCcostoSelected(ccosto)"
+                       class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border last:border-b-0 transition-colors">
+                    <div class="flex items-center space-x-3">
+                      <div class="w-6 h-6 bg-fiori-info/10 rounded-lg flex items-center justify-center">
+                        <lucide-icon name="file-text" class="w-3 h-3 text-fiori-info"></lucide-icon>
+                      </div>
+                      <div>
+                        <div class="text-sm font-medium text-fiori-text">{{ ccosto.descripcion }}</div>
+                        <div class="text-xs text-fiori-subtext">ID: {{ ccosto.ccostoId }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p *ngIf="form.get('costCenterId')?.hasError('required') && form.get('costCenterId')?.touched" 
+                 class="mt-1 text-xs text-fiori-error">
+                <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+                Debe seleccionar un centro de costo
+              </p>
+            </div>
+
+            <!-- Fecha Field -->
+            <div>
+              <label for="creationDate" class="block text-xs font-medium text-fiori-subtext mb-1">
+                Fecha de creación
+              </label>
+              <div class="relative">
+                <input 
+                  type="datetime-local" 
+                  id="creationDate"
+                  formControlName="creationDate"
+                  readonly
+                  class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm bg-fiori-muted text-fiori-subtext cursor-not-allowed">
+                <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+                  <lucide-icon name="calendar" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                </div>
+              </div>
+            </div>
+
+            <!-- Observación Field -->
+            <div>
+              <label for="observation" class="block text-xs font-medium text-fiori-subtext mb-1">
+                Observación
+              </label>
+              <div class="relative">
+                <textarea 
+                  id="observation"
+                  formControlName="observation" 
+                  rows="3" 
+                  placeholder="Agregar comentarios adicionales..."
+                  class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors resize-none"></textarea>
+                <div class="absolute left-2 top-3">
+                  <lucide-icon name="file-text" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botones de acción compactos -->
+            <div class="flex justify-end gap-2 pt-4 border-t border-fiori-border">
+              <button 
+                type="button" 
+                (click)="cancelEdit()" 
+                *ngIf="editing"
+                class="inline-flex items-center px-3 py-1.5 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-lg hover:bg-fiori-hover transition-colors">
+                <lucide-icon name="x" class="w-3 h-3 mr-1"></lucide-icon>
+                Cancelar
+              </button>
+              
+              <button 
+                type="submit" 
+                [disabled]="form.invalid || loading"
+                class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <div *ngIf="loading" class="w-3 h-3 mr-1 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <lucide-icon *ngIf="!loading" [name]="editing ? 'save' : 'plus'" class="w-3 h-3 mr-1"></lucide-icon>
+                {{ editing ? 'Actualizar' : 'Registrar' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de registros compacta -->
+    <div class="lg:w-2/3 w-full">
+      <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden">
+        <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
+          <div class="text-lg font-semibold text-fiori-text">Sedes y Centros de Costo</div>
+        </div>
+
+        <!-- Overlay de loading compacto -->
+        <div *ngIf="loading" class="relative">
+          <div class="absolute inset-0 z-10 flex items-center justify-center bg-fiori-surface/70">
+            <div class="text-center p-4">
+              <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-fiori-primary mb-2"></div>
+              <p class="text-sm text-fiori-subtext">Cargando relaciones...</p>
+            </div>
+          </div>
+          <div class="px-4 py-8 text-center text-fiori-subtext">Cargando...</div>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full" *ngIf="!loading">
+            <thead class="bg-fiori-muted">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-fiori-subtext uppercase tracking-wider">Sede</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-fiori-subtext uppercase tracking-wider">Centro de Costo</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-fiori-subtext uppercase tracking-wider">Observación</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-fiori-subtext uppercase tracking-wider">Estado</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-fiori-subtext uppercase tracking-wider">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="bg-fiori-surface divide-y divide-fiori-border">
+              <tr *ngFor="let item of sedeCcostoList; trackBy: trackBySedeCcostoId" class="hover:bg-fiori-hover transition-colors">
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center mr-3">
+                      <lucide-icon name="building" class="w-4 h-4 text-fiori-primary"></lucide-icon>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-fiori-text">{{ item.siteName }}</div>
+                      <div class="text-xs text-fiori-subtext">ID: {{ item.siteId }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-fiori-info/10 rounded-lg flex items-center justify-center mr-3">
+                      <lucide-icon name="file-text" class="w-4 h-4 text-fiori-info"></lucide-icon>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-fiori-text">{{ item.costCenterName }}</div>
+                      <div class="text-xs text-fiori-subtext">ID: {{ item.costCenterId }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <div class="text-sm text-fiori-text">{{ item.observation || '-' }}</div>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span *ngIf="item.active === 'Y'; else inactiveState" 
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-fiori-success/10 text-fiori-success border border-fiori-success/20">
+                    <lucide-icon name="check-circle" class="w-3 h-3 mr-1"></lucide-icon>
+                    Activo
+                  </span>
+                  <ng-template #inactiveState>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-fiori-error/10 text-fiori-error border border-fiori-error/20">
+                      <lucide-icon name="x-circle" class="w-3 h-3 mr-1"></lucide-icon>
+                      Inactivo
+                    </span>
+                  </ng-template>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                  <div class="flex items-center justify-end space-x-2">
+                    <button 
+                      (click)="onEdit(item)" 
+                      class="inline-flex items-center p-1.5 text-fiori-primary hover:text-fiori-secondary hover:bg-fiori-primary/5 rounded-lg transition-colors" 
+                      title="Editar relación">
+                      <lucide-icon name="edit" class="w-4 h-4"></lucide-icon>
+                    </button>
+                    <button 
+                      (click)="onToggleActive(item)" 
+                      [class]="item.active === 'Y' ? 
+                        'inline-flex items-center p-1.5 text-fiori-warning hover:text-orange-800 hover:bg-fiori-warning/5 rounded-lg transition-colors' : 
+                        'inline-flex items-center p-1.5 text-fiori-success hover:text-green-800 hover:bg-fiori-success/5 rounded-lg transition-colors'"
+                      [title]="item.active === 'Y' ? 'Desactivar' : 'Activar'">
+                      <lucide-icon [name]="item.active === 'Y' ? 'eye-off' : 'eye'" class="w-4 h-4"></lucide-icon>
+                    </button>
+                    <button 
+                      (click)="onDelete(item)" 
+                      class="inline-flex items-center p-1.5 text-fiori-error hover:text-red-800 hover:bg-fiori-error/5 rounded-lg transition-colors" 
+                      title="Eliminar relación">
+                      <lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Estado vacío compacto -->
+        <div *ngIf="!loading && sedeCcostoList.length === 0" class="text-center py-12">
+          <lucide-icon name="building" class="w-16 h-16 text-fiori-subtext mx-auto mb-4"></lucide-icon>
+          <div class="text-lg font-medium text-fiori-text mb-2">No se encontraron registros</div>
+          <p class="text-fiori-subtext">Comienza añadiendo tu primer registro</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>

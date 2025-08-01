@@ -25,9 +25,13 @@ export class UsuarioSedeComponent implements OnInit {
   usuarios: User[] = [];
   searchTerm = '';
 
-  // Filtered observables for autocomplete
-  filteredUsuarios!: Observable<User[]>;
-  filteredSedes!: Observable<CategoriaAuxiliar[]>;
+  // Filtered arrays for Flowbite autocomplete
+  filteredUsuarios: User[] = [];
+  filteredSedes: CategoriaAuxiliar[] = [];
+  
+  // Dropdown states
+  showUsuarioDropdown = false;
+  showSedeDropdown = false;
 
   constructor(
     private fb: FormBuilder,
@@ -51,11 +55,6 @@ export class UsuarioSedeComponent implements OnInit {
     this.loadUserSites();
     this.loadSedes();
     this.loadUsuarios();
-    
-    // Setup autocomplete after data is loaded
-    setTimeout(() => {
-      this.setupAutocomplete();
-    }, 100);
   }
 
   loadUserSites() {
@@ -76,12 +75,14 @@ export class UsuarioSedeComponent implements OnInit {
   loadSedes() {
     this.categoriaAuxiliarService.getCategoriasAuxiliar().subscribe(sedes => {
       this.sedes = sedes;
+      this.filteredSedes = [...this.sedes];
     });
   }
 
   loadUsuarios() {
     this.appUserService.getAllUsers().subscribe(users => {
       this.usuarios = users;
+      this.filteredUsuarios = [...this.usuarios];
     });
   }
 
@@ -132,8 +133,8 @@ export class UsuarioSedeComponent implements OnInit {
     this.form.patchValue({
       userId: userSite.userId,
       siteId: userSite.siteId,
-      usuarioFilter: usuario,
-      sedeFilter: sede,
+      usuarioFilter: usuario?.userName || '',
+      sedeFilter: sede?.descripcion || '',
       observation: userSite.observation,
       creationDate: userSite.creationDate?.substring(0, 16)
     });
@@ -198,80 +199,70 @@ export class UsuarioSedeComponent implements OnInit {
     });
   }
 
-  // Setup autocomplete filtering
-  private setupAutocomplete(): void {
-    this.filteredUsuarios = this.form.get('usuarioFilter')!.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filterUsuarios(value || ''))
-    );
-
-    this.filteredSedes = this.form.get('sedeFilter')!.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filterSedes(value || ''))
-    );
-  }
-
-  private _filterUsuarios(value: string | User): User[] {
-    if (typeof value === 'object') return this.usuarios;
-    const filterValue = value.toLowerCase();
-    return this.usuarios.filter(usuario => usuario.userName.toLowerCase().includes(filterValue));
-  }
-
-  private _filterSedes(value: string | CategoriaAuxiliar): CategoriaAuxiliar[] {
-    if (typeof value === 'object') return this.sedes;
-    const filterValue = value.toLowerCase();
-    return this.sedes.filter(sede => sede.descripcion.toLowerCase().includes(filterValue));
-  }
-
-  // Selection handlers for autocomplete
-  onUsuarioSelected(usuario: User): void {
-    if (usuario && usuario.userId) {
-      this.form.patchValue({
-        userId: usuario.userId,
-        usuarioFilter: usuario
-      });
-     
+  // Flowbite Autocomplete methods
+  onUsuarioFilterChange(event: any): void {
+    const value = event.target.value.toLowerCase();
+    if (!value.trim()) {
+      this.filteredUsuarios = [...this.usuarios];
+    } else {
+      this.filteredUsuarios = this.usuarios.filter(usuario => 
+        usuario.userName.toLowerCase().includes(value)
+      );
     }
+  }
+
+  onSedeFilterChange(event: any): void {
+    const value = event.target.value.toLowerCase();
+    if (!value.trim()) {
+      this.filteredSedes = [...this.sedes];
+    } else {
+      this.filteredSedes = this.sedes.filter(sede => 
+        sede.descripcion.toLowerCase().includes(value)
+      );
+    }
+  }
+
+  onUsuarioSelected(usuario: User): void {
+    this.form.patchValue({
+      userId: usuario.userId,
+      usuarioFilter: usuario.userName
+    });
+    this.showUsuarioDropdown = false;
   }
 
   onSedeSelected(sede: CategoriaAuxiliar): void {
-    if (sede && sede.categoriaAuxiliarId) {
-      this.form.patchValue({
-        siteId: sede.categoriaAuxiliarId
-      });
-    }
+    this.form.patchValue({
+      siteId: sede.categoriaAuxiliarId,
+      sedeFilter: sede.descripcion
+    });
+    this.showSedeDropdown = false;
   }
 
-  // Display functions for autocomplete
-  displayUsuarioFunction = (usuario: User): string => {
-    return usuario && usuario.userName ? usuario.userName : '';
+  onUsuarioBlur(): void {
+    // Delay hiding to allow for selection
+    setTimeout(() => {
+      this.showUsuarioDropdown = false;
+    }, 150);
   }
 
-  displaySedeFunction = (sede: CategoriaAuxiliar): string => {
-    return sede && sede.descripcion ? sede.descripcion : '';
+  onSedeBlur(): void {
+    // Delay hiding to allow for selection
+    setTimeout(() => {
+      this.showSedeDropdown = false;
+    }, 150);
   }
 
-  // Focus handlers to open autocomplete panels automatically
-  onUsuarioFieldFocus(autocomplete: any): void {
-    if (this.usuarios.length > 0) {
-      //this.form.get('usuarioFilter')?.setValue('');
-      setTimeout(() => {
-        if (autocomplete && autocomplete.openPanel) {
-          autocomplete.openPanel();
-        }
-      }, 100);
-    }
+  // TrackBy functions for performance
+  trackByUserId(index: number, usuario: User): number {
+    return usuario.userId;
   }
 
-  onSedeFieldFocus(autocomplete: any): void {
-    if (this.sedes.length > 0) {
-      //this.form.get('sedeFilter')?.setValue('');
-      setTimeout(() => {
-        if (autocomplete && autocomplete.openPanel) {
-          autocomplete.openPanel();
-        }
-      }, 100);
-    }
+  trackBySedeId(index: number, sede: CategoriaAuxiliar): string {
+    return sede.categoriaAuxiliarId;
+  }
+
+  trackByUserSiteId(index: number, userSite: UserSite): string {
+    return `${userSite.userId}-${userSite.siteId}`;
   }
 
   // Search functionality for table

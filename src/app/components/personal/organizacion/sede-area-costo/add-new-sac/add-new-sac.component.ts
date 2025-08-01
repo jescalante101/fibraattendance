@@ -33,6 +33,15 @@ export class AddNewSacComponent implements OnInit {
   filteredAreas!: Observable<RhArea[]>;
   filteredCostCenters!: Observable<CostCenter[]>;
 
+  // Flowbite Autocomplete arrays and dropdown states
+  filteredSedesArray: CategoriaAuxiliar[] = [];
+  filteredAreasArray: RhArea[] = [];
+  filteredCostCentersArray: CostCenter[] = [];
+  
+  showSedeDropdown = false;
+  showAreaDropdown = false;
+  showCostCenterDropdown = false;
+
   constructor(
     private fb: FormBuilder,
     private categoriaAuxiliarService: CategoriaAuxiliarService,
@@ -143,19 +152,19 @@ export class AddNewSacComponent implements OnInit {
     // Set sede filter value
     const sede = this.sedes.find(s => s.categoriaAuxiliarId === data.siteId);
     if (sede) {
-      this.form.patchValue({ sedeFilter: sede });
+      this.form.patchValue({ sedeFilter: sede.descripcion });
     }
     
     // Set area filter value
     const area = this.areas.find(a => a.areaId === data.areaId);
     if (area) {
-      this.form.patchValue({ areaFilter: area });
+      this.form.patchValue({ areaFilter: area.descripcion });
     }
     
     // Set cost center filter value
     const costCenter = this.costCenters.find(cc => cc.ccostoId === data.costCenterId);
     if (costCenter) {
-      this.form.patchValue({ costCenterFilter: costCenter });
+      this.form.patchValue({ costCenterFilter: costCenter.descripcion });
     }
   }
 
@@ -219,6 +228,7 @@ export class AddNewSacComponent implements OnInit {
     this.categoriaAuxiliarService.getCategoriasAuxiliar().subscribe({
       next: (sedes) => {
         this.sedes = sedes;
+        this.filteredSedesArray = [...this.sedes];
         console.log('Sedes loaded:', sedes);
         checkAllLoaded();
       },
@@ -231,6 +241,7 @@ export class AddNewSacComponent implements OnInit {
     this.rhAreaService.getAreas().subscribe({
       next: (areas) => {
         this.areas = areas;
+        this.filteredAreasArray = [...this.areas];
         console.log('Areas loaded:', areas);
         checkAllLoaded();
       },
@@ -243,6 +254,7 @@ export class AddNewSacComponent implements OnInit {
     this.costCenterService.getAll().subscribe({
       next: (ccs) => {
         this.costCenters = ccs;
+        this.filteredCostCentersArray = [...this.costCenters];
         console.log('Cost centers loaded:', ccs);
         checkAllLoaded();
       },
@@ -258,8 +270,10 @@ export class AddNewSacComponent implements OnInit {
     if (sede && sede.categoriaAuxiliarId) {
       this.form.patchValue({
         siteId: sede.categoriaAuxiliarId,
-        siteName: sede.descripcion
+        siteName: sede.descripcion,
+        sedeFilter: sede.descripcion
       });
+      this.showSedeDropdown = false;
       console.log('Sede selected:', sede);
     }
   }
@@ -268,8 +282,10 @@ export class AddNewSacComponent implements OnInit {
     if (area && area.areaId) {
       this.form.patchValue({
         areaId: area.areaId,
-        areaName: area.descripcion
+        areaName: area.descripcion,
+        areaFilter: area.descripcion
       });
+      this.showAreaDropdown = false;
       console.log('Area selected:', area);
     }
   }
@@ -278,8 +294,10 @@ export class AddNewSacComponent implements OnInit {
     if (cc && cc.ccostoId) {
       this.form.patchValue({
         costCenterId: cc.ccostoId,
-        costCenterName: cc.descripcion
+        costCenterName: cc.descripcion,
+        costCenterFilter: cc.descripcion
       });
+      this.showCostCenterDropdown = false;
       console.log('Cost center selected:', cc);
     }
   }
@@ -371,5 +389,70 @@ export class AddNewSacComponent implements OnInit {
     } else if (this.modalRef) {
       this.modalRef.closeModalFromChild();
     }
+  }
+
+  // Flowbite Autocomplete methods
+  onSedeFilterChange(event: any): void {
+    const value = event.target.value.toLowerCase();
+    if (!value.trim()) {
+      this.filteredSedesArray = [...this.sedes];
+    } else {
+      this.filteredSedesArray = this.sedes.filter(sede => 
+        sede.descripcion.toLowerCase().includes(value)
+      );
+    }
+  }
+
+  onAreaFilterChange(event: any): void {
+    const value = event.target.value.toLowerCase();
+    if (!value.trim()) {
+      this.filteredAreasArray = [...this.areas];
+    } else {
+      this.filteredAreasArray = this.areas.filter(area => 
+        area.descripcion.toLowerCase().includes(value)
+      );
+    }
+  }
+
+  onCostCenterFilterChange(event: any): void {
+    const value = event.target.value.toLowerCase();
+    if (!value.trim()) {
+      this.filteredCostCentersArray = [...this.costCenters];
+    } else {
+      this.filteredCostCentersArray = this.costCenters.filter(cc => 
+        cc.descripcion.toLowerCase().includes(value)
+      );
+    }
+  }
+
+  onSedeBlur(): void {
+    setTimeout(() => {
+      this.showSedeDropdown = false;
+    }, 150);
+  }
+
+  onAreaBlur(): void {
+    setTimeout(() => {
+      this.showAreaDropdown = false;
+    }, 150);
+  }
+
+  onCostCenterBlur(): void {
+    setTimeout(() => {
+      this.showCostCenterDropdown = false;
+    }, 150);
+  }
+
+  // TrackBy functions for performance
+  trackBySedeId(index: number, sede: CategoriaAuxiliar): string {
+    return sede.categoriaAuxiliarId;
+  }
+
+  trackByAreaId(index: number, area: RhArea): string {
+    return area.areaId;
+  }
+
+  trackByCostCenterId(index: number, cc: CostCenter): string {
+    return cc.ccostoId;
   }
 }

@@ -23,6 +23,14 @@ export class SedeCcostoComponent implements OnInit {
   loading = false;
   error = '';
 
+  // Dropdown states for Flowbite components
+  showSedeDropdown = false;
+  showCcostoDropdown = false;
+
+  // Filtered arrays for autocomplete
+  filteredSedes: CategoriaAuxiliar[] = [];
+  filteredCcostos: CostCenter[] = [];
+
   constructor(
     private fb: FormBuilder,
     private sedeCcostoService: SedeCcostoService,
@@ -34,6 +42,8 @@ export class SedeCcostoComponent implements OnInit {
     this.form = this.fb.group({
       siteId: ['', Validators.required],
       costCenterId: ['', Validators.required],
+      sedeFilter: [''],
+      ccostoFilter: [''],
       observation: [''],
       creationDate: [{ value: new Date().toISOString().substring(0, 16), disabled: true }, Validators.required],
     });
@@ -71,12 +81,14 @@ export class SedeCcostoComponent implements OnInit {
   loadSedes() {
     this.categoriaAuxiliarService.getCategoriasAuxiliar().subscribe(sedes => {
       this.sedes = sedes;
+      this.filteredSedes = [...this.sedes];
     });
   }
 
   loadCostCenters() {
     this.costCenterService.getAll().subscribe(ccs => {
       this.ccostos = ccs;
+      this.filteredCcostos = [...this.ccostos];
     });
   }
 
@@ -119,9 +131,16 @@ export class SedeCcostoComponent implements OnInit {
   onEdit(item: SedeCcosto) {
     this.editing = true;
     this.selected = item;
+    
+    // Find the objects for autocomplete
+    const sede = this.sedes.find(s => s.categoriaAuxiliarId === item.siteId);
+    const ccosto = this.ccostos.find(c => c.ccostoId === item.costCenterId);
+    
     this.form.patchValue({
       siteId: item.siteId,
       costCenterId: item.costCenterId,
+      sedeFilter: sede?.descripcion || '',
+      ccostoFilter: ccosto?.descripcion || '',
       observation: item.observation,
       creationDate: item.creationDate?.substring(0, 16)
     });
@@ -130,7 +149,11 @@ export class SedeCcostoComponent implements OnInit {
   cancelEdit() {
     this.editing = false;
     this.selected = undefined;
-    this.form.reset({ creationDate: new Date().toISOString().substring(0, 16) });
+    this.form.reset({ 
+      creationDate: new Date().toISOString().substring(0, 16),
+      sedeFilter: '',
+      ccostoFilter: ''
+    });
   }
 
   onDelete(item: SedeCcosto) {
@@ -204,5 +227,78 @@ export class SedeCcostoComponent implements OnInit {
         });
       }
     });
+  }
+
+  // Flowbite autocomplete methods
+  onSedeFilterChange(event: any): void {
+    const value = event.target.value.toLowerCase();
+    if (!value.trim()) {
+      this.filteredSedes = [...this.sedes];
+    } else {
+      this.filteredSedes = this.sedes.filter(sede => 
+        sede.descripcion.toLowerCase().includes(value)
+      );
+    }
+  }
+
+  onCcostoFilterChange(event: any): void {
+    const value = event.target.value.toLowerCase();
+    if (!value.trim()) {
+      this.filteredCcostos = [...this.ccostos];
+    } else {
+      this.filteredCcostos = this.ccostos.filter(ccosto => 
+        ccosto.descripcion.toLowerCase().includes(value)
+      );
+    }
+  }
+
+  onSedeSelected(sede: CategoriaAuxiliar): void {
+    this.form.patchValue({ 
+      siteId: sede.categoriaAuxiliarId,
+      sedeFilter: sede.descripcion
+    });
+    this.showSedeDropdown = false;
+  }
+
+  onCcostoSelected(ccosto: CostCenter): void {
+    this.form.patchValue({ 
+      costCenterId: ccosto.ccostoId,
+      ccostoFilter: ccosto.descripcion
+    });
+    this.showCcostoDropdown = false;
+  }
+
+  onSedeBlur(): void {
+    setTimeout(() => {
+      this.showSedeDropdown = false;
+    }, 150);
+  }
+
+  onCcostoBlur(): void {
+    setTimeout(() => {
+      this.showCcostoDropdown = false;
+    }, 150);
+  }
+
+  // Helper methods for statistics
+  getActiveCount(): number {
+    return this.sedeCcostoList.filter(item => item.active === 'Y').length;
+  }
+
+  getInactiveCount(): number {
+    return this.sedeCcostoList.filter(item => item.active !== 'Y').length;
+  }
+
+  // TrackBy functions for performance
+  trackBySedeId(index: number, sede: CategoriaAuxiliar): string {
+    return sede.categoriaAuxiliarId;
+  }
+
+  trackByCcostoId(index: number, ccosto: CostCenter): string {
+    return ccosto.ccostoId;
+  }
+
+  trackBySedeCcostoId(index: number, item: SedeCcosto): string {
+    return `${item.siteId}-${item.costCenterId}`;
   }
 }

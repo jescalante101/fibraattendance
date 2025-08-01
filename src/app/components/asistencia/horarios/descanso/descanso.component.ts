@@ -14,6 +14,8 @@ import { ModalService } from 'src/app/shared/modal/modal.service';
 export class DescansoComponent implements OnInit {
   // Variables for data
   dataDescansos: any[] = [];
+  filteredDescansos: any[] = [];
+  searchTerm: string = '';
   
   // Variables for pagination
   totalRecords: number = 0;
@@ -36,6 +38,7 @@ export class DescansoComponent implements OnInit {
         console.log('Response:', response);
         if (response) {
           this.dataDescansos = response.data || [];
+          this.filteredDescansos = [...this.dataDescansos];
           this.totalRecords = response.totalRecords || 0;
         }
       },
@@ -262,5 +265,39 @@ calcularHoraFin(horaInicio: string, duracionEnMinutos: number): string {
     
   }
 
+  // Search functionality
+  onSearchChange(): void {
+    if (!this.searchTerm.trim()) {
+      this.filteredDescansos = [...this.dataDescansos];
+      return;
+    }
+
+    const term = this.searchTerm.toLowerCase();
+    this.filteredDescansos = this.dataDescansos.filter(descanso => 
+      descanso.alias?.toLowerCase().includes(term) ||
+      descanso.id?.toString().includes(term)
+    );
+  }
+
+  // Statistics methods
+  getAutoDeductCount(): number {
+    return this.dataDescansos.filter(item => item.calcType === 0).length;
+  }
+
+  getManualCount(): number {
+    return this.dataDescansos.filter(item => item.calcType !== 0).length;
+  }
+
+  // Display helper for pagination
+  getDisplayRange(): string {
+    const start = (this.pageNumber - 1) * this.pageSize + 1;
+    const end = Math.min(this.pageNumber * this.pageSize, this.totalRecords);
+    return `${start}-${end}`;
+  }
+
+  // TrackBy function for performance
+  trackByDescansoId(index: number, descanso: any): number {
+    return descanso.id;
+  }
 
 }

@@ -13,6 +13,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { IClockTransactionService } from 'src/app/core/services/iclock-transaction.service';
 import { IClockTransactionResponse } from 'src/app/core/models/iclock-transaction.model';
 import { IclockTransactionComponent } from '../iclock-transaction/iclock-transaction.component';
+import { ModalService } from 'src/app/shared/modal/modal.service';
 
 @Component({
   selector: 'app-empleado',
@@ -22,12 +23,13 @@ import { IclockTransactionComponent } from '../iclock-transaction/iclock-transac
 export class EmpleadoComponent implements OnInit {
 
   constructor(
-    private personalService: PersonService, 
-    private dialog: MatDialog, 
-    private categoriaAuxiliarService: CategoriaAuxiliarService, 
+    private personalService: PersonService,
+    private dialog: MatDialog,
+    private categoriaAuxiliarService: CategoriaAuxiliarService,
     private rhAreaService: RhAreaService,
     private route: ActivatedRoute,
     private snackBar: MatSnackBar,
+    private modalService:ModalService
   )
      { }
   mostrarBotonAsignar = false;
@@ -174,6 +176,7 @@ export class EmpleadoComponent implements OnInit {
     });
 
   }
+
   verMarcaciones(empleado: Employee) {
     const empCode = empleado.nroDoc;
     if (!empCode) {
@@ -185,14 +188,19 @@ export class EmpleadoComponent implements OnInit {
       });
       return;
     }
+    this.modalService.open({
+      width: '80vw',
+      title: `Marcaciones de ${empleado.nombres} ${empleado.apellidoPaterno} ${empleado.apellidoMaterno}`,
+      componentType: IclockTransactionComponent,
+      componentData: { empCode, empleado }
+    }).then(result => {
+      if (result) {
+        console.log('Marcaciones abiertas:', result);
+      }
+    }).catch(error => {
+      console.error('Error al abrir el modal de marcaciones:', error);
+    })
   
-    this.dialog.open(IclockTransactionComponent, {
-      width: '70vw',
-      height: '90vh',
-      maxWidth: '95vw',
-      maxHeight: '90vh',
-      data: { empCode, empleado }
-    });
   }
   
 }

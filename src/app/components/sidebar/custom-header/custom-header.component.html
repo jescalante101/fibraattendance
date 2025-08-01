@@ -25,87 +25,63 @@
           class="text-fiori-text bg-fiori-surface hover:bg-fiori-hover focus:ring-4 focus:outline-none focus:ring-fiori-primary/30 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-fiori-border transition-colors"
           type="button">
           <lucide-icon name="building" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-          {{ selectedEmpresa || 'Seleccionar Empresa' }}
+          {{ selectedEmpresa?.descripcion || 'Seleccionar Empresa' }}
           <lucide-icon name="chevron-down" class="ms-3" size="12"></lucide-icon>
         </button>
         
         <!-- Dropdown menu Empresa -->
-        <div id="dropdownEmpresa" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-64 border border-fiori-border">
+        <div id="dropdownEmpresa" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-64 border border-fiori-border max-h-80 overflow-y-auto">
           <div class="px-4 py-3 text-sm text-fiori-text">
             <div class="font-medium">Seleccionar Empresa</div>
             <div class="text-fiori-subtext">Elige la empresa activa</div>
           </div>
           <ul class="py-2 text-sm text-fiori-text" aria-labelledby="dropdownEmpresaButton">
-            <li>
-              <a href="#" 
-                 (click)="selectEmpresa('Fibrafil S.A.')"
-                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
-                <lucide-icon name="building" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-                Fibrafil S.A.
-              </a>
-            </li>
-            <li>
-              <a href="#" 
-                 (click)="selectEmpresa('Textiles del Norte')"
-                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
-                <lucide-icon name="building" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-                Textiles del Norte
-              </a>
-            </li>
-            <li>
-              <a href="#" 
-                 (click)="selectEmpresa('Confecciones Sur')"
-                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
-                <lucide-icon name="building" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-                Confecciones Sur
+            <li *ngFor="let empresa of empresas">
+              <a   
+                 (click)="selectEmpresa(empresa)"
+                 class="block px-4 py-2 hover:bg-blue-100 transition-colors hover:text-fiori-primary"
+                 [class.bg-fiori-primary]="selectedEmpresa?.companiaId === empresa.companiaId"
+                 [class.text-white]="selectedEmpresa?.companiaId === empresa.companiaId">
+                {{ empresa.descripcion }}
               </a>
             </li>
           </ul>
         </div>
       </div>
 
-      <!-- Dropdown Sede -->
+      <!-- Dropdown Planilla -->
       <div class="relative">
         <button 
-          id="dropdownSedeButton" 
-          data-dropdown-toggle="dropdownSede"
+          id="dropdownPlanillaButton" 
+          data-dropdown-toggle="dropdownPlanilla"
           class="text-fiori-text bg-fiori-surface hover:bg-fiori-hover focus:ring-4 focus:outline-none focus:ring-fiori-primary/30 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-fiori-border transition-colors"
           type="button">
-          <lucide-icon name="map-pin" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-          {{ selectedSede || 'Seleccionar Sede' }}
+          <lucide-icon name="file-text" class="text-fiori-primary mr-2" size="16"></lucide-icon>
+          {{ selectedPlanilla?.descripcion || 'Seleccionar Planilla' }}
           <lucide-icon name="chevron-down" class="ms-3" size="12"></lucide-icon>
         </button>
         
-        <!-- Dropdown menu Sede -->
-        <div id="dropdownSede" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-56 border border-fiori-border">
+        <!-- Dropdown menu Planilla -->
+        <div id="dropdownPlanilla" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-56 border border-fiori-border max-h-80 overflow-y-auto">
           <div class="px-4 py-3 text-sm text-fiori-text">
-            <div class="font-medium">Seleccionar Sede</div>
-            <div class="text-fiori-subtext">Elige la sede activa</div>
+            <div class="font-medium">Seleccionar Planilla</div>
+            <div class="text-fiori-subtext">Elige la planilla activa</div>
           </div>
-          <ul class="py-2 text-sm text-fiori-text" aria-labelledby="dropdownSedeButton">
-            <li>
-              <a href="#" 
-                 (click)="selectSede('Sede Lima')"
-                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
-                <lucide-icon name="map-pin" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-                Sede Lima
+          <ul class="py-2 text-sm text-fiori-text" aria-labelledby="dropdownPlanillaButton">
+            <li *ngFor="let planilla of planillas">
+              <a   
+                 (click)="selectPlanilla(planilla)"
+                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors hover:text-fiori-primary"
+                 [class.bg-fiori-primary]="selectedPlanilla?.planillaId === planilla.planillaId"
+                 [class.text-white]="selectedPlanilla?.planillaId === planilla.planillaId">
+                
+                {{ planilla.descripcion }}
               </a>
             </li>
-            <li>
-              <a href="#" 
-                 (click)="selectSede('Sede Arequipa')"
-                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
-                <lucide-icon name="map-pin" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-                Sede Arequipa
-              </a>
-            </li>
-            <li>
-              <a href="#" 
-                 (click)="selectSede('Sede Cusco')"
-                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
-                <lucide-icon name="map-pin" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-                Sede Cusco
-              </a>
+            <li *ngIf="planillas.length === 0">
+              <span class="block px-4 py-2 text-fiori-subtext italic">
+                No hay planillas disponibles
+              </span>
             </li>
           </ul>
         </div>
@@ -124,34 +100,19 @@
         </button>
         
         <!-- Dropdown menu Año -->
-        <div id="dropdownAno" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-48 border border-fiori-border">
+        <div id="dropdownAno" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-48 border border-fiori-border max-h-80 overflow-y-auto">
           <div class="px-4 py-3 text-sm text-fiori-text">
             <div class="font-medium">Seleccionar Año</div>
             <div class="text-fiori-subtext">Elige el año activo</div>
           </div>
           <ul class="py-2 text-sm text-fiori-text" aria-labelledby="dropdownAnoButton">
-            <li>
-              <a href="#" 
-                 (click)="selectAno('2025')"
-                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
-                <lucide-icon name="calendar-days" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-                2025
-              </a>
-            </li>
-            <li>
-              <a href="#" 
-                 (click)="selectAno('2024')"
-                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
-                <lucide-icon name="calendar-days" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-                2024
-              </a>
-            </li>
-            <li>
-              <a href="#" 
-                 (click)="selectAno('2023')"
-                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
-                <lucide-icon name="calendar-days" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-                2023
+            <li *ngFor="let ano of anos">
+              <a   
+                 (click)="selectAno(ano)"
+                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors hover:text-fiori-primary"
+                 [class.bg-fiori-primary]="selectedAno === ano"
+                 [class.text-white]="selectedAno === ano"> 
+                {{ ano }}
               </a>
             </li>
           </ul>
@@ -166,40 +127,30 @@
           class="text-fiori-text bg-fiori-surface hover:bg-fiori-hover focus:ring-4 focus:outline-none focus:ring-fiori-primary/30 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-fiori-border transition-colors"
           type="button">
           <lucide-icon name="calendar" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-          {{ selectedPeriodo || 'Seleccionar Periodo' }}
+          {{ selectedPeriodo?.descripcion || 'Seleccionar Periodo' }}
           <lucide-icon name="chevron-down" class="ms-3" size="12"></lucide-icon>
         </button>
         
         <!-- Dropdown menu Periodo -->
-        <div id="dropdownPeriodo" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-56 border border-fiori-border">
+        <div id="dropdownPeriodo" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-56 border border-fiori-border max-h-80 overflow-y-auto">
           <div class="px-4 py-3 text-sm text-fiori-text">
             <div class="font-medium">Seleccionar Periodo</div>
             <div class="text-fiori-subtext">Elige el periodo activo</div>
           </div>
           <ul class="py-2 text-sm text-fiori-text" aria-labelledby="dropdownPeriodoButton">
-            <li>
-              <a href="#" 
-                 (click)="selectPeriodo('Enero 2025')"
-                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
-                <lucide-icon name="calendar" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-                Enero 2025
+            <li *ngFor="let periodo of periodos">
+              <a   
+                 (click)="selectPeriodo(periodo)"
+                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors hover:text-fiori-primary"
+                 [class.bg-fiori-primary]="selectedPeriodo?.periodoId === periodo.periodoId"
+                 [class.text-white]="selectedPeriodo?.periodoId === periodo.periodoId">
+                {{ periodo.descripcion }}
               </a>
             </li>
-            <li>
-              <a href="#" 
-                 (click)="selectPeriodo('Febrero 2025')"
-                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
-                <lucide-icon name="calendar" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-                Febrero 2025
-              </a>
-            </li>
-            <li>
-              <a href="#" 
-                 (click)="selectPeriodo('Marzo 2025')"
-                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors">
-                <lucide-icon name="calendar" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-                Marzo 2025
-              </a>
+            <li *ngIf="periodos.length === 0">
+              <span class="block px-4 py-2 text-fiori-subtext italic">
+                No hay periodos disponibles
+              </span>
             </li>
           </ul>
         </div>
@@ -250,7 +201,7 @@
         <!-- Opciones del menú -->
         <ul class="py-2" aria-labelledby="user-menu-button">
           <li>
-            <a href="#" 
+            <a   
                (click)="handleUserMenuAction('profile')"
                class="block px-4 py-2 text-sm text-fiori-text hover:bg-fiori-hover transition-colors">
               <lucide-icon name="user" class="text-fiori-primary mr-3" size="16"></lucide-icon>
@@ -258,7 +209,7 @@
             </a>
           </li>
           <li>
-            <a href="#" 
+            <a   
                (click)="handleUserMenuAction('settings')"
                class="block px-4 py-2 text-sm text-fiori-text hover:bg-fiori-hover transition-colors">
               <lucide-icon name="settings" class="text-fiori-primary mr-3" size="16"></lucide-icon>
@@ -269,7 +220,7 @@
             <hr class="my-2 border-fiori-border">
           </li>
           <li>
-            <a href="#" 
+            <a   
                (click)="handleUserMenuAction('logout')"
                class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
               <lucide-icon name="log-out" class="text-red-600 mr-3" size="16"></lucide-icon>
@@ -295,39 +246,52 @@
             type="button">
             <span class="flex items-center">
               <lucide-icon name="building" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-              {{ selectedEmpresa || 'Seleccionar Empresa' }}
+              {{ selectedEmpresa?.descripcion || 'Seleccionar Empresa' }}
             </span>
             <lucide-icon name="chevron-down" size="12"></lucide-icon>
           </button>
           
-          <div id="dropdownEmpresaMobile" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-full border border-fiori-border mt-1">
+          <div id="dropdownEmpresaMobile" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-full border border-fiori-border mt-1 max-h-60 overflow-y-auto">
             <ul class="py-2 text-sm text-fiori-text">
-              <li><a href="#" (click)="selectEmpresa('Fibrafil S.A.')" class="block px-4 py-2 hover:bg-fiori-hover">Fibrafil S.A.</a></li>
-              <li><a href="#" (click)="selectEmpresa('Textiles del Norte')" class="block px-4 py-2 hover:bg-fiori-hover">Textiles del Norte</a></li>
-              <li><a href="#" (click)="selectEmpresa('Confecciones Sur')" class="block px-4 py-2 hover:bg-fiori-hover">Confecciones Sur</a></li>
+              <li *ngFor="let empresa of empresas">
+                <a (click)="selectEmpresa(empresa)" class="block px-4 py-2 hover:bg-fiori-hover"
+                   [class.bg-fiori-primary]="selectedEmpresa?.companiaId === empresa.companiaId"
+                   [class.text-white]="selectedEmpresa?.companiaId === empresa.companiaId">
+                  {{ empresa.descripcion }}
+                </a>
+              </li>
             </ul>
           </div>
         </div>
 
-        <!-- Dropdown Sede móvil -->
+        <!-- Dropdown Planilla móvil -->
         <div class="relative">
           <button 
-            id="dropdownSedeButtonMobile" 
-            data-dropdown-toggle="dropdownSedeMobile"
+            id="dropdownPlanillaButtonMobile" 
+            data-dropdown-toggle="dropdownPlanillaMobile"
             class="w-full text-fiori-text bg-fiori-surface hover:bg-fiori-hover focus:ring-4 focus:outline-none focus:ring-fiori-primary/30 font-medium rounded-lg text-sm px-4 py-2.5 text-left inline-flex items-center justify-between border border-fiori-border transition-colors"
             type="button">
             <span class="flex items-center">
-              <lucide-icon name="map-pin" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-              {{ selectedSede || 'Seleccionar Sede' }}
+              <lucide-icon name="file-text" class="text-fiori-primary mr-2" size="16"></lucide-icon>
+              {{ selectedPlanilla?.descripcion || 'Seleccionar Planilla' }}
             </span>
             <lucide-icon name="chevron-down" size="12"></lucide-icon>
           </button>
           
-          <div id="dropdownSedeMobile" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-full border border-fiori-border mt-1">
+          <div id="dropdownPlanillaMobile" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-full border border-fiori-border mt-1 max-h-60 overflow-y-auto">
             <ul class="py-2 text-sm text-fiori-text">
-              <li><a href="#" (click)="selectSede('Sede Lima')" class="block px-4 py-2 hover:bg-fiori-hover">Sede Lima</a></li>
-              <li><a href="#" (click)="selectSede('Sede Arequipa')" class="block px-4 py-2 hover:bg-fiori-hover">Sede Arequipa</a></li>
-              <li><a href="#" (click)="selectSede('Sede Cusco')" class="block px-4 py-2 hover:bg-fiori-hover">Sede Cusco</a></li>
+              <li *ngFor="let planilla of planillas">
+                <a   (click)="selectPlanilla(planilla)" class="block px-4 py-2 hover:bg-fiori-hover"
+                   [class.bg-fiori-primary]="selectedPlanilla?.planillaId === planilla.planillaId"
+                   [class.text-white]="selectedPlanilla?.planillaId === planilla.planillaId">
+                  {{ planilla.descripcion }}
+                </a>
+              </li>
+              <li *ngIf="planillas.length === 0">
+                <span class="block px-4 py-2 text-fiori-subtext italic">
+                  No hay planillas disponibles
+                </span>
+              </li>
             </ul>
           </div>
         </div>
@@ -346,11 +310,15 @@
             <lucide-icon name="chevron-down" size="12"></lucide-icon>
           </button>
           
-          <div id="dropdownAnoMobile" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-full border border-fiori-border mt-1">
+          <div id="dropdownAnoMobile" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-full border border-fiori-border mt-1 max-h-60 overflow-y-auto">
             <ul class="py-2 text-sm text-fiori-text">
-              <li><a href="#" (click)="selectAno('2025')" class="block px-4 py-2 hover:bg-fiori-hover">2025</a></li>
-              <li><a href="#" (click)="selectAno('2024')" class="block px-4 py-2 hover:bg-fiori-hover">2024</a></li>
-              <li><a href="#" (click)="selectAno('2023')" class="block px-4 py-2 hover:bg-fiori-hover">2023</a></li>
+              <li *ngFor="let ano of anos">
+                <a   (click)="selectAno(ano)" class="block px-4 py-2 hover:bg-fiori-hover"
+                   [class.bg-fiori-primary]="selectedAno === ano"
+                   [class.text-white]="selectedAno === ano">
+                  {{ ano }}
+                </a>
+              </li>
             </ul>
           </div>
         </div>
@@ -364,16 +332,25 @@
             type="button">
             <span class="flex items-center">
               <lucide-icon name="calendar" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-              {{ selectedPeriodo || 'Seleccionar Periodo' }}
+              {{ selectedPeriodo?.descripcion || 'Seleccionar Periodo' }}
             </span>
             <lucide-icon name="chevron-down" size="12"></lucide-icon>
           </button>
           
-          <div id="dropdownPeriodoMobile" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-full border border-fiori-border mt-1">
+          <div id="dropdownPeriodoMobile" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-full border border-fiori-border mt-1 max-h-60 overflow-y-auto">
             <ul class="py-2 text-sm text-fiori-text">
-              <li><a href="#" (click)="selectPeriodo('Enero 2025')" class="block px-4 py-2 hover:bg-fiori-hover">Enero 2025</a></li>
-              <li><a href="#" (click)="selectPeriodo('Febrero 2025')" class="block px-4 py-2 hover:bg-fiori-hover">Febrero 2025</a></li>
-              <li><a href="#" (click)="selectPeriodo('Marzo 2025')" class="block px-4 py-2 hover:bg-fiori-hover">Marzo 2025</a></li>
+              <li *ngFor="let periodo of periodos">
+                <a   (click)="selectPeriodo(periodo)" class="block px-4 py-2 hover:bg-fiori-hover"
+                   [class.bg-fiori-primary]="selectedPeriodo?.periodoId === periodo.periodoId"
+                   [class.text-white]="selectedPeriodo?.periodoId === periodo.periodoId">
+                  {{ periodo.descripcion }}
+                </a>
+              </li>
+              <li *ngIf="periodos.length === 0">
+                <span class="block px-4 py-2 text-fiori-subtext italic">
+                  No hay periodos disponibles
+                </span>
+              </li>
             </ul>
           </div>
         </div>

@@ -87,7 +87,7 @@ import { ReporteMarcacionesDetalleComponent } from './components/asistencia/marc
 import { ModalVerHorarioComponent } from './components/personal/empleado/asignar-horario-empleado/modal-ver-horario/modal-ver-horario.component';
 import { ModalEditarAsignacionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-editar-asignacion/modal-editar-asignacion.component';
 import { ModalRegistrarExcepcionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-registrar-excepcion/modal-registrar-excepcion.component';
-import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, Layers, Menu, Info } from 'lucide-angular';
+import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, Layers, Menu, Info, FileSpreadsheet, Search, RefreshCcw, RefreshCw } from 'lucide-angular';
 registerLocaleData(localeEs);
 @NgModule({ declarations: [
         AppComponent,
@@ -184,7 +184,24 @@ registerLocaleData(localeEs);
         MatSlideToggleModule,
         ReactiveFormsModule,
         MatTooltipModule,
-        LucideAngularModule.pick({ Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, Layers, Menu, Info })
+        LucideAngularModule.pick({
+            Building,
+            MapPin,
+            CalendarDays,
+            Calendar, Users,
+            IdCard,
+            Clock, CheckSquare,
+            FileText, Settings,
+            User, LogOut,
+            ChevronRight,
+            ChevronDown,
+            ChevronLeft,
+            Layers,
+            Menu, Info,
+            FileSpreadsheet,
+            Search,
+            RefreshCw
+        })
     ], providers: [
         provideHttpClient(withInterceptorsFromDi()),
         { provide: LOCALE_ID, useValue: 'es' },

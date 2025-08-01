@@ -41,10 +41,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (typeof window !== 'undefined') {
       setTimeout(() => {
         initFlowbite();
-        // Forzar reinicialización de popovers después de un tiempo
+        //; Forzar reinicialización de popovers después de un tiempo
         setTimeout(() => {
           initFlowbite();
-        }, 500);
+        }, 500)
       }, 100);
     }
   }

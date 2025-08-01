@@ -4,26 +4,28 @@ import { environment } from "src/environments/environment";
 import { IClockTransactionParams, IClockTransactionParams2, IClockTransactionResponse, IClockTransactionResponse2 } from "../models/iclock-transaction.model";
 import { ApiResponse } from "../models/api-response.model";
 import { Observable } from "rxjs";
+import { TransactionFilter, TransactionResponse } from "../models/transaction-response.model";
 
 @Injectable({
     providedIn: 'root'
 })
 export class TransactionService {
-    private readonly apiUrl = `${environment.apiUrl}`;
-    private readonly baseUrl = `${this.apiUrl}api/iclockTransaction/smart`;
+    private readonly apiUrl = `${environment.apiUrlPro}api/IclockTransaction/`;
+   // private readonly baseUrl = `${this.apiUrl}api/iclockTransaction/smart`;
 
     constructor(private http: HttpClient) {}
-
-    getTransactions(params: IClockTransactionParams2 = {page: 1, pageSize: 20}): Observable<ApiResponse<IClockTransactionResponse2>> {
+    //get transactions by empCode with pagination and date range
+    getTransactions(params: TransactionFilter): Observable<TransactionResponse> {
+        // return this url   'http://localhost:5025/api/IclockTransaction/paginado?fechaInicio=2025-07-01&fechaFin=2025-07-05&empleadoFilter=76095492&pageNumber=1&pageSize=2'
         let httpParams = new HttpParams();
-        httpParams = httpParams.set('page', params.page?.toString() || '1');
-        httpParams = httpParams.set('pageSize', params.pageSize?.toString() || '20');
-        if(params.empCode) httpParams = httpParams.set('empCode', params.empCode);
-        if(params.personalId) httpParams= httpParams.set('personalId',params.personalId)
-        if(params.startDate) httpParams = httpParams.set('startDate', params.startDate);
-        if(params.endDate) httpParams = httpParams.set('endDate', params.endDate);
-        httpParams.set("forceSync",true);
-        return this.http.get<ApiResponse<IClockTransactionResponse2>>(`${this.baseUrl}`, { params: httpParams });
+        if (params.startDate) httpParams = httpParams.set('fechaInicio', params.startDate);
+        if (params.endDate) httpParams = httpParams.set('fechaFin', params.endDate);
+        if (params.empCode) httpParams = httpParams.set('empleadoFilter', params.empCode);
+        if (params.page) httpParams = httpParams.set('pageNumber', params.page.toString());
+        if (params.pageSize) httpParams = httpParams.set('pageSize', params.pageSize.toString());
+        return this.http.get<TransactionResponse>(`${this.apiUrl}paginado`, { params: httpParams });
     }
+ 
+
     
 }

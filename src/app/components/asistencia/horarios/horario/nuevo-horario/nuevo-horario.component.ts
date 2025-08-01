@@ -33,7 +33,6 @@ export class NuevoHorarioComponent implements OnInit {
     private attendanceService: AttendanceService,
     private fb: FormBuilder,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
-    private dialogLoading: MatDialog
   ) {}
 
   ngOnInit() {

@@ -300,7 +300,7 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
       return;
     }
     this.modalService.open({
-      width: '1200px',
+      width: '80vw',
       title: `Marcaciones de ${empleado.nombres} ${empleado.apellidoPaterno} ${empleado.apellidoMaterno}`,
       componentType: IclockTransactionComponent,
       componentData: { empCode, empleado }

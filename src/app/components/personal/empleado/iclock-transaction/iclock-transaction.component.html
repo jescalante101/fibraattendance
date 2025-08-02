@@ -1,4 +1,4 @@
-<div class="mx-auto max-w-7xl p-4 lg:p-6">
+<div class="mx-auto  p-4 lg:p-6">
   
 
   <!-- Filtros compactos -->
@@ -131,13 +131,13 @@
           class="text-xs text-fiori-subtext uppercase bg-fiori-muted sticky top-0"
         >
           <tr>
-            <th scope="col" class="px-6 py-3 font-medium">Documento</th>
-            <th scope="col" class="px-6 py-3 font-medium">Fecha y Hora</th>
-            <th scope="col" class="px-6 py-3 font-medium">Empleado</th>
-            <th scope="col" class="px-6 py-3 font-medium">Área</th>
-            <th scope="col" class="px-6 py-3 font-medium">Terminal</th>
-            <th scope="col" class="px-6 py-3 font-medium">Horario</th>
-            <th scope="col" class="px-6 py-3 font-medium">Día</th>
+            <th scope="col" class="px-4 py-3 font-medium">Empleado</th>
+            <th scope="col" class="px-4 py-3 font-medium">Fecha</th>
+            <th scope="col" class="px-4 py-3 font-medium">Horario</th>
+            <th scope="col" class="px-4 py-3 font-medium">Marcaciones</th>
+            <th scope="col" class="px-4 py-3 font-medium">Estado</th>
+            <th scope="col" class="px-4 py-3 font-medium">Tiempo</th>
+            <th scope="col" class="px-4 py-3 font-medium">Observaciones</th>
           </tr>
         </thead>
         <tbody>
@@ -145,93 +145,160 @@
             *ngFor="let marcacion of marcaciones; trackBy: trackByFn"
             class="bg-fiori-surface border-b border-fiori-border hover:bg-fiori-hover transition-colors"
           >
-            <!-- Documento -->
-            <td class="px-6 py-4">
-              <span
-                class="font-mono text-sm bg-fiori-muted px-2 py-1 rounded"
-                >{{ marcacion.nroDoc }}</span
-              >
-            </td>
-
-            <!-- Fecha y Hora -->
-            <td class="px-6 py-4">
-              <div class="flex flex-col">
-                <span class="font-medium text-fiori-text">{{
-                  formatearFecha(marcacion.punchTime)
-                }}</span>
-                <span class="text-sm text-fiori-subtext">{{
-                  formatearHora(marcacion.punchTime)
-                }}</span>
-              </div>
-            </td>
-
             <!-- Empleado -->
-            <td class="px-6 py-4">
+            <td class="px-4 py-4">
               <div class="flex items-center gap-3">
                 <div
-                  class="w-8 h-8 bg-fiori-primary/10 rounded-full flex items-center justify-center"
+                  class="w-10 h-10 bg-fiori-primary/10 rounded-full flex items-center justify-center"
                 >
-                  <mat-icon class="text-fiori-primary" style="font-size: 16px;">person</mat-icon>
+                  <mat-icon class="text-fiori-primary" style="font-size: 18px;">person</mat-icon>
                 </div>
                 <div>
-                  <div class="font-medium text-fiori-text">
+                  <div class="font-medium text-fiori-text text-sm">
                     {{ marcacion.nombreCompleto }}
+                  </div>
+                  <div class="text-xs text-fiori-subtext">
+                    {{ marcacion.nro_Doc }}
+                  </div>
+                  <div class="text-xs text-fiori-subtext">
+                    {{ marcacion.areaDescripcion }}
                   </div>
                 </div>
               </div>
             </td>
 
-            <!-- Área -->
-            <td class="px-6 py-4">
-              <span
-                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-              >
-                <mat-icon style="font-size: 12px;" class="mr-1">business</mat-icon>
-                {{ marcacion.areaDescripcion }}
-              </span>
-            </td>
-
-            <!-- Terminal -->
-            <td class="px-6 py-4">
+            <!-- Fecha -->
+            <td class="px-4 py-4">
               <div class="flex flex-col">
-                <span class="font-medium text-fiori-text">{{
-                  marcacion.terminalAlias
+                <span class="font-medium text-fiori-text text-sm">{{
+                  formatearFecha(marcacion.fechaMarcacion)
                 }}</span>
-                <span class="text-sm text-fiori-subtext">{{
-                  marcacion.ccostoDescripcion
+                <span class="text-xs text-fiori-subtext">{{
+                  marcacion.diaSemanaTexto
                 }}</span>
               </div>
             </td>
 
             <!-- Horario -->
-            <td class="px-6 py-4">
-              <div
-                class="flex flex-col"
-                *ngIf="marcacion.horarioAlias; else sinHorario"
-              >
-                <span class="font-medium text-fiori-text">{{
+            <td class="px-4 py-4">
+              <div class="flex flex-col" *ngIf="marcacion.horarioAlias; else sinHorario">
+                <span class="font-medium text-fiori-text text-sm">{{
                   marcacion.horarioAlias
                 }}</span>
-                <div class="flex items-center gap-2 text-xs text-fiori-subtext">
-                  <span>{{ marcacion.inTime }}</span>
+                <div class="flex items-center gap-1 text-xs text-fiori-subtext">
+                  <mat-icon style="font-size: 12px;">schedule</mat-icon>
+                  <span>{{ marcacion.horarioEntrada }}</span>
                   <span>-</span>
-                  <span>{{ marcacion.outTime }}</span>
+                  <span>{{ marcacion.horarioSalida }}</span>
                 </div>
               </div>
               <ng-template #sinHorario>
-                <span class="text-sm text-fiori-subtext italic"
-                  >Sin horario asignado</span
-                >
+                <span class="text-sm text-fiori-subtext italic">Sin horario</span>
               </ng-template>
             </td>
 
-            <!-- Día -->
-            <td class="px-6 py-4">
-              <span
-                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
-              >
-                {{ marcacion.diaSemanaTexto }}
-              </span>
+            <!-- Marcaciones -->
+            <td class="px-4 py-4">
+              <div class="flex flex-col gap-2">
+                <!-- Marcación Entrada -->
+                <div class="flex items-center gap-2" *ngIf="marcacion.horaEntrada">
+                  <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span class="text-sm font-medium text-green-700">{{ marcacion.horaEntrada }}</span>
+                  <span class="text-xs text-fiori-subtext">{{ marcacion.terminalEntrada }}</span>
+                </div>
+                
+                <!-- Marcación Salida -->
+                <div class="flex items-center gap-2" *ngIf="marcacion.horaSalida">
+                  <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                  <span class="text-sm font-medium text-red-700">{{ marcacion.horaSalida }}</span>
+                  <span class="text-xs text-fiori-subtext">{{ marcacion.terminalSalida }}</span>
+                </div>
+
+                <!-- Contador de marcaciones -->
+                <div class="flex gap-3 text-xs text-fiori-subtext">
+                  <span>Total: {{ marcacion.totalMarcacionesDia }}/{{ marcacion.marcacionesEsperadas }}</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Estado -->
+            <td class="px-4 py-4">
+              <div class="flex flex-col gap-2">
+                <!-- Estado del día -->
+                <span [ngClass]="{
+                  'bg-green-100 text-green-800': marcacion.asistenciaCompleta,
+                  'bg-red-100 text-red-800': !marcacion.asistenciaCompleta,
+                  'bg-gray-100 text-gray-800': marcacion.estadoDia === 'FALTA'
+                }" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium">
+                  <mat-icon style="font-size: 12px;" class="mr-1">
+                    {{ marcacion.asistenciaCompleta ? 'check_circle' : 'error' }}
+                  </mat-icon>
+                  {{ marcacion.estadoDia }}
+                </span>
+
+                <!-- Estado de puntualidad -->
+                <div class="flex gap-1">
+                  <span *ngIf="marcacion.esPuntual" 
+                        class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <mat-icon style="font-size: 10px;" class="mr-1">schedule</mat-icon>
+                    Puntual
+                  </span>
+                  <span *ngIf="marcacion.tieneTardanza" 
+                        class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                    <mat-icon style="font-size: 10px;" class="mr-1">schedule</mat-icon>
+                    Tardanza
+                  </span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Tiempo -->
+            <td class="px-4 py-4">
+              <div class="flex flex-col gap-1">
+                <!-- Horas trabajadas -->
+                <div class="flex items-center gap-1">
+                  <mat-icon style="font-size: 12px;" class="text-green-600">timer</mat-icon>
+                  <span class="text-sm font-medium text-green-700">{{ marcacion.horasTrabajadas }}h</span>
+                </div>
+
+                <!-- Tardanza -->
+                <div *ngIf="marcacion.minutosTardanza > 0" class="flex items-center gap-1">
+                  <mat-icon style="font-size: 12px;" class="text-orange-600">schedule</mat-icon>
+                  <span class="text-xs text-orange-700">+{{ marcacion.minutosTardanza }}min tarde</span>
+                </div>
+
+                <!-- Salida temprana -->
+                <div *ngIf="marcacion.minutosSalidaTemprana > 0" class="flex items-center gap-1">
+                  <mat-icon style="font-size: 12px;" class="text-red-600">exit_to_app</mat-icon>
+                  <span class="text-xs text-red-700">-{{ marcacion.minutosSalidaTemprana }}min temprano</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Observaciones -->
+            <td class="px-4 py-4">
+              <div class="flex flex-col gap-1 max-w-xs">
+                <!-- Estado de marcaciones -->
+                <span class="text-xs text-fiori-subtext">
+                  {{ marcacion.estadoMarcaciones }}
+                </span>
+                
+                <!-- Detalle de marcaciones si existe -->
+                <div *ngIf="marcacion.detalleMarcaciones" 
+                     class="text-xs text-fiori-subtext bg-gray-50 p-2 rounded border-l-2 border-gray-300">
+                  {{ marcacion.detalleMarcaciones }}
+                </div>
+
+                <!-- Indicadores de estado -->
+                <div class="flex gap-1 mt-1">
+                  <span *ngIf="marcacion.marcacionesCompletas" 
+                        class="w-2 h-2 bg-green-500 rounded-full" 
+                        title="Marcaciones completas"></span>
+                  <span *ngIf="!marcacion.marcacionesCompletas" 
+                        class="w-2 h-2 bg-red-500 rounded-full" 
+                        title="Marcaciones incompletas"></span>
+                </div>
+              </div>
             </td>
           </tr>
         </tbody>

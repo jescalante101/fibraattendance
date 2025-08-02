@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
@@ -9,13 +9,15 @@ import { AttManualLogService } from 'src/app/core/services/att-manual-log.servic
 import { AttManualLog } from 'src/app/models/att-manual-log/att-maunual-log.model';
 import { EmployeeScheduleAssignmentService } from 'src/app/core/services/employee-schedule-assignment.service';
 import { EmployeeScheduleHours } from 'src/app/models/employee-schedule/employee-schedule-hours.model';
+import { Subject, takeUntil } from 'rxjs';
+import { HeaderConfig, HeaderConfigService } from '../../../../../core/services/header-config.service';
 
 @Component({
   selector: 'app-nueva-marcacion-manual',
   templateUrl: './nueva-marcacion-manual.component.html',
   styleUrls: ['./nueva-marcacion-manual.component.css']
 })
-export class NuevaMarcacionManualComponent implements OnInit {
+export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
 
   modalRef: any;
   // Formularios reactivos
@@ -43,12 +45,18 @@ export class NuevaMarcacionManualComponent implements OnInit {
   expandedElement: EmployeeScheduleHours | null = null;
   displayedColumnsWithExpand: string[] = [];
 
+  //Destroy
+  // Aquí puedes agregar un Subject para manejar la limpieza de recursos si es necesario
+   private destroy$ = new Subject<void>();
+  //
+  // Configuración del header
+  headerConfig: HeaderConfig | null = null;
   constructor(
     private fb: FormBuilder,
     private rhAreaService: RhAreaService,
-    private personService: PersonService,
     private attManualLogService: AttManualLogService,
-    private employeeScheduleAssignmentService: EmployeeScheduleAssignmentService
+    private employeeScheduleAssignmentService: EmployeeScheduleAssignmentService,
+    private HeaderConfigService: HeaderConfigService,
   ) {
     this.empleadoForm = this.fb.group({
       departamento: [''],
@@ -64,15 +72,36 @@ export class NuevaMarcacionManualComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.cargarAreas();
-    this.cargarEmpleados();
-    this.empleadosSeleccionados = [];
-    this.displayedColumnsWithExpand = ['expand', ...this.displayedColumns];
+
+
+    this.HeaderConfigService.getHeaderConfig$()
+      .pipe(takeUntil(this.destroy$))
+    .subscribe(config => {
+        console.log('Header config cambió:', config);
+        this.headerConfig = config;
+        // Recargar empleados cuando cambie la configuración
+        this.cargarAreas();
+        this.cargarEmpleados();
+        this.empleadosSeleccionados = [];
+        this.displayedColumnsWithExpand = ['expand', ...this.displayedColumns];
+      }); 
+
+    
+  }
+
+  ngOnDestroy(): void {
+    // Aquí puedes limpiar recursos si es necesario
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   cargarAreas() {
     this.loadingAreas = true;
-    this.rhAreaService.getAreas().subscribe({
+
+    // get comnia
+    
+    const empresaId = this.headerConfig?.selectedEmpresa?.companiaId?.toString() || '';
+    this.rhAreaService.getAreas(empresaId).subscribe({
       next: (areas) => {
         this.departamentos = areas;
         this.loadingAreas = false;

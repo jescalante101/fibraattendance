@@ -4,9 +4,10 @@
   (click)="onOverlayClick($event)">
   
   <div 
-    class="bg-fiori-surface border border-fiori-border rounded-lg shadow-2xl animate-slide-down max-w-4xl max-h-[90vh] overflow-hidden"
-    [style.width]="width"
-    [style.height]="height">
+    class="bg-fiori-surface border border-fiori-border rounded-lg shadow-2xl animate-slide-down max-h-[90vh] overflow-hidden"
+    [style.width]="modalWidth"
+    [style.height]="modalHeight"
+    [style.max-width]="'95vw'">
     
     <!-- Windows-style Title Bar -->
     <div class="bg-white text-fiori-primary px-4 py-1 flex items-center justify-between shadow-md border-b border-fiori-border" style="min-height: 38px;">
@@ -52,6 +53,5 @@
       </div>
     </div>
     <!-- Footer -->
-
   </div>
 </div>

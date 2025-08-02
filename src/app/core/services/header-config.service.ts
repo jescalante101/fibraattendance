@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { CompaniResponse } from '../models/compania-reponse.model';
 import { PlanillaResponse } from '../models/planilla-response.model';
 import { PeriodoResponse } from '../models/periodo-response.model';
@@ -15,8 +16,16 @@ export interface HeaderConfig {
 })
 export class HeaderConfigService {
   private readonly STORAGE_KEY = 'fibra_header_config';
+  
+  // BehaviorSubject para notificar cambios en la configuración
+  private headerConfigSubject = new BehaviorSubject<HeaderConfig | null>(null);
+  public headerConfig$ = this.headerConfigSubject.asObservable();
 
-  constructor() { }
+  constructor() { 
+    // Cargar configuración inicial
+    const initialConfig = this.loadHeaderConfig();
+    this.headerConfigSubject.next(initialConfig);
+  }
 
   /**
    * Guarda la configuración del header en localStorage
@@ -32,6 +41,9 @@ export class HeaderConfigService {
       };
       
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(configToSave));
+      
+      // Notificar a todos los subscribers sobre el cambio
+      this.headerConfigSubject.next(config);
     } catch (error) {
       console.error('Error al guardar configuración del header:', error);
     }
@@ -92,6 +104,20 @@ export class HeaderConfigService {
     
     currentConfig.selectedEmpresa = empresa;
     this.saveHeaderConfig(currentConfig);
+  }
+
+  /**
+   * Obtiene la configuración actual como Observable
+   */
+  getHeaderConfig$(): Observable<HeaderConfig | null> {
+    return this.headerConfig$;
+  }
+
+  /**
+   * Obtiene la configuración actual de forma síncrona
+   */
+  getCurrentHeaderConfig(): HeaderConfig | null {
+    return this.headerConfigSubject.value;
   }
 
   /**

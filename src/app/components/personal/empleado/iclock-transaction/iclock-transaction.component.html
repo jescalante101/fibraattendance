@@ -1,58 +1,5 @@
 <div class="mx-auto max-w-7xl p-4 lg:p-6">
-  <!-- Header compacto con información del empleado -->
-  <div
-    class="bg-fiori-surface border border-fiori-border rounded-lg p-4 mb-4 shadow-fiori"
-  >
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div
-          class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center"
-        >
-          <lucide-icon
-            name="user"
-            class="text-fiori-primary"
-            size="16"
-          ></lucide-icon>
-        </div>
-        <div>
-          <h2 class="text-lg font-semibold text-fiori-text">
-            {{
-              empleado?.nombres ||
-                empleado?.nombres + " " + empleado?.apellidoPaterno
-            }}
-          </h2>
-          <p class="text-sm text-fiori-subtext">
-            {{ empleado?.nroDoc }} • {{ empleado?.areaDescripcion }}
-          </p>
-        </div>
-      </div>
-      <div class="flex items-center gap-4">
-        <!-- Estadísticas compactas en línea -->
-        <div class="flex items-center gap-4 text-sm">
-          <div class="flex items-center gap-2">
-            <lucide-icon
-              name="clock"
-              class="text-fiori-primary"
-              size="16"
-            ></lucide-icon>
-            <span class="text-fiori-subtext"
-              >{{ marcaciones.length || 0 }} marcaciones</span
-            >
-          </div>
-          <div class="flex items-center gap-2">
-            <lucide-icon
-              name="calendar"
-              class="text-fiori-accent"
-              size="16"
-            ></lucide-icon>
-            <span class="text-fiori-subtext">{{
-              fechaInicio && fechaFin ? getDiasRango() + " días" : "Mes actual"
-            }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  
 
   <!-- Filtros compactos -->
   <div
@@ -65,32 +12,21 @@
       >
         <!-- Filtros de fecha en línea -->
         <div class="flex items-center gap-2">
-          <lucide-icon
-            name="calendar"
-            class="text-fiori-primary"
-            size="16"
-          ></lucide-icon>
+          <mat-icon class="text-fiori-primary" style="font-size: 16px;">calendar_today</mat-icon>
           <span class="text-sm font-medium text-fiori-text whitespace-nowrap"
             >Fechas:</span
           >
         </div>
 
         <div class="relative max-w-sm">
-          <lucide-icon
-            name="calendar"
-            class="absolute left-2 top-1/2 transform -translate-y-1/2 text-fiori-primary"
-            size="16"
-          ></lucide-icon>
+          <mat-icon class="absolute left-2 top-1/2 transform -translate-y-1/2 text-fiori-primary pointer-events-none" style="font-size: 16px;">calendar_today</mat-icon>
           <input
-            id="datepicker-fechaInicio"
-            datepicker
-            datepicker-format="yyyy-mm-dd"
-            type="text"
-            datepicker-language="es"
+            id="fechaInicio"
+            type="date"
             class="bg-fiori-surface border border-fiori-border text-fiori-text text-sm rounded-lg focus:ring-fiori-primary focus:border-fiori-primary block w-full pl-10 p-2"
-            placeholder="Selecciona fecha"
-            [ngModel]="fechaInicio"
-            (ngModelChange)="fechaInicio = $event"
+            [ngModel]="fechaInicioStr"
+            (ngModelChange)="onFechaInicioChange($event)"
+            (change)="onFechaInicioChangeEvent($event)"
             name="fechaInicio"
             required
           />
@@ -99,21 +35,14 @@
         <span class="text-fiori-subtext">hasta</span>
 
         <div class="relative max-w-sm">
-          <lucide-icon
-            name="calendar"
-            class="absolute left-2 top-1/2 transform -translate-y-1/2 text-fiori-primary"
-            size="16"
-          ></lucide-icon>
+          <mat-icon class="absolute left-2 top-1/2 transform -translate-y-1/2 text-fiori-primary pointer-events-none" style="font-size: 16px;">calendar_today</mat-icon>
           <input
-            id="datepicker-fechaFin"
-            datepicker
-            datepicker-format="yyyy-mm-dd"
-            type="text"
-            datepicker-language="es"
+            id="fechaFin"
+            type="date"
             class="bg-fiori-surface border border-fiori-border text-fiori-text text-sm rounded-lg focus:ring-fiori-primary focus:border-fiori-primary block w-full pl-10 p-2"
-            placeholder="Selecciona fecha"
-            [ngModel]="fechaFin"
-            (ngModelChange)="fechaFin = $event"
+            [ngModel]="fechaFinStr"
+            (ngModelChange)="onFechaFinChange($event)"
+            (change)="onFechaFinChangeEvent($event)"
             name="fechaFin"
             required
           />
@@ -125,7 +54,7 @@
             type="submit"
             class="text-white bg-fiori-primary hover:bg-fiori-secondary focus:ring-4 focus:outline-none focus:ring-fiori-primary/30 font-medium rounded-lg text-sm px-4 py-2 flex items-center gap-1.5 transition-colors"
           >
-            <lucide-icon name="search" size="14"></lucide-icon>
+            <mat-icon style="font-size: 14px;">search</mat-icon>
             Buscar
           </button>
 
@@ -135,7 +64,7 @@
             class="text-fiori-subtext hover:text-fiori-text bg-fiori-hover hover:bg-fiori-muted rounded-lg text-sm p-2 transition-colors"
             title="Limpiar filtros"
           >
-            <lucide-icon name="refresh-cw" size="14"></lucide-icon>
+            <mat-icon style="font-size: 14px;">refresh</mat-icon>
           </button>
 
           <div class="h-4 w-px bg-fiori-border"></div>
@@ -146,7 +75,7 @@
             class="text-fiori-success hover:text-fiori-success/80 bg-fiori-hover hover:bg-green-50 rounded-lg text-sm p-2 transition-colors"
             title="Exportar Excel"
           >
-            <lucide-icon name="file-spreadsheet"></lucide-icon>
+            <mat-icon>table_view</mat-icon>
           </button>
 
           <button
@@ -155,7 +84,7 @@
             class="text-fiori-error hover:text-fiori-error/80 bg-fiori-hover hover:bg-red-50 rounded-lg text-sm p-2 transition-colors"
             title="Exportar PDF"
           >
-            <lucide-icon name="file-text" size="14"></lucide-icon>
+            <mat-icon style="font-size: 14px;">description</mat-icon>
           </button>
         </div>
       </form>
@@ -242,11 +171,7 @@
                 <div
                   class="w-8 h-8 bg-fiori-primary/10 rounded-full flex items-center justify-center"
                 >
-                  <lucide-icon
-                    name="user"
-                    class="text-fiori-primary"
-                    size="16"
-                  ></lucide-icon>
+                  <mat-icon class="text-fiori-primary" style="font-size: 16px;">person</mat-icon>
                 </div>
                 <div>
                   <div class="font-medium text-fiori-text">
@@ -261,11 +186,7 @@
               <span
                 class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
               >
-                <lucide-icon
-                  name="building"
-                  size="12"
-                  class="mr-1"
-                ></lucide-icon>
+                <mat-icon style="font-size: 12px;" class="mr-1">business</mat-icon>
                 {{ marcacion.areaDescripcion }}
               </span>
             </td>
@@ -322,11 +243,7 @@
           <div
             class="w-16 h-16 bg-fiori-muted rounded-full flex items-center justify-center"
           >
-            <lucide-icon
-              name="calendar-x"
-              class="text-fiori-subtext"
-              size="32"
-            ></lucide-icon>
+            <mat-icon class="text-fiori-subtext" style="font-size: 32px;">event_busy</mat-icon>
           </div>
           <h3 class="text-lg font-medium text-fiori-text">
             {{ mensajeSinMarcaciones || "No se encontraron marcaciones" }}
@@ -339,7 +256,7 @@
             (click)="reiniciarBusqueda()"
             class="text-white bg-fiori-primary hover:bg-fiori-secondary focus:ring-4 focus:outline-none focus:ring-fiori-primary/30 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center gap-2 mt-4 transition-colors"
           >
-            <lucide-icon name="refresh-cw" size="16"></lucide-icon>
+            <mat-icon style="font-size: 16px;">refresh</mat-icon>
             Reintentar búsqueda
           </button>
         </div>

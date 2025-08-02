@@ -17,7 +17,7 @@ export class RhAreaService {
 
   constructor(private http: HttpClient) { }
 
-  getAreas(): Observable<RhArea[]> {
-    return this.http.get<RhArea[]>(`${this.apiUrl}api/RhArea`);
+  getAreas(id:string): Observable<RhArea[]> {
+    return this.http.get<RhArea[]>(`${this.apiUrl}api/RhArea?companiaId=${id}`);
   }
 } 

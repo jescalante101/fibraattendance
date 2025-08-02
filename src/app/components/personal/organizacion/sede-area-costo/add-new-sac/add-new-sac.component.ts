@@ -1,19 +1,20 @@
-import { Component, EventEmitter, Inject, Input, OnInit, Output, SimpleChanges, OnChanges, Optional } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnInit, Output, SimpleChanges, OnChanges, Optional, OnDestroy } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Observable, map, startWith } from 'rxjs';
+import { Observable, Subject, map, startWith, takeUntil } from 'rxjs';
 import { SedeAreaCosto } from 'src/app/models/site-area-ccost.model';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 import { CostCenterService, CostCenter } from 'src/app/core/services/cost-center.service';
+import { HeaderConfigService } from 'src/app/core/services/header-config.service';
 
 @Component({
   selector: 'app-add-new-sac',
   templateUrl: './add-new-sac.component.html',
   styleUrls: ['./add-new-sac.component.css']
 })
-export class AddNewSacComponent implements OnInit {
+export class AddNewSacComponent implements OnInit,OnDestroy {
   @Input() dataToEdit?: SedeAreaCosto;
   @Input() componentData?: any;
   @Output() formSubmit = new EventEmitter<SedeAreaCosto>();
@@ -42,13 +43,18 @@ export class AddNewSacComponent implements OnInit {
   showAreaDropdown = false;
   showCostCenterDropdown = false;
 
+  //header configuration
+  headerConfig: any;
+  private destroy$ = new Subject<void>();
+
   constructor(
     private fb: FormBuilder,
     private categoriaAuxiliarService: CategoriaAuxiliarService,
     private rhAreaService: RhAreaService,
     private costCenterService: CostCenterService,
     @Optional() public dialogRef: MatDialogRef<AddNewSacComponent>,
-    @Optional() @Inject(MAT_DIALOG_DATA) public data: any
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
+    private headerConfigService: HeaderConfigService
   ) {
     this.form = this.fb.group({
       siteId: ['', Validators.required],
@@ -66,15 +72,19 @@ export class AddNewSacComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('AddNewSacComponent ngOnInit called');
-    console.log('componentData fds:', this.componentData);
-    console.log('matDialogData:', this.data);
-    console.log('dataToEdit:', this.dataToEdit);
 
-    console.log('ID:', this.componentData);
+    this.headerConfigService.getHeaderConfig$()
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(config => {
+            console.log('Header config cambió:', config);
+            this.headerConfig = config;
+            // Recargar empleados cuando cambie la configuración
+            this.loadSelects();
+            this.initializeForm();
+          });
+        
     
-    this.loadSelects();
-    this.initializeForm();
+  
     
     // Setup autocomplete after data is loaded
      setTimeout(() => {
@@ -82,26 +92,11 @@ export class AddNewSacComponent implements OnInit {
     }, 100); 
   }
 
-  /* ngOnChanges(changes: SimpleChanges): void {
-    console.log('==== AddNewSacComponent ngOnChanges called ====');
-    console.log('Changes:', changes);
-    console.log('Current componentData:', this.componentData);
-    console.log('Current dataToEdit:', this.dataToEdit);
-    console.log('Current matDialogData:', this.matDialogData);
-    console.log('ID2:', this.componentData);
-    
-    if (changes['componentData']) {
-      console.log('componentData changed from:', changes['componentData'].previousValue);
-      console.log('componentData changed to:', changes['componentData'].currentValue);
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-      this.initializeForm();
-      
-      // Re-setup autocomplete after data changes
-       setTimeout(() => {
-        this.setupAutocomplete();
-      }, 100); 
-    }
-  } */
 
   private initializeForm(): void {
     console.log('==== initializeForm called ====');
@@ -237,8 +232,8 @@ export class AddNewSacComponent implements OnInit {
         checkAllLoaded();
       }
     });
-    
-    this.rhAreaService.getAreas().subscribe({
+    const empresaId = this.headerConfig?.selectedEmpresa?.companiaId?.toString() || '';
+    this.rhAreaService.getAreas(empresaId).subscribe({
       next: (areas) => {
         this.areas = areas;
         this.filteredAreasArray = [...this.areas];
@@ -250,8 +245,11 @@ export class AddNewSacComponent implements OnInit {
         checkAllLoaded();
       }
     });
+
+    // Use the company ID from header config if available
+
     
-    this.costCenterService.getAll().subscribe({
+    this.costCenterService.getAll(empresaId).subscribe({
       next: (ccs) => {
         this.costCenters = ccs;
         this.filteredCostCentersArray = [...this.costCenters];

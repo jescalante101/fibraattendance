@@ -39,17 +39,24 @@ export class PersonService {
 
 
 
-getPersonalActivo(page = 1, pageSize = 15, filter = '',categoriaAuxiliarId = '',rhAreaId = '',ccosto=''): Observable<ApiResponse<Employee>> {
-  const params = new HttpParams()
-    .set('page', page)
-    .set('pageSize', pageSize)
-    .set('searchText', filter)
-    .set('ccostoId',ccosto)
-    .set('sede',categoriaAuxiliarId)
-    .set('areaId', rhAreaId);
-  return this.http.get<ApiResponse<Employee>>(`${this.apiUrlScire}api/Personal/search`, { params });
+getPersonalActivo(employeeParams:EmployeesParameters): Observable<ApiResponse<Employee>> {
+
+  return this.http.post<ApiResponse<Employee>>(`${this.apiUrlScire}api/Personal/search`,employeeParams);
 }
 
   
 
 }
+
+export interface EmployeesParameters {
+    searchText: string;
+    page:       number | 1;
+    pagesize:   number | 15;
+    areaId:     string | null;
+    ccostoId:   string | null;
+    sede:       string | null;
+    periodoId:  string | null;
+    planillaId: string | null;
+    companiaId: string | null;
+}
+

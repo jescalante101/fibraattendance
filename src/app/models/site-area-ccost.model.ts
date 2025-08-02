@@ -10,4 +10,4 @@ export interface SedeAreaCosto {
     costCenterId: string;
     costCenterName: string;
     active: string;
-  }
+}

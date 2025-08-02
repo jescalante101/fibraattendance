@@ -14,6 +14,16 @@ export class ModalComponent implements OnInit, OnDestroy {
   @Input() componentData: any = {};
   @Input() width: string = '600px';
   @Input() height: string = 'auto';
+  
+  // Getter para debug
+  get modalWidth() {
+    console.log('Getting modal width:', this.width);
+    return this.width;
+  }
+  
+  get modalHeight() {
+    return this.height;
+  }
   @Output() closeEvent = new EventEmitter<void>();
 
   @ViewChild('dynamicContent', { read: ViewContainerRef})
@@ -35,6 +45,7 @@ export class ModalComponent implements OnInit, OnDestroy {
   
 
   ngOnInit() {
+    console.log('Modal ngOnInit - width:', this.width, 'height:', this.height);
     if (this.componentType) {
       //this.loadComponent();
     }

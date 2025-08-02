@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit, Optional } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { RhArea } from 'src/app/core/services/rh-area.service';
-import { PersonService } from 'src/app/core/services/person.service';
+import { EmployeesParameters, PersonService } from 'src/app/core/services/person.service';
 import { AppUserService, SedeArea } from 'src/app/core/services/app-user.services';
 import { ShiftsService, Shift } from 'src/app/core/services/shifts.service';
 import { PageEvent } from '@angular/material/paginator';
 import { EmployeeScheduleAssignmentService, EmployeeScheduleAssignmentInsert } from 'src/app/core/services/employee-schedule-assignment.service';
 import { forkJoin } from 'rxjs';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { HeaderConfig, HeaderConfigService } from 'src/app/core/services/header-config.service';
 
 @Component({
   selector: 'app-asignar-turno-masivo',
@@ -17,6 +18,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['./asignar-turno-masivo.component.css']
 })
 export class AsignarTurnoMasivoComponent implements OnInit {
+
+
   filtroForm!: FormGroup;
   personalForm!: FormGroup;
   turnoForm!: FormGroup;
@@ -48,12 +51,19 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   // Nuevas propiedades para las mejoras
   searchTermPersonal = '';
   personalTotal: any[] = [];
-  filtro=''
   expandedTurnos = new Set<string>();
   
   // Array de días de la semana como en thorassemanal
   diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
   diasAbreviados = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+  headerConfig: HeaderConfig | null = null;
+  
+  // Step navigation
+  currentStep = 1;
+  
+  // Math for template
+  Math = Math;
 
   constructor(
     private fb: FormBuilder,
@@ -61,11 +71,15 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     private appUserService: AppUserService,
     private shiftsService: ShiftsService,
     private employeeScheduleAssignmentService: EmployeeScheduleAssignmentService,
-    private dialogRef: MatDialogRef<AsignarTurnoMasivoComponent>,
-    private snackBar: MatSnackBar
+    @Optional() public dialogRef: MatDialogRef<AsignarTurnoMasivoComponent>,
+    private snackBar: MatSnackBar,
+    private headerConfigService: HeaderConfigService,
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
+    
   ) {}
 
   ngOnInit(): void {
+    this.headerConfig = this.headerConfigService.loadHeaderConfig();
     this.inicializarFormularios();
     this.cargarDatosIniciales();
   }
@@ -115,6 +129,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
           this.onSedeSeleccionada(this.sedes[0].categoriaAuxiliarId);
         }
       },
+
       error: err => {
         console.error('Error al cargar sedes y áreas:', err);
         this.sedesAreas = [];
@@ -146,7 +161,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   getHorarioResumen(turno: Shift): string {
     if (!turno.horario || turno.horario.length === 0) {
       return 'Sin horario definido';
-    }
+  }
     
     const diasLaborables = turno.horario.filter(h => h.workTimeDuration > 0);
     if (diasLaborables.length === 0) {
@@ -183,10 +198,30 @@ export class AsignarTurnoMasivoComponent implements OnInit {
 
   cargarPersonal() {
     this.loadingPersonal = true;
+
+    // Obtner otros valores de localStorage o del headerConfig
+    const companiaId = this.headerConfig?.selectedEmpresa?.companiaId || '01';
+    const periodoId = this.headerConfig?.selectedPeriodo?.periodoId || null;
+    const planillaId = this.headerConfig?.selectedPlanilla?.planillaId || null;
+
     const categoriaAuxiliarId = this.filtroForm.value.sede;
     const rhAreaId = this.filtroForm.value.area;
-    console.log("filtro",this.filtro)
-    this.personService.getPersonalActivo(this.paginaActual, this.pageSize, this.filtro, categoriaAuxiliarId, rhAreaId).subscribe({
+    console.log("Cargando personal con filtros:", { categoriaAuxiliarId, rhAreaId });
+    const ccosto = null; // Filtro adicional de centro de costo
+    const filtro = this.searchTermPersonal.trim();
+    const employeeParams: EmployeesParameters = {
+      searchText: filtro,
+      page: this.paginaActual,
+      pagesize: this.pageSize,
+      areaId: rhAreaId || null,
+      ccostoId: ccosto || null,
+      sede: categoriaAuxiliarId || null,
+      periodoId: periodoId, // Puedes ajustar esto según tu lógica
+      planillaId: planillaId, // Puedes ajustar esto según tu lógica
+      companiaId: companiaId // Valor por defecto
+    };
+      
+    this.personService.getPersonalActivo(employeeParams).subscribe({
       next: res => {
         if (res.exito && res.data && res.data.items) {
           this.personalTotal = res.data.items;
@@ -342,16 +377,21 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   // Agregar estos métodos a tu componente
 
   // Método para filtrar áreas cuando se selecciona una sede
-  onSedeSeleccionada(sedeId: string): void {
+  onSedeSeleccionada(sedeId: string ): void {
+    
+    console.log('Sede seleccionada:', sedeId);
+    if (!sedeId) return;
+    
     const sede = this.sedes.find(s => s.categoriaAuxiliarId === sedeId);
     if (!sede) return;
+    
     this.filtroForm.patchValue({
-      sede: sede.categoriaAuxiliarId,
+      sede: sedeId,
       area: null // Resetear área cuando cambia la sede
     });
     
     // Filtrar áreas para la sede seleccionada
-    const sedeSeleccionada = this.sedesAreas.find(s => s.siteId === sede.categoriaAuxiliarId);
+    const sedeSeleccionada = this.sedesAreas.find(s => s.siteId === sedeId);
     if (sedeSeleccionada) {
       this.areasFiltradas = sedeSeleccionada.areas.map(area => ({
         areaId: area.areaId,
@@ -417,14 +457,12 @@ export class AsignarTurnoMasivoComponent implements OnInit {
 
   // Métodos para la búsqueda de personal
   onSearchPersonalChange(): void {
-    this.paginaActual=1
-    this.cargarPersonal()
-
-
+    this.paginaActual = 1;
+    this.cargarPersonal();
   }
   buscarEmpleado(){
-    this.paginaActual=1
-    this.cargarPersonal()
+    this.paginaActual = 1;
+    this.cargarPersonal();
   }
 
   // Método para obtener el número de seleccionados
@@ -478,6 +516,39 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     const turnoId = this.turnoForm.get('turno')?.value;
     if (!turnoId) return null;
     return this.turnos.find(t => t.id === turnoId) || null;
+  }
+
+  // Step navigation methods
+  nextStep(): void {
+    if (this.currentStep < 3) {
+      this.currentStep++;
+      if (this.currentStep === 2) {
+        this.cargarPersonal();
+      } else if (this.currentStep === 3) {
+        this.cargarTurnos();
+      }
+    }
+  }
+
+  previousStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  // Pagination methods
+  previousPage(): void {
+    if (this.paginaActual > 1) {
+      this.paginaActual--;
+      this.cargarPersonal();
+    }
+  }
+
+  nextPage(): void {
+    if (this.paginaActual < Math.ceil(this.totalCount / this.pageSize)) {
+      this.paginaActual++;
+      this.cargarPersonal();
+    }
   }
 
   getDayName(dayIndex:number):string{

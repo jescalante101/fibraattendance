@@ -12,6 +12,7 @@ import {
 } from 'src/app/core/models/attendance-resport.model';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
+import { HeaderConfigService } from 'src/app/core/services/header-config.service';
 
 @Component({
   selector: 'app-reporte-asistencia-excel',
@@ -80,6 +81,9 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy, After
   // ===== QUICK FILTER =====
   quickFilter: string | null = null;
 
+  // header configuration
+  headerConfig: any = null;
+
   // ===== LIFECYCLE =====
   private destroy$ = new Subject<void>();
 
@@ -87,12 +91,27 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy, After
     private attendanceAnalysisService: AttendanceAnalysisService,
     private fb: FormBuilder,
     private categoriaAuxiliarService: CategoriaAuxiliarService,
-    private rhAreaService: RhAreaService
+    private rhAreaService: RhAreaService,
+    private headerConfigService: HeaderConfigService
   ) {
     this.initializeForm();
   }
 
   ngOnInit() {
+    
+    this.headerConfigService.getHeaderConfig$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(config => {
+        console.log('Header config cambió:', config);
+        this.headerConfig = config;
+        // Recargar empleados cuando cambie la configuración
+        this.initializeForm();
+        this.getData();
+        this.loadMasterData();
+        this.setupFormSubscriptions();
+        this.setupStickyScrollHandlers();
+      });
+
     this.loadInitialData();
     this.setupFormSubscriptions();
   }
@@ -131,8 +150,10 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy, After
         error: (error) => console.error('Error loading sedes:', error)
       });
 
+    //
+    const empresaId = this.headerConfig?.selectedEmpresa?.companiaId?.toString() || '';
     // Load areas
-    this.rhAreaService.getAreas()
+    this.rhAreaService.getAreas(empresaId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (areas) => this.areas = areas,

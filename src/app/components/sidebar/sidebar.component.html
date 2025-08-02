@@ -136,13 +136,15 @@
               <div
                 class="font-semibold text-gray-900 mb-2 text-xs uppercase tracking-wider"
               >
+              <span class="text-fiori-text">
                 Organización
+              </span>
               </div>
               <ul class="space-y-1">
                 <li>
                   <a
                     [routerLink]="['panel/personal/organizacion/app-user']"
-                    class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                    class="block px-2 py-1 font-semibold text-sm text-gray-700 hover:bg-gray-100 rounded"
                   >
                     Usuario
                   </a>
@@ -150,7 +152,7 @@
                 <li>
                   <a
                     [routerLink]="['panel/personal/organizacion/usuario-sede']"
-                    class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                    class="block px-2 py-1 font-semibold text-sm text-gray-700 hover:bg-gray-100 rounded"
                   >
                     Usuario-Sede
                   </a>
@@ -160,7 +162,7 @@
                     [routerLink]="[
                       'panel/personal/organizacion/sede-area-costo'
                     ]"
-                    class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                    class="block px-2 py-1 font-semibold text-sm text-gray-700 hover:bg-gray-100 rounded"
                   >
                     Sede-Area-Ccosto
                   </a>
@@ -168,7 +170,7 @@
                 <li>
                   <a
                     [routerLink]="['panel/personal/organizacion/sede-ccosto']"
-                    class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                    class="block px-2 py-1  font-semibold text-sm text-gray-700 hover:bg-gray-100 rounded"
                   >
                     Sede-CCosto
                   </a>
@@ -291,7 +293,7 @@
                 <li>
                   <a
                     [routerLink]="['panel/personal/empleado/empleado']"
-                    class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                    class="block px-2 font-semibold py-1 text-sm text-gray-700 hover:bg-gray-100 rounded"
                   >
                     Empleados
                   </a>
@@ -299,7 +301,7 @@
                 <li>
                   <a
                     [routerLink]="['panel/personal/empleado/asignar-horario']"
-                    class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                    class="block px-2  font-semibold py-1 text-sm text-gray-700 hover:bg-gray-100 rounded"
                   >
                     Empleados con Turnos
                   </a>
@@ -428,7 +430,7 @@
                     [routerLink]="sub.link || '#'"
                     [class.text-gray-400]="!sub.link"
                     [class.cursor-default]="!sub.link"
-                    class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                    class="block px-2 py-1 font-semibold text-sm text-gray-700 hover:bg-gray-100 rounded"
                   >
                     {{ sub.label }}
                   </a>

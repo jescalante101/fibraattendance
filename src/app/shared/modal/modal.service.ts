@@ -38,6 +38,8 @@ export class ModalService {
       this.modalRef.instance.width = config.width || '600px';
       this.modalRef.instance.height = config.height || 'auto';
       this.modalRef.instance.isOpen = true;
+      
+      console.log('Modal Service - Configurando width:', config.width, 'height:', config.height);
 
       // Suscribirse al evento de cierre
       this.modalRef.instance.closeEvent.subscribe((data?: any) => {

@@ -4,6 +4,7 @@ import { Employee } from '../empleado/model/employeeDto';
 import { TransactionService } from 'src/app/core/services/transaction.service';
 import { TransactionResponse, Datum, TransactionFilter } from 'src/app/core/models/transaction-response.model';
 import { initFlowbite } from 'flowbite';
+import { HeaderConfig, HeaderConfigService } from '../../../../core/services/header-config.service';
 
 @Component({
   selector: 'app-iclock-transaction',
@@ -18,6 +19,10 @@ export class IclockTransactionComponent implements OnInit {
   
   fechaInicio: Date | null = null;
   fechaFin: Date | null = null;
+  
+  // Fechas para el datepicker (formato string)
+  fechaInicioStr: string = '';
+  fechaFinStr: string = '';
   marcaciones: Datum[] = [];
   
   // Columnas de la tabla 
@@ -39,22 +44,37 @@ export class IclockTransactionComponent implements OnInit {
   filtroTipo: string = '';
   cargando: boolean = false;
   tieneHorarios: boolean = false;
+  // Configuración del header
+  headerConfig: HeaderConfig | null = null;
 
   constructor(
     @Optional() public dialogRef: MatDialogRef<IclockTransactionComponent>,
     private transactionService: TransactionService,
-   @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
+    private HeaderConfigService: HeaderConfigService
   ) {}
 
   ngOnInit(): void {
     console.log('Datos recibidos:', this.data);
+    // Cargar configuración del header
+    this.HeaderConfigService.getHeaderConfig$().subscribe(config => {
+      this.headerConfig = config;
+      console.log('Configuración del header:', this.headerConfig);
+    });
+
+
     if (this.data && this.data.empleado) {
       this.empCode = this.data.empCode || this.data.empleado.nroDoc;
       this.empleado = this.data.empleado;
       // Calcular fechas: inicio de mes y fecha actual
-      const hoy = new Date();
+      //fecha de acuerdo a periodo actual
+      const hoy=this.headerConfig?.selectedPeriodo?.fechaFin ? new Date(this.headerConfig.selectedPeriodo.fechaFin) : new Date();
+      this.fechaFin = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
       this.fechaInicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-      this.fechaFin = hoy;
+      
+      // Convertir a strings para el datepicker
+      this.fechaInicioStr = this.formatDate(this.fechaInicio);
+      this.fechaFinStr = this.formatDate(this.fechaFin);
       // Mostrar loading desde el inicio
       this.cargando = true;
       // Buscar automáticamente
@@ -73,9 +93,24 @@ export class IclockTransactionComponent implements OnInit {
   }
 
   buscarMarcaciones() {
+    console.log('=== Iniciando búsqueda de marcaciones ===');
+    console.log('fechaInicio:', this.fechaInicio);
+    console.log('fechaFin:', this.fechaFin);
+    console.log('fechaInicioStr:', this.fechaInicioStr);
+    console.log('fechaFinStr:', this.fechaFinStr);
+    
     if (!this.fechaInicio || !this.fechaFin) {
       this.marcaciones = [];
       this.mensajeSinMarcaciones = 'Seleccione un rango de fechas válido.';
+      console.log('Búsqueda cancelada: fechas no válidas');
+      return;
+    }
+
+    // Validar que fecha inicio no sea mayor que fecha fin
+    if (this.fechaInicio > this.fechaFin) {
+      this.marcaciones = [];
+      this.mensajeSinMarcaciones = 'La fecha de inicio no puede ser mayor que la fecha fin.';
+      console.log('Búsqueda cancelada: rango de fechas inválido');
       return;
     }
 
@@ -85,15 +120,17 @@ export class IclockTransactionComponent implements OnInit {
     // Formatear fechas a yyyy-MM-dd
     const start = this.formatDate(this.fechaInicio);
     const end = this.formatDate(this.fechaFin);
+    console.log('Fechas formateadas:', { start, end });
 
     // Crear filtros de transacción - solo usar personal_id
     const filter: TransactionFilter = {
       startDate: start,
       endDate: end,
       page: 1,
-      pageSize: 30,
+      pageSize: 50,
       empCode: this.empleado?.personalId || this.empleado?.nroDoc || this.empCode
     };
+    console.log('Filtros de búsqueda:', filter);
 
     // Ejecutar búsqueda directamente
     this.ejecutarBusqueda(filter);
@@ -208,6 +245,11 @@ export class IclockTransactionComponent implements OnInit {
     const hoy = new Date();
     this.fechaInicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
     this.fechaFin = hoy;
+    
+    // Actualizar strings para el datepicker
+    this.fechaInicioStr = this.formatDate(this.fechaInicio);
+    this.fechaFinStr = this.formatDate(this.fechaFin);
+    
     this.buscarMarcaciones();
   }
 
@@ -242,6 +284,50 @@ export class IclockTransactionComponent implements OnInit {
   // TrackBy function para mejorar rendimiento de ngFor
   trackByFn(index: number, item: Datum): string {
     return `${item.nroDoc}-${item.punchTime}`;
+  }
+
+  // Métodos para manejar cambios de fecha
+  onFechaInicioChange(fechaStr: string): void {
+    console.log('Fecha inicio cambió:', fechaStr);
+    if (fechaStr && fechaStr !== this.fechaInicioStr) {
+      this.fechaInicioStr = fechaStr;
+      this.fechaInicio = new Date(fechaStr + 'T00:00:00'); // Asegurar zona horaria local
+      console.log('Nueva fecha inicio:', this.fechaInicio);
+      this.buscarMarcaciones();
+    }
+  }
+
+  onFechaFinChange(fechaStr: string): void {
+    console.log('Fecha fin cambió:', fechaStr);
+    if (fechaStr && fechaStr !== this.fechaFinStr) {
+      this.fechaFinStr = fechaStr;
+      this.fechaFin = new Date(fechaStr + 'T23:59:59'); // Final del día
+      console.log('Nueva fecha fin:', this.fechaFin);
+      this.buscarMarcaciones();
+    }
+  }
+
+  // Métodos para manejar eventos change (simplificados)
+  onFechaInicioChangeEvent(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    if (target && target.value) {
+      this.onFechaInicioChange(target.value);
+    }
+  }
+
+  onFechaFinChangeEvent(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    if (target && target.value) {
+      this.onFechaFinChange(target.value);
+    }
+  }
+
+  // Método para validar que fecha inicio no sea mayor que fecha fin
+  validarFechas(): boolean {
+    if (this.fechaInicio && this.fechaFin) {
+      return this.fechaInicio <= this.fechaFin;
+    }
+    return true;
   }
 
   // Obtener el horario asignado al empleado

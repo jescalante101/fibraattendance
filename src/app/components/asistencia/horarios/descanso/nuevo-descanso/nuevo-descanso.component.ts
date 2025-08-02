@@ -17,6 +17,14 @@ export class NuevoDescansoComponent implements OnInit {
   idDescanso: number = 0;
   loading = false;
   isEditMode: boolean = false;
+  
+  // Dropdown states
+  showCalcTypeDropdown = false;
+  showMultiplePunchDropdown = false;
+  showAvailableIntervalTypeDropdown = false;
+  
+  // Tab state
+  activeTab = 'basic';
 
   constructor(
     private fb: FormBuilder,
@@ -140,6 +148,47 @@ export class NuevoDescansoComponent implements OnInit {
     }
   }
 
-  
+  // Dropdown methods
+  getCalcTypeName(): string {
+    const calcType = this.descansoForm.get('calcType')?.value;
+    switch(calcType) {
+      case 0: return 'Auto Deducir';
+      case 1: return 'Requiere marcación';
+      default: return '';
+    }
+  }
+
+  onCalcTypeSelected(value: number): void {
+    this.descansoForm.patchValue({ calcType: value });
+    this.showCalcTypeDropdown = false;
+  }
+
+  getMultiplePunchName(): string {
+    const multiplePunch = this.descansoForm.get('multiplePunch')?.value;
+    switch(multiplePunch) {
+      case 0: return 'Acorde a la regla';
+      case 1: return 'Usuario Definido';
+      default: return '';
+    }
+  }
+
+  onMultiplePunchSelected(value: number): void {
+    this.descansoForm.patchValue({ multiplePunch: value });
+    this.showMultiplePunchDropdown = false;
+  }
+
+  getAvailableIntervalTypeName(): string {
+    const availableIntervalType = this.descansoForm.get('availableIntervalType')?.value;
+    switch(availableIntervalType) {
+      case 0: return 'No';
+      case 1: return 'Sí';
+      default: return '';
+    }
+  }
+
+  onAvailableIntervalTypeSelected(value: number): void {
+    this.descansoForm.patchValue({ availableIntervalType: value });
+    this.showAvailableIntervalTypeDropdown = false;
+  }
 
 }

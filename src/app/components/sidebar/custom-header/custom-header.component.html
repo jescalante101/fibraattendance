@@ -35,7 +35,7 @@
             <div class="font-medium">Seleccionar Empresa</div>
             <div class="text-fiori-subtext">Elige la empresa activa</div>
           </div>
-          <ul class="py-2 text-sm text-fiori-text" aria-labelledby="dropdownEmpresaButton">
+          <ul class="py-2 font-semibold text-gray-900 text-xs uppercase tracking-wider" aria-labelledby="dropdownEmpresaButton">
             <li *ngFor="let empresa of empresas">
               <a   
                  (click)="selectEmpresa(empresa)"
@@ -67,15 +67,16 @@
             <div class="font-medium">Seleccionar Planilla</div>
             <div class="text-fiori-subtext">Elige la planilla activa</div>
           </div>
-          <ul class="py-2 text-sm text-fiori-text" aria-labelledby="dropdownPlanillaButton">
+          <ul class="py-2 font-semibold text-gray-900 text-xs uppercase tracking-wider" aria-labelledby="dropdownPlanillaButton">
             <li *ngFor="let planilla of planillas">
               <a   
                  (click)="selectPlanilla(planilla)"
                  class="block px-4 py-2 hover:bg-fiori-hover transition-colors hover:text-fiori-primary"
                  [class.bg-fiori-primary]="selectedPlanilla?.planillaId === planilla.planillaId"
                  [class.text-white]="selectedPlanilla?.planillaId === planilla.planillaId">
-                
-                {{ planilla.descripcion }}
+                <div>
+                  {{ planilla.descripcion }}
+                </div>
               </a>
             </li>
             <li *ngIf="planillas.length === 0">
@@ -95,7 +96,7 @@
           class="text-fiori-text bg-fiori-surface hover:bg-fiori-hover focus:ring-4 focus:outline-none focus:ring-fiori-primary/30 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-fiori-border transition-colors"
           type="button">
           <lucide-icon name="calendar-days" class="text-fiori-primary mr-2" size="16"></lucide-icon>
-          {{ selectedAno || 'Seleccionar Año' }}
+          <div class="w-50">{{ selectedAno || 'Seleccionar Año' }}</div>
           <lucide-icon name="chevron-down" class="ms-3" size="12"></lucide-icon>
         </button>
         
@@ -105,14 +106,16 @@
             <div class="font-medium">Seleccionar Año</div>
             <div class="text-fiori-subtext">Elige el año activo</div>
           </div>
-          <ul class="py-2 text-sm text-fiori-text" aria-labelledby="dropdownAnoButton">
+          <ul class="py-2 font-semibold text-gray-900 text-xs uppercase tracking-wider" aria-labelledby="dropdownAnoButton">
             <li *ngFor="let ano of anos">
               <a   
                  (click)="selectAno(ano)"
                  class="block px-4 py-2 hover:bg-fiori-hover transition-colors hover:text-fiori-primary"
                  [class.bg-fiori-primary]="selectedAno === ano"
                  [class.text-white]="selectedAno === ano"> 
-                {{ ano }}
+                 <div>
+                   {{ ano }}
+                 </div>
               </a>
             </li>
           </ul>
@@ -120,7 +123,7 @@
       </div>
 
       <!-- Dropdown Periodo -->
-      <div class="relative">
+      <div class="relative ">
         <button 
           id="dropdownPeriodoButton" 
           data-dropdown-toggle="dropdownPeriodo"
@@ -132,19 +135,21 @@
         </button>
         
         <!-- Dropdown menu Periodo -->
-        <div id="dropdownPeriodo" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-56 border border-fiori-border max-h-80 overflow-y-auto">
+        <div id="dropdownPeriodo" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-90 border border-fiori-border max-h-80 overflow-y-auto">
           <div class="px-4 py-3 text-sm text-fiori-text">
             <div class="font-medium">Seleccionar Periodo</div>
             <div class="text-fiori-subtext">Elige el periodo activo</div>
           </div>
-          <ul class="py-2 text-sm text-fiori-text" aria-labelledby="dropdownPeriodoButton">
+          <ul class="py-2 text-sm font-medium text-fiori-text" aria-labelledby="dropdownPeriodoButton">
             <li *ngFor="let periodo of periodos">
               <a   
                  (click)="selectPeriodo(periodo)"
-                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors hover:text-fiori-primary"
+                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors hover:text-fiori-primary "
                  [class.bg-fiori-primary]="selectedPeriodo?.periodoId === periodo.periodoId"
                  [class.text-white]="selectedPeriodo?.periodoId === periodo.periodoId">
-                {{ periodo.descripcion }}
+                 <div>
+                   {{ periodo.descripcion }}
+                 </div>
               </a>
             </li>
             <li *ngIf="periodos.length === 0">

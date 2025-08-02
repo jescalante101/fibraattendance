@@ -32,14 +32,7 @@ export class ModalVerHorarioComponent implements OnInit {
   diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
   diasAbreviados = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
   
-  // Propiedades para trabajar con el modal genérico
-  /* componentData: HorarioData = {
-    employeeName: '',
-    scheduleName: '',
-    startDate: '',
-    endDate: '',
-    horarios: []
-  }; */
+
   modalRef: any; // Referencia al modal padre
   componentData:any;
 

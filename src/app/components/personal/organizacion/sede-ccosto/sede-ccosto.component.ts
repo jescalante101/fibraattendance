@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SedeCcostoService } from 'src/app/core/services/sede-ccosto.service';
 import { SedeCcosto } from 'src/app/core/models/sede-ccosto.model';
@@ -7,13 +7,15 @@ import { CostCenterService, CostCenter } from 'src/app/core/services/cost-center
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
+import { HeaderConfigService } from 'src/app/core/services/header-config.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-sede-ccosto',
   templateUrl: './sede-ccosto.component.html',
   styleUrls: ['./sede-ccosto.component.css']
 })
-export class SedeCcostoComponent implements OnInit {
+export class SedeCcostoComponent implements OnInit,OnDestroy {
   form: FormGroup;
   sedeCcostoList: SedeCcosto[] = [];
   sedes: CategoriaAuxiliar[] = [];
@@ -31,13 +33,20 @@ export class SedeCcostoComponent implements OnInit {
   filteredSedes: CategoriaAuxiliar[] = [];
   filteredCcostos: CostCenter[] = [];
 
+  //header config
+  headerConfig: any;
+
+  //destroy subject for unsubscribing
+  private destroy$ = new Subject<void>();
+
   constructor(
     private fb: FormBuilder,
     private sedeCcostoService: SedeCcostoService,
     private categoriaAuxiliarService: CategoriaAuxiliarService,
     private costCenterService: CostCenterService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private headerConfigService: HeaderConfigService // Assuming you have a service for header config 
   ) {
     this.form = this.fb.group({
       siteId: ['', Validators.required],
@@ -50,9 +59,25 @@ export class SedeCcostoComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadSedeCcosto();
+
+    this.headerConfigService.getHeaderConfig$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(config => {
+        console.log('Header config cambió:', config);
+        this.headerConfig = config;
+        // Recargar sedes y centros de costo cuando cambie la configuración
+       this.loadSedeCcosto();
     this.loadSedes();
     this.loadCostCenters();
+
+      });
+
+    
+  }
+
+  ngOnDestroy(): void {
+      this.destroy$.next();
+      this.destroy$.complete();
   }
 
   loadSedeCcosto() {
@@ -86,7 +111,10 @@ export class SedeCcostoComponent implements OnInit {
   }
 
   loadCostCenters() {
-    this.costCenterService.getAll().subscribe(ccs => {
+
+    const companiaId = this.headerConfig?.selectedEmpresa?.companiaId?.toString() || '';
+
+    this.costCenterService.getAll(companiaId).subscribe(ccs => {
       this.ccostos = ccs;
       this.filteredCcostos = [...this.ccostos];
     });

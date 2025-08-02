@@ -4,7 +4,7 @@
   <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border p-4 mb-4">
     <div class="flex items-center space-x-3">
       <div class="w-10 h-10 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
-        <lucide-icon [name]="isEditMode ? 'edit' : 'plus'" class="w-5 h-5 text-fiori-primary"></lucide-icon>
+        <mat-icon class="w-5 h-5 text-fiori-primary">{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
       </div>
       <div>
         <div class="text-xl font-semibold text-fiori-text">{{ isEditMode ? 'Editar Descanso' : 'Nuevo Descanso' }}</div>
@@ -19,7 +19,7 @@
     <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden">
       <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
         <div class="flex items-center space-x-2">
-          <lucide-icon name="info" class="w-4 h-4 text-fiori-primary"></lucide-icon>
+          <mat-icon class="w-4 h-4 text-fiori-primary">info</mat-icon>
           <div class="text-lg font-semibold text-fiori-text">Información Básica</div>
         </div>
       </div>
@@ -40,12 +40,12 @@
                 class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors"
                 [class.border-fiori-error]="descansoForm.get('alias')?.hasError('required') && descansoForm.get('alias')?.touched">
               <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
-                <lucide-icon name="clock" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                <mat-icon class="w-3 h-3 text-fiori-subtext">schedule</mat-icon>
               </div>
             </div>
             <p *ngIf="descansoForm.get('alias')?.hasError('required') && descansoForm.get('alias')?.touched" 
                class="mt-1 text-xs text-fiori-error">
-              <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+              <mat-icon class="w-3 h-3 inline mr-1">error_outline</mat-icon>
               El nombre es obligatorio
             </p>
           </div>
@@ -65,10 +65,10 @@
                 {{ getCalcTypeName() || 'Seleccionar tipo...' }}
               </button>
               <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
-                <lucide-icon name="zap" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                <mat-icon class="w-3 h-3 text-fiori-subtext">flash_on</mat-icon>
               </div>
               <div class="absolute right-2 top-1/2 transform -translate-y-1/2">
-                <lucide-icon [name]="showCalcTypeDropdown ? 'chevron-up' : 'chevron-down'" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                <mat-icon class="w-3 h-3 text-fiori-subtext">{{ showCalcTypeDropdown ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
               </div>
               
               <!-- Dropdown de tipos -->
@@ -78,7 +78,7 @@
                      class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border transition-colors">
                   <div class="flex items-center space-x-3">
                     <div class="w-6 h-6 bg-fiori-success/10 rounded-lg flex items-center justify-center">
-                      <lucide-icon name="zap" class="w-3 h-3 text-fiori-success"></lucide-icon>
+                      <mat-icon class="w-3 h-3 text-fiori-success">flash_on</mat-icon>
                     </div>
                     <div>
                       <div class="text-sm font-medium text-fiori-text">Auto Deducir</div>
@@ -90,7 +90,7 @@
                      class="px-4 py-3 hover:bg-fiori-hover cursor-pointer transition-colors">
                   <div class="flex items-center space-x-3">
                     <div class="w-6 h-6 bg-fiori-warning/10 rounded-lg flex items-center justify-center">
-                      <lucide-icon name="hand" class="w-3 h-3 text-fiori-warning"></lucide-icon>
+                      <mat-icon class="w-3 h-3 text-fiori-warning">pan_tool</mat-icon>
                     </div>
                     <div>
                       <div class="text-sm font-medium text-fiori-text">Requiere marcación</div>
@@ -102,7 +102,7 @@
             </div>
             <p *ngIf="descansoForm.get('calcType')?.hasError('required') && descansoForm.get('calcType')?.touched" 
                class="mt-1 text-xs text-fiori-error">
-              <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+              <mat-icon class="w-3 h-3 inline mr-1">error_outline</mat-icon>
               Debe seleccionar un tipo de cálculo
             </p>
           </div>
@@ -121,7 +121,7 @@
             'flex items-center px-4 py-3 text-sm font-medium border-b-2 border-fiori-primary text-fiori-primary bg-fiori-surface' : 
             'flex items-center px-4 py-3 text-sm font-medium border-b-2 border-transparent text-fiori-subtext hover:text-fiori-text hover:border-fiori-border transition-colors'"
           (click)="activeTab = 'basic'">
-          <lucide-icon name="settings" class="w-4 h-4 mr-2"></lucide-icon>
+          <mat-icon class="w-4 h-4 mr-2">settings</mat-icon>
           Configuración Básica
         </button>
         <button 
@@ -130,7 +130,7 @@
             'flex items-center px-4 py-3 text-sm font-medium border-b-2 border-fiori-primary text-fiori-primary bg-fiori-surface' : 
             'flex items-center px-4 py-3 text-sm font-medium border-b-2 border-transparent text-fiori-subtext hover:text-fiori-text hover:border-fiori-border transition-colors'"
           (click)="activeTab = 'rules'">
-          <lucide-icon name="check-square" class="w-4 h-4 mr-2"></lucide-icon>
+          <mat-icon class="w-4 h-4 mr-2">check_box</mat-icon>
           Configuración de Reglas
         </button>
       </div>
@@ -154,12 +154,12 @@
                   class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors"
                   [class.border-fiori-error]="descansoForm.get('periodStart')?.hasError('required') && descansoForm.get('periodStart')?.touched">
                 <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
-                  <lucide-icon name="play" class="w-3 h-3 text-fiori-success"></lucide-icon>
+                  <mat-icon class="w-3 h-3 text-fiori-success">play_arrow</mat-icon>
                 </div>
               </div>
               <p *ngIf="descansoForm.get('periodStart')?.hasError('required') && descansoForm.get('periodStart')?.touched" 
                  class="mt-1 text-xs text-fiori-error">
-                <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+                <mat-icon class="w-3 h-3 inline mr-1">error_outline</mat-icon>
                 La hora de inicio es obligatoria
               </p>
             </div>
@@ -177,12 +177,12 @@
                   class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors"
                   [class.border-fiori-error]="descansoForm.get('endMargin')?.hasError('required') && descansoForm.get('endMargin')?.touched">
                 <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
-                  <lucide-icon name="square" class="w-3 h-3 text-fiori-error"></lucide-icon>
+                  <mat-icon class="w-3 h-3 text-fiori-error">stop</mat-icon>
                 </div>
               </div>
               <p *ngIf="descansoForm.get('endMargin')?.hasError('required') && descansoForm.get('endMargin')?.touched" 
                  class="mt-1 text-xs text-fiori-error">
-                <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+                <mat-icon class="w-3 h-3 inline mr-1">error_outline</mat-icon>
                 La hora final es obligatoria
               </p>
             </div>
@@ -203,12 +203,12 @@
                 class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors"
                 [class.border-fiori-error]="descansoForm.get('duration')?.hasError('required') && descansoForm.get('duration')?.touched">
               <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
-                <lucide-icon name="timer" class="w-3 h-3 text-fiori-info"></lucide-icon>
+                <mat-icon class="w-3 h-3 text-fiori-info">timer</mat-icon>
               </div>
             </div>
             <p *ngIf="descansoForm.get('duration')?.hasError('required') && descansoForm.get('duration')?.touched" 
                class="mt-1 text-xs text-fiori-error">
-              <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+              <mat-icon class="w-3 h-3 inline mr-1">error_outline</mat-icon>
               La duración es obligatoria
             </p>
           </div>
@@ -231,10 +231,10 @@
                   {{ getMultiplePunchName() || 'Seleccionar opción...' }}
                 </button>
                 <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
-                  <lucide-icon name="layers" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                  <mat-icon class="w-3 h-3 text-fiori-subtext">layers</mat-icon>
                 </div>
                 <div class="absolute right-2 top-1/2 transform -translate-y-1/2">
-                  <lucide-icon [name]="showMultiplePunchDropdown ? 'chevron-up' : 'chevron-down'" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                  <mat-icon class="w-3 h-3 text-fiori-subtext">{{ showMultiplePunchDropdown ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
                 </div>
                 
                 <!-- Dropdown -->
@@ -266,7 +266,7 @@
                   min="0"
                   class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors">
                 <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
-                  <lucide-icon name="clock" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                  <mat-icon class="w-3 h-3 text-fiori-subtext">schedule</mat-icon>
                 </div>
               </div>
             </div>
@@ -286,10 +286,10 @@
                 {{ getAvailableIntervalTypeName() || 'Seleccionar opción...' }}
               </button>
               <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
-                <lucide-icon name="check-square" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                <mat-icon class="w-3 h-3 text-fiori-subtext">check_box</mat-icon>
               </div>
               <div class="absolute right-2 top-1/2 transform -translate-y-1/2">
-                <lucide-icon [name]="showAvailableIntervalTypeDropdown ? 'chevron-up' : 'chevron-down'" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                <mat-icon class="w-3 h-3 text-fiori-subtext">{{ showAvailableIntervalTypeDropdown ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
               </div>
               
               <!-- Dropdown -->
@@ -298,14 +298,14 @@
                 <div (click)="onAvailableIntervalTypeSelected(1)"
                      class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border transition-colors">
                   <div class="flex items-center space-x-2">
-                    <lucide-icon name="check-circle" class="w-4 h-4 text-fiori-success"></lucide-icon>
+                    <mat-icon class="w-4 h-4 text-fiori-success">check_circle</mat-icon>
                     <div class="text-sm font-medium text-fiori-text">Sí</div>
                   </div>
                 </div>
                 <div (click)="onAvailableIntervalTypeSelected(0)"
                      class="px-4 py-3 hover:bg-fiori-hover cursor-pointer transition-colors">
                   <div class="flex items-center space-x-2">
-                    <lucide-icon name="x-circle" class="w-4 h-4 text-fiori-error"></lucide-icon>
+                    <mat-icon class="w-4 h-4 text-fiori-error">cancel</mat-icon>
                     <div class="text-sm font-medium text-fiori-text">No</div>
                   </div>
                 </div>
@@ -323,7 +323,7 @@
           type="button" 
           (click)="cancelar()"
           class="inline-flex items-center px-4 py-2 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-lg hover:bg-fiori-hover transition-colors">
-          <lucide-icon name="x" class="w-4 h-4 mr-2"></lucide-icon>
+          <mat-icon class="w-4 h-4 mr-2">close</mat-icon>
           Cancelar
         </button>
         <button 
@@ -331,7 +331,7 @@
           [disabled]="descansoForm.invalid || loading"
           class="inline-flex items-center px-4 py-2 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           <div *ngIf="loading" class="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-          <lucide-icon *ngIf="!loading" name="save" class="w-4 h-4 mr-2"></lucide-icon>
+          <mat-icon *ngIf="!loading" class="w-4 h-4 mr-2">save</mat-icon>
           {{ isEditMode ? 'Actualizar' : 'Guardar' }}
         </button>
       </div>

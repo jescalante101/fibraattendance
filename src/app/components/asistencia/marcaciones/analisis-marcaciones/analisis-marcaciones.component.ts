@@ -10,6 +10,7 @@ import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 import * as XLSX from 'xlsx-js-style';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { HeaderConfigService } from 'src/app/core/services/header-config.service';
 
 // Interfaz para datos agrupados por empleado y fecha
 interface GroupedAttendanceRecord {
@@ -137,6 +138,9 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
     noLaborable: 0
   };
 
+  //header configuration
+  headerConfig: any = null;
+
   // Lifecycle management
   private destroy$ = new Subject<void>();
 
@@ -144,14 +148,29 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
     private attendanceAnalysisService: AttendanceAnalysisService,
     private fb: FormBuilder,
     private categoriaAuxiliarService: CategoriaAuxiliarService,
-    private rhAreaService: RhAreaService
+    private rhAreaService: RhAreaService,
+    private headerConfigService: HeaderConfigService
   ) {
     this.initializeForm();
   }
 
   ngOnInit() {
-    this.loadInitialData();
-    this.setupFormSubscriptions();
+    this.headerConfigService.getHeaderConfig$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (config) => {
+          console.log('Header config cambió:', config);
+          this.headerConfig = config;
+          // Recargar empleados cuando cambie la configuración
+          this.loadInitialData();
+          this.setupFormSubscriptions();
+        }
+    })
+    
+    
+    
+    // this.loadInitialData();
+    // this.setupFormSubscriptions();
   }
 
   ngOnDestroy() {
@@ -235,8 +254,9 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
         error: (error) => console.error('Error loading sedes:', error)
       });
 
+    const companiaId = this.headerConfig?.selectedEmpresa?.companiaId?.toString() || '';  
     // Load areas
-    this.rhAreaService.getAreas()
+    this.rhAreaService.getAreas(companiaId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (areas) => this.areas = areas,

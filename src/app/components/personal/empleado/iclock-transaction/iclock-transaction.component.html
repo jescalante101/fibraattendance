@@ -134,6 +134,8 @@
             <th scope="col" class="px-4 py-3 font-medium">Empleado</th>
             <th scope="col" class="px-4 py-3 font-medium">Fecha</th>
             <th scope="col" class="px-4 py-3 font-medium">Horario</th>
+            <th scope="col" class="px-4 py-3 font-medium">Entrada</th>
+            <th scope="col" class="px-4 py-3 font-medium">Salida</th>
             <th scope="col" class="px-4 py-3 font-medium">Marcaciones</th>
             <th scope="col" class="px-4 py-3 font-medium">Estado</th>
             <th scope="col" class="px-4 py-3 font-medium">Tiempo</th>
@@ -197,26 +199,44 @@
               </ng-template>
             </td>
 
-            <!-- Marcaciones -->
+            <!-- Entrada -->
             <td class="px-4 py-4">
               <div class="flex flex-col gap-2">
-                <!-- Marcación Entrada -->
-                <div class="flex items-center gap-2" *ngIf="marcacion.horaEntrada">
+                <div class="flex items-center gap-2" *ngIf="marcacion.horaEntrada; else sinEntrada">
                   <div class="w-2 h-2 rounded-full bg-green-500"></div>
                   <span class="text-sm font-medium text-green-700">{{ marcacion.horaEntrada }}</span>
-                  <span class="text-xs text-fiori-subtext">{{ marcacion.terminalEntrada }}</span>
                 </div>
-                
-                <!-- Marcación Salida -->
-                <div class="flex items-center gap-2" *ngIf="marcacion.horaSalida">
+                <ng-template #sinEntrada>
+                  <span class="text-sm text-fiori-subtext italic">Sin marcación</span>
+                </ng-template>
+                <span class="text-xs text-fiori-subtext" *ngIf="marcacion.terminalEntrada">{{ marcacion.terminalEntrada }}</span>
+              </div>
+            </td>
+
+            <!-- Salida -->
+            <td class="px-4 py-4">
+              <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-2" *ngIf="marcacion.horaSalida; else sinSalida">
                   <div class="w-2 h-2 rounded-full bg-red-500"></div>
                   <span class="text-sm font-medium text-red-700">{{ marcacion.horaSalida }}</span>
-                  <span class="text-xs text-fiori-subtext">{{ marcacion.terminalSalida }}</span>
                 </div>
+                <ng-template #sinSalida>
+                  <span class="text-sm text-fiori-subtext italic">Sin marcación</span>
+                </ng-template>
+                <span class="text-xs text-fiori-subtext" *ngIf="marcacion.terminalSalida">{{ marcacion.terminalSalida }}</span>
+              </div>
+            </td>
 
-                <!-- Contador de marcaciones -->
-                <div class="flex gap-3 text-xs text-fiori-subtext">
-                  <span>Total: {{ marcacion.totalMarcacionesDia }}/{{ marcacion.marcacionesEsperadas }}</span>
+            <!-- Contador de marcaciones -->
+            <td class="px-4 py-4">
+              <div class="flex flex-col items-center gap-2">
+                <div class="text-center">
+                  <div class="text-sm font-semibold text-fiori-text">
+                    {{ marcacion.totalMarcacionesDia }}/{{ marcacion.marcacionesEsperadas }}
+                  </div>
+                  <div class="text-xs text-fiori-subtext">
+                    marcaciones
+                  </div>
                 </div>
               </div>
             </td>
@@ -238,12 +258,12 @@
 
                 <!-- Estado de puntualidad -->
                 <div class="flex gap-1">
-                  <span *ngIf="marcacion.esPuntual" 
+                  <span *ngIf=" marcacion.horarioAlias !== 'Sin horario' && marcacion.esPuntual" 
                         class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     <mat-icon style="font-size: 10px;" class="mr-1">schedule</mat-icon>
                     Puntual
                   </span>
-                  <span *ngIf="marcacion.tieneTardanza" 
+                  <span *ngIf=" marcacion.horarioAlias !== 'Sin horario' && marcacion.tieneTardanza" 
                         class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                     <mat-icon style="font-size: 10px;" class="mr-1">schedule</mat-icon>
                     Tardanza
@@ -261,14 +281,14 @@
                   <span class="text-sm font-medium text-green-700">{{ marcacion.horasTrabajadas }}h</span>
                 </div>
 
-                <!-- Tardanza -->
-                <div *ngIf="marcacion.minutosTardanza > 0" class="flex items-center gap-1">
+                <!-- Tardanza - Solo si tiene horario válido -->
+                <div *ngIf="marcacion.horarioAlias !== 'Sin horario' && marcacion.turnoAlias !== 'Sin turno' && marcacion.minutosTardanza > 0" class="flex items-center gap-1">
                   <mat-icon style="font-size: 12px;" class="text-orange-600">schedule</mat-icon>
                   <span class="text-xs text-orange-700">+{{ marcacion.minutosTardanza }}min tarde</span>
                 </div>
 
-                <!-- Salida temprana -->
-                <div *ngIf="marcacion.minutosSalidaTemprana > 0" class="flex items-center gap-1">
+                <!-- Salida temprana - Solo si tiene horario válido -->
+                <div *ngIf="marcacion.horarioAlias !== 'Sin horario' && marcacion.turnoAlias !== 'Sin turno' && marcacion.minutosSalidaTemprana > 0" class="flex items-center gap-1">
                   <mat-icon style="font-size: 12px;" class="text-red-600">exit_to_app</mat-icon>
                   <span class="text-xs text-red-700">-{{ marcacion.minutosSalidaTemprana }}min temprano</span>
                 </div>
@@ -329,13 +349,17 @@
         </div>
       </div>
     </div>
+
+    <!-- Paginador Fiori Genérico -->
+    <app-fiori-paginator
+      [totalRecords]="totalMarcaciones"
+      [pageSize]="pageSize"
+      [pageNumber]="pageNumber"
+      [loading]="cargando"
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      [showAllOption]="true"
+      (pageChange)="onPaginatorChange($event)">
+    </app-fiori-paginator>
   </div>
 
-  <!-- Footer con información adicional -->
-  <div *ngIf="marcaciones.length > 0" class="mt-6 text-center">
-    <p class="text-sm text-fiori-subtext">
-      Mostrando {{ marcaciones.length }} marcaciones para el período
-      seleccionado
-    </p>
-  </div>
 </div>

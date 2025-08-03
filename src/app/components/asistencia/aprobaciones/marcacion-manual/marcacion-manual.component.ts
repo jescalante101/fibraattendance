@@ -5,6 +5,7 @@ import { ApiResponse } from 'src/app/core/models/api-response.model';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { NuevaMarcacionManualComponent } from './nueva-marcacion-manual/nueva-marcacion-manual.component';
 import { EditarMarcionManualComponent } from './editar-marcion-manual/editar-marcion-manual.component';
+import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
 
 @Component({
   selector: 'app-marcacion-manual',
@@ -77,7 +78,6 @@ export class MarcacionManualComponent implements OnInit {
       componentType: NuevaMarcacionManualComponent,
       componentData: {},
       width: '900px',
-      height: '800px'
     }).then(result => {
       if (result) {
         // Si se guardó una nueva marcación, recargar la lista
@@ -86,8 +86,11 @@ export class MarcacionManualComponent implements OnInit {
     });
   }
 
-  onPageChange(page: number) {
-    this.pageNumber = page;
+   
+  onPageChangeCustom(event: PaginatorEvent) {
+    this.pageNumber = event.pageNumber;
+    this.pageSize = event.pageSize;
+    this.totalRecords=event.totalRecords
     this.loadMarcacionesManuales();
   }
 

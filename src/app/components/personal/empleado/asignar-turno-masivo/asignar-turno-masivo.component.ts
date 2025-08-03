@@ -11,6 +11,7 @@ import { forkJoin } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HeaderConfig, HeaderConfigService } from 'src/app/core/services/header-config.service';
+import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
 
 @Component({
   selector: 'app-asignar-turno-masivo',
@@ -544,11 +545,12 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     }
   }
 
-  nextPage(): void {
-    if (this.paginaActual < Math.ceil(this.totalCount / this.pageSize)) {
-      this.paginaActual++;
-      this.cargarPersonal();
-    }
+  
+  onPageChangeCustom(event: PaginatorEvent) {
+    this.paginaActual = event.pageNumber;
+    this.pageSize = event.pageSize;
+    this.totalCount=event.totalRecords
+    this.cargarPersonal();
   }
 
   getDayName(dayIndex:number):string{

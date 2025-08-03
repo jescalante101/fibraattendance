@@ -8,13 +8,15 @@ import { ModalConfirmComponent } from './modal-confirm/modal-confirm.component';
 import { ModalLoadingComponent } from './modal-loading/modal-loading.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { FioriPaginatorComponent } from './fiori-paginator/fiori-paginator.component';
+import { LucideAngularModule } from 'lucide-angular';
 
 @NgModule({
   declarations: [
     ModalAlertaComponent,
     ModalConfirmComponent,
     ModalLoadingComponent,
-    
+    FioriPaginatorComponent
   ],
   imports: [
     CommonModule,
@@ -22,14 +24,16 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     MatDialogModule,
     MatButtonModule,
     MatCardModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    LucideAngularModule
   ],
   exports: [
     ModalAlertaComponent,
     ModalConfirmComponent,
     ModalLoadingComponent,
     MatCardModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    FioriPaginatorComponent
   ]
 })
 export class SharedModule { }

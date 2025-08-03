@@ -1,0 +1,40 @@
+/* Estilos específicos del paginador Fiori */
+.fiori-paginator {
+  @apply bg-fiori-surface border-t border-fiori-border;
+}
+
+/* Animaciones suaves para los botones de página */
+.page-button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.page-button.active {
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+}
+
+/* Dropdown con mejor z-index */
+.page-size-dropdown {
+  z-index: 1000;
+}
+
+/* Responsivo */
+@media (max-width: 640px) {
+  .hidden-mobile {
+    display: none;
+  }
+  
+  .paginator-container {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .paginator-section {
+    justify-content: center;
+  }
+}

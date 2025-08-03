@@ -435,41 +435,17 @@
               </div>
 
               <!-- Pagination -->
-              <div
-                class="bg-fiori-muted px-6 py-3 border-t border-fiori-border"
-              >
-                <div class="flex items-center justify-between">
-                  <div class="text-sm text-fiori-subtext">
-                    Mostrando {{ (paginaActual - 1) * pageSize + 1 }} a
-                    {{ Math.min(paginaActual * pageSize, totalCount) }} de
-                    {{ totalCount }} empleados
-                  </div>
-                  <div class="flex items-center space-x-2">
-                    <button
-                      (click)="previousPage()"
-                      [disabled]="paginaActual <= 1"
-                      class="inline-flex items-center px-3 py-2 text-sm font-medium text-fiori-subtext bg-fiori-surface border border-fiori-border rounded-lg hover:bg-fiori-hover disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <mat-icon class="w-4 h-4 mr-1">chevron_left</mat-icon>
-                      Anterior
-                    </button>
-                    <span class="text-sm text-fiori-subtext">
-                      Página {{ paginaActual }} de
-                      {{ Math.ceil(totalCount / pageSize) }}
-                    </span>
-                    <button
-                      (click)="nextPage()"
-                      [disabled]="
-                        paginaActual >= Math.ceil(totalCount / pageSize)
-                      "
-                      class="inline-flex items-center px-3 py-2 text-sm font-medium text-fiori-subtext bg-fiori-surface border border-fiori-border rounded-lg hover:bg-fiori-hover disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Siguiente
-                      <mat-icon class="w-4 h-4 ml-1">chevron_right</mat-icon>
-                    </button>
-                  </div>
-                </div>
-              </div>
+               <app-fiori-paginator
+                [totalRecords]="totalCount"
+                [pageSize]="pageSize"
+                [pageNumber]="paginaActual"
+                [pageSizeOptions]="[5, 10, 25, 50]"
+                [showAllOption]="true"
+                [loading]="false"
+                (pageChange)="onPageChangeCustom($event)">
+              </app-fiori-paginator>
+
+
             </div>
           </div>
 

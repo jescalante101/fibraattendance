@@ -92,30 +92,43 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
   showColumnsConfig = false;
   currentQuickFilter: string | null = null;
   
-  // Column configuration
+  // Column configuration with groups
   columns = [
-    { id: 'fullNameEmployee', label: 'Empleado', visible: true },
-    { id: 'nroDoc', label: 'Documento', visible: true },
-    { id: 'areaDescription', label: 'Área', visible: true },
-    { id: 'locationName', label: 'Sede', visible: true },
-    { id: 'fechaFormateada', label: 'Fecha', visible: true },
-    { id: 'shiftName', label: 'Turno', visible: true },
-    { id: 'intervalAlias', label: 'Horario', visible: true },
-    { id: 'horaEsperada', label: 'Esperado', visible: true },
-    { id: 'horaMarcacionReal', label: 'Real', visible: true },
-    { id: 'estadoMarcacion', label: 'Estado', visible: true },
-    { id: 'minutosTardanza', label: 'Tardanza', visible: false },
-    { id: 'minutosAdelanto', label: 'Adelanto', visible: false },
-    { id: 'tipoMarcacion', label: 'Tipo Horario', visible: false },
-    { id: 'exceptionRemarks', label: 'Observaciones', visible: true },
-    { id: 'tipoPermiso', label: 'Tipo Permiso', visible: false },
-    { id: 'diasInfo', label: 'Días Info', visible: false },
-    { id: 'razonManual', label: 'Razón Manual', visible: false },
-    { id: 'validacionRango', label: 'Validación', visible: false },
-    { id: 'informacionAdicional', label: 'Info Adicional', visible: false },
-    { id: 'origenMarcacion', label: 'Origen', visible: false },
-    { id: 'actions', label: 'Acciones', visible: true }
+    { id: 'fullNameEmployee', label: 'Empleado', visible: true, group: 'basic' },
+    { id: 'nroDoc', label: 'Documento', visible: true, group: 'basic' },
+    { id: 'areaDescription', label: 'Área', visible: true, group: 'basic' },
+    { id: 'locationName', label: 'Sede', visible: true, group: 'basic' },
+    { id: 'fechaFormateada', label: 'Fecha', visible: true, group: 'basic' },
+    { id: 'shiftName', label: 'Turno', visible: true, group: 'basic' },
+    { id: 'intervalAlias', label: 'Horario Entrada', visible: true, group: 'entrada' },
+    { id: 'horaEsperada', label: 'Entrada Esperada', visible: true, group: 'entrada' },
+    { id: 'horaMarcacionReal', label: 'Entrada Real', visible: true, group: 'entrada' },
+    { id: 'estadoMarcacion', label: 'Estado Entrada', visible: true, group: 'entrada' },
+    { id: 'minutosTardanza', label: 'Tardanza (min)', visible: false, group: 'entrada' },
+    { id: 'intervalAlias', label: 'Horario Salida', visible: true, group: 'salida' },
+    { id: 'horaEsperada', label: 'Salida Esperada', visible: true, group: 'salida' },
+    { id: 'horaMarcacionReal', label: 'Salida Real', visible: true, group: 'salida' },
+    { id: 'estadoMarcacion', label: 'Estado Salida', visible: true, group: 'salida' },
+    { id: 'minutosAdelanto', label: 'Adelanto (min)', visible: false, group: 'salida' },
+    { id: 'tipoMarcacion', label: 'Tipo Horario', visible: false, group: 'adicional' },
+    { id: 'exceptionRemarks', label: 'Observaciones', visible: true, group: 'adicional' },
+    { id: 'tipoPermiso', label: 'Tipo Permiso', visible: false, group: 'adicional' },
+    { id: 'diasInfo', label: 'Días Info', visible: false, group: 'adicional' },
+    { id: 'razonManual', label: 'Razón Manual', visible: false, group: 'adicional' },
+    { id: 'validacionRango', label: 'Validación', visible: false, group: 'adicional' },
+    { id: 'informacionAdicional', label: 'Info Adicional', visible: false, group: 'adicional' },
+    { id: 'origenMarcacion', label: 'Origen', visible: false, group: 'adicional' },
+    { id: 'actions', label: 'Acciones', visible: true, group: 'basic' }
   ];
+
+  // Tree view state
+  expandedGroups = new Set<string>(['basic', 'entrada', 'salida']); // Grupos expandidos por defecto
+
+  // Autocomplete state
+  showAreaDropdown = false;
+  showSedeDropdown = false;
+  filteredAreas: RhArea[] = [];
+  filteredSedes: CategoriaAuxiliar[] = [];
 
   // Data management
   allData: AttendanceAnalysis[] = [];
@@ -236,7 +249,9 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
       fechaFin: [''],
       filter: [''],
       areaId: [''],
-      locationId: ['']
+      areaFilter: [''],
+      locationId: [''],
+      sedeFilter: ['']
     });
   }
 
@@ -250,7 +265,10 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
     this.categoriaAuxiliarService.getCategoriasAuxiliar()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (sedes) => this.sedes = sedes,
+        next: (sedes) => {
+          this.sedes = sedes;
+          this.filteredSedes = [...sedes]; // Inicializar lista filtrada
+        },
         error: (error) => console.error('Error loading sedes:', error)
       });
 
@@ -259,38 +277,17 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
     this.rhAreaService.getAreas(companiaId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (areas) => this.areas = areas,
+        next: (areas) => {
+          this.areas = areas;
+          this.filteredAreas = [...areas]; // Inicializar lista filtrada
+        },
         error: (error) => console.error('Error loading areas:', error)
       });
   }
 
   private setupFormSubscriptions() {
-    // Debounce search input
-    this.filterForm.get('filter')?.valueChanges
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(() => {
-        this.page = 1;
-        this.getData();
-      });
-
-    // Auto-filter on area/location change
-    this.filterForm.get('areaId')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.page = 1;
-        this.getData();
-      });
-
-    this.filterForm.get('locationId')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.page = 1;
-        this.getData();
-      });
+    // Eliminar suscripciones automáticas para evitar conflictos
+    // El filtro se ejecuta manualmente en los métodos onAreaSelected y onSedeSelected
   }
 
   // ===== DATA MANAGEMENT =====
@@ -878,6 +875,106 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
     this.columns.forEach(col => {
       col.visible = ['fullNameEmployee', 'actions'].includes(col.id);
     });
+  }
+
+  // ===== TREE VIEW METHODS =====
+  toggleGroup(groupName: string) {
+    if (this.expandedGroups.has(groupName)) {
+      this.expandedGroups.delete(groupName);
+    } else {
+      this.expandedGroups.add(groupName);
+    }
+  }
+
+  isGroupExpanded(groupName: string): boolean {
+    return this.expandedGroups.has(groupName);
+  }
+
+  getColumnsByGroup(groupName: string) {
+    return this.columns.filter(col => col.group === groupName);
+  }
+
+  onColumnsDropdownBlur() {
+    // Cerrar dropdown después de un pequeño delay para permitir clicks internos
+    setTimeout(() => {
+      this.showColumnsConfig = false;
+    }, 150);
+  }
+
+  // ===== AUTOCOMPLETE METHODS =====
+  
+  // Filtrado frontend solo para UX - no afecta el filtro backend
+  onAreaFilterChange(event: any) {
+    const filterValue = event.target.value.toLowerCase();
+    this.filteredAreas = this.areas.filter(area =>
+      area.descripcion.toLowerCase().includes(filterValue)
+    );
+  }
+
+  onAreaSelected(area: RhArea | null) {
+    // Cerrar dropdown inmediatamente para evitar conflictos
+    this.showAreaDropdown = false;
+    
+    if (area) {
+      this.filterForm.patchValue({
+        areaId: area.areaId,
+        areaFilter: area.descripcion
+      });
+    } else {
+      this.filterForm.patchValue({
+        areaId: '',
+        areaFilter: 'Todas las áreas'
+      });
+    }
+    
+    // Forzar la actualización después de un pequeño delay
+    setTimeout(() => {
+      this.page = 1;
+      this.getData();
+    }, 100);
+  }
+
+  onAreaBlur() {
+    setTimeout(() => {
+      this.showAreaDropdown = false;
+    }, 150);
+  }
+
+  // Filtrado frontend solo para UX - no afecta el filtro backend
+  onSedeFilterChange(event: any) {
+    const filterValue = event.target.value.toLowerCase();
+    this.filteredSedes = this.sedes.filter(sede =>
+      sede.descripcion.toLowerCase().includes(filterValue)
+    );
+  }
+
+  onSedeSelected(sede: CategoriaAuxiliar | null) {
+    // Cerrar dropdown inmediatamente para evitar conflictos
+    this.showSedeDropdown = false;
+    
+    if (sede) {
+      this.filterForm.patchValue({
+        locationId: sede.categoriaAuxiliarId,
+        sedeFilter: sede.descripcion
+      });
+    } else {
+      this.filterForm.patchValue({
+        locationId: '',
+        sedeFilter: 'Todas las sedes'
+      });
+    }
+    
+    // Forzar la actualización después de un pequeño delay
+    setTimeout(() => {
+      this.page = 1;
+      this.getData();
+    }, 100);
+  }
+
+  onSedeBlur() {
+    setTimeout(() => {
+      this.showSedeDropdown = false;
+    }, 150);
   }
 
   // ===== SELECTION =====

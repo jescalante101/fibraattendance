@@ -1,4 +1,4 @@
-<div class="w-full max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
+<div class="w-full  mx-auto p-6 bg-gray-50 min-h-screen">
   
   <!-- Header con título y estadísticas -->
   <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
@@ -188,19 +188,19 @@
       </table>
     </div>
 
-    <!-- Paginador mejorado -->
-    <div class="bg-white px-6 py-3 border-t border-gray-200">
-      <mat-paginator
-        [length]="totalRecords"
-        [pageSize]="pageSize"
-        [pageIndex]="pageNumber - 1"
-        (page)="handlePageEvent($event)"
-        [pageSizeOptions]="[5, 10, 20, 50, totalRecords]"
-        showFirstLastButtons
-        aria-label="Seleccione la página"
-        class="w-full">
-      </mat-paginator>
-    </div>
+
+     <app-fiori-paginator
+      [totalRecords]="totalRecords"
+      [pageSize]="pageSize"
+      [pageNumber]="pageNumber"
+      [pageSizeOptions]="[5, 10, 25, 50]"
+      [showAllOption]="true"
+      [loading]="false"
+      (pageChange)="onPageChangeCustom($event)">
+    </app-fiori-paginator>
+
+
+
   </div>
 
   <!-- Estado vacío -->

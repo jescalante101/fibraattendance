@@ -1,0 +1,119 @@
+<!-- Paginador Fiori Genérico -->
+<div class="flex items-center justify-between p-4 bg-fiori-surface border-t border-fiori-border" 
+     *ngIf="totalRecords > 0 || loading">
+  
+  <!-- IZQUIERDA: Información de registros -->
+  <div class="flex items-center gap-3">
+    <div class="w-8 h-8 bg-gradient-to-br from-fiori-primary to-fiori-secondary rounded-lg flex items-center justify-center">
+      <lucide-icon name="bar-chart-3" class="w-4 h-4 text-white"></lucide-icon>
+    </div>
+    <div>
+      <div class="text-sm font-semibold text-fiori-text" *ngIf="!loading">
+        Total: {{ totalRecords | number }} registro{{ totalRecords !== 1 ? 's' : '' }}
+      </div>
+      <div class="text-xs text-fiori-subtext" *ngIf="!loading && pageSize > 0">
+        Mostrando {{ startRecord | number }} - {{ endRecord | number }}
+      </div>
+      <div class="text-xs text-fiori-subtext" *ngIf="!loading && pageSize === 0">
+        Mostrando todos los registros
+      </div>
+      <!-- Loading state -->
+      <div class="text-sm text-fiori-subtext" *ngIf="loading">
+        <div class="flex items-center gap-2">
+          <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-fiori-primary"></div>
+          Cargando...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTRO: Navegación de páginas -->
+  <div class="flex items-center gap-2" *ngIf="!loading && pageSize > 0 && totalPages > 1">
+    
+    <!-- Botón Anterior -->
+    <button 
+      (click)="previousPage()"
+      [disabled]="isFirstPage"
+      class="inline-flex items-center gap-1 px-3 py-2 text-sm border border-fiori-border rounded-lg hover:bg-fiori-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+      <lucide-icon name="chevron-left" class="w-4 h-4"></lucide-icon>
+      <span class="hidden sm:inline">Anterior</span>
+    </button>
+
+    <!-- Números de página -->
+    <div class="flex items-center gap-1">
+      <button 
+        *ngFor="let page of getPageNumbers()"
+        (click)="goToPage(page)"
+        class="w-10 h-10 flex items-center justify-center text-sm rounded-lg transition-all duration-200"
+        [ngClass]="{
+          'bg-fiori-primary text-white font-semibold shadow-lg': page === pageNumber,
+          'bg-fiori-surface text-fiori-text hover:bg-fiori-hover border border-fiori-border': page !== pageNumber
+        }">
+        {{ page }}
+      </button>
+    </div>
+
+    <!-- Botón Siguiente -->
+    <button 
+      (click)="nextPage()"
+      [disabled]="isLastPage"
+      class="inline-flex items-center gap-1 px-3 py-2 text-sm border border-fiori-border rounded-lg hover:bg-fiori-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+      <span class="hidden sm:inline">Siguiente</span>
+      <lucide-icon name="chevron-right" class="w-4 h-4"></lucide-icon>
+    </button>
+  </div>
+
+  <!-- Mensaje cuando solo hay una página -->
+  <div class="text-sm text-fiori-subtext" *ngIf="!loading && pageSize > 0 && totalPages <= 1">
+    Página 1 de 1
+  </div>
+
+  <!-- DERECHA: Selector de tamaño de página -->
+  <div class="relative flex items-center gap-2" *ngIf="!loading">
+    <span class="text-sm text-fiori-subtext hidden sm:inline">Mostrar:</span>
+    
+    <div class="relative">
+      <button 
+        (click)="togglePageSizeDropdown()"
+        (blur)="closePageSizeDropdown()"
+        class="inline-flex items-center gap-2 px-3 py-2 text-sm border border-fiori-border rounded-lg bg-fiori-surface hover:bg-fiori-hover focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
+        <span class="font-medium text-fiori-text">{{ currentPageSizeLabel }}</span>
+        <lucide-icon name="chevron-down" class="w-4 h-4 text-fiori-subtext transition-transform" 
+                     [class.rotate-180]="showPageSizeDropdown"></lucide-icon>
+      </button>
+
+      <!-- Dropdown de opciones -->
+      <div *ngIf="showPageSizeDropdown" 
+           class="absolute bottom-full right-0 mb-1 bg-fiori-surface border border-fiori-border rounded-xl shadow-2xl z-50 min-w-[120px] overflow-hidden">
+        
+        <!-- Opciones de tamaño -->
+        <div *ngFor="let size of pageSizeOptions" 
+             (mousedown)="changePageSize(size)"
+             class="px-4 py-3 cursor-pointer hover:bg-fiori-hover text-sm transition-colors"
+             [ngClass]="{'bg-fiori-primary/10 text-fiori-primary font-medium': size === pageSize && pageSize !== 0}">
+          <div class="flex items-center justify-between">
+            <span>{{ size }} por página</span>
+            <lucide-icon name="check" class="w-3 h-3" 
+                         *ngIf="size === pageSize && pageSize !== 0"></lucide-icon>
+          </div>
+        </div>
+
+        <!-- Opción "Todos" -->
+        <div *ngIf="showAllOption" 
+             (mousedown)="showAll()"
+             class="px-4 py-3 cursor-pointer hover:bg-fiori-hover text-sm transition-colors border-t border-fiori-border"
+             [ngClass]="{'bg-fiori-primary/10 text-fiori-primary font-medium': pageSize === 0}">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="font-medium">Mostrar todos</div>
+              <div class="text-xs text-fiori-subtext">{{ totalRecords | number }} registros</div>
+            </div>
+            <lucide-icon name="check" class="w-3 h-3" 
+                         *ngIf="pageSize === 0"></lucide-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

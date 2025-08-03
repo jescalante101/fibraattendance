@@ -7,18 +7,7 @@ import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confir
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 
-interface HorarioData {
-  employeeName: string;
-  scheduleName: string;
-  startDate: string;
-  endDate: string;
-  horarios: {
-    id: number;
-    dayIndex: number;  
-    inTime: string;
-    workTimeDuration: number;
-  }[];
-}
+
 
 @Component({
   selector: 'app-modal-ver-horario',

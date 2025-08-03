@@ -9,6 +9,7 @@ import { HeaderConfig, HeaderConfigService } from '../../../../core/services/hea
 import * as XLSX from 'xlsx-js-style';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
 
 @Component({
   selector: 'app-iclock-transaction',
@@ -47,6 +48,11 @@ export class IclockTransactionComponent implements OnInit {
   // Nuevas propiedades para filtros
   filtroTipo: string = '';
   cargando: boolean = false;
+
+  // Propiedades para paginación
+  pageNumber: number = 1;
+  pageSize: number = 25;
+  totalMarcaciones: number = 0;
   tieneHorarios: boolean = false;
   // Configuración del header
   headerConfig: HeaderConfig | null = null;
@@ -97,12 +103,7 @@ export class IclockTransactionComponent implements OnInit {
   }
 
   buscarMarcaciones() {
-    console.log('=== Iniciando búsqueda de marcaciones ===');
-    console.log('fechaInicio:', this.fechaInicio);
-    console.log('fechaFin:', this.fechaFin);
-    console.log('fechaInicioStr:', this.fechaInicioStr);
-    console.log('fechaFinStr:', this.fechaFinStr);
-    
+
     if (!this.fechaInicio || !this.fechaFin) {
       this.marcaciones = [];
       this.mensajeSinMarcaciones = 'Seleccione un rango de fechas válido.';
@@ -126,12 +127,12 @@ export class IclockTransactionComponent implements OnInit {
     const end = this.formatDate(this.fechaFin);
     console.log('Fechas formateadas:', { start, end });
 
-    // Crear filtros de transacción - solo usar personal_id
+    // Crear filtros de transacción - usar paginación
     const filter: TransactionFilter = {
       startDate: start,
       endDate: end,
-      page: 1,
-      pageSize: 50,
+      page: this.pageNumber,
+      pageSize: this.pageSize === 0 ? 999999 : this.pageSize, // 0 significa mostrar todos
       empCode: this.empleado?.personalId || this.empleado?.nroDoc || this.empCode
     };
     console.log('Filtros de búsqueda:', filter);
@@ -156,10 +157,13 @@ export class IclockTransactionComponent implements OnInit {
 
   private procesarRespuesta(response: TransactionResponse<TransactionComplete>) {
     if (response && response.data && response.data.length > 0) {
+      console.log("Respuesta de la API:", response);
       this.marcaciones = response.data;
+      this.totalMarcaciones = response.totalPages || response.data.length;
       this.mensajeSinMarcaciones = '';
     } else {
       this.marcaciones = [];
+      this.totalMarcaciones = 0;
       this.mensajeSinMarcaciones = 'No se encontraron marcaciones para el rango seleccionado.';
     }
     this.cargando = false;
@@ -254,11 +258,22 @@ export class IclockTransactionComponent implements OnInit {
     this.fechaInicioStr = this.formatDate(this.fechaInicio);
     this.fechaFinStr = this.formatDate(this.fechaFin);
     
+    // Resetear paginación
+    this.pageNumber = 1;
+    
     this.buscarMarcaciones();
   }
 
   // Reiniciar búsqueda
   reiniciarBusqueda(): void {
+    this.buscarMarcaciones();
+  }
+
+  // Método para manejar eventos del paginador
+  onPaginatorChange(event: PaginatorEvent): void {
+    console.log('📄 Paginador de marcaciones cambió:', event);
+    this.pageNumber = event.pageNumber;
+    this.pageSize = event.pageSize;
     this.buscarMarcaciones();
   }
 

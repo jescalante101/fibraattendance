@@ -10,6 +10,7 @@ import { ShiftsService } from 'src/app/core/services/shifts.service';
 import { ModalVerHorarioComponent } from './modal-ver-horario/modal-ver-horario.component';
 import { ModalEditarAsignacionComponent } from './modal-editar-asignacion/modal-editar-asignacion.component';
 import { ModalService } from 'src/app/shared/modal/modal.service';
+import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
 
 @Component({
   selector: 'app-asignar-horario-empleado',
@@ -180,11 +181,15 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
     this.cargarAsignaciones();
   }
 
-  onPageChange(event: PageEvent) {
-    this.pageNumber = event.pageIndex + 1;
+  onPageChange2(event: PaginatorEvent) {
+    console.log('Página actual:', event.pageNumber);
+    console.log('Tamaño de página:', event.pageSize);
+    console.log('Total de registros:', event.totalRecords);
+    this.pageNumber = event.pageNumber;
     this.pageSize = event.pageSize;
     this.cargarAsignaciones();
   }
+
 
   editar(asignacion: EmployeeScheduleAssignment) {
     console.log('Editar asignación:', asignacion);

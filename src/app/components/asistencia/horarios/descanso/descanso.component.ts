@@ -5,6 +5,7 @@ import { AttendanceService } from 'src/app/core/services/attendance.service';
 import { NuevoDescansoComponent } from './nuevo-descanso/nuevo-descanso.component';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 import { ModalService } from 'src/app/shared/modal/modal.service';
+import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
 
 @Component({
   selector: 'app-descanso',
@@ -73,6 +74,13 @@ calcularHoraFin(horaInicio: string, duracionEnMinutos: number): string {
   handlePageEvent(event: PageEvent) {
     this.pageNumber = event.pageIndex + 1;
     this.pageSize = event.pageSize;
+    this.loadDescansos();
+  }
+
+   onPageChangeCustom(event: PaginatorEvent) {
+    this.pageNumber = event.pageNumber;
+    this.pageSize = event.pageSize;
+    this.totalRecords=event.totalRecords
     this.loadDescansos();
   }
 

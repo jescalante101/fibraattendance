@@ -50,13 +50,10 @@ export class HorarioComponent implements OnInit {
     )
   }
   
-  borrarSeleccionados(){
-    
-  }
-    
-  handlePageEvent(event: PageEvent): void {
+
+  onPageChangeCustom(event: any) {
+    this.pageNumber = event.pageNumber;
     this.pageSize = event.pageSize;
-    this.pageNumber = event.pageIndex + 1; // Sumamos 1 porque pageIndex empieza desde 0
     this.loadHoraiosData();
   }
 

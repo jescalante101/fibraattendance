@@ -184,19 +184,17 @@
           </table>
         </div>
 
-        <!-- Paginador mejorado -->
-        <div class="bg-white px-6 py-3 border-t border-gray-200">
-          <mat-paginator
-            [length]="totalRecords"
-            [pageSize]="pageSize"
-            [pageIndex]="pageNumber - 1"
-            (page)="handlePageEvent($event)"
-            [pageSizeOptions]="[5, 10, 20, 50]"
-            showFirstLastButtons
-            aria-label="Seleccione la página"
-            class="w-full">
-          </mat-paginator>
-        </div>
+      
+
+         <app-fiori-paginator
+          [totalRecords]="totalRecords"
+          [pageSize]="pageSize"
+          [pageNumber]="pageNumber"
+          [pageSizeOptions]="[5, 10, 25, 50]"
+          [showAllOption]="true"
+          [loading]="false"
+          (pageChange)="onPageChangeCustom($event)">
+        </app-fiori-paginator>
       </div>
 
       <!-- Loading State -->

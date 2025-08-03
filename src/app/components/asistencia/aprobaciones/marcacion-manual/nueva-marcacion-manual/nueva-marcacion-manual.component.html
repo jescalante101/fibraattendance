@@ -1,444 +1,563 @@
-<mat-horizontal-stepper [linear]="true" #stepper class="bg-fiori-surface">
-
-  <!-- Paso 1: Selección de empleado -->
-  <mat-step [stepControl]="empleadoForm" label="Seleccionar Empleado">
-    <form [formGroup]="empleadoForm" class="p-6 max-w-7xl mx-auto">
-      
-      <!-- Header del paso con mejor diseño -->
-      <div class="mb-6 pb-4 border-b border-fiori-border">
-        <div class="flex items-center gap-3 mb-2">
-          <div class="w-8 h-8 bg-fiori-primary rounded-full flex items-center justify-center">
-            <mat-icon class="text-white text-sm">person_search</mat-icon>
+<!-- Contenedor principal con tema Fiori -->
+<div class="bg-fiori-muted/30 pb-8">
+  <div class="mx-auto">
+    
+    <!-- Header principal -->
+    <div class="bg-gradient-to-r from-fiori-surface to-fiori-surface/80 rounded-2xl shadow-xl border border-fiori-border/30 overflow-hidden backdrop-blur-sm">
+      <!-- Indicador de pasos elegante -->
+      <div class="px-8 py-6">
+        <div class="flex items-center justify-center">
+          <!-- Paso 1 -->
+          <div class="flex items-center">
+            <div class="relative">
+              <div class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-all duration-300"
+                   [class]="currentStep >= 1 ? 'bg-gradient-to-br from-fiori-primary to-fiori-secondary text-white shadow-fiori-primary/30' : 'bg-fiori-muted text-fiori-subtext'">
+                <span class="text-base font-semibold">1</span>
+              </div>
+              <div *ngIf="currentStep >= 1" class="absolute -top-1 -right-1 w-4 h-4 bg-fiori-success rounded-full flex items-center justify-center">
+                <lucide-icon name="check" class="w-2.5 h-2.5 text-white"></lucide-icon>
+              </div>
+            </div>
+            <div class="ml-4">
+              <span class="block text-base font-semibold transition-colors duration-200"
+                    [class]="currentStep >= 1 ? 'text-fiori-text' : 'text-fiori-subtext'">
+                Seleccionar Empleados
+              </span>
+              <span class="text-xs text-fiori-subtext">Filtrar y elegir empleados</span>
+            </div>
           </div>
-          <div class="text-title text-fiori-text">Seleccionar Empleado</div>
-        </div>
-        <div class="text-sm text-fiori-subtext ml-11">Busca y selecciona los empleados para registrar la marcación manual</div>
-      </div>
-
-      <!-- Filtros de búsqueda con mejor layout -->
-      <div class="card-fiori mb-6">
-        <div class="flex items-center gap-2 mb-4">
-          <mat-icon class="text-fiori-primary">filter_list</mat-icon>
-          <span class="text-label">Filtros de búsqueda</span>
-        </div>
-        
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>Departamento</mat-label>
-            <mat-select formControlName="departamento">
-              <mat-option value="">
-                <div class="flex items-center gap-2">
-                  <mat-icon class="text-fiori-subtext">business</mat-icon>
-                  <span>Todas las áreas</span>
-                </div>
-              </mat-option>
-              <mat-option *ngFor="let area of departamentos" [value]="area.areaId">
-                <div class="flex items-center gap-2">
-                  <mat-icon class="text-fiori-subtext">domain</mat-icon>
-                  <span>{{ area.descripcion }}</span>
-                </div>
-              </mat-option>
-            </mat-select>
-            <mat-icon matSuffix *ngIf="!loadingAreas" class="text-fiori-subtext">expand_more</mat-icon>
-            <mat-icon matSuffix *ngIf="loadingAreas" class="animate-spin text-fiori-primary">refresh</mat-icon>
-          </mat-form-field>
           
-          <mat-form-field appearance="fill" class="w-full lg:col-span-2">
-            <mat-label>Buscar empleado</mat-label>
-            <input matInput placeholder="Ingresa nombre, apellido o número de documento" formControlName="filtroEmpleado">
-            <mat-icon matSuffix class="text-fiori-subtext">search</mat-icon>
-          </mat-form-field>
+          <!-- Conectores elegantes -->
+          <div class="flex-1 mx-8 relative">
+            <div class="h-0.5 bg-fiori-border rounded-full"></div>
+            <div class="h-0.5 bg-gradient-to-r from-fiori-primary to-fiori-secondary rounded-full transition-all duration-500"
+                 [style.width]="currentStep >= 2 ? '100%' : '0%'"></div>
+          </div>
+          
+          <!-- Paso 2 -->
+          <div class="flex items-center">
+            <div class="relative">
+              <div class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-all duration-300"
+                   [class]="currentStep >= 2 ? 'bg-gradient-to-br from-fiori-primary to-fiori-secondary text-white shadow-fiori-primary/30' : 'bg-fiori-muted text-fiori-subtext'">
+                <span class="text-base font-semibold">2</span>
+              </div>
+              <div *ngIf="currentStep >= 2" class="absolute -top-1 -right-1 w-4 h-4 bg-fiori-warning rounded-full flex items-center justify-center">
+                <lucide-icon name="clock" class="w-2.5 h-2.5 text-white"></lucide-icon>
+              </div>
+            </div>
+            <div class="ml-4">
+              <span class="block text-base font-semibold transition-colors duration-200"
+                    [class]="currentStep >= 2 ? 'text-fiori-text' : 'text-fiori-subtext'">
+                Registrar Marcación
+              </span>
+              <span class="text-xs text-fiori-subtext">Detalles de marcación</span>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
 
-        <div class="flex justify-end pt-4 border-t border-fiori-border">
-          <button mat-flat-button color="primary" type="button" (click)="buscarEmpleados()" 
-                  [disabled]="loadingEmpleados"
-                  class="btn-fiori flex items-center gap-2">
-            <mat-icon *ngIf="!loadingEmpleados">search</mat-icon>
-            <mat-icon *ngIf="loadingEmpleados" class="animate-spin">refresh</mat-icon>
-            <span>{{ loadingEmpleados ? 'Buscando...' : 'Buscar Empleados' }}</span>
-          </button>
+    <!-- Paso 1: Selección de empleados -->
+    <div *ngIf="currentStep === 1" class="space-y-6">
+      
+      <!-- Filtros de búsqueda -->
+      <div class="bg-fiori-surface rounded-xl shadow-lg border border-fiori-border/50" style="overflow: visible;">
+        <div class="px-6 py-5">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 bg-gradient-to-br from-fiori-primary to-fiori-secondary rounded-lg flex items-center justify-center">
+              <lucide-icon name="filter" class="w-4 h-4 text-white"></lucide-icon>
+            </div>
+            <h3 class="text-base font-semibold text-fiori-text">Filtros de búsqueda</h3>
+          </div>
+          
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Departamento Autocomplete (copiado exacto de empleado.component.html) -->
+            <div class="relative">
+              <label class="block text-sm font-medium text-fiori-subtext mb-2">Departamento</label>
+              <div class="relative">
+                <input type="text"
+                       [(ngModel)]="departamentoSearchTerm"
+                       (input)="onDepartamentoSearchChange($event)"
+                       (focus)="showDepartamentoDropdown = true"
+                       (blur)="onDepartamentoBlur()"
+                       (keydown)="onDepartamentoKeydown($event)"
+                       placeholder="Buscar departamento..."
+                       class="w-full pl-10 pr-4 py-3 border border-fiori-border rounded-xl bg-fiori-surface/50 focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary text-sm transition-all duration-200 hover:border-fiori-primary/50">
+                <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                  <div class="w-5 h-5 bg-fiori-primary/10 rounded-md flex items-center justify-center">
+                    <lucide-icon name="building" class="w-3 h-3 text-fiori-primary"></lucide-icon>
+                  </div>
+                </div>
+                <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <lucide-icon name="chevron-down" class="w-4 h-4 text-fiori-subtext"></lucide-icon>
+                </div>
+              </div>
+              
+              <!-- Dropdown -->
+              <div *ngIf="showDepartamentoDropdown" 
+                   class="absolute z-[9999] w-full mt-1 bg-white border border-fiori-border/20 rounded-xl shadow-2xl max-h-64 overflow-y-auto"
+                   style="z-index: 9999 !important;">
+                
+                <!-- Opción "Todas las áreas" -->
+                <div class="px-4 py-3 cursor-pointer hover:bg-fiori-hover text-sm transition-colors border-b border-fiori-border"
+                     [ngClass]="{'bg-fiori-primary text-white': highlightedDepartamentoIndex === -1}"
+                     (mousedown)="selectTodasLasAreas()"
+                     (mouseenter)="highlightedDepartamentoIndex = -1">
+                  <div class="flex items-center gap-3">
+                    <div class="w-6 h-6 rounded-lg flex items-center justify-center"
+                         [ngClass]="highlightedDepartamentoIndex === -1 ? 'bg-white/20' : 'bg-fiori-primary/10'">
+                      <lucide-icon name="globe" class="w-3.5 h-3.5"
+                                   [ngClass]="highlightedDepartamentoIndex === -1 ? 'text-white' : 'text-fiori-primary'"></lucide-icon>
+                    </div>
+                    <div>
+                      <div class="font-medium text-fiori-text">Todas las áreas</div>
+                      <div class="text-xs text-fiori-subtext">Mostrar todos los departamentos</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Opciones de departamentos -->
+                <div *ngFor="let area of filteredDepartamentos; let i = index" 
+                     class="px-4 py-3 cursor-pointer hover:bg-fiori-hover text-sm transition-colors"
+                     [ngClass]="{'bg-fiori-primary text-white': highlightedDepartamentoIndex === i}"
+                     (mousedown)="selectDepartamento(area)"
+                     (mouseenter)="highlightedDepartamentoIndex = i">
+                  <div class="flex items-center gap-3">
+                    <div class="w-6 h-6 rounded-lg flex items-center justify-center"
+                         [ngClass]="highlightedDepartamentoIndex === i ? 'bg-white/20' : 'bg-fiori-primary/10'">
+                      <lucide-icon name="building" class="w-3.5 h-3.5"
+                                   [ngClass]="highlightedDepartamentoIndex === i ? 'text-white' : 'text-fiori-primary'"></lucide-icon>
+                    </div>
+                    <div>
+                      <div class="font-medium text-fiori-text">{{ area.descripcion }}</div>
+                      <div class="text-xs text-fiori-subtext">ID: {{ area.areaId }}</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div *ngIf="filteredDepartamentos.length === 0" class="px-4 py-3 text-sm text-fiori-subtext">
+                  No se encontraron departamentos
+                </div>
+              </div>
+            </div>
+            
+            <!-- Búsqueda de empleado -->
+            <div class="relative">
+              <label class="block text-sm font-medium text-fiori-subtext mb-2">Buscar empleado</label>
+              <div class="relative flex gap-2">
+                <div class="relative flex-1">
+                  <input type="text" 
+                         [(ngModel)]="filtroEmpleadoText"
+                         (keyup.enter)="buscarEmpleados()"
+                         placeholder="Nombre, apellido o documento"
+                         class="w-full pl-10 pr-4 py-3 border border-fiori-border rounded-xl bg-fiori-surface/50 focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary text-sm transition-all duration-200 hover:border-fiori-primary/50">
+                  <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                    <div class="w-5 h-5 bg-fiori-primary/10 rounded-md flex items-center justify-center">
+                      <lucide-icon name="search" class="w-3 h-3 text-fiori-primary"></lucide-icon>
+                    </div>
+                  </div>
+                </div>
+                <button type="button"
+                        (click)="buscarEmpleados()"
+                        class="px-4 py-3 bg-fiori-primary text-white rounded-xl hover:bg-fiori-secondary focus:ring-2 focus:ring-fiori-primary focus:ring-offset-1 transition-colors"
+                        title="Buscar empleados">
+                  <lucide-icon name="search" class="w-4 h-4"></lucide-icon>
+                </button>
+                <button type="button"
+                        (click)="limpiarFiltroEmpleado()"
+                        class="px-4 py-3 bg-fiori-muted text-fiori-text rounded-xl hover:bg-fiori-hover focus:ring-2 focus:ring-fiori-border focus:ring-offset-1 transition-colors"
+                        title="Limpiar búsqueda">
+                  <lucide-icon name="x" class="w-4 h-4"></lucide-icon>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Resultados de búsqueda -->
-      <div class="card-fiori mb-6 relative">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-2">
-            <mat-icon class="text-fiori-primary">people</mat-icon>
-            <span class="text-label">Empleados encontrados</span>
-            <span class="bg-fiori-muted text-fiori-text px-2 py-1 rounded-full text-xs">{{ totalEmpleados }}</span>
-          </div>
-          <div *ngIf="empleadosSeleccionados.length > 0" class="flex items-center gap-2">
-            <mat-icon class="text-fiori-success">check_circle</mat-icon>
-            <span class="text-sm text-fiori-success font-medium">{{ empleadosSeleccionados.length }} seleccionados</span>
+      <div class="bg-fiori-surface rounded-2xl shadow-xl border border-fiori-border/50 overflow-hidden backdrop-blur-sm">
+        <div class="px-6 py-5 border-b border-fiori-border/30 bg-gradient-to-r from-fiori-muted/50 to-fiori-muted/30">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-gradient-to-br from-fiori-primary to-fiori-secondary rounded-xl flex items-center justify-center shadow-lg">
+                <lucide-icon name="users" class="w-5 h-5 text-white"></lucide-icon>
+              </div>
+              <div>
+                <h2 class="text-lg font-semibold text-fiori-text">Empleados encontrados</h2>
+                <span class="bg-gradient-to-r from-fiori-primary/10 to-fiori-secondary/10 text-fiori-primary px-3 py-1 rounded-full text-sm font-medium border border-fiori-primary/20">
+                  {{ totalEmpleados }} empleados
+                </span>
+              </div>
+            </div>
+            <div *ngIf="empleadosSeleccionados.length > 0" class="flex items-center gap-3 bg-fiori-success/10 px-4 py-2 rounded-xl border border-fiori-success/20">
+              <div class="w-8 h-8 bg-fiori-success rounded-lg flex items-center justify-center">
+                <lucide-icon name="check-circle" class="w-4 h-4 text-white"></lucide-icon>
+              </div>
+              <div>
+                <span class="text-sm text-fiori-success font-semibold">
+                  {{ empleadosSeleccionados.length }} seleccionado{{ empleadosSeleccionados.length !== 1 ? 's' : '' }}
+                </span>
+                <div class="text-xs text-fiori-success/70">Listos para marcación</div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Loading overlay -->
-        <div *ngIf="loadingEmpleados" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10 rounded-fiori">
+        <!-- Loading state -->
+        <div *ngIf="loadingEmpleados" class="p-12 text-center">
           <div class="flex flex-col items-center gap-4">
-            <mat-spinner diameter="48" color="primary"></mat-spinner>
-            <div class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-fiori-primary"></div>
+            <div>
               <div class="text-fiori-text font-medium">Cargando empleados</div>
               <div class="text-fiori-subtext text-sm">Por favor espere...</div>
             </div>
           </div>
         </div>
-        
-        <div class="overflow-hidden rounded-fiori border border-fiori-border">
-          <div class="overflow-auto max-h-[65vh]">
-            <table mat-table [dataSource]="empleados" class="w-full" multiTemplateDataRows>
-              
-              <!-- Columna de expandir -->
-              <ng-container matColumnDef="expand">
-                <th mat-header-cell *matHeaderCellDef class="w-12 bg-fiori-muted"></th>
-                <td mat-cell *matCellDef="let row" class="w-12">
-                  <button mat-icon-button 
-                          (click)="expandedElement = expandedElement === row ? null : row" 
-                          [attr.aria-label]="'Ver horarios de ' + row.fullNameEmployee"
-                          class="hover:bg-fiori-hover transition-colors">
-                    <mat-icon class="text-fiori-subtext">
-                      {{ expandedElement === row ? 'expand_less' : 'expand_more' }}
-                    </mat-icon>
-                  </button>
-                </td>
-              </ng-container>
 
-              <!-- Columna de selección -->
-              <ng-container matColumnDef="select">
-                <th mat-header-cell *matHeaderCellDef class="w-16 bg-fiori-muted">
-                  <div class="flex flex-col items-center gap-1">
-                    <mat-checkbox
-                      [checked]="isAllSelected()"
-                      [indeterminate]="isSomeSelected() && !isAllSelected()"
-                      (change)="toggleSelectAll($event.checked)"
-                      color="primary">
-                    </mat-checkbox>
-                    <span class="text-xs text-fiori-subtext">Todo</span>
+        <!-- Tabla de empleados -->
+        <div *ngIf="!loadingEmpleados" class="h-[400px] overflow-auto">
+          <table class="min-w-full text-sm">
+            <thead class="bg-fiori-muted border-b border-fiori-border sticky top-0 z-10">
+              <tr>
+                <th class="px-4 py-3 text-left">
+                  <div class="flex items-center gap-2">
+                    <input type="checkbox" 
+                           [checked]="isAllSelected()"
+                           [indeterminate]="isSomeSelected() && !isAllSelected()"
+                           (change)="toggleSelectAll($event)"
+                           class="w-4 h-4 text-fiori-primary bg-fiori-surface border-fiori-border rounded focus:ring-fiori-primary">
+                    <span class="text-xs font-medium text-fiori-subtext uppercase">Seleccionar</span>
                   </div>
                 </th>
-                <td mat-cell *matCellDef="let row" class="w-16">
-                  <mat-checkbox 
-                    [checked]="isEmpleadoSeleccionado(row)" 
-                    (change)="toggleSeleccionEmpleado(row, $event.checked)"
-                    color="primary">
-                  </mat-checkbox>
-                </td>
-              </ng-container>
-
-              <!-- Número de Documento -->
-              <ng-container matColumnDef="nroDoc">
-                <th mat-header-cell *matHeaderCellDef class="bg-fiori-muted">
+                <th class="px-4 py-3 text-left text-xs font-medium text-fiori-subtext uppercase">
                   <div class="flex items-center gap-2">
-                    <mat-icon class="text-fiori-subtext text-sm">badge</mat-icon>
-                    <span class="text-label">Documento</span>
+                    <lucide-icon name="id-card" class="w-4 h-4"></lucide-icon>
+                    Documento
                   </div>
                 </th>
-                <td mat-cell *matCellDef="let row">
+                <th class="px-4 py-3 text-left text-xs font-medium text-fiori-subtext uppercase">
                   <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-fiori-primary bg-opacity-10 rounded-full flex items-center justify-center">
-                      <mat-icon class="text-fiori-primary text-sm">person</mat-icon>
+                    <lucide-icon name="user" class="w-4 h-4"></lucide-icon>
+                    Empleado
+                  </div>
+                </th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-fiori-subtext uppercase">
+                  <div class="flex items-center gap-2">
+                    <lucide-icon name="building" class="w-4 h-4"></lucide-icon>
+                    Área
+                  </div>
+                </th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-fiori-subtext uppercase">
+                  <div class="flex items-center gap-2">
+                    <lucide-icon name="clock" class="w-4 h-4"></lucide-icon>
+                    Horarios
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-fiori-surface divide-y divide-fiori-border">
+              <tr *ngFor="let emp of empleados.data; trackBy: trackByEmpleado" 
+                  class="hover:bg-fiori-hover transition-colors duration-200">
+                
+                <!-- Checkbox -->
+                <td class="px-4 py-4">
+                  <input type="checkbox" 
+                         [checked]="isEmpleadoSeleccionado(emp)"
+                         (change)="toggleSeleccionEmpleado(emp, $event)"
+                         class="w-4 h-4 text-fiori-primary bg-fiori-surface border-fiori-border rounded focus:ring-fiori-primary">
+                </td>
+                
+                <!-- Documento -->
+                <td class="px-4 py-4">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+                      <lucide-icon name="badge" class="w-4 h-4 text-fiori-primary"></lucide-icon>
                     </div>
-                    <span class="font-medium text-fiori-text">{{ row.nroDoc }}</span>
+                    <span class="font-medium text-fiori-text">{{ emp.nroDoc }}</span>
                   </div>
                 </td>
-              </ng-container>
-
-              <!-- Nombre completo -->
-              <ng-container matColumnDef="fullNameEmployee">
-                <th mat-header-cell *matHeaderCellDef class="bg-fiori-muted">
-                  <div class="flex items-center gap-2">
-                    <mat-icon class="text-fiori-subtext text-sm">person</mat-icon>
-                    <span class="text-label">Nombre Completo</span>
-                  </div>
-                </th>
-                <td mat-cell *matCellDef="let row">
+                
+                <!-- Empleado -->
+                <td class="px-4 py-4">
                   <div class="flex flex-col">
-                    <span class="text-fiori-text font-medium">{{ row.fullNameEmployee }}</span>
-                    <span class="text-xs text-fiori-subtext">ID: {{ row.nroDoc }}</span>
+                    <span class="font-medium text-fiori-text">{{ emp.fullNameEmployee }}</span>
+                    <span class="text-xs text-fiori-subtext">ID: {{ emp.nroDoc }}</span>
                   </div>
                 </td>
-              </ng-container>
-
-              <!-- Área -->
-              <ng-container matColumnDef="areaName">
-                <th mat-header-cell *matHeaderCellDef class="bg-fiori-muted">
+                
+                <!-- Área -->
+                <td class="px-4 py-4">
+                  <div class="inline-flex items-center gap-2 px-3 py-1 bg-fiori-muted text-fiori-text text-sm rounded-full border border-fiori-border">
+                    <lucide-icon name="building" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
+                    <span>{{ emp.areaName || 'Sin área asignada' }}</span>
+                  </div>
+                </td>
+                
+                <!-- Horarios -->
+                <td class="px-4 py-4">
                   <div class="flex items-center gap-2">
-                    <mat-icon class="text-fiori-subtext text-sm">domain</mat-icon>
-                    <span class="text-label">Área</span>
+                    <button (click)="toggleExpandEmployee(emp)" 
+                            class="inline-flex items-center gap-1 px-2 py-1 text-xs bg-fiori-primary/10 text-fiori-primary rounded border border-fiori-primary/20 hover:bg-fiori-primary/20 transition-colors">
+                      <lucide-icon name="clock" class="w-3 h-3"></lucide-icon>
+                      <span>{{ emp.horarios.length || 0 }} horarios</span>
+                      <lucide-icon [name]="expandedEmployee === emp ? 'chevron-up' : 'chevron-down'" 
+                                   class="w-3 h-3"></lucide-icon>
+                    </button>
                   </div>
-                </th>
-                <td mat-cell *matCellDef="let row">
-                  <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-fiori-muted text-fiori-text text-sm rounded-full border border-fiori-border">
-                    <mat-icon class="text-fiori-subtext text-xs">business</mat-icon>
-                    <span>{{ row.areaName || 'Sin área asignada' }}</span>
+                  
+                  <!-- Horarios expandidos -->
+                  <div *ngIf="expandedEmployee === emp && emp.horarios.length > 0" 
+                       class="mt-3 space-y-2 border-t border-fiori-border pt-2">
+                    <div *ngFor="let horario of getHorariosAgrupados(emp.horarios)" 
+                         class="flex items-center justify-between bg-fiori-muted/50 p-2 rounded border border-fiori-border">
+                      <div class="flex items-center gap-2">
+                        <lucide-icon name="clock" class="w-3 h-3 text-fiori-primary"></lucide-icon>
+                        <span class="text-xs font-medium text-fiori-text">{{ horario.nameHora }}</span>
+                      </div>
+                      <span class="text-xs text-fiori-subtext">{{ horario.inTime }} - {{ horario.outTime }}</span>
+                    </div>
+                  </div>
+                  
+                  <div *ngIf="expandedEmployee === emp && (!emp.horarios || emp.horarios.length === 0)" 
+                       class="mt-3 flex items-center gap-2 text-fiori-warning bg-fiori-warning/10 p-2 rounded border border-fiori-warning/20">
+                    <lucide-icon name="warning" class="w-3 h-3"></lucide-icon>
+                    <span class="text-xs">No tiene horarios asignados</span>
                   </div>
                 </td>
-              </ng-container>
-
-              <!-- Fila expandida para horarios -->
-              <ng-container matColumnDef="expandedDetail">
-                <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumnsWithExpand.length">
-                  <div *ngIf="expandedElement === row" class="bg-fiori-muted bg-opacity-50 p-4 animate-fade-in">
-                    <div class="flex items-center gap-2 mb-3">
-                      <mat-icon class="text-fiori-primary">schedule</mat-icon>
-                      <span class="font-semibold text-fiori-text">Horarios asignados</span>
+              </tr>
+              
+              <!-- Estado vacío -->
+              <tr *ngIf="empleados.data.length === 0">
+                <td colspan="5" class="px-4 py-12 text-center">
+                  <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 bg-fiori-muted rounded-full flex items-center justify-center mb-4">
+                      <lucide-icon name="people-off" class="w-8 h-8 text-fiori-subtext"></lucide-icon>
                     </div>
-                    
-                    <div *ngIf="row.horarios && row.horarios.length > 0; else noHorarios" 
-                         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      <div *ngFor="let horario of getHorariosAgrupados(row.horarios)" 
-                           class="bg-white p-3 rounded-fiori border border-fiori-border">
-                        <div class="flex items-center justify-between">
-                          <div class="flex items-center gap-2">
-                            <mat-icon class="text-fiori-primary text-sm">access_time</mat-icon>
-                            <span class="font-medium text-fiori-text text-sm">{{ horario.nameHora }}</span>
-                          </div>
-                          <div class="text-xs text-fiori-subtext">
-                            {{ horario.inTime }} - {{ horario.outTime }}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <ng-template #noHorarios>
-                      <div class="flex items-center gap-2 text-fiori-subtext bg-white p-3 rounded-fiori border border-fiori-border">
-                        <mat-icon class="text-fiori-warning">warning</mat-icon>
-                        <span>No tiene horarios asignados</span>
-                      </div>
-                    </ng-template>
+                    <h3 class="text-lg font-medium text-fiori-text mb-2">No se encontraron empleados</h3>
+                    <p class="text-sm text-fiori-subtext">Intenta ajustar los filtros de búsqueda</p>
                   </div>
                 </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="displayedColumnsWithExpand" class="bg-fiori-muted"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumnsWithExpand;" 
-                  class="hover:bg-fiori-hover transition-colors duration-200 cursor-pointer border-b border-fiori-border last:border-b-0"></tr>
-              <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-row"></tr>
-            </table>
-          </div>
-          
-          <!-- Mensaje cuando no hay datos -->
-          <div *ngIf="!loadingEmpleados && empleados.data.length === 0" 
-               class="text-center py-12 text-fiori-subtext bg-fiori-muted bg-opacity-30">
-            <mat-icon class="mb-4 text-6xl text-fiori-subtext opacity-50">people_off</mat-icon>
-            <div class="text-lg font-medium mb-2">No se encontraron empleados</div>
-            <div class="text-sm">Intenta ajustar los filtros de búsqueda</div>
-          </div>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <!-- Paginación -->
-        <div class="border-t border-fiori-border mt-4 pt-4">
-          <mat-paginator 
-            [length]="totalEmpleados" 
-            [pageSize]="pageSize" 
-            [pageIndex]="pageNumber - 1"
-            (page)="onEmpleadoPage($event)" 
-            [pageSizeOptions]="[5, 10, 20, 50]"
-            [disabled]="loadingEmpleados"
-            class="border-0 bg-transparent">
-          </mat-paginator>
-        </div>
+        <!-- Paginador Fiori Genérico -->
+        <app-fiori-paginator
+          [totalRecords]="totalEmpleados"
+          [pageSize]="pageSize"
+          [pageNumber]="pageNumber"
+          [loading]="loadingEmpleados"
+          [pageSizeOptions]="[5, 10, 15, 25, 50]"
+          [showAllOption]="false"
+          (pageChange)="onPaginatorChange($event)">
+        </app-fiori-paginator>
+        
       </div>
 
-      <!-- Botones de navegación -->
-      <div class="flex justify-between items-center pt-4 border-t border-fiori-border">
+    </div>
+
+    <!-- Paso 2: Formulario de marcación -->
+    <div *ngIf="currentStep === 2" class="space-y-6">
+      
+      <!-- Formulario de marcación elegante -->
+      <div class="bg-gradient-to-br from-fiori-surface to-fiori-surface/80 rounded-2xl shadow-xl border border-fiori-border/50 overflow-hidden backdrop-blur-sm">
+        
+        <form [formGroup]="marcacionForm" class="p-6">
+          
+          <!-- Header elegante con empleados seleccionados -->
+          <div class="flex items-center justify-between mb-6 pb-4 border-b border-fiori-border/30">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-gradient-to-br from-fiori-warning to-fiori-warning/80 rounded-xl flex items-center justify-center shadow-lg">
+                <lucide-icon name="clock" class="w-5 h-5 text-white"></lucide-icon>
+              </div>
+              <div>
+                <h2 class="text-lg font-semibold text-fiori-text">Detalles de marcación</h2>
+                <p class="text-sm text-fiori-subtext">Complete la información de la marcación manual</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 bg-fiori-primary/10 px-4 py-2 rounded-xl border border-fiori-primary/20">
+              <div class="w-8 h-8 bg-fiori-primary rounded-lg flex items-center justify-center">
+                <lucide-icon name="users" class="w-4 h-4 text-white"></lucide-icon>
+              </div>
+              <div>
+                <span class="text-sm text-fiori-primary font-semibold">{{ empleadosSeleccionados.length }} empleado{{ empleadosSeleccionados.length !== 1 ? 's' : '' }}</span>
+                <div class="text-xs text-fiori-primary/70">Seleccionados</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Campos del formulario elegantes -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            
+            <!-- Fecha -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-fiori-subtext">Fecha de marcación</label>
+              <div class="relative group">
+                <input type="date" 
+                       formControlName="fechaMarcacion"
+                       class="w-full pl-12 pr-4 py-3 border border-fiori-border rounded-xl bg-fiori-surface/50 focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary text-sm transition-all duration-200 hover:border-fiori-primary/50 group-hover:shadow-lg">
+                <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                  <div class="w-6 h-6 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+                    <lucide-icon name="calendar" class="w-3.5 h-3.5 text-fiori-primary"></lucide-icon>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Hora -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-fiori-subtext">Hora de marcación</label>
+              <div class="relative group">
+                <input type="time" 
+                       formControlName="horaMarcacion"
+                       class="w-full pl-12 pr-4 py-3 border border-fiori-border rounded-xl bg-fiori-surface/50 focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary text-sm transition-all duration-200 hover:border-fiori-primary/50 group-hover:shadow-lg">
+                <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                  <div class="w-6 h-6 bg-fiori-warning/10 rounded-lg flex items-center justify-center">
+                    <lucide-icon name="clock" class="w-3.5 h-3.5 text-fiori-warning"></lucide-icon>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tipo de marcación -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-fiori-subtext">Tipo de marcación</label>
+              <div class="relative group">
+                <select formControlName="estadoMarcacion"
+                        class="w-full pl-12 pr-10 py-3 border border-fiori-border rounded-xl bg-fiori-surface/50 focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary text-sm appearance-none transition-all duration-200 hover:border-fiori-primary/50 group-hover:shadow-lg">
+                  <option value="">Seleccionar tipo...</option>
+                  <option value="entrada">🟢 Entrada</option>
+                  <option value="salida">🔴 Salida</option>
+                  <option value="salida_descanso">🟡 Salida Descanso</option>
+                  <option value="entrada_descanso">🔵 Regreso Descanso</option>
+                </select>
+                <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                  <div class="w-6 h-6 bg-fiori-secondary/10 rounded-lg flex items-center justify-center">
+                    <lucide-icon name="clock" class="w-3.5 h-3.5 text-fiori-secondary"></lucide-icon>
+                  </div>
+                </div>
+                <lucide-icon name="chevron-down" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-fiori-subtext w-4 h-4 transition-transform group-focus-within:rotate-180"></lucide-icon>
+              </div>
+            </div>
+          </div>
+
+          <!-- Motivo e incidencias elegantes -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Motivo -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-fiori-subtext">Motivo de marcación <span class="text-fiori-error">*</span></label>
+              <div class="relative group">
+                <textarea formControlName="motivo"
+                          rows="3"
+                          placeholder="Describa el motivo de la marcación manual..."
+                          class="w-full pl-12 pr-4 py-3 border border-fiori-border rounded-xl bg-fiori-surface/50 focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary text-sm resize-none transition-all duration-200 hover:border-fiori-primary/50 group-hover:shadow-lg"></textarea>
+                <div class="absolute left-3 top-3">
+                  <div class="w-6 h-6 bg-fiori-error/10 rounded-lg flex items-center justify-center">
+                    <lucide-icon name="file-edit" class="w-3.5 h-3.5 text-fiori-error"></lucide-icon>
+                  </div>
+                </div>
+              </div>
+              <div class="text-xs text-fiori-subtext">Este campo es obligatorio</div>
+            </div>
+
+            <!-- Incidencias -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-fiori-subtext">Incidencias adicionales</label>
+              <div class="relative group">
+                <textarea formControlName="incidencias"
+                          rows="3"
+                          placeholder="Situaciones especiales, observaciones o incidencias..."
+                          class="w-full pl-12 pr-4 py-3 border border-fiori-border rounded-xl bg-fiori-surface/50 focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary text-sm resize-none transition-all duration-200 hover:border-fiori-primary/50 group-hover:shadow-lg"></textarea>
+                <div class="absolute left-3 top-3">
+                  <div class="w-6 h-6 bg-fiori-warning/10 rounded-lg flex items-center justify-center">
+                    <lucide-icon name="clipboard-list" class="w-3.5 h-3.5 text-fiori-warning"></lucide-icon>
+                  </div>
+                </div>
+              </div>
+              <div class="text-xs text-fiori-subtext">Información adicional (opcional)</div>
+            </div>
+          </div>
+          
+          <!-- Lista elegante de empleados seleccionados -->
+          <div class="mt-6 pt-4 border-t border-fiori-border/30">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-6 h-6 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+                <lucide-icon name="users" class="w-3.5 h-3.5 text-fiori-primary"></lucide-icon>
+              </div>
+              <span class="text-sm font-semibold text-fiori-subtext">Empleados que recibirán la marcación:</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <div *ngFor="let emp of empleadosSeleccionados | slice:0:5" 
+                   class="inline-flex items-center gap-2 bg-gradient-to-r from-fiori-primary/10 to-fiori-secondary/10 px-3 py-2 rounded-xl border border-fiori-primary/20 transition-all hover:shadow-lg">
+                <div class="w-6 h-6 bg-fiori-primary/20 rounded-lg flex items-center justify-center">
+                  <lucide-icon name="user" class="w-3 h-3 text-fiori-primary"></lucide-icon>
+                </div>
+                <span class="font-medium text-fiori-text text-sm">{{ emp.fullNameEmployee }}</span>
+              </div>
+              <div *ngIf="empleadosSeleccionados.length > 5"
+                   class="inline-flex items-center gap-2 bg-fiori-muted/50 px-3 py-2 rounded-xl border border-fiori-border text-sm text-fiori-subtext">
+                <div class="w-6 h-6 bg-fiori-muted rounded-lg flex items-center justify-center">
+                  <span class="text-xs font-bold">+{{ empleadosSeleccionados.length - 5 }}</span>
+                </div>
+                <span>empleados más</span>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Barra de acciones flotante en el footer del modal -->
+  <div class="bg-fiori-surface border-t border-fiori-border p-4 rounded-b-lg">
+    
+    <!-- Paso 1: Botón continuar -->
+    <div *ngIf="currentStep === 1" class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
         <div class="text-sm text-fiori-subtext">
           Paso 1 de 2 - Selección de empleados
         </div>
-        <button mat-flat-button color="primary" (click)="stepper.next()" 
-                [disabled]="empleadosSeleccionados.length === 0"
-                class="btn-fiori flex items-center gap-2">
-          <span>Continuar</span>
-          <mat-icon>arrow_forward</mat-icon>
+        <div *ngIf="empleadosSeleccionados.length > 0" class="flex items-center gap-2 px-3 py-1 bg-fiori-success/10 text-fiori-success rounded-full text-sm">
+          <lucide-icon name="check-circle" class="w-4 h-4"></lucide-icon>
+          <span class="font-medium">{{ empleadosSeleccionados.length }} seleccionado{{ empleadosSeleccionados.length !== 1 ? 's' : '' }}</span>
+        </div>
+      </div>
+      
+      <button (click)="nextStep()" 
+              [disabled]="empleadosSeleccionados.length === 0"
+              class="inline-flex items-center gap-2 px-6 py-3 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary focus:ring-2 focus:ring-fiori-primary focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg">
+        <span>Continuar</span>
+        <lucide-icon name="chevron-right" class="w-4 h-4"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Paso 2: Botones de navegación y guardar -->
+    <div *ngIf="currentStep === 2" class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <button (click)="previousStep()" 
+                class="inline-flex items-center gap-2 px-4 py-2 text-sm border border-fiori-border rounded-lg hover:bg-fiori-hover transition-colors">
+          <lucide-icon name="chevron-left" class="w-4 h-4"></lucide-icon>
+          <span>Atrás</span>
         </button>
-      </div>
-    </form>
-  </mat-step>
-
-  <!-- Paso 2: Formulario de marcación -->
-  <mat-step [stepControl]="marcacionForm" label="Registrar Marcación">
-    <form [formGroup]="marcacionForm" class="p-6 max-w-4xl mx-auto">
-
-      <!-- Header del paso -->
-      <div class="mb-6 pb-4 border-b border-fiori-border">
-        <div class="flex items-center gap-3 mb-2">
-          <div class="w-8 h-8 bg-fiori-primary rounded-full flex items-center justify-center">
-            <mat-icon class="text-white text-sm">access_time</mat-icon>
-          </div>
-          <div class="text-title text-fiori-text">Registrar Marcación</div>
-        </div>
-        <div class="text-sm text-fiori-subtext ml-11">
-          Complete los detalles de la marcación para 
-          <span class="font-medium text-fiori-primary">{{ empleadosSeleccionados.length }}</span> 
-          empleado{{ empleadosSeleccionados.length !== 1 ? 's' : '' }} seleccionado{{ empleadosSeleccionados.length !== 1 ? 's' : '' }}
+        <div class="text-sm text-fiori-subtext">
+          Paso 2 de 2 - Detalles de marcación
         </div>
       </div>
+      
+      <button (click)="guardarMarcacion()" 
+              [disabled]="marcacionForm.invalid || loadingGuardado"
+              class="inline-flex items-center gap-2 px-6 py-3 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary focus:ring-2 focus:ring-fiori-primary focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg">
+        <lucide-icon [name]="loadingGuardado ? 'refresh-cw' : 'save'" 
+                     [class]="loadingGuardado ? 'w-4 h-4 animate-spin' : 'w-4 h-4'"></lucide-icon>
+        <span>{{ loadingGuardado ? 'Guardando...' : 'Guardar Marcación' }}</span>
+      </button>
+    </div>
+  </div>
 
-      <!-- Resumen de empleados seleccionados -->
-      <div class="card-fiori mb-6">
-        <div class="flex items-center gap-2 mb-3">
-          <mat-icon class="text-fiori-primary">group</mat-icon>
-          <span class="text-label">Empleados seleccionados</span>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <div *ngFor="let emp of empleadosSeleccionados | slice:0:3" 
-               class="flex items-center gap-2 bg-fiori-primary bg-opacity-10 px-3 py-1.5 rounded-full border border-fiori-primary border-opacity-20">
-            <mat-icon class="text-fiori-primary text-sm">person</mat-icon>
-            <span class="text-sm font-medium text-fiori-text">{{ emp.fullNameEmployee }}</span>
-            <span class="text-xs text-fiori-subtext">({{ emp.nroDoc }})</span>
-          </div>
-          <ng-container *ngIf="empleadosSeleccionados.length > 3">
-            <div
-              class="flex items-center gap-2 bg-fiori-primary bg-opacity-10 px-3 py-1.5 rounded-full border border-fiori-primary border-opacity-20 cursor-pointer"
-              [matTooltip]="getEmpleadosTooltip()"
-              matTooltipClass="max-w-xs whitespace-pre-line text-xs"
-              matTooltipPosition="above">
-              <mat-icon class="text-fiori-primary text-sm">more_horiz</mat-icon>
-              <span class="text-sm font-medium text-fiori-text">+{{ empleadosSeleccionados.length - 3 }} más</span>
-            </div>
-          </ng-container>
-        </div>
-      </div>
 
-      <!-- Campos del formulario -->
-      <div class="space-y-6">
-        
-        <!-- Fecha y hora -->
-        <div class="card-fiori">
-          <div class="flex items-center gap-2 mb-4">
-            <mat-icon class="text-fiori-primary">event</mat-icon>
-            <span class="text-label">Fecha y hora de marcación</span>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <mat-form-field appearance="fill" class="w-full">
-              <mat-label>Fecha de Marcación</mat-label>
-              <input matInput [matDatepicker]="picker" formControlName="fechaMarcacion" readonly>
-              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker></mat-datepicker>
-              <mat-icon matIconPrefix class="text-fiori-subtext">calendar_today</mat-icon>
-            </mat-form-field>
-
-            <mat-form-field appearance="fill" class="w-full">
-              <mat-label>Hora de Marcación</mat-label>
-              <input matInput type="time" formControlName="horaMarcacion">
-              <mat-icon matIconPrefix class="text-fiori-subtext">schedule</mat-icon>
-            </mat-form-field>
-          </div>
-        </div>
-
-        <!-- Tipo de marcación -->
-        <div class="card-fiori">
-          <div class="flex items-center gap-2 mb-4">
-            <mat-icon class="text-fiori-primary">touch_app</mat-icon>
-            <span class="text-label">Tipo de marcación</span>
-          </div>
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>Selecciona el tipo de marcación</mat-label>
-            <mat-select formControlName="estadoMarcacion">
-              <mat-option value="entrada">
-                <div class="flex items-center gap-3 py-2">
-                  <div class="w-8 h-8 bg-fiori-success bg-opacity-10 rounded-full flex items-center justify-center">
-                    <mat-icon class="text-fiori-success text-sm">login</mat-icon>
-                  </div>
-                  <div class="flex flex-col">
-                    <span class="font-medium">Marcación de Entrada</span>
-                    <span class="text-xs text-fiori-subtext">Inicio de jornada laboral</span>
-                  </div>
-                </div>
-              </mat-option>
-              <mat-option value="salida">
-                <div class="flex items-center gap-3 py-2">
-                  <div class="w-8 h-8 bg-fiori-error bg-opacity-10 rounded-full flex items-center justify-center">
-                    <mat-icon class="text-fiori-error text-sm">logout</mat-icon>
-                  </div>
-                  <div class="flex flex-col">
-                    <span class="font-medium">Marcación de Salida</span>
-                    <span class="text-xs text-fiori-subtext">Fin de jornada laboral</span>
-                  </div>
-                </div>
-              </mat-option>
-              <mat-option value="salida_descanso">
-                <div class="flex items-center gap-3 py-2">
-                  <div class="w-8 h-8 bg-fiori-warning bg-opacity-10 rounded-full flex items-center justify-center">
-                    <mat-icon class="text-fiori-warning text-sm">coffee</mat-icon>
-                  </div>
-                  <div class="flex flex-col">
-                    <span class="font-medium">Salida a Descanso</span>
-                    <span class="text-xs text-fiori-subtext">Inicio de break o almuerzo</span>
-                  </div>
-                </div>
-              </mat-option>
-              <mat-option value="entrada_descanso">
-                <div class="flex items-center gap-3 py-2">
-                  <div class="w-8 h-8 bg-fiori-info bg-opacity-10 rounded-full flex items-center justify-center">
-                    <mat-icon class="text-fiori-info text-sm">work</mat-icon>
-                  </div>
-                  <div class="flex flex-col">
-                    <span class="font-medium">Entrada de Descanso</span>
-                    <span class="text-xs text-fiori-subtext">Regreso de break o almuerzo</span>
-                  </div>
-                </div>
-              </mat-option>
-            </mat-select>
-            <mat-icon matIconPrefix class="text-fiori-subtext">access_time</mat-icon>
-          </mat-form-field>
-        </div>
-
-        <!-- Observaciones -->
-        <div class="card-fiori">
-          <div class="flex items-center gap-2 mb-4">
-            <mat-icon class="text-fiori-primary">note</mat-icon>
-            <span class="text-label">Observaciones y detalles</span>
-          </div>
-          <div class="space-y-4">
-            <mat-form-field appearance="fill" class="w-full">
-              <mat-label>Motivo de la marcación manual</mat-label>
-              <textarea matInput 
-                        formControlName="motivo" 
-                        rows="3" 
-                        placeholder="Describe el motivo por el cual se registra esta marcación manual">
-              </textarea>
-              <mat-icon matIconPrefix class="text-fiori-subtext">edit_note</mat-icon>
-            </mat-form-field>
-
-            <mat-form-field appearance="fill" class="w-full">
-              <mat-label>Incidencias (opcional)</mat-label>
-              <textarea matInput 
-                        formControlName="incidencias" 
-                        rows="2" 
-                        placeholder="Describe cualquier incidencia o situación especial relacionada">
-              </textarea>
-              <mat-icon matIconPrefix class="text-fiori-subtext">report_problem</mat-icon>
-            </mat-form-field>
-          </div>
-        </div>
-      </div>
-
-      <!-- Botones de navegación -->
-      <div class="flex justify-between items-center pt-6 border-t border-fiori-border mt-6">
-        <div class="flex items-center gap-4">
-          <button mat-stroked-button type="button" (click)="stepper.previous()" 
-                  class="btn-fiori-secondary flex items-center gap-2">
-            <mat-icon>arrow_back</mat-icon>
-            <span>Atrás</span>
-          </button>
-          <div class="text-sm text-fiori-subtext">
-            Paso 2 de 2 - Detalles de marcación
-          </div>
-        </div>
-        
-        <button mat-flat-button color="primary" type="submit" 
-                (click)="guardarMarcacion()" 
-                [disabled]="marcacionForm.invalid || loadingGuardado"
-                class="btn-fiori flex items-center gap-2">
-          <mat-icon *ngIf="!loadingGuardado">save</mat-icon>
-          <mat-icon *ngIf="loadingGuardado" class="animate-spin">refresh</mat-icon>
-          <span>{{ loadingGuardado ? 'Guardando...' : 'Guardar Marcación' }}</span>
-        </button>
-      </div>
-    </form>
-  </mat-step>
-
-</mat-horizontal-stepper>
+</div>

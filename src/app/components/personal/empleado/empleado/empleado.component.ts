@@ -14,6 +14,7 @@ import { IclockTransactionComponent } from '../iclock-transaction/iclock-transac
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { HeaderConfigService, HeaderConfig } from 'src/app/core/services/header-config.service';
 import { EmployeesParameters } from '../../../../core/services/person.service';
+import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
 
 @Component({
   selector: 'app-empleado',
@@ -228,6 +229,13 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
   onPageChange(event: PageEvent) {
     this.page = event.pageIndex + 1;
     this.pageSize = event.pageSize;
+    this.getEmployees();
+  }
+  
+  onPageChangeCustom(event: PaginatorEvent) {
+    this.page = event.pageNumber;
+    this.pageSize = event.pageSize;
+    this.totalCount=event.totalRecords
     this.getEmployees();
   }
 

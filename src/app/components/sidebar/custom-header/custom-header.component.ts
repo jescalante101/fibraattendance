@@ -378,9 +378,24 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
           }
         }
         
-        // Si no hay periodo guardado o no se encuentra, usar el primero
+        // Si no hay periodo guardado o no se encuentra, buscar el periodo del mes actual
         if (!periodoToSelect && periodos.length > 0) {
-          periodoToSelect = periodos[0];
+          const currentMonth = new Date().getMonth();
+          const selectedYear = parseInt(this.selectedAno);
+          
+          // Buscar periodo donde fechaIni coincida con el mes actual y el año seleccionado
+          periodoToSelect = periodos.find(p => {
+            // Convertir fechaIni a Date si viene como string
+            const fechaIni = p.fechaIni instanceof Date ? p.fechaIni : new Date(p.fechaIni);
+            return fechaIni.getMonth() === currentMonth && fechaIni.getFullYear() === selectedYear ;
+          }) || periodos[0];
+          
+          // Si no encuentra coincidencia, usar el primer periodo
+          if (!periodoToSelect) {
+            periodoToSelect = periodos[0];
+          }
+          
+          console.log('Buscando periodo:', { currentMonth, selectedYear, encontrado: periodoToSelect?.periodoId });
         }
         
         if (periodoToSelect) {

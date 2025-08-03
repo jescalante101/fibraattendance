@@ -11,6 +11,7 @@ import { EmployeeScheduleAssignmentService } from 'src/app/core/services/employe
 import { EmployeeScheduleHours } from 'src/app/models/employee-schedule/employee-schedule-hours.model';
 import { Subject, takeUntil } from 'rxjs';
 import { HeaderConfig, HeaderConfigService } from '../../../../../core/services/header-config.service';
+import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
 
 @Component({
   selector: 'app-nueva-marcacion-manual',
@@ -20,6 +21,12 @@ import { HeaderConfig, HeaderConfigService } from '../../../../../core/services/
 export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
 
   modalRef: any;
+  // Control de pasos
+  currentStep: number = 1;
+  
+  // Referencia a Math para uso en template
+  Math = Math;
+  
   // Formularios reactivos
   empleadoForm: FormGroup;
   marcacionForm: FormGroup;
@@ -28,6 +35,17 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
   empleados: MatTableDataSource<EmployeeScheduleHours> = new MatTableDataSource<EmployeeScheduleHours>([]);
   empleadosRaw: EmployeeScheduleHours[] = [];
   departamentos: RhArea[] = [];
+  filteredDepartamentos: RhArea[] = [];
+  
+  // Estados de dropdown
+  showDepartamentoDropdown: boolean = false;
+  
+  // Autocomplete de departamento (igual que empleado.component.ts)
+  departamentoSearchTerm: string = '';
+  highlightedDepartamentoIndex: number = -1;
+  
+  // Filtro de empleado usando ngModel como el departamento
+  filtroEmpleadoText: string = '';
 
   // Estados de loading
   loadingAreas: boolean = false;
@@ -43,6 +61,7 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
   empleadosSeleccionados: EmployeeScheduleHours[] = [];
   displayedColumns: string[] = ['select', 'nroDoc', 'fullNameEmployee', 'areaName'];
   expandedElement: EmployeeScheduleHours | null = null;
+  expandedEmployee: EmployeeScheduleHours | null = null;
   displayedColumnsWithExpand: string[] = [];
 
   //Destroy
@@ -59,9 +78,11 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
     private HeaderConfigService: HeaderConfigService,
   ) {
     this.empleadoForm = this.fb.group({
-      departamento: [''],
-      filtroEmpleado: ['']
+      departamento: ['']
     });
+    
+    // Inicializar el autocomplete
+    this.departamentoSearchTerm = 'Todas las áreas';
     this.marcacionForm = this.fb.group({
       fechaMarcacion: [null, Validators.required],
       horaMarcacion: ['', Validators.required],
@@ -104,10 +125,13 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
     this.rhAreaService.getAreas(empresaId).subscribe({
       next: (areas) => {
         this.departamentos = areas;
+        this.filteredDepartamentos = [...this.departamentos];
         this.loadingAreas = false;
       },
       error: (error) => {
         console.error('Error cargando áreas:', error);
+        this.departamentos = [];
+        this.filteredDepartamentos = [];
         this.loadingAreas = false;
       }
     });
@@ -115,10 +139,22 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
 
   cargarEmpleados() {
     this.loadingEmpleados = true;
-    const filtro = this.empleadoForm.value.filtroEmpleado || '';
+    
+    // Usar ngModel variables directamente como en el departamento
+    const filtro = this.filtroEmpleadoText || '';
     const areaId = this.empleadoForm.value.departamento || '';
+    
+    console.log('Cargando empleados con filtros:', {
+      filtro: filtro,
+      areaId: areaId,
+      pageNumber: this.pageNumber,
+      pageSize: this.pageSize,
+      filtroEmpleadoText: this.filtroEmpleadoText // Debug adicional
+    });
+    
     // Usar getEmployeeScheduleHours para traer empleados con horarios
-    this.employeeScheduleAssignmentService.getEmployeeScheduleHours('', filtro, this.pageNumber, this.pageSize, areaId).subscribe({
+    // Los parámetros son: nroDoc, fullName, pageNumber, pageSize, areaId
+    this.employeeScheduleAssignmentService.getEmployeeScheduleHours(filtro, filtro, this.pageNumber, this.pageSize, areaId).subscribe({
       next: (response) => {
         console.log('Respuesta empleados con horarios:', response); // <-- Log para depuración
         this.empleadosRaw = response.data.items || [];
@@ -137,6 +173,14 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
   }
 
   buscarEmpleados() {
+    console.log('🔍 buscarEmpleados() ejecutado');
+    console.log('Valor actual del input (ngModel):', this.filtroEmpleadoText);
+    this.pageNumber = 1;
+    this.cargarEmpleados();
+  }
+
+  limpiarFiltroEmpleado() {
+    this.filtroEmpleadoText = '';
     this.pageNumber = 1;
     this.cargarEmpleados();
   }
@@ -155,7 +199,10 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
     return this.empleadosSeleccionados?.some(e => e.nroDoc === row.nroDoc) || false;
   }
 
-  toggleSeleccionEmpleado(row: EmployeeScheduleHours, checked: boolean) {
+  toggleSeleccionEmpleado(row: EmployeeScheduleHours, event: Event) {
+    const checkbox = event.target as HTMLInputElement;
+    const checked = checkbox.checked;
+    
     if (checked) {
       if (!this.empleadosSeleccionados.some(e => e.nroDoc === row.nroDoc)) {
         this.empleadosSeleccionados.push(row);
@@ -176,8 +223,11 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
     return empleadosPagina.some(emp => this.isEmpleadoSeleccionado(emp)) && !this.isAllSelected();
   }
 
-  toggleSelectAll(checked: boolean) {
+  toggleSelectAll(event: Event) {
+    const checkbox = event.target as HTMLInputElement;
+    const checked = checkbox.checked;
     const empleadosPagina = this.empleados.data;
+    
     if (checked) {
       empleadosPagina.forEach(emp => {
         if (!this.isEmpleadoSeleccionado(emp)) {
@@ -314,4 +364,137 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
   getEmpleadosTooltip(): string {
     return this.empleadosSeleccionados.slice(3).map(e => `${e.fullNameEmployee} (${e.nroDoc})`).join('\n');
   }
+
+  // Métodos para navegación de pasos
+  nextStep(): void {
+    if (this.currentStep < 2 && this.empleadosSeleccionados.length > 0) {
+      this.currentStep++;
+    }
+  }
+
+  previousStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  // Método para expansión de empleados
+  toggleExpandEmployee(employee: EmployeeScheduleHours): void {
+    this.expandedEmployee = this.expandedEmployee === employee ? null : employee;
+  }
+
+  // Método para trackBy en ngFor
+  trackByEmpleado(index: number, item: EmployeeScheduleHours): any {
+    return item.nroDoc || index;
+  }
+
+  // Método para manejar eventos del paginador genérico
+  onPaginatorChange(event: PaginatorEvent): void {
+    console.log('📄 Paginador cambió:', event);
+    this.pageNumber = event.pageNumber;
+    this.pageSize = event.pageSize;
+    this.cargarEmpleados();
+  }
+
+  // Métodos de paginación simplificados (mantenidos para compatibilidad)
+  previousPage(): void {
+    if (this.pageNumber > 1) {
+      this.pageNumber--;
+      this.cargarEmpleados();
+    }
+  }
+
+  nextPage(): void {
+    if (this.pageNumber * this.pageSize < this.totalEmpleados) {
+      this.pageNumber++;
+      this.cargarEmpleados();
+    }
+  }
+
+  // Métodos para autocomplete de departamento (copiado exacto de empleado.component.ts)
+  onDepartamentoSearchChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.departamentoSearchTerm = target.value;
+    this.filterDepartamentos();
+    this.showDepartamentoDropdown = true;
+    this.highlightedDepartamentoIndex = -1;
+  }
+
+  filterDepartamentos(): void {
+    if (!this.departamentoSearchTerm.trim()) {
+      this.filteredDepartamentos = [...this.departamentos];
+    } else {
+      this.filteredDepartamentos = this.departamentos.filter(dept => 
+        dept.descripcion.toLowerCase().includes(this.departamentoSearchTerm.toLowerCase())
+      );
+    }
+  }
+
+  selectDepartamento(area: RhArea): void {
+    this.departamentoSearchTerm = area.descripcion;
+    this.empleadoForm.get('departamento')?.setValue(area.areaId);
+    this.showDepartamentoDropdown = false;
+    this.highlightedDepartamentoIndex = -1;
+    console.log('Departamento seleccionado:', area.descripcion, 'ID:', area.areaId);
+    this.onDepartamentoChange();
+  }
+
+  selectTodasLasAreas(): void {
+    this.departamentoSearchTerm = 'Todas las áreas';
+    this.empleadoForm.get('departamento')?.setValue('');
+    this.showDepartamentoDropdown = false;
+    this.highlightedDepartamentoIndex = -1;
+    console.log('Seleccionado: Todas las áreas');
+    this.onDepartamentoChange();
+  }
+
+  onDepartamentoBlur(): void {
+    setTimeout(() => {
+      this.showDepartamentoDropdown = false;
+      this.highlightedDepartamentoIndex = -1;
+      
+      // Si no hay selección válida, limpiar
+      if (this.departamentoSearchTerm && 
+          this.departamentoSearchTerm !== 'Todas las áreas' && 
+          !this.departamentos.find(d => d.descripcion === this.departamentoSearchTerm)) {
+        this.departamentoSearchTerm = '';
+        this.empleadoForm.get('departamento')?.setValue('');
+        this.onDepartamentoChange();
+      }
+    }, 150);
+  }
+
+  onDepartamentoKeydown(event: KeyboardEvent): void {
+    if (!this.showDepartamentoDropdown) return;
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.highlightedDepartamentoIndex = Math.min(this.highlightedDepartamentoIndex + 1, this.filteredDepartamentos.length);
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        this.highlightedDepartamentoIndex = Math.max(this.highlightedDepartamentoIndex - 1, -1);
+        break;
+      case 'Enter':
+        event.preventDefault();
+        if (this.highlightedDepartamentoIndex === -1) {
+          // Seleccionar "Todas las áreas"
+          this.selectTodasLasAreas();
+        } else if (this.highlightedDepartamentoIndex >= 0 && this.highlightedDepartamentoIndex < this.filteredDepartamentos.length) {
+          this.selectDepartamento(this.filteredDepartamentos[this.highlightedDepartamentoIndex]);
+        }
+        break;
+      case 'Escape':
+        this.showDepartamentoDropdown = false;
+        this.highlightedDepartamentoIndex = -1;
+        break;
+    }
+  }
+
+  onDepartamentoChange(): void {
+    this.pageNumber = 1;
+    this.cargarEmpleados();
+  }
+
 }

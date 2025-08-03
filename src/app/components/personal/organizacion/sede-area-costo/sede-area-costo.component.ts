@@ -74,8 +74,9 @@ export class SedeAreaCostoComponent implements OnInit {
       componentType: AddNewSacComponent,
       componentData: null,
       width: '700px'
-    }).then((result: SedeAreaCosto | null) => {
+    }).then((result: SedeAreaCosto[] | null) => {
       if (result) {
+        
         this.sedeAreaCostoService.create(result).subscribe({
           next: () => {
             this.loadSites();

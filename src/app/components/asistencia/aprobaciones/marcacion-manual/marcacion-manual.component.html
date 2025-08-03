@@ -1,7 +1,7 @@
 <!-- Header principal con tema Fiori -->
 <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border mb-4 overflow-hidden">
   <!-- Header -->
-  <div class="px-6 py-4 border-b border-fiori-border bg-fiori-muted">
+  <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
@@ -12,9 +12,13 @@
           <p class="text-sm text-fiori-subtext">Gestión y aprobación de marcaciones manuales</p>
         </div>
       </div>
+    </div>
+    
+    <!-- Botón de acción compacto -->
+    <div class="mt-3 pt-3 border-t border-fiori-border">
       <button 
         (click)="registrarNuevaMarcacionManual()"
-        class="inline-flex items-center gap-2 px-4 py-2 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary focus:outline-none focus:ring-2 focus:ring-fiori-primary focus:ring-offset-1 transition-colors">
+        class="inline-flex items-center gap-2 px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary focus:outline-none focus:ring-2 focus:ring-fiori-primary focus:ring-offset-1 transition-colors">
         <lucide-icon name="plus" class="w-4 h-4"></lucide-icon>
         Nueva Marcación Manual
       </button>

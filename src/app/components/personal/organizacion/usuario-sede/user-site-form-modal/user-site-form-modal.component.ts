@@ -12,7 +12,7 @@ export interface UserSiteData {
 
 export interface UserSiteFormResult {
   action: 'save' | 'cancel';
-  data?: UserSiteData;
+  data?: UserSiteData | UserSiteData[];
 }
 
 export interface Usuario {
@@ -48,10 +48,13 @@ export class UserSiteFormModalComponent implements OnInit {
   showUsuarioDropdown: boolean = false;
   showSedeDropdown: boolean = false;
 
+  // Multiselect functionality for Sede
+  selectedSedes: Sede[] = [];
+
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
       userId: ['', [Validators.required]],
-      siteId: ['', [Validators.required]],
+      siteId: ['', this.selectedSedesValidator.bind(this)],
       usuarioFilter: [''],
       sedeFilter: [''],
       creationDate: [{ value: '', disabled: true }],
@@ -99,26 +102,27 @@ export class UserSiteFormModalComponent implements OnInit {
     if (this.form.valid) {
       this.loading = true;
       
-      const formData: UserSiteData = {
+      // Crear array de UserSiteData para cada sede seleccionada
+      const userSiteDataArray: UserSiteData[] = this.selectedSedes.map(sede => ({
         userId: this.form.value.userId,
-        siteId: this.form.value.siteId,
+        siteId: sede.categoriaAuxiliarId,
         observation: this.form.value.observation,
-        creationDate: this.form.value.creationDate
-      };
+        creationDate: this.form.value.creationDate || new Date().toISOString(),
+        active: 'Y'
+      }));
 
-      if (this.isEditMode && this.userSiteData) {
-        formData.userSiteId = this.userSiteData.userSiteId;
-        formData.active = this.userSiteData.active;
-      }
+      console.log('🚀 Array de UserSiteData creado:', userSiteDataArray);
+      console.log('📍 Sedes seleccionadas:', this.selectedSedes.map(s => s.descripcion));
+      console.log('📊 Total registros a crear:', userSiteDataArray.length);
 
       // Simular delay de guardar
       setTimeout(() => {
         this.loading = false;
-        // Cerrar modal con los datos
+        // Cerrar modal con el array de datos
         if (this.modalRef) {
           this.modalRef.closeModalFromChild({
             action: 'save',
-            data: formData
+            data: userSiteDataArray  // Ahora retorna UserSiteData[]
           });
         }
       }, 500);
@@ -178,6 +182,63 @@ export class UserSiteFormModalComponent implements OnInit {
     setTimeout(() => {
       this.showSedeDropdown = false;
     }, 200);
+  }
+
+  // Multiselect methods for Sede
+  isSedeSelected(sede: Sede): boolean {
+    return this.selectedSedes.some(s => s.categoriaAuxiliarId === sede.categoriaAuxiliarId);
+  }
+
+  toggleSedeSelection(sede: Sede, event: any): void {
+    if (event.target.checked) {
+      if (!this.isSedeSelected(sede)) {
+        this.selectedSedes.push(sede);
+        console.log('Sede added to selection:', sede.descripcion);
+      }
+    } else {
+      this.selectedSedes = this.selectedSedes.filter(s => s.categoriaAuxiliarId !== sede.categoriaAuxiliarId);
+      console.log('Sede removed from selection:', sede.descripcion);
+    }
+    console.log('Current selected sedes:', this.selectedSedes.map(s => s.descripcion));
+    // Trigger validation update and mark as touched
+    this.form.get('siteId')?.markAsTouched();
+    this.form.get('siteId')?.updateValueAndValidity();
+  }
+
+  // Método para toggle cuando se hace click en el item (no en el checkbox)
+  toggleSedeSelectionFromClick(sede: Sede): void {
+    const isCurrentlySelected = this.isSedeSelected(sede);
+    
+    if (isCurrentlySelected) {
+      // Si está seleccionado, lo removemos
+      this.selectedSedes = this.selectedSedes.filter(s => s.categoriaAuxiliarId !== sede.categoriaAuxiliarId);
+      console.log('Sede removed from click:', sede.descripcion);
+    } else {
+      // Si no está seleccionado, lo agregamos
+      this.selectedSedes.push(sede);
+      console.log('Sede added from click:', sede.descripcion);
+    }
+    
+    console.log('Current selected sedes:', this.selectedSedes.map(s => s.descripcion));
+    // Trigger validation update and mark as touched
+    this.form.get('siteId')?.markAsTouched();
+    this.form.get('siteId')?.updateValueAndValidity();
+  }
+
+  removeSedeSelection(sede: Sede): void {
+    this.selectedSedes = this.selectedSedes.filter(s => s.categoriaAuxiliarId !== sede.categoriaAuxiliarId);
+    console.log('Sede removed via tag button:', sede.descripcion);
+    // Trigger validation update and mark as touched
+    this.form.get('siteId')?.markAsTouched();
+    this.form.get('siteId')?.updateValueAndValidity();
+  }
+
+  // Custom validator for selected sedes
+  selectedSedesValidator(control: any) {
+    if (this.selectedSedes && this.selectedSedes.length > 0) {
+      return null; // Valid
+    }
+    return { sedeRequired: true }; // Invalid
   }
 
   // TrackBy functions

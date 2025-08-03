@@ -79,12 +79,57 @@ export class UsuarioSedeComponent implements OnInit {
       height: '700px'
     }).then((result: UserSiteFormResult | null) => {
       if (result && result.action === 'save' && result.data) {
-        this.createUserSite(result.data);
+        this.createUserSiteArray(Array.isArray(result.data) ? result.data : [result.data]);
       }
     });
   }
 
-  // Crear asignación usuario-sede
+  // Crear múltiples asignaciones usuario-sede
+  private createUserSiteArray(userSiteDataArray: UserSiteData[]) {
+    this.loading = true;
+    
+    if (!Array.isArray(userSiteDataArray) || userSiteDataArray.length === 0) {
+      this.snackBar.open('No hay datos para procesar', 'Cerrar', { duration: 3000 });
+      this.loading = false;
+      return;
+    }
+
+    // Crear array de UserSite para enviar al backend
+    const userSitesToCreate: UserSite[] = userSiteDataArray.map(userSiteData => {
+      const user = this.usuarios.find(u => u.userId === userSiteData.userId);
+      const sede = this.sedes.find(s => s.categoriaAuxiliarId === userSiteData.siteId);
+      
+      return {
+        userId: userSiteData.userId,
+        userName: user?.userName || '',
+        siteId: userSiteData.siteId,
+        siteName: sede?.descripcion || '',
+        observation: userSiteData.observation || '',
+        createdBy: 'Admin',
+        creationDate: userSiteData.creationDate || new Date().toISOString(),
+        active: 'Y',
+      };
+    });
+
+    // Usar el método createBlock para crear todas las asignaciones en una sola petición
+    this.userSiteService.createBlock(userSitesToCreate).subscribe({
+      next: () => {
+        this.loading = false;
+        this.snackBar.open(
+          `${userSitesToCreate.length} asignación(es) creada(s) exitosamente`, 
+          'Cerrar', 
+          { duration: 3000 }
+        );
+        this.loadUserSites();
+      },
+      error: () => {
+        this.loading = false;
+        this.snackBar.open('Error al crear las asignaciones', 'Cerrar', { duration: 3000 });
+      }
+    });
+  }
+
+  // Crear asignación usuario-sede (método legacy para edición)
   private createUserSite(userSiteData: UserSiteData) {
     this.loading = true;
     const user = this.usuarios.find(u => u.userId === userSiteData.userId);
@@ -169,7 +214,12 @@ export class UsuarioSedeComponent implements OnInit {
       height: '700px'
     }).then((result: UserSiteFormResult | null) => {
       if (result && result.action === 'save' && result.data) {
-        this.updateUserSite(result.data);
+        // Ensure result.data is a single UserSiteData object before updating
+        if (Array.isArray(result.data)) {
+          this.updateUserSite(result.data[0]); // Take first item if array
+        } else {
+          this.updateUserSite(result.data);
+        }
       }
     });
   }

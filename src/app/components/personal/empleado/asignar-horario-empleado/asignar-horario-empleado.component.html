@@ -1,32 +1,32 @@
-<div class="w-full mx-auto p-6 bg-gray-50 min-h-screen">
+<div class="w-full mx-auto p-6 bg-fiori-background min-h-screen">
   
   <!-- Header compacto -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 mb-3">
+  <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border p-3 mb-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
-        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-blue-600">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-          </svg>
+        <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+          <lucide-icon name="users" class="w-4 h-4 text-fiori-primary"></lucide-icon>
         </div>
         <div>
-          <div class="text-lg font-semibold text-gray-900">Empleados con Turno</div>
-          <div class="text-xs text-gray-500">{{ totalCount }} empleados registrados</div>
+          <div class="text-lg font-semibold text-fiori-text">Empleados con Turno</div>
+          <div class="text-xs text-fiori-subtext">{{ totalCount }} empleados registrados</div>
         </div>
       </div>
+    </div>
+    
+    <!-- Botón de acción compacto -->
+    <div class="mt-3 pt-3 border-t border-fiori-border">
       <button 
         (click)="irAEmpleados()"
-        class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
+        class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors">
+        <lucide-icon name="plus" class="w-4 h-4 mr-1"></lucide-icon>
         Asignar Turno
       </button>
     </div>
   </div>
 
   <!-- Panel de filtros compacto -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-3">
+  <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden mb-3">
     <div class="p-4">
       <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
         <!-- Campo de búsqueda -->
@@ -90,11 +90,11 @@
   </div>
 
   <!-- Tabla de empleados -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+  <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden">
+    <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
       <div class="flex items-center justify-between">
-        <div class="text-lg font-semibold text-gray-900">Lista de Empleados</div>
-        <div class="flex items-center space-x-2 text-sm text-gray-600">
+        <div class="text-lg font-semibold text-fiori-text">Lista de Empleados</div>
+        <div class="flex items-center space-x-2 text-sm text-fiori-subtext">
           <span>Mostrando {{ employees.length }} de {{ totalCount }} empleados</span>
         </div>
       </div>

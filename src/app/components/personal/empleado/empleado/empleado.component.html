@@ -1,53 +1,29 @@
-<div class="w-full mx-auto p-6 bg-gray-50 min-h-screen">
+<div class="w-full mx-auto p-6 bg-fiori-background min-h-screen">
   <!-- Header compacto -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 mb-3">
+  <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border p-3 mb-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
-        <div
-          class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-4 h-4 text-blue-600"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-            />
-          </svg>
+        <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+          <lucide-icon name="users" class="w-4 h-4 text-fiori-primary"></lucide-icon>
         </div>
         <div>
-          <div class="text-lg font-semibold text-gray-900">
+          <div class="text-lg font-semibold text-fiori-text">
             Gestión de Empleados
           </div>
-          <div class="text-xs text-gray-500">
+          <div class="text-xs text-fiori-subtext">
             {{ totalCount }} empleados registrados
           </div>
         </div>
       </div>
+    </div>
+    
+    <!-- Botón de acción compacto -->
+    <div class="mt-3 pt-3 border-t border-fiori-border">
       <button
         (click)="abrirAsignarTurnoMasivo()"
-        class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+        class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-4 h-4 mr-1"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
+        <lucide-icon name="clock" class="w-4 h-4 mr-1"></lucide-icon>
         Asignar Turnos
       </button>
     </div>
@@ -55,7 +31,7 @@
 
   <!-- Panel de filtros compacto -->
   <div
-    class="bg-white rounded-lg shadow-sm border border-gray-200 mb-3"
+    class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border mb-3"
   >
     <div class="p-4">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
@@ -241,14 +217,14 @@
 
   <!-- Tabla de empleados -->
   <div
-    class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+    class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden"
   >
-    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+    <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
       <div class="flex items-center justify-between">
-        <div class="text-lg font-semibold text-gray-900">
+        <div class="text-lg font-semibold text-fiori-text">
           Lista de Empleados
         </div>
-        <div class="flex items-center space-x-2 text-sm text-gray-600">
+        <div class="flex items-center space-x-2 text-sm text-fiori-subtext">
           <span
             >Mostrando {{ employees.length }} de
             {{ totalCount }} empleados</span

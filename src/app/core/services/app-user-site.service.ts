@@ -26,6 +26,11 @@ export class AppUserSiteService {
   create(userSite: UserSite): Observable<UserSite> {
     return this.http.post<UserSite>(this.resource, userSite);
   }
+   // registrar en bloque 
+  createBlock(data: any[]) {
+    return this.http.post<any>(this.resource + '/bulk', data);
+  }
+  
   // update by userId and siteId
   update(userId: number, siteId: string, userSite: UserSite): Observable<UserSite> {
     return this.http.put<UserSite>(`${this.resource}/${userId}/${siteId}`, userSite);

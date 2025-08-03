@@ -28,6 +28,7 @@ export class SedeAreaCostoService {
   create(data: any) {
     return this.http.post<any>(this.resource, data);
   }
+ 
 
   // Actualizar
   update(siteId: string, areaId: string, data: SedeAreaCosto) {

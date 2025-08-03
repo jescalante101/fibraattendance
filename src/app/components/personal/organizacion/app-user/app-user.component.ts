@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { AppUserService, User } from 'src/app/core/services/app-user.services';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
+import { ModalService } from 'src/app/shared/modal/modal.service';
+import { UserFormModalComponent, UserFormResult, UserData } from './user-form-modal/user-form-modal.component';
 
 // Interfaz para tipos de Toast
 interface ToastConfig {
@@ -19,24 +20,19 @@ interface ToastConfig {
   styleUrls: ['./app-user.component.css']
 })
 export class AppUserComponent implements OnInit {
-  userForm!: FormGroup;
   users: User[] = [];
   filteredUsers: User[] = [];
-  editingUser: User | null = null;
   loading = false;
   searchTerm = '';
   private toastCounter = 0;
 
   constructor(
     private appUserService: AppUserService, 
-    private fb: FormBuilder,
-    private dialog: MatDialog // <--- agrega esto
+    private dialog: MatDialog,
+    private modalService: ModalService
   ) { }
 
   ngOnInit() {
-    this.userForm = this.fb.group({
-      userName: ['', Validators.required]
-    });
     this.loadUsers();
   }
 
@@ -58,48 +54,78 @@ export class AppUserComponent implements OnInit {
     });
   }
 
-  submit() {
-    if (this.userForm.invalid) return;
+  // Abrir modal para nuevo usuario
+  openNewUserModal() {
+    this.modalService.open({
+      title: 'Nuevo Usuario',
+      componentType: UserFormModalComponent,
+      componentData: {
+        userData: null,
+        isEditMode: false
+      },
+      width: '500px',
+      height: '450px'
+    }).then((result: UserFormResult | null) => {
+      if (result && result.action === 'save' && result.data) {
+        this.createUser(result.data);
+      }
+    });
+  }
+
+  // Crear usuario
+  private createUser(userData: UserData) {
+    this.loading = true;
+    this.appUserService.addUser(userData.userName).subscribe({
+      next: _ => {
+        this.showToast('success', 'Usuario creado', `El usuario "${userData.userName}" ha sido registrado exitosamente.`);
+        this.loadUsers();
+      },
+      error: (error) => {
+        this.loading = false;
+        this.showToast('error', 'Error al crear', 'No se pudo crear el usuario. Verifica los datos e inténtalo de nuevo.');
+        console.error('Error creating user:', error);
+      }
+    });
+  }
+
+  // Actualizar usuario
+  private updateUser(userData: UserData) {
+    if (!userData.userId) return;
     
     this.loading = true;
-    const userName = this.userForm.value.userName;
-    
-    if (this.editingUser) {
-      // Editar usuario
-      const updatedUser: User = { ...this.editingUser, userName };
-      this.appUserService.updateUser(updatedUser).subscribe({
-        next: _ => {
-          this.showToast('success', 'Usuario actualizado', `El usuario "${userName}" ha sido actualizado correctamente.`);
-          this.editingUser = null;
-          this.userForm.reset();
-          this.loadUsers();
-        },
-        error: (error) => {
-          this.loading = false;
-          this.showToast('error', 'Error al actualizar', 'No se pudo actualizar el usuario. Inténtalo de nuevo.');
-          console.error('Error updating user:', error);
-        }
-      });
-    } else {
-      // Agregar usuario
-      this.appUserService.addUser(userName).subscribe({
-        next: _ => {
-          this.showToast('success', 'Usuario creado', `El usuario "${userName}" ha sido registrado exitosamente.`);
-          this.userForm.reset();
-          this.loadUsers();
-        },
-        error: (error) => {
-          this.loading = false;
-          this.showToast('error', 'Error al crear', 'No se pudo crear el usuario. Verifica los datos e inténtalo de nuevo.');
-          console.error('Error creating user:', error);
-        }
-      });
-    }
+    const updatedUser: User = { userId: userData.userId, userName: userData.userName };
+    this.appUserService.updateUser(updatedUser).subscribe({
+      next: _ => {
+        this.showToast('success', 'Usuario actualizado', `El usuario "${userData.userName}" ha sido actualizado correctamente.`);
+        this.loadUsers();
+      },
+      error: (error) => {
+        this.loading = false;
+        this.showToast('error', 'Error al actualizar', 'No se pudo actualizar el usuario. Inténtalo de nuevo.');
+        console.error('Error updating user:', error);
+      }
+    });
   }
 
   editUser(user: User) {
-    this.editingUser = user;
-    this.userForm.patchValue({ userName: user.userName });
+    this.modalService.open({
+      title: 'Editar Usuario',
+      componentType: UserFormModalComponent,
+      
+      componentData: {
+        userData: {
+          userId: user.userId,
+          userName: user.userName
+        },
+        isEditMode: true
+      },
+      width: '500px',
+      height: '450px'
+    }).then((result: UserFormResult | null) => {
+      if (result && result.action === 'save' && result.data) {
+        this.updateUser(result.data);
+      }
+    });
   }
 
   deleteUser(user: User) {
@@ -130,10 +156,6 @@ export class AppUserComponent implements OnInit {
     });
   }
 
-  cancelEdit() {
-    this.editingUser = null;
-    this.userForm.reset();
-  }
 
   // Search functionality for table
   onSearchChange() {
@@ -229,11 +251,8 @@ export class AppUserComponent implements OnInit {
     }
   }
 
-  // Método para enfocar el input del formulario
+  // Método para enfocar el input del formulario (ahora abre el modal)
   focusUserNameInput() {
-    const input = document.getElementById('userName') as HTMLInputElement;
-    if (input) {
-      input.focus();
-    }
+    this.openNewUserModal();
   }
 }

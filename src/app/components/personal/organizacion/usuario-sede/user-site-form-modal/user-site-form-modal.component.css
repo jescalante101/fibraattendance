@@ -1,0 +1,69 @@
+/* Estilos específicos para el modal de usuario-sede */
+.user-site-modal-container {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Mejorar la apariencia del scroll en el dropdown */
+.dropdown-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdown-scroll::-webkit-scrollbar-track {
+  background: var(--fiori-muted);
+  border-radius: 3px;
+}
+
+.dropdown-scroll::-webkit-scrollbar-thumb {
+  background: var(--fiori-border);
+  border-radius: 3px;
+}
+
+.dropdown-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--fiori-subtext);
+}
+
+/* Animaciones para los dropdowns */
+.dropdown-enter {
+  animation: dropdownSlideIn 0.2s ease-out;
+}
+
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos para estados de validación */
+.field-error input,
+.field-error textarea {
+  border-color: var(--fiori-error) !important;
+  box-shadow: 0 0 0 1px var(--fiori-error);
+}
+
+/* Mejorar la apariencia de los campos disabled */
+input:disabled,
+textarea:disabled {
+  background-color: var(--fiori-muted);
+  color: var(--fiori-subtext);
+  cursor: not-allowed;
+}
+
+/* Estilos para el loading spinner */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

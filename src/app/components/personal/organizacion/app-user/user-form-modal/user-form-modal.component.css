@@ -1,0 +1,25 @@
+/* Estilos específicos del componente modal de usuario */
+.user-form-container {
+  max-width: 500px;
+  width: 100%;
+}
+
+/* Animaciones suaves para el loading */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Mejoras de accesibilidad */
+input:focus {
+  outline: none;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--fiori-primary);
+  outline-offset: 2px;
+}

@@ -9,6 +9,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 import { HeaderConfigService } from 'src/app/core/services/header-config.service';
 import { Subject, takeUntil } from 'rxjs';
+import { ModalService } from 'src/app/shared/modal/modal.service';
+import { SedeCcostoFormModalComponent, SedeCcostoFormResult, SedeCcostoData } from './sede-ccosto-form-modal/sede-ccosto-form-modal.component';
 
 @Component({
   selector: 'app-sede-ccosto',
@@ -46,7 +48,8 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
     private costCenterService: CostCenterService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
-    private headerConfigService: HeaderConfigService // Assuming you have a service for header config 
+    private headerConfigService: HeaderConfigService,
+    private modalService: ModalService
   ) {
     this.form = this.fb.group({
       siteId: ['', Validators.required],
@@ -157,20 +160,28 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
   }
 
   onEdit(item: SedeCcosto) {
-    this.editing = true;
-    this.selected = item;
-    
-    // Find the objects for autocomplete
-    const sede = this.sedes.find(s => s.categoriaAuxiliarId === item.siteId);
-    const ccosto = this.ccostos.find(c => c.ccostoId === item.costCenterId);
-    
-    this.form.patchValue({
-      siteId: item.siteId,
-      costCenterId: item.costCenterId,
-      sedeFilter: sede?.descripcion || '',
-      ccostoFilter: ccosto?.descripcion || '',
-      observation: item.observation,
-      creationDate: item.creationDate?.substring(0, 16)
+    this.modalService.open({
+      title: 'Editar Relación',
+      componentType: SedeCcostoFormModalComponent,
+      componentData: {
+        sedeCcostoData: {
+          sedeCcostoId: item.siteId + '-' + item.costCenterId,
+          siteId: item.siteId,
+          costCenterId: item.costCenterId,
+          observation: item.observation,
+          creationDate: item.creationDate,
+          active: item.active
+        },
+        isEditMode: true,
+        sedes: this.sedes,
+        ccostos: this.ccostos
+      },
+      width: '550px',
+      height: '700px'
+    }).then((result: SedeCcostoFormResult | null) => {
+      if (result && result.action === 'save' && result.data) {
+        this.updateSedeCcosto(result.data, item);
+      }
     });
   }
 
@@ -315,6 +326,84 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
 
   getInactiveCount(): number {
     return this.sedeCcostoList.filter(item => item.active !== 'Y').length;
+  }
+
+  // Abrir modal para nueva relación
+  openNewSedeCcostoModal() {
+    this.modalService.open({
+      title: 'Nueva Relación',
+      componentType: SedeCcostoFormModalComponent,
+      componentData: {
+        sedeCcostoData: null,
+        isEditMode: false,
+        sedes: this.sedes,
+        ccostos: this.ccostos
+      },
+      width: '550px',
+      height: '700px'
+    }).then((result: SedeCcostoFormResult | null) => {
+      if (result && result.action === 'save' && result.data) {
+        this.createSedeCcosto(result.data);
+      }
+    });
+  }
+
+  // Crear relación sede-ccosto
+  private createSedeCcosto(sedeCcostoData: SedeCcostoData) {
+    this.loading = true;
+    const sede = this.sedes.find(s => s.categoriaAuxiliarId === sedeCcostoData.siteId);
+    const ccosto = this.ccostos.find(c => c.ccostoId === sedeCcostoData.costCenterId);
+    
+    const sedeCcosto: SedeCcosto = {
+      siteId: sedeCcostoData.siteId,
+      siteName: sede?.descripcion || '',
+      costCenterId: sedeCcostoData.costCenterId,
+      costCenterName: ccosto?.descripcion || '',
+      observation: sedeCcostoData.observation || '',
+      createdBy: 'Admin',
+      creationDate: sedeCcostoData.creationDate || new Date().toISOString(),
+      active: 'Y',
+    };
+
+    this.sedeCcostoService.create(sedeCcosto).subscribe({
+      next: () => {
+        this.snackBar.open('Relación creada exitosamente', 'Cerrar', { duration: 3000 });
+        this.loadSedeCcosto();
+      },
+      error: () => {
+        this.loading = false;
+        this.snackBar.open('Error al crear la relación', 'Cerrar', { duration: 3000 });
+      }
+    });
+  }
+
+  // Actualizar relación sede-ccosto
+  private updateSedeCcosto(sedeCcostoData: SedeCcostoData, originalItem: SedeCcosto) {
+    this.loading = true;
+    const sede = this.sedes.find(s => s.categoriaAuxiliarId === sedeCcostoData.siteId);
+    const ccosto = this.ccostos.find(c => c.ccostoId === sedeCcostoData.costCenterId);
+    
+    const sedeCcosto: SedeCcosto = {
+      siteId: sedeCcostoData.siteId,
+      siteName: sede?.descripcion || '',
+      costCenterId: sedeCcostoData.costCenterId,
+      costCenterName: ccosto?.descripcion || '',
+      observation: sedeCcostoData.observation || '',
+      createdBy: originalItem.createdBy,
+      creationDate: sedeCcostoData.creationDate || originalItem.creationDate,
+      active: sedeCcostoData.active || 'Y',
+    };
+
+    this.sedeCcostoService.update(originalItem.siteId, originalItem.costCenterId, sedeCcosto).subscribe({
+      next: () => {
+        this.snackBar.open('Relación actualizada exitosamente', 'Cerrar', { duration: 3000 });
+        this.loadSedeCcosto();
+      },
+      error: () => {
+        this.loading = false;
+        this.snackBar.open('Error al actualizar la relación', 'Cerrar', { duration: 3000 });
+      }
+    });
   }
 
   // TrackBy functions for performance

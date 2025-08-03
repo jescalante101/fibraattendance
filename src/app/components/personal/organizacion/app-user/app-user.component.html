@@ -8,13 +8,13 @@
           <lucide-icon name="users" class="w-4 h-4 text-fiori-primary"></lucide-icon>
         </div>
         <div>
-          <div class="text-lg font-semibold text-fiori-text">Gestión de Usuarios</div>
+          <div class="text-lg font-semibold text-fiori-text">Definición de Usuarios</div>
           <div class="text-xs text-fiori-subtext">{{ users.length }} usuarios registrados</div>
         </div>
       </div>
       <button 
         type="button"
-        (click)="focusUserNameInput()"
+        (click)="openNewUserModal()"
         class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors">
         <lucide-icon name="user-plus" class="w-4 h-4 mr-1"></lucide-icon>
         Nuevo Usuario
@@ -22,75 +22,8 @@
     </div>
   </div>
 
-  <div class="flex flex-col lg:flex-row gap-6">
-    <!-- Formulario compacto -->
-    <div class="lg:w-1/3 w-full">
-      <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden">
-        <!-- Header del formulario -->
-        <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
-          <div class="flex items-center space-x-2">
-            <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
-              <lucide-icon [name]="editingUser ? 'user-pen' : 'user-plus'" class="w-4 h-4 text-fiori-primary"></lucide-icon>
-            </div>
-            <div class="text-lg font-semibold text-fiori-text">{{ editingUser ? 'Editar Usuario' : 'Nuevo Usuario' }}</div>
-          </div>
-        </div>
-        
-        <!-- Formulario compacto -->
-        <div class="p-4">
-          <form [formGroup]="userForm" (ngSubmit)="submit()" class="space-y-4">
-            <div>
-              <label for="userName" class="block text-xs font-medium text-fiori-subtext mb-1">
-                Nombre de Usuario <span class="text-fiori-error">*</span>
-              </label>
-              <div class="relative">
-                <input 
-                  #userNameInput
-                  type="text" 
-                  id="userName"
-                  formControlName="userName"
-                  class="w-full pl-8 pr-3 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface text-fiori-text transition-colors"
-                  [class.border-fiori-error]="userForm.get('userName')?.hasError('required') && userForm.get('userName')?.touched"
-                  placeholder="Ingrese el nombre de usuario">
-                <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
-                  <lucide-icon name="user" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
-                </div>
-              </div>
-              <p *ngIf="userForm.get('userName')?.hasError('required') && userForm.get('userName')?.touched" 
-                 class="mt-1 text-xs text-fiori-error">
-                <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
-                El nombre de usuario es obligatorio
-              </p>
-            </div>
-
-            <!-- Botones de acción compactos -->
-            <div class="flex justify-end gap-2 pt-4 border-t border-fiori-border">
-              <button 
-                type="button" 
-                (click)="cancelEdit()" 
-                *ngIf="editingUser"
-                class="inline-flex items-center px-3 py-1.5 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-lg hover:bg-fiori-hover transition-colors">
-                <lucide-icon name="x" class="w-3 h-3 mr-1"></lucide-icon>
-                Cancelar
-              </button>
-              
-              <button 
-                type="submit" 
-                [disabled]="userForm.invalid || loading"
-                class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                <!-- Loading spinner compacto -->
-                <div *ngIf="loading" class="w-3 h-3 mr-1 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <lucide-icon *ngIf="!loading" [name]="editingUser ? 'save' : 'plus'" class="w-3 h-3 mr-1"></lucide-icon>
-                {{ editingUser ? 'Actualizar' : 'Registrar' }}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tabla de usuarios compacta -->
-    <div class="lg:w-2/3 w-full">
+  <!-- Tabla de usuarios compacta -->
+  <div class="w-full">
       <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden">
         <!-- Header de la tabla compacto -->
         <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
@@ -191,7 +124,7 @@
           <p class="text-fiori-subtext mb-4">Los usuarios que registres aparecerán aquí</p>
           <button 
             type="button" 
-            (click)="focusUserNameInput()"
+            (click)="openNewUserModal()"
             class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors">
             <lucide-icon name="plus" class="w-4 h-4 mr-1"></lucide-icon>
             Agregar Usuario
@@ -199,7 +132,6 @@
         </div>
       </div>
     </div>
-  </div>
 </div>
 
 <!-- Toast Container para notificaciones -->

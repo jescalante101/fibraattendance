@@ -94,12 +94,19 @@ export class SidebarComponent implements OnInit, OnDestroy {
       icon: 'file-text',
       submenu: [
         { label: 'Análisis de Marcaciones', link: '/panel/asistencia/marcaciones/analisis' },
+      ],
+    },
+    {
+      key: 'Reportes',
+      label: 'Reportes',
+      icon: 'file-spreadsheet',
+      submenu: [
         { label: 'Reporte Marcaciones', link: '/panel/asistencia/marcaciones/reporte-asistencia-excel' },
         { label: 'Reporte Marcación Mensual', link: 'panel/asistencia/marcaciones/reportes-excel/asistencia-mensual' },
         { label: 'Reporte Ccosto', link: 'panel/asistencia/marcaciones/reportes-excel/centro-costos' },
         { label: 'Reporte Detalle', link: 'panel/asistencia/marcaciones/reportes-excel/marcaciones-detalle' },
       ],
-    },
+    }
   ];
 
   toggleSidebar() {

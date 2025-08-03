@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit, Optional } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AttManualLogService } from 'src/app/core/services/att-manual-log.service';
 import { AttManualLog } from 'src/app/models/att-manual-log/att-maunual-log.model';
 
@@ -15,7 +16,12 @@ export class EditarMarcionManualComponent implements OnInit {
   isLoading: boolean = false;
   modalRef: any; // Referencia al modal para poder cerrarlo
 
-  constructor(private fb: FormBuilder, private attManualLogService: AttManualLogService) {
+  constructor(
+    private fb: FormBuilder, 
+    private attManualLogService: AttManualLogService,
+    @Optional() public dialogRef: MatDialogRef<EditarMarcionManualComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {
     this.editForm = this.fb.group({
       fecha: [null, Validators.required],
       hora: ['', Validators.required],
@@ -26,11 +32,14 @@ export class EditarMarcionManualComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.id=this.data
+    console.log("id",this.id)
     if (this.id) {
       this.isLoading = true;
       this.attManualLogService.getManualLogById(this.id).subscribe({
         next: (resp) => {
-          const log: AttManualLog = (resp as any).data;
+          console.log("resp",resp)
+          const log: AttManualLog = (resp as any).data.items[0];
           // Set label empleado
           this.empleadoLabel = `${log.nroDoc ?? ''}`;
           // Parse fecha y hora

@@ -252,14 +252,12 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
   }
 
   abrirAsignarTurnoMasivo() {
-    const dialogRef = this.dialog.open(AsignarTurnoMasivoComponent, {
-      width: '95vw',
-      height: '90vh',
-      maxWidth: '95vw',
-      maxHeight: '90vh',
-    });
-  
-    dialogRef.afterClosed().subscribe(result => {
+    this.modalService.open({
+      title: 'Asignación Masiva de Turnos',
+      componentType: AsignarTurnoMasivoComponent,
+      width: '80vw',
+      height: 'auto'
+    }).then(result => {
       if (result && result.exito) {
         this.snackBar.open('Asignación masiva realizada correctamente.', 'Cerrar', {
           duration: 4000,
@@ -279,22 +277,6 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
     });
   }
 
-  abrirAsignarTurnoMasivoService() {
-    this.modalService.open({
-      width: '80vw',
-      componentType: AsignarTurnoMasivoComponent,
-      title: 'Asignación Masiva de Turnos'
-    }).then(result => {
-      if (result && result.exito) {
-        this.snackBar.open('Asignación masiva realizada correctamente.', 'Cerrar', {
-          duration: 4000,
-          verticalPosition: 'top',
-          horizontalPosition: 'end',
-          panelClass: ['snackbar-success']
-        });
-      }
-    })
-  }
 
   verMarcaciones(empleado: Employee) {
     const empCode = empleado.nroDoc;

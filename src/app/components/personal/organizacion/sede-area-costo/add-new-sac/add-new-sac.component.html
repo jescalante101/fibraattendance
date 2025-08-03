@@ -188,14 +188,7 @@
 
         <!-- Botones de acción compactos -->
         <div class="flex justify-end gap-2 pt-4 border-t border-fiori-border">
-          <button 
-            type="button" 
-            (click)="onCancel()"
-            class="inline-flex items-center px-3 py-1.5 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-lg hover:bg-fiori-hover transition-colors">
-            <lucide-icon name="x" class="w-3 h-3 mr-1"></lucide-icon>
-            Cancelar
-          </button>
-          <button 
+            <button 
             type="submit" 
             [disabled]="form.invalid || loading"
             class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
@@ -203,7 +196,16 @@
             <lucide-icon *ngIf="!loading" name="save" class="w-3 h-3 mr-1"></lucide-icon>
             {{ isEdit ? 'Actualizar' : 'Guardar' }}
           </button>
+          
+          <button 
+            type="button" 
+            (click)="onCancel()"
+            class="inline-flex items-center px-3 py-1.5 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-lg hover:bg-fiori-hover transition-colors">
+            <lucide-icon name="x" class="w-3 h-3 mr-1"></lucide-icon>
+            Cancelar
+          </button>
         </div>
+
       </form>
     </div>
   </div>

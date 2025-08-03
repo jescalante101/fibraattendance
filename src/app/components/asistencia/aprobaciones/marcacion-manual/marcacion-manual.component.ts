@@ -129,7 +129,7 @@ export class MarcacionManualComponent implements OnInit {
     this.modalService.open({
       title: 'Editar Marcación Manual',
       componentType: EditarMarcionManualComponent,
-      componentData: { id },
+      componentData: id ,
       width: '500px',
       height: 'auto'
     }).then(result => {

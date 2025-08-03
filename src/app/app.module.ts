@@ -66,6 +66,9 @@ import {MatRadioModule} from '@angular/material/radio';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { AppUserComponent } from './components/personal/organizacion/app-user/app-user.component';
+import { UserFormModalComponent } from './components/personal/organizacion/app-user/user-form-modal/user-form-modal.component';
+import { UserSiteFormModalComponent } from './components/personal/organizacion/usuario-sede/user-site-form-modal/user-site-form-modal.component';
+import { SedeCcostoFormModalComponent } from './components/personal/organizacion/sede-ccosto/sede-ccosto-form-modal/sede-ccosto-form-modal.component';
 import { SedeAreaCostoComponent } from './components/personal/organizacion/sede-area-costo/sede-area-costo.component';
 import { AddNewSacComponent } from './components/personal/organizacion/sede-area-costo/add-new-sac/add-new-sac.component';
 import { UsuarioSedeComponent } from './components/personal/organizacion/usuario-sede/usuario-sede.component';
@@ -121,6 +124,9 @@ registerLocaleData(localeEs);
         AsignarHorarioEmpleadoComponent,
         AsignarTurnoMasivoComponent,
         AppUserComponent,
+        UserFormModalComponent,
+        UserSiteFormModalComponent,
+        SedeCcostoFormModalComponent,
         SedeAreaCostoComponent,
         AddNewSacComponent,
         UsuarioSedeComponent,

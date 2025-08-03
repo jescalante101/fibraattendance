@@ -319,14 +319,7 @@
     <!-- Botones de acción -->
     <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border p-4">
       <div class="flex justify-end gap-3">
-        <button 
-          type="button" 
-          (click)="cancelar()"
-          class="inline-flex items-center px-4 py-2 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-lg hover:bg-fiori-hover transition-colors">
-          <mat-icon class="w-4 h-4 mr-2">close</mat-icon>
-          Cancelar
-        </button>
-        <button 
+          <button 
           type="submit" 
           [disabled]="descansoForm.invalid || loading"
           class="inline-flex items-center px-4 py-2 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
@@ -334,6 +327,14 @@
           <mat-icon *ngIf="!loading" class="w-4 h-4 mr-2">save</mat-icon>
           {{ isEditMode ? 'Actualizar' : 'Guardar' }}
         </button>
+        <button 
+          type="button" 
+          (click)="cancelar()"
+          class="inline-flex items-center px-4 py-2 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-lg hover:bg-fiori-hover transition-colors">
+          <mat-icon class="w-4 h-4 mr-2">close</mat-icon>
+          Cancelar
+        </button>
+   
       </div>
     </div>
   </form>

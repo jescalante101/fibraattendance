@@ -2,64 +2,31 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Columna izquierda -->
     <div class="lg:col-span-2">
-      <!-- Header con estadísticas y botones -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-          <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-blue-600">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+      <!-- Header compacto -->
+      <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border p-3 mb-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+              <lucide-icon name="rotate-cw" class="w-4 h-4 text-fiori-primary"></lucide-icon>
             </div>
             <div>
-              <div class="text-2xl font-bold text-gray-900">Gestión de Turnos</div>
-              <p class="text-sm text-gray-600">Administra los turnos de trabajo de la organización</p>
+              <div class="text-lg font-semibold text-fiori-text">Gestión de Turnos</div>
+              <div class="text-xs text-fiori-subtext">{{ totalRecords }} turnos ({{ getTurnosAutomaticos() }} automáticos, {{ getTurnosManuales() }} manuales)</div>
             </div>
           </div>
-          
-          <!-- Estadísticas rápidas -->
-          <div class="flex space-x-4 mt-4 md:mt-0">
-            <div class="text-center">
-              <div class="text-2xl font-bold text-blue-600">{{ totalRecords }}</div>
-              <div class="text-xs text-gray-500">Total Turnos</div>
-            </div>
-            <div class="text-center">
-              <div class="text-2xl font-bold text-green-600">{{ getTurnosAutomaticos() }}</div>
-              <div class="text-xs text-gray-500">Automáticos</div>
-            </div>
-            <div class="text-center">
-              <div class="text-2xl font-bold text-orange-600">{{ getTurnosManuales() }}</div>
-              <div class="text-xs text-gray-500">Manuales</div>
-            </div>
+          <div class="flex items-center gap-2">
+            <button 
+              (click)="openNuevoTurnoModal()" 
+              class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors">
+              <lucide-icon name="plus" class="w-4 h-4 mr-1"></lucide-icon>
+              Nuevo Turno
+            </button>
+            <button 
+              class="inline-flex items-center px-3 py-1.5 bg-fiori-error text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors">
+              <lucide-icon name="trash-2" class="w-4 h-4 mr-1"></lucide-icon>
+              Eliminar
+            </button>
           </div>
-        </div>
-
-        <!-- Barra de acciones -->
-        <div class="flex flex-wrap gap-3">
-          <button 
-            (click)="openNuevoTurnoModal()" 
-            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            Nuevo Turno
-          </button>
-          
-          <button 
-            class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-            </svg>
-            Eliminar Seleccionados
-          </button>
-          
-          <button 
-            class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-            </svg>
-            Exportar
-          </button>
         </div>
       </div>
 

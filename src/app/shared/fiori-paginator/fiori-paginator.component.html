@@ -27,8 +27,8 @@
     </div>
   </div>
 
-  <!-- CENTRO: Navegación de páginas -->
-  <div class="flex items-center gap-2" *ngIf="!loading && pageSize > 0 && totalPages > 1">
+  <!-- CENTRO: Navegación de páginas (siempre visible cuando hay paginación) -->
+  <div class="flex items-center gap-2" *ngIf="!loading && pageSize > 0">
     
     <!-- Botón Anterior -->
     <button 
@@ -61,11 +61,6 @@
       <span class="hidden sm:inline">Siguiente</span>
       <lucide-icon name="chevron-right" class="w-4 h-4"></lucide-icon>
     </button>
-  </div>
-
-  <!-- Mensaje cuando solo hay una página -->
-  <div class="text-sm text-fiori-subtext" *ngIf="!loading && pageSize > 0 && totalPages <= 1">
-    Página 1 de 1
   </div>
 
   <!-- DERECHA: Selector de tamaño de página -->

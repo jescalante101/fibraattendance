@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AppUserSiteService } from 'src/app/core/services/app-user-site.service';
 import { UserSite } from 'src/app/models/user-site.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -7,7 +6,8 @@ import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/servic
 import { AppUserService, User } from 'src/app/core/services/app-user.services';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 import { MatDialog } from '@angular/material/dialog';
-import { Observable, map, startWith } from 'rxjs';
+import { ModalService } from 'src/app/shared/modal/modal.service';
+import { UserSiteFormModalComponent, UserSiteFormResult, UserSiteData, Usuario, Sede } from './user-site-form-modal/user-site-form-modal.component';
 
 @Component({
   selector: 'app-usuario-sede',
@@ -15,41 +15,21 @@ import { Observable, map, startWith } from 'rxjs';
   styleUrls: ['./usuario-sede.component.css']
 })
 export class UsuarioSedeComponent implements OnInit {
-  form: FormGroup;
   userSites: UserSite[] = [];
   filteredUserSites: UserSite[] = [];
-  editing: boolean = false;
-  selectedUserSite?: UserSite;
   loading = false;
   sedes: CategoriaAuxiliar[] = [];
   usuarios: User[] = [];
   searchTerm = '';
 
-  // Filtered arrays for Flowbite autocomplete
-  filteredUsuarios: User[] = [];
-  filteredSedes: CategoriaAuxiliar[] = [];
-  
-  // Dropdown states
-  showUsuarioDropdown = false;
-  showSedeDropdown = false;
-
   constructor(
-    private fb: FormBuilder,
     private userSiteService: AppUserSiteService,
     private categoriaAuxiliarService: CategoriaAuxiliarService,
     private appUserService: AppUserService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
-  ) {
-    this.form = this.fb.group({
-      userId: ['', Validators.required],
-      siteId: ['', Validators.required],
-      usuarioFilter: [''],
-      sedeFilter: [''],
-      observation: [''],
-      creationDate: [{ value: new Date().toISOString().substring(0, 16), disabled: true }, Validators.required],
-    });
-  }
+    private dialog: MatDialog,
+    private modalService: ModalService
+  ) {}
 
   ngOnInit() {
     this.loadUserSites();
@@ -75,75 +55,123 @@ export class UsuarioSedeComponent implements OnInit {
   loadSedes() {
     this.categoriaAuxiliarService.getCategoriasAuxiliar().subscribe(sedes => {
       this.sedes = sedes;
-      this.filteredSedes = [...this.sedes];
     });
   }
 
   loadUsuarios() {
     this.appUserService.getAllUsers().subscribe(users => {
       this.usuarios = users;
-      this.filteredUsuarios = [...this.usuarios];
     });
   }
 
-  onSubmit() {
-    if (this.form.invalid) return;
-    const value = this.form.getRawValue();
-    const user = this.usuarios.find(u => u.userId == value.userId);
-    const sede = this.sedes.find(s => s.categoriaAuxiliarId === value.siteId);
+  // Abrir modal para nueva asignación
+  openNewUserSiteModal() {
+    this.modalService.open({
+      title: 'Nueva Asignación',
+      componentType: UserSiteFormModalComponent,
+      componentData: {
+        userSiteData: null,
+        isEditMode: false,
+        usuarios: this.usuarios,
+        sedes: this.sedes
+      },
+      width: '550px',
+      height: '700px'
+    }).then((result: UserSiteFormResult | null) => {
+      if (result && result.action === 'save' && result.data) {
+        this.createUserSite(result.data);
+      }
+    });
+  }
+
+  // Crear asignación usuario-sede
+  private createUserSite(userSiteData: UserSiteData) {
+    this.loading = true;
+    const user = this.usuarios.find(u => u.userId === userSiteData.userId);
+    const sede = this.sedes.find(s => s.categoriaAuxiliarId === userSiteData.siteId);
+    
     const userSite: UserSite = {
-      userId: value.userId,
+      userId: userSiteData.userId,
       userName: user?.userName || '',
-      siteId: value.siteId,
+      siteId: userSiteData.siteId,
       siteName: sede?.descripcion || '',
-      observation: value.observation,
+      observation: userSiteData.observation || '',
       createdBy: 'Admin',
-      creationDate: value.creationDate || new Date().toISOString(),
+      creationDate: userSiteData.creationDate || new Date().toISOString(),
       active: 'Y',
     };
-    if (this.editing && this.selectedUserSite) {
-      this.userSiteService.update(this.selectedUserSite.userId, this.selectedUserSite.siteId, userSite).subscribe({
+
+    this.userSiteService.create(userSite).subscribe({
+      next: () => {
+        this.snackBar.open('Asignación creada exitosamente', 'Cerrar', { duration: 3000 });
+        this.loadUserSites();
+      },
+      error: () => {
+        this.loading = false;
+        this.snackBar.open('Error al crear la asignación', 'Cerrar', { duration: 3000 });
+      }
+    });
+  }
+
+  // Actualizar asignación usuario-sede
+  private updateUserSite(userSiteData: UserSiteData) {
+    if (!userSiteData.userSiteId) return;
+    
+    this.loading = true;
+    const user = this.usuarios.find(u => u.userId === userSiteData.userId);
+    const sede = this.sedes.find(s => s.categoriaAuxiliarId === userSiteData.siteId);
+    
+    const userSite: UserSite = {
+      userId: userSiteData.userId,
+      userName: user?.userName || '',
+      siteId: userSiteData.siteId,
+      siteName: sede?.descripcion || '',
+      observation: userSiteData.observation || '',
+      createdBy: 'Admin',
+      creationDate: userSiteData.creationDate || new Date().toISOString(),
+      active: userSiteData.active || 'Y',
+    };
+
+    // Use the original userSite IDs for update
+    const originalUserSite = this.userSites.find(us => us.userId === userSiteData.userId && us.siteId === userSiteData.siteId);
+    if (originalUserSite) {
+      this.userSiteService.update(originalUserSite.userId, originalUserSite.siteId, userSite).subscribe({
         next: () => {
-          this.snackBar.open('Registro actualizado', 'Cerrar', { duration: 3000 });
+          this.snackBar.open('Asignación actualizada exitosamente', 'Cerrar', { duration: 3000 });
           this.loadUserSites();
-          this.cancelEdit();
         },
-        error: () => this.snackBar.open('Error al actualizar', 'Cerrar', { duration: 3000 })
-      });
-    } else {
-      this.userSiteService.create(userSite).subscribe({
-        next: () => {
-          this.snackBar.open('Registro creado', 'Cerrar', { duration: 3000 });
-          this.loadUserSites();
-          this.form.reset({ creationDate: new Date().toISOString().substring(0, 16) });
-        },
-        error: () => this.snackBar.open('Error al crear', 'Cerrar', { duration: 3000 })
+        error: () => {
+          this.loading = false;
+          this.snackBar.open('Error al actualizar la asignación', 'Cerrar', { duration: 3000 });
+        }
       });
     }
   }
 
   onEdit(userSite: UserSite) {
-    this.editing = true;
-    this.selectedUserSite = userSite;
-    
-    // Find the objects for autocomplete
-    const usuario = this.usuarios.find(u => u.userId === userSite.userId);
-    const sede = this.sedes.find(s => s.categoriaAuxiliarId === userSite.siteId);
-    
-    this.form.patchValue({
-      userId: userSite.userId,
-      siteId: userSite.siteId,
-      usuarioFilter: usuario?.userName || '',
-      sedeFilter: sede?.descripcion || '',
-      observation: userSite.observation,
-      creationDate: userSite.creationDate?.substring(0, 16)
+    this.modalService.open({
+      title: 'Editar Asignación',
+      componentType: UserSiteFormModalComponent,
+      componentData: {
+        userSiteData: {
+          userSiteId: userSite.userId + '-' + userSite.siteId, // Composite ID
+          userId: userSite.userId,
+          siteId: userSite.siteId,
+          observation: userSite.observation,
+          creationDate: userSite.creationDate,
+          active: userSite.active
+        },
+        isEditMode: true,
+        usuarios: this.usuarios,
+        sedes: this.sedes
+      },
+      width: '550px',
+      height: '700px'
+    }).then((result: UserSiteFormResult | null) => {
+      if (result && result.action === 'save' && result.data) {
+        this.updateUserSite(result.data);
+      }
     });
-  }
-
-  cancelEdit() {
-    this.editing = false;
-    this.selectedUserSite = undefined;
-    this.form.reset({ creationDate: new Date().toISOString().substring(0, 16) });
   }
 
   onDelete(userSite: UserSite) {
@@ -199,67 +227,7 @@ export class UsuarioSedeComponent implements OnInit {
     });
   }
 
-  // Flowbite Autocomplete methods
-  onUsuarioFilterChange(event: any): void {
-    const value = event.target.value.toLowerCase();
-    if (!value.trim()) {
-      this.filteredUsuarios = [...this.usuarios];
-    } else {
-      this.filteredUsuarios = this.usuarios.filter(usuario => 
-        usuario.userName.toLowerCase().includes(value)
-      );
-    }
-  }
-
-  onSedeFilterChange(event: any): void {
-    const value = event.target.value.toLowerCase();
-    if (!value.trim()) {
-      this.filteredSedes = [...this.sedes];
-    } else {
-      this.filteredSedes = this.sedes.filter(sede => 
-        sede.descripcion.toLowerCase().includes(value)
-      );
-    }
-  }
-
-  onUsuarioSelected(usuario: User): void {
-    this.form.patchValue({
-      userId: usuario.userId,
-      usuarioFilter: usuario.userName
-    });
-    this.showUsuarioDropdown = false;
-  }
-
-  onSedeSelected(sede: CategoriaAuxiliar): void {
-    this.form.patchValue({
-      siteId: sede.categoriaAuxiliarId,
-      sedeFilter: sede.descripcion
-    });
-    this.showSedeDropdown = false;
-  }
-
-  onUsuarioBlur(): void {
-    // Delay hiding to allow for selection
-    setTimeout(() => {
-      this.showUsuarioDropdown = false;
-    }, 150);
-  }
-
-  onSedeBlur(): void {
-    // Delay hiding to allow for selection
-    setTimeout(() => {
-      this.showSedeDropdown = false;
-    }, 150);
-  }
-
   // TrackBy functions for performance
-  trackByUserId(index: number, usuario: User): number {
-    return usuario.userId;
-  }
-
-  trackBySedeId(index: number, sede: CategoriaAuxiliar): string {
-    return sede.categoriaAuxiliarId;
-  }
 
   trackByUserSiteId(index: number, userSite: UserSite): string {
     return `${userSite.userId}-${userSite.siteId}`;

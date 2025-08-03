@@ -144,14 +144,12 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
   }
 
   irAEmpleados() {
-    const dialogRef = this.dialog.open(AsignarTurnoMasivoComponent, {
-      width: '95vw',
-      height: '90vh',
-      maxWidth: '95vw',
-      maxHeight: '90vh',
-    });
-  
-    dialogRef.afterClosed().subscribe(result => {
+    this.modalService.open({
+      title: 'Asignación Masiva de Turnos',
+      componentType: AsignarTurnoMasivoComponent,
+      width: '80vw',
+      height: 'auto'
+    }).then(result => {
       if (result && result.exito) {
         this.snackBar.open('Asignación masiva realizada correctamente.', 'Cerrar', {
           duration: 4000,
@@ -159,7 +157,8 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
           horizontalPosition: 'end',
           panelClass: ['snackbar-success']
         });
-        // Si quieres refrescar la lista de empleados, llama aquí a this.getEmployees();
+        // Si quieres refrescar la lista de empleados, llama aquí a this.cargarAsignaciones();
+        this.cargarAsignaciones();
       } else if (result && result.exito === false) {
         this.snackBar.open('No se pudo realizar la asignación masiva.', 'Cerrar', {
           duration: 4000,

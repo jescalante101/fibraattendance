@@ -11,6 +11,7 @@ import * as XLSX from 'xlsx-js-style';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { HeaderConfigService } from 'src/app/core/services/header-config.service';
+import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
 
 // Interfaz para datos agrupados por empleado y fecha
 interface GroupedAttendanceRecord {
@@ -117,8 +118,7 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
     { id: 'razonManual', label: 'Razón Manual', visible: false, group: 'adicional' },
     { id: 'validacionRango', label: 'Validación', visible: false, group: 'adicional' },
     { id: 'informacionAdicional', label: 'Info Adicional', visible: false, group: 'adicional' },
-    { id: 'origenMarcacion', label: 'Origen', visible: false, group: 'adicional' },
-    { id: 'actions', label: 'Acciones', visible: true, group: 'basic' }
+    { id: 'origenMarcacion', label: 'Origen', visible: false, group: 'adicional' }
   ];
 
   // Tree view state
@@ -485,7 +485,7 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
   }
 
   visibleColumnsFiltered() {
-    return this.columns.filter(c => c.visible && c.id !== 'fullNameEmployee' && c.id !== 'actions');
+    return this.columns.filter(c => c.visible && c.id !== 'fullNameEmployee');
   }
 
   /* get totalPages(): number {
@@ -631,6 +631,14 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
 
   onPageSizeChange() {
     this.page = 1;
+    this.getData();
+  }
+
+  // Método para manejar eventos del paginador Fiori genérico
+  onPaginatorChange(event: PaginatorEvent): void {
+    console.log('📄 Paginador de análisis cambió:', event);
+    this.page = event.pageNumber;
+    this.pageSize = event.pageSize;
     this.getData();
   }
 
@@ -873,7 +881,7 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
   hideAllColumns() {
     // Keep essential columns visible
     this.columns.forEach(col => {
-      col.visible = ['fullNameEmployee', 'actions'].includes(col.id);
+      col.visible = ['fullNameEmployee'].includes(col.id);
     });
   }
 
@@ -1051,7 +1059,7 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
   }
 
   private performExcelExport(data: AttendanceAnalysis[]) {
-    const visibleColumns = this.columns.filter(c => c.visible && c.id !== 'actions');
+    const visibleColumns = this.columns.filter(c => c.visible);
     
     // Prepare data
     const exportData = data.map(row => {
@@ -1157,7 +1165,7 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
 
   exportToPDF() {
     const doc = new jsPDF('l', 'mm', 'a4');
-    const visibleColumns = this.columns.filter(c => c.visible && c.id !== 'actions');
+    const visibleColumns = this.columns.filter(c => c.visible);
     
     // Title
     doc.setFontSize(16);

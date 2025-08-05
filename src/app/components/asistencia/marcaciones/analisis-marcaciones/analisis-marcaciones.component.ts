@@ -12,6 +12,9 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { HeaderConfigService } from 'src/app/core/services/header-config.service';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
+import { ModalService } from 'src/app/shared/modal/modal.service';
+import { ModalRegistrarMarcacionComponent } from './modal-registrar-marcacion/modal-registrar-marcacion.component';
+import { AttendanceReportService } from 'src/app/core/services/report/attendance-report.service';
 
 // Interfaz para datos agrupados por empleado y fecha
 interface GroupedAttendanceRecord {
@@ -93,6 +96,11 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
   showColumnsConfig = false;
   currentQuickFilter: string | null = null;
   
+  // Context menu state
+  showContextMenu = false;
+  contextMenuPosition = { x: 0, y: 0 };
+  selectedRecord: GroupedAttendanceRecord | null = null;
+  
   // Column configuration with groups
   columns = [
     { id: 'fullNameEmployee', label: 'Empleado', visible: true, group: 'basic' },
@@ -162,7 +170,9 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
     private fb: FormBuilder,
     private categoriaAuxiliarService: CategoriaAuxiliarService,
     private rhAreaService: RhAreaService,
-    private headerConfigService: HeaderConfigService
+    private headerConfigService: HeaderConfigService,
+    private modalService: ModalService,
+    private attendanceReportService: AttendanceReportService
   ) {
     this.initializeForm();
   }
@@ -291,7 +301,7 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
   }
 
   // ===== DATA MANAGEMENT =====
-  getData() {
+   getData() {
     this.loading = true;
     const formValues = this.filterForm.value;
     
@@ -389,7 +399,7 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
       const isEntrada = item.tipoMarcacion?.toLowerCase().includes('entrada') || 
                        item.tipoMarcacion?.toLowerCase().includes('in') ||
                        item.intervalAlias?.toLowerCase().includes('entrada');
-
+        console.log("isEntrada",item);
       if (isEntrada) {
         record.marcaciones.entrada = {
           intervalAlias: item.intervalAlias,
@@ -1037,15 +1047,17 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
 
   // ===== Download excel =====
   downloadExcel() {
-    this.attendanceAnalysisService.exportAttendanceReport(this.filterForm.value).subscribe(response => {
-      const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `analisis_marcaciones_${new Date().toISOString().split('T')[0]}.xlsx`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    });
+    // this.attendanceAnalysisService.exportAttendanceReport(this.filterForm.value).subscribe(response => {
+    //   const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    //   const url = window.URL.createObjectURL(blob);
+    //   const a = document.createElement('a');
+    //   a.href = url;
+    //   a.download = `analisis_marcaciones_${new Date().toISOString().split('T')[0]}.xlsx`;
+    //   a.click();
+    //   window.URL.revokeObjectURL(url);
+    // });
+
+    this.attendanceReportService.generateMonthlyAttendanceReport(this.dataSource.data);
   }
 
   // ===== EXPORT =====
@@ -1252,5 +1264,290 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
 
     // Save PDF
     doc.save(`analisis_marcaciones_${new Date().toISOString().split('T')[0]}.pdf`);
+  }
+
+  // ===== CONTEXT MENU METHODS =====
+  
+  onRightClick(event: MouseEvent, record: GroupedAttendanceRecord): void {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.selectedRecord = record;
+    this.contextMenuPosition = {
+      x: event.clientX,
+      y: event.clientY
+    };
+    
+    // Ajustar posición si el menú se sale de la pantalla
+    const menuWidth = 256; // min-w-64 = 256px
+    const menuHeight = 400; // altura aproximada del menú
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    if (this.contextMenuPosition.x + menuWidth > windowWidth) {
+      this.contextMenuPosition.x = windowWidth - menuWidth - 10;
+    }
+    
+    if (this.contextMenuPosition.y + menuHeight > windowHeight) {
+      this.contextMenuPosition.y = windowHeight - menuHeight - 10;
+    }
+    
+    this.showContextMenu = true;
+  }
+
+  closeContextMenu(): void {
+    this.showContextMenu = false;
+    this.selectedRecord = null;
+  }
+
+  // ===== CONTEXT MENU CONDITION METHODS =====
+  
+  private isMarcacionMissing(marcacion: any): boolean {
+    return !marcacion?.horaMarcacionReal || 
+           marcacion?.horaMarcacionReal === 'Sin marcar' ||
+           marcacion?.horaMarcacionReal === '' ||
+           marcacion?.horaMarcacionReal === null;
+  }
+
+  canRegisterCompleteAttendance(record: GroupedAttendanceRecord | null): boolean {
+    if (!record) return false;
+    
+    // Mostrar opción completa cuando faltan AMBAS marcaciones (entrada Y salida)
+    const noEntrada = this.isMarcacionMissing(record.marcaciones.entrada);
+    const noSalida = this.isMarcacionMissing(record.marcaciones.salida);
+    
+    return !!(noEntrada && noSalida);
+  }
+
+  canRegisterOnlyEntrada(record: GroupedAttendanceRecord | null): boolean {
+    if (!record) return false;
+    
+    // Mostrar opción específica de entrada cuando:
+    // - Falta entrada PERO existe salida
+    const noEntrada = this.isMarcacionMissing(record.marcaciones.entrada);
+    const tieneSalida = !this.isMarcacionMissing(record.marcaciones.salida);
+    
+    return !!(noEntrada && tieneSalida);
+  }
+
+  canRegisterOnlySalida(record: GroupedAttendanceRecord | null): boolean {
+    if (!record) return false;
+    
+    // Mostrar opción específica de salida cuando:
+    // - Falta salida PERO existe entrada
+    const tieneEntrada = !this.isMarcacionMissing(record.marcaciones.entrada);
+    const noSalida = this.isMarcacionMissing(record.marcaciones.salida);
+    
+    return !!(tieneEntrada && noSalida);
+  }
+
+  // ===== CONTEXT MENU ACTION METHODS =====
+  
+  registerCompleteAttendance(record: GroupedAttendanceRecord | null): void {
+    if (!record) return;
+    
+    const modalData = {
+      employeeId: record.employeeId,
+      fullNameEmployee: record.fullNameEmployee,
+      nroDoc: record.nroDoc,
+      areaDescription: record.areaDescription,
+      shiftName: record.shiftName,
+      fecha: record.fecha,
+      fechaFormateada: record.fechaFormateada,
+      tipo: 'completa' as const,
+      horaEntradaEsperada: record.marcaciones.entrada?.horaEsperada,
+      horaSalidaEsperada: record.marcaciones.salida?.horaEsperada
+    };
+
+    this.modalService.open({
+      title: 'Registrar Marcación',
+      componentType: ModalRegistrarMarcacionComponent,
+      componentData: modalData,
+      width: '700px',
+      height: 'auto'
+    }).then((result) => {
+      if (result) {
+        console.log('Marcación guardada:', result);
+        // Recargar datos después de guardar
+        this.getData();
+      }
+    });
+    
+    this.closeContextMenu();
+  }
+
+  registerEntradaManual(record: GroupedAttendanceRecord | null): void {
+    if (!record) return;
+    
+    const modalData = {
+      employeeId: record.employeeId,
+      fullNameEmployee: record.fullNameEmployee,
+      nroDoc: record.nroDoc,
+      areaDescription: record.areaDescription,
+      shiftName: record.shiftName,
+      fecha: record.fecha,
+      fechaFormateada: record.fechaFormateada,
+      tipo: 'entrada' as const,
+      horaEntradaEsperada: record.marcaciones.entrada?.horaEsperada
+    };
+
+    this.modalService.open({
+      title: 'Registrar Marcación de Entrada',
+      componentType: ModalRegistrarMarcacionComponent,
+      componentData: modalData,
+      width: '700px',
+      height: 'auto'
+    }).then((result) => {
+      if (result) {
+        console.log('Marcación de entrada guardada:', result);
+        // Recargar datos después de guardar
+        this.getData();
+      }
+    });
+    
+    this.closeContextMenu();
+  }
+
+  registerSalidaManual(record: GroupedAttendanceRecord | null): void {
+    if (!record) return;
+    
+    const modalData = {
+      employeeId: record.employeeId,
+      fullNameEmployee: record.fullNameEmployee,
+      nroDoc: record.nroDoc,
+      areaDescription: record.areaDescription,
+      shiftName: record.shiftName,
+      fecha: record.fecha,
+      fechaFormateada: record.fechaFormateada,
+      tipo: 'salida' as const,
+      horaSalidaEsperada: record.marcaciones.salida?.horaEsperada
+    };
+
+    this.modalService.open({
+      title: 'Registrar Marcación de Salida',
+      componentType: ModalRegistrarMarcacionComponent,
+      componentData: modalData,
+      width: '700px',
+      height: 'auto'
+    }).then((result) => {
+      if (result) {
+        console.log('Marcación de salida guardada:', result);
+        // Recargar datos después de guardar
+        this.getData();
+      }
+    });
+    
+    this.closeContextMenu();
+  }
+
+  viewFullDetails(record: GroupedAttendanceRecord | null): void {
+    if (!record) return;
+    
+    console.log('Ver detalles completos de:', record.fullNameEmployee);
+    // TODO: Implementar modal con información detallada
+    // Mostrar toda la información de marcaciones, horarios, etc.
+    
+    this.closeContextMenu();
+  }
+
+  justifyLateness(record: GroupedAttendanceRecord | null): void {
+    if (!record) return;
+    
+    console.log('Justificar tardanza para:', record.fullNameEmployee);
+    // TODO: Implementar modal para agregar justificación de tardanza
+    
+    this.closeContextMenu();
+  }
+
+  exportSingleRow(record: GroupedAttendanceRecord | null): void {
+    if (!record) return;
+    
+    console.log('Exportar fila individual:', record.fullNameEmployee);
+    
+    // Crear Excel con solo esta fila
+    const excelData = [{
+      'Empleado': record.fullNameEmployee,
+      'Documento': record.nroDoc,
+      'Área': record.areaDescription,
+      'Sede': record.locationName,
+      'Fecha': record.fechaFormateada,
+      'Turno': record.shiftName,
+      'Entrada Esperada': record.marcaciones.entrada?.horaEsperada || '-',
+      'Entrada Real': record.marcaciones.entrada?.horaMarcacionReal || 'Sin marcar',
+      'Estado Entrada': record.marcaciones.entrada?.estadoMarcacion || '-',
+      'Tardanza (min)': record.marcaciones.entrada?.minutosTardanza || 0,
+      'Salida Esperada': record.marcaciones.salida?.horaEsperada || '-',
+      'Salida Real': record.marcaciones.salida?.horaMarcacionReal || 'Sin marcar',
+      'Estado Salida': record.marcaciones.salida?.estadoMarcacion || '-',
+      'Adelanto (min)': record.marcaciones.salida?.minutosAdelanto || 0,
+      'Es Puntual': record.esPuntual ? 'Sí' : 'No',
+      'Es Tardanza': record.esTardanza ? 'Sí' : 'No',
+      'Es Falta': record.esFalta ? 'Sí' : 'No',
+      'Es Manual': record.esMarcacionManual ? 'Sí' : 'No',
+      'Observaciones': record.exceptionRemarks || '-'
+    }];
+
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(excelData);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Marcación');
+    
+    const fileName = `Marcacion_${record.fullNameEmployee.replace(/\s+/g, '_')}_${record.fechaFormateada.replace(/\//g, '-')}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    
+    this.closeContextMenu();
+  }
+
+  reportInconsistency(record: GroupedAttendanceRecord | null): void {
+    if (!record) return;
+    
+    console.log('Reportar inconsistencia para:', record.fullNameEmployee);
+    // TODO: Implementar modal para reportar inconsistencias
+    // Esto podría enviar un reporte al sistema o marcar la marcación para revisión
+    
+    this.closeContextMenu();
+  }
+
+  copyInformation(record: GroupedAttendanceRecord | null): void {
+    if (!record) return;
+    
+    // Preparar información para copiar
+    const info = `
+Empleado: ${record.fullNameEmployee}
+Documento: ${record.nroDoc}
+Área: ${record.areaDescription}
+Sede: ${record.locationName}
+Fecha: ${record.fechaFormateada}
+Turno: ${record.shiftName}
+Entrada Esperada: ${record.marcaciones.entrada?.horaEsperada || '-'}
+Entrada Real: ${record.marcaciones.entrada?.horaMarcacionReal || 'Sin marcar'}
+Estado Entrada: ${record.marcaciones.entrada?.estadoMarcacion || '-'}
+Salida Esperada: ${record.marcaciones.salida?.horaEsperada || '-'}
+Salida Real: ${record.marcaciones.salida?.horaMarcacionReal || 'Sin marcar'}
+Estado Salida: ${record.marcaciones.salida?.estadoMarcacion || '-'}
+Es Puntual: ${record.esPuntual ? 'Sí' : 'No'}
+Es Tardanza: ${record.esTardanza ? 'Sí' : 'No'}
+Es Falta: ${record.esFalta ? 'Sí' : 'No'}
+    `.trim();
+
+    // Copiar al portapapeles
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(info).then(() => {
+        console.log('Información copiada al portapapeles');
+        // TODO: Mostrar notificación de éxito
+      }).catch(err => {
+        console.error('Error al copiar:', err);
+      });
+    } else {
+      // Fallback para navegadores sin soporte a clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = info;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      console.log('Información copiada al portapapeles (fallback)');
+    }
+    
+    this.closeContextMenu();
   }
 }

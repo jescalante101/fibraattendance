@@ -15,9 +15,10 @@ export class EditarMarcionManualComponent implements OnInit {
   empleadoLabel: string = '';
   isLoading: boolean = false;
   modalRef: any; // Referencia al modal para poder cerrarlo
+  saving: boolean = false; // Estado de guardado
 
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private attManualLogService: AttManualLogService,
     @Optional() public dialogRef: MatDialogRef<EditarMarcionManualComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
@@ -32,13 +33,13 @@ export class EditarMarcionManualComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.id=this.data
-    console.log("id",this.id)
+    this.id = this.data
+    console.log("id", this.id)
     if (this.id) {
       this.isLoading = true;
       this.attManualLogService.getManualLogById(this.id).subscribe({
         next: (resp) => {
-          console.log("resp",resp)
+          console.log("resp", resp)
           const log: AttManualLog = (resp as any).data.items[0];
           // Set label empleado
           this.empleadoLabel = `${log.nroDoc ?? ''}`;
@@ -53,7 +54,7 @@ export class EditarMarcionManualComponent implements OnInit {
             hora: hora,
             estadoMarcacion: estadoMarcacion,
             incidencias: log.auditReason,
-            motivo: log.applyReason
+            motivo: log.applyReason,
           });
           this.isLoading = false;
         },
@@ -77,8 +78,138 @@ export class EditarMarcionManualComponent implements OnInit {
   }
 
   onCancel() {
-    if (this.modalRef) {
-      this.modalRef.closeModalFromChild();
+    if (this.dialogRef) {
+      this.dialogRef.close(null);
+    } else if (this.modalRef) {
+      this.modalRef.closeModalFromChild(null);
+    }
+  }
+
+  onSave() {
+    if (this.editForm.valid && this.id) {
+      this.isLoading = true;
+
+      const formData = this.editForm.value;
+
+      // Crear punchTime combinando fecha y hora
+      let punchTime: string;
+      if (formData.fecha && formData.hora) {
+        let fechaStr = formData.fecha;
+        const horaStr = formData.hora;
+
+        // Si la fecha es un objeto Date, convertir a string YYYY-MM-DD
+        if (formData.fecha instanceof Date) {
+          const year = formData.fecha.getFullYear();
+          const month = String(formData.fecha.getMonth() + 1).padStart(2, '0');
+          const day = String(formData.fecha.getDate()).padStart(2, '0');
+          fechaStr = `${year}-${month}-${day}`;
+        }
+
+        punchTime = `${fechaStr}T${horaStr}:00`;
+      } else {
+        const ahora = new Date();
+        punchTime = ahora.toISOString();
+      }
+
+      // Crear el objeto AttManualLog actualizado
+      const marcacionActualizada: AttManualLog = {
+        manualLogId: this.id,
+        abstractexceptionPtrId: 1,
+        punchTime: punchTime,
+        punchState: this.getPunchStateValue(formData.estadoMarcacion),
+        workCode: '',
+        applyReason: formData.motivo || '',
+        applyTime: new Date().toISOString(),
+        auditReason: formData.incidencias || '',
+        auditTime: new Date().toISOString(),
+        approvalLevel: 0,
+        auditUserId: null,
+        approver: '',
+        employeeId: this.id,
+        isMask: false,
+        temperature: null,
+        nroDoc: this.empleadoLabel // Se mantendrá el valor existente en el backend
+      };
+
+      console.log('Actualizando marcación manual:', marcacionActualizada);
+
+      // Llamar al servicio para actualizar la marcación
+      this.attManualLogService.updateManualLog(this.id, marcacionActualizada).subscribe({
+        next: (response) => {
+          console.log('Marcación actualizada exitosamente:', response);
+          this.isLoading = false;
+
+          // Cerrar modal con resultado exitoso
+          const result = {
+            success: true,
+            data: marcacionActualizada,
+            action: 'updated'
+          };
+
+          if (this.dialogRef) {
+            this.dialogRef.close(result);
+          } else if (this.modalRef) {
+            this.modalRef.closeModalFromChild(result);
+          }
+        },
+        error: (error) => {
+          console.error('Error al actualizar marcación:', error);
+          this.isLoading = false;
+
+          // Cerrar modal con error
+          const errorResult = {
+            success: false,
+            error: error,
+            action: 'update_failed'
+          };
+
+          if (this.dialogRef) {
+            this.dialogRef.close(errorResult);
+          } else if (this.modalRef) {
+            this.modalRef.closeModalFromChild(errorResult);
+          }
+        }
+      });
+
+
+    } else {
+      this.editForm.markAllAsTouched();
+      console.log('Formulario inválido:', this.editForm.errors);
+    }
+  }
+
+  delete(id: number) {
+    // show 
+    this.attManualLogService.deleteManualLog(id).subscribe({
+      next: (response) => {
+        console.log('Marcación eliminada exitosamente:', response);
+        this.isLoading = false;
+        this.onCancel();
+        this.modalRef.closeModalFromChild(response);
+      },
+      error: (error) => {
+        console.error('Error al eliminar marcación:', error);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  private getPunchStateValue(estadoMarcacion: string): number {
+    switch (estadoMarcacion) {
+      case 'entrada':
+        return 0;
+      case 'salida':
+        return 1;
+      case 'salida_descanso':
+        return 2;
+      case 'entrada_descanso':
+        return 3;
+      case 'entrada_he':
+        return 4;
+      case 'salida_he':
+        return 5;
+      default:
+        return 0;
     }
   }
 }

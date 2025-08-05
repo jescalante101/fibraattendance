@@ -82,6 +82,7 @@ import { MarcacionManualComponent } from './components/asistencia/aprobaciones/m
 import { NuevaMarcacionManualComponent } from './components/asistencia/aprobaciones/marcacion-manual/nueva-marcacion-manual/nueva-marcacion-manual.component';
 import { EditarMarcionManualComponent } from './components/asistencia/aprobaciones/marcacion-manual/editar-marcion-manual/editar-marcion-manual.component';
 import { AnalisisMarcacionesComponent } from './components/asistencia/marcaciones/analisis-marcaciones/analisis-marcaciones.component';
+import { ModalRegistrarMarcacionComponent } from './components/asistencia/marcaciones/analisis-marcaciones/modal-registrar-marcacion/modal-registrar-marcacion.component';
 import { ReporteAsistenciaExcelComponent } from './components/asistencia/marcaciones/reporte-asistencia-excel/reporte-asistencia-excel.component';
 import { ConfigCatalogosComponent } from './components/asistencia/marcaciones/reportes-excel/config-catalogos/config-catalogos.component';
 import { ReporteCentroCostosComponent } from './components/asistencia/marcaciones/reportes-excel/reporte-centro-costos/reporte-centro-costos.component';
@@ -136,6 +137,7 @@ registerLocaleData(localeEs);
         NuevaMarcacionManualComponent,
         EditarMarcionManualComponent,
         AnalisisMarcacionesComponent,
+        ModalRegistrarMarcacionComponent,
         ReporteAsistenciaExcelComponent,
         ConfigCatalogosComponent,
         ReporteCentroCostosComponent,

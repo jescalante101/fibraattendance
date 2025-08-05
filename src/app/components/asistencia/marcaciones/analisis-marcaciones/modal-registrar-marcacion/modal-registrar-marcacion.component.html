@@ -1,0 +1,208 @@
+<!-- Modal para registrar marcación manual -->
+<div class="bg-gradient-to-br from-fiori-surface to-fiori-surface/80 rounded-2xl shadow-xl border border-fiori-border/50 overflow-hidden backdrop-blur-sm">
+  
+  <!-- Header del modal -->
+  <div class="px-6 py-5 border-b border-fiori-border/30 bg-gradient-to-r from-fiori-muted/50 to-fiori-muted/30">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-fiori-warning to-fiori-warning/80 rounded-xl flex items-center justify-center shadow-lg">
+          <lucide-icon name="clock" class="w-5 h-5 text-white"></lucide-icon>
+        </div>
+        <div>
+          <h2 class="text-lg font-semibold text-fiori-text">{{ getModalTitle() }}</h2>
+          <p class="text-sm text-fiori-subtext">{{ getModalSubtitle() }}</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 bg-fiori-primary/10 px-4 py-2 rounded-xl border border-fiori-primary/20">
+        <div class="w-8 h-8 bg-fiori-primary rounded-lg flex items-center justify-center">
+          <lucide-icon name="user" class="w-4 h-4 text-white"></lucide-icon>
+        </div>
+        <div>
+          <span class="text-sm text-fiori-primary font-semibold">{{ data.fullNameEmployee }}</span>
+          <div class="text-xs text-fiori-primary/70">{{ data.fechaFormateada }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario de marcación -->
+  <form [formGroup]="marcacionForm" class="p-6">
+    
+    <!-- Información previa del empleado -->
+    <div class="mb-6 p-4 bg-fiori-muted/30 rounded-xl border border-fiori-border/50">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <div class="flex items-center gap-2">
+          <lucide-icon name="id-card" class="w-4 h-4 text-fiori-primary"></lucide-icon>
+          <span class="text-fiori-subtext">Documento:</span>
+          <span class="font-medium text-fiori-text">{{ data.nroDoc }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <lucide-icon name="building" class="w-4 h-4 text-fiori-primary"></lucide-icon>
+          <span class="text-fiori-subtext">Área:</span>
+          <span class="font-medium text-fiori-text">{{ data.areaDescription }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <lucide-icon name="clock" class="w-4 h-4 text-fiori-primary"></lucide-icon>
+          <span class="text-fiori-subtext">Turno:</span>
+          <span class="font-medium text-fiori-text">{{ data.shiftName || 'Sin turno' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campos del formulario -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      
+      <!-- Fecha (precargada) -->
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-fiori-subtext">Fecha de marcación</label>
+        <div class="relative group">
+          <input type="date" 
+                 formControlName="fechaMarcacion"
+                 readonly
+                 class="w-full pl-12 pr-4 py-3 border border-fiori-border rounded-xl bg-fiori-muted/50 text-sm cursor-not-allowed">
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+            <div class="w-6 h-6 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+              <lucide-icon name="calendar" class="w-3.5 h-3.5 text-fiori-primary"></lucide-icon>
+            </div>
+          </div>
+        </div>
+        <div class="text-xs text-fiori-subtext">Fecha fija basada en el registro seleccionado</div>
+      </div>
+      
+      <!-- Hora -->
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-fiori-subtext">
+          Hora de marcación <span class="text-fiori-error">*</span>
+        </label>
+        <div class="relative group">
+          <input type="time" 
+                 formControlName="horaMarcacion"
+                 class="w-full pl-12 pr-4 py-3 border border-fiori-border rounded-xl bg-fiori-surface/50 focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary text-sm transition-all duration-200 hover:border-fiori-primary/50 group-hover:shadow-lg">
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+            <div class="w-6 h-6 bg-fiori-warning/10 rounded-lg flex items-center justify-center">
+              <lucide-icon name="clock" class="w-3.5 h-3.5 text-fiori-warning"></lucide-icon>
+            </div>
+          </div>
+        </div>
+        <div class="text-xs text-fiori-subtext" *ngIf="getHoraEsperada()">
+          Hora esperada: <span class="font-medium text-fiori-primary">{{ getHoraEsperada() }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tipo de marcación -->
+    <div class="mb-6">
+      <label class="block text-sm font-semibold text-fiori-subtext mb-2">
+        Tipo de marcación <span class="text-fiori-error">*</span>
+      </label>
+      
+      <!-- Select para marcación completa -->
+      <div *ngIf="data.tipo === 'completa'" class="relative group">
+        <select formControlName="estadoMarcacion"
+                class="w-full pl-12 pr-10 py-3 border border-fiori-border rounded-xl bg-fiori-surface/50 focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary text-sm appearance-none transition-all duration-200 hover:border-fiori-primary/50 group-hover:shadow-lg">
+          <option value="">Seleccionar tipo...</option>
+          <option value="entrada">🟢 Entrada</option>
+          <option value="salida">🔴 Salida</option>
+          <option value="salida_descanso">🟡 Salida Descanso</option>
+          <option value="entrada_descanso">🔵 Regreso Descanso</option>
+        </select>
+        <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+          <div class="w-6 h-6 bg-fiori-secondary/10 rounded-lg flex items-center justify-center">
+            <lucide-icon name="clock" class="w-3.5 h-3.5 text-fiori-secondary"></lucide-icon>
+          </div>
+        </div>
+        <lucide-icon name="chevron-down" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-fiori-subtext w-4 h-4 transition-transform group-focus-within:rotate-180"></lucide-icon>
+      </div>
+
+      <!-- Input readonly para tipos específicos -->
+      <div *ngIf="data.tipo !== 'completa'" class="relative group">
+        <input type="text"
+               [value]="getTipoMarcacionText()"
+               readonly
+               class="w-full pl-12 pr-4 py-3 border border-fiori-border rounded-xl bg-fiori-muted/50 text-sm cursor-not-allowed">
+        <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+          <div class="w-6 h-6 bg-fiori-secondary/10 rounded-lg flex items-center justify-center">
+            <lucide-icon [name]="getTipoMarcacionIcon()" class="w-3.5 h-3.5 text-fiori-secondary"></lucide-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-xs text-fiori-subtext">
+        {{ data.tipo === 'completa' ? 'Seleccione el tipo de marcación que desea registrar' : 'Tipo automáticamente detectado según las marcaciones faltantes' }}
+      </div>
+      
+      <!-- Error de validación -->
+      <div *ngIf="data.tipo === 'completa' && marcacionForm.get('estadoMarcacion')?.invalid && marcacionForm.get('estadoMarcacion')?.touched" 
+           class="text-xs text-fiori-error mt-1">
+        Debe seleccionar un tipo de marcación
+      </div>
+    </div>
+
+    <!-- Motivo (obligatorio) -->
+    <div class="mb-6">
+      <label class="block text-sm font-semibold text-fiori-subtext mb-2">
+        Motivo de marcación <span class="text-fiori-error">*</span>
+      </label>
+      <div class="relative group">
+        <textarea formControlName="motivo"
+                  rows="3"
+                  placeholder="Describa el motivo de la marcación manual..."
+                  class="w-full pl-12 pr-4 py-3 border border-fiori-border rounded-xl bg-fiori-surface/50 focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary text-sm resize-none transition-all duration-200 hover:border-fiori-primary/50 group-hover:shadow-lg"></textarea>
+        <div class="absolute left-3 top-3">
+          <div class="w-6 h-6 bg-fiori-error/10 rounded-lg flex items-center justify-center">
+            <lucide-icon name="file-edit" class="w-3.5 h-3.5 text-fiori-error"></lucide-icon>
+          </div>
+        </div>
+      </div>
+      <div class="text-xs text-fiori-subtext">Este campo es obligatorio para justificar la marcación manual</div>
+      <div *ngIf="marcacionForm.get('motivo')?.invalid && marcacionForm.get('motivo')?.touched" 
+           class="text-xs text-fiori-error mt-1">
+        El motivo es obligatorio
+      </div>
+    </div>
+
+    <!-- Incidencias (opcional) -->
+    <div class="mb-6">
+      <label class="block text-sm font-semibold text-fiori-subtext mb-2">Incidencias adicionales</label>
+      <div class="relative group">
+        <textarea formControlName="incidencias"
+                  rows="2"
+                  placeholder="Situaciones especiales, observaciones o incidencias..."
+                  class="w-full pl-12 pr-4 py-3 border border-fiori-border rounded-xl bg-fiori-surface/50 focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary text-sm resize-none transition-all duration-200 hover:border-fiori-primary/50 group-hover:shadow-lg"></textarea>
+        <div class="absolute left-3 top-3">
+          <div class="w-6 h-6 bg-fiori-warning/10 rounded-lg flex items-center justify-center">
+            <lucide-icon name="clipboard-list" class="w-3.5 h-3.5 text-fiori-warning"></lucide-icon>
+          </div>
+        </div>
+      </div>
+      <div class="text-xs text-fiori-subtext">Información adicional (opcional)</div>
+    </div>
+
+  </form>
+
+  <!-- Footer con botones -->
+  <div class="bg-fiori-surface border-t border-fiori-border p-4">
+    <div class="flex items-center justify-between">
+      <div class="text-sm text-fiori-subtext">
+        Complete la información requerida para registrar la marcación
+      </div>
+      
+      <div class="flex gap-3">
+        <button (click)="onSave()" 
+                [disabled]="marcacionForm.invalid || loading"
+                class="inline-flex items-center gap-2 px-6 py-3 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary focus:ring-2 focus:ring-fiori-primary focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg">
+          <lucide-icon [name]="loading ? 'refresh-cw' : 'save'" 
+                       [class]="loading ? 'w-4 h-4 animate-spin' : 'w-4 h-4'"></lucide-icon>
+          <span>{{ loading ? 'Guardando...' : 'Guardar Marcación' }}</span>
+        </button>
+        
+        <button (click)="onCancel()" 
+                class="inline-flex items-center gap-2 px-4 py-2 text-sm border border-fiori-border rounded-lg hover:bg-fiori-hover transition-colors">
+          <lucide-icon name="x" class="w-4 h-4"></lucide-icon>
+          <span>Cancelar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

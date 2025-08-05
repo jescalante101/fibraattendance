@@ -566,7 +566,9 @@
         <!-- Body -->
         <tbody class="bg-white divide-y divide-gray-200">
           <tr *ngFor="let record of groupedDataSource.data; trackBy: trackByGroupedRecord" 
-              [class]="getGroupedRowClass(record) + ' transition-colors'">
+              [class]="getGroupedRowClass(record) + ' transition-colors'"
+              (contextmenu)="onRightClick($event, record)"
+              class="cursor-pointer hover:bg-fiori-hover">
             
             <!-- Empleado -->
             <td *ngIf="isColumnVisible('fullNameEmployee')" 
@@ -745,4 +747,128 @@
     [showAllOption]="true"
     (pageChange)="onPaginatorChange($event)">
   </app-fiori-paginator>
+
+  <!-- Menú Contextual Flotante -->
+  <div *ngIf="showContextMenu" 
+       class="fixed bg-white border border-gray-300 rounded-lg shadow-xl z-50 min-w-64 py-2"
+       [style.left.px]="contextMenuPosition.x"
+       [style.top.px]="contextMenuPosition.y"
+       (click)="closeContextMenu()"
+       (mouseleave)="closeContextMenu()">
+    
+    <!-- Header del menú con información del empleado -->
+    <div class="px-4 py-3 border-b border-gray-200 bg-fiori-muted">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-fiori-primary/10 rounded-full flex items-center justify-center">
+          <lucide-icon name="user" class="w-4 h-4 text-fiori-primary"></lucide-icon>
+        </div>
+        <div>
+          <div class="font-medium text-sm text-fiori-text">{{ selectedRecord?.fullNameEmployee }}</div>
+          <div class="text-xs text-fiori-subtext">{{ selectedRecord?.fechaFormateada }} • {{ selectedRecord?.areaDescription }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Opciones del menú -->
+    <div class="py-1">
+      
+      <!-- Registrar Marcación Completa (cuando faltan ambas) -->
+      <button *ngIf="canRegisterCompleteAttendance(selectedRecord)"
+              (click)="registerCompleteAttendance(selectedRecord)"
+              class="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-fiori-hover transition-colors">
+        <lucide-icon name="plus-circle" class="w-4 h-4 text-blue-600"></lucide-icon>
+        <div>
+          <div class="font-medium">Registrar Marcación</div>
+          <div class="text-xs text-gray-500">Agregar entrada y/o salida faltante</div>
+        </div>
+      </button>
+
+      <!-- Registrar Marcación de Entrada (cuando solo falta entrada) -->
+      <button *ngIf="canRegisterOnlyEntrada(selectedRecord)"
+              (click)="registerEntradaManual(selectedRecord)"
+              class="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-fiori-hover transition-colors">
+        <lucide-icon name="log-in" class="w-4 h-4 text-green-600"></lucide-icon>
+        <div>
+          <div class="font-medium">Registrar Marcación de Entrada</div>
+          <div class="text-xs text-gray-500">Agregar marcación de entrada faltante</div>
+        </div>
+      </button>
+
+      <!-- Registrar Marcación de Salida (cuando solo falta salida) -->
+      <button *ngIf="canRegisterOnlySalida(selectedRecord)"
+              (click)="registerSalidaManual(selectedRecord)"
+              class="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-fiori-hover transition-colors">
+        <lucide-icon name="log-out" class="w-4 h-4 text-red-600"></lucide-icon>
+        <div>
+          <div class="font-medium">Registrar Marcación de Salida</div>
+          <div class="text-xs text-gray-500">Agregar marcación de salida faltante</div>
+        </div>
+      </button>
+
+      <!-- Separador -->
+      <div class="border-t border-gray-200 my-1"></div>
+
+      <!-- Ver Detalles Completos -->
+      <button (click)="viewFullDetails(selectedRecord)"
+              class="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-fiori-hover transition-colors">
+        <lucide-icon name="eye" class="w-4 h-4 text-fiori-primary"></lucide-icon>
+        <div>
+          <div class="font-medium">Ver Detalles Completos</div>
+          <div class="text-xs text-gray-500">Información detallada de marcaciones</div>
+        </div>
+      </button>
+
+      <!-- Justificar Tardanza -->
+      <button *ngIf="selectedRecord?.esTardanza"
+              (click)="justifyLateness(selectedRecord)"
+              class="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-fiori-hover transition-colors">
+        <lucide-icon name="clock" class="w-4 h-4 text-orange-600"></lucide-icon>
+        <div>
+          <div class="font-medium">Justificar Tardanza</div>
+          <div class="text-xs text-gray-500">Agregar justificación de tardanza</div>
+        </div>
+      </button>
+
+      <!-- Separador -->
+      <div class="border-t border-gray-200 my-1"></div>
+
+      <!-- Exportar Fila -->
+      <button (click)="exportSingleRow(selectedRecord)"
+              class="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-fiori-hover transition-colors">
+        <lucide-icon name="download" class="w-4 h-4 text-green-600"></lucide-icon>
+        <div>
+          <div class="font-medium">Exportar a Excel</div>
+          <div class="text-xs text-gray-500">Descargar solo esta marcación</div>
+        </div>
+      </button>
+
+      <!-- Reportar Inconsistencia -->
+      <button (click)="reportInconsistency(selectedRecord)"
+              class="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-fiori-hover transition-colors">
+        <lucide-icon name="alert-triangle" class="w-4 h-4 text-red-600"></lucide-icon>
+        <div>
+          <div class="font-medium">Reportar Inconsistencia</div>
+          <div class="text-xs text-gray-500">Marcar problema en la marcación</div>
+        </div>
+      </button>
+
+      <!-- Copiar Información -->
+      <button (click)="copyInformation(selectedRecord)"
+              class="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-fiori-hover transition-colors">
+        <lucide-icon name="copy" class="w-4 h-4 text-gray-600"></lucide-icon>
+        <div>
+          <div class="font-medium">Copiar Información</div>
+          <div class="text-xs text-gray-500">Copiar datos al portapapeles</div>
+        </div>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Overlay para cerrar menú al hacer click fuera -->
+  <div *ngIf="showContextMenu" 
+       class="fixed inset-0 z-40" 
+       (click)="closeContextMenu()">
+  </div>
+
 </div>

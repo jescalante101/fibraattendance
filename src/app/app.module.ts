@@ -84,7 +84,6 @@ import { EditarMarcionManualComponent } from './components/asistencia/aprobacion
 import { AnalisisMarcacionesComponent } from './components/asistencia/marcaciones/analisis-marcaciones/analisis-marcaciones.component';
 import { ModalRegistrarMarcacionComponent } from './components/asistencia/marcaciones/analisis-marcaciones/modal-registrar-marcacion/modal-registrar-marcacion.component';
 import { ReporteAsistenciaExcelComponent } from './components/asistencia/marcaciones/reporte-asistencia-excel/reporte-asistencia-excel.component';
-import { ConfigCatalogosComponent } from './components/asistencia/marcaciones/reportes-excel/config-catalogos/config-catalogos.component';
 import { ReporteCentroCostosComponent } from './components/asistencia/marcaciones/reportes-excel/reporte-centro-costos/reporte-centro-costos.component';
 import { ReporteAsistenciaMensualComponent } from './components/asistencia/marcaciones/reportes-excel/reporte-asistencia-mensual/reporte-asistencia-mensual.component';
 import { ReporteMarcacionesDetalleComponent } from './components/asistencia/marcaciones/reportes-excel/reporte-marcaciones-detalle/reporte-marcaciones-detalle.component';
@@ -92,6 +91,7 @@ import { ModalVerHorarioComponent } from './components/personal/empleado/asignar
 import { ModalEditarAsignacionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-editar-asignacion/modal-editar-asignacion.component';
 import { ModalRegistrarExcepcionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-registrar-excepcion/modal-registrar-excepcion.component';
 import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, ChevronUp, Layers, Menu, Info, FileSpreadsheet, Search,  RefreshCw, Save, Plus, X, AlertCircle, UserPen, UserPlus, Table, Edit, Trash2, CheckCircle, XCircle, Eye, EyeOff, Play, Square, ArrowRight, Timer, Zap, Hand, BarChart3, Database, Download, Filter, CalendarRange, LogIn, LogOut as LogOutIcon, Columns, Globe, Coffee, Badge,  Group,  FileEdit, ClipboardList, Check } from 'lucide-angular';
+import { ReporteAsistenciaComponent } from './components/asistencia/reportes/reporte-asistencia/reporte-asistencia.component';
 registerLocaleData(localeEs);
 @NgModule({ declarations: [
         AppComponent,
@@ -139,13 +139,13 @@ registerLocaleData(localeEs);
         AnalisisMarcacionesComponent,
         ModalRegistrarMarcacionComponent,
         ReporteAsistenciaExcelComponent,
-        ConfigCatalogosComponent,
         ReporteCentroCostosComponent,
         ReporteAsistenciaMensualComponent,
         ReporteMarcacionesDetalleComponent,
         ModalVerHorarioComponent,
         ModalEditarAsignacionComponent,
         ModalRegistrarExcepcionComponent,
+        ReporteAsistenciaComponent,
     ],
     exports: [
         TerminalSyncComponent,

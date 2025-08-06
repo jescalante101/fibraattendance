@@ -12,7 +12,7 @@ import { UserSiteFormModalComponent, UserSiteFormResult, UserSiteData, Usuario, 
 @Component({
   selector: 'app-usuario-sede',
   templateUrl: './usuario-sede.component.html',
-  styleUrls: ['./usuario-sede.component.css']
+  styleUrls: ['./usuario-sede.component.css'],
 })
 export class UsuarioSedeComponent implements OnInit {
   userSites: UserSite[] = [];

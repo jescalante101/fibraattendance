@@ -1,0 +1,71 @@
+{
+    "success": true,
+    "message": "string",
+    "employees": [
+        {
+            "personalId": "string",
+            "nroDoc": "string",
+            "colaborador": "string",
+            "sede": "string",
+            "area": "string",
+            "cargo": "string",
+            "centroCosto": "string",
+            "ccCodigo": "string",
+            "compania": "string",
+            "fechaIngreso": "string",
+            "dailyData": {
+                "additionalProp1": {
+                    "diaSemana": "string",
+                    "tipoDia": "string",
+                    "turnoNombre": "string",
+                    "entradaProgramada": "string",
+                    "salidaProgramada": "string",
+                    "marcacionesDelDia": "string",
+                    "origenMarcaciones": "string",
+                    "tipoPermiso": "string",
+                    "entradaReal": "string",
+                    "salidaReal": "string"
+                },
+                "additionalProp2": {
+                    "diaSemana": "string",
+                    "tipoDia": "string",
+                    "turnoNombre": "string",
+                    "entradaProgramada": "string",
+                    "salidaProgramada": "string",
+                    "marcacionesDelDia": "string",
+                    "origenMarcaciones": "string",
+                    "tipoPermiso": "string",
+                    "entradaReal": "string",
+                    "salidaReal": "string"
+                },
+                "additionalProp3": {
+                    "diaSemana": "string",
+                    "tipoDia": "string",
+                    "turnoNombre": "string",
+                    "entradaProgramada": "string",
+                    "salidaProgramada": "string",
+                    "marcacionesDelDia": "string",
+                    "origenMarcaciones": "string",
+                    "tipoPermiso": "string",
+                    "entradaReal": "string",
+                    "salidaReal": "string"
+                }
+            },
+            "totalHoras": 0,
+            "horasExtras": 0
+        }
+    ],
+    "dateRange": [
+        "2025-08-05T21:01:22.895Z"
+    ],
+    "summary": {
+        "totalEmployees": 0,
+        "totalWorkingDays": 0,
+        "totalAbsences": 0,
+        "totalPermissions": 0,
+        "totalHours": 0,
+        "totalOvertimeHours": 0
+    },
+    "generatedAt": "2025-08-05T21:01:22.895Z",
+    "executionTime": "string"
+}

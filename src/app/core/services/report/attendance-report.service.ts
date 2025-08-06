@@ -142,7 +142,7 @@ export class AttendanceReportService {
                     fechas: new Map()
                 });
             }
-
+            
             const emp = employeesMap.get(key)!;
 
             // Aseguramos que exista el objeto de fecha

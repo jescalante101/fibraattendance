@@ -105,6 +105,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
         { label: 'Reporte Marcación Mensual', link: 'panel/asistencia/marcaciones/reportes-excel/asistencia-mensual' },
         { label: 'Reporte Ccosto', link: 'panel/asistencia/marcaciones/reportes-excel/centro-costos' },
         { label: 'Reporte Detalle', link: 'panel/asistencia/marcaciones/reportes-excel/marcaciones-detalle' },
+        { label: 'Reporte Asistencia', link: 'panel/asistencia/marcaciones/reportes-excel/matrix' },
       ],
     }
   ];

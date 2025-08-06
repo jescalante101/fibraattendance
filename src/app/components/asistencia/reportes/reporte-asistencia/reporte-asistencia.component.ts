@@ -3,25 +3,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AttendanceMatrixReportService } from 'src/app/core/services/report/attendance-matrix-report.service';
 import { ReportMatrixParams } from 'src/app/core/models/report/report-matrix-params.model';
 import { ReportMatrixResponse, ReportMatrixResponseData } from 'src/app/core/models/report/report-matrix-response.model';
+import { AttendanceMatrixPivotResponse, EmployeePivotData as BackendEmployeePivotData, DailyAttendanceData as BackendDailyAttendanceData, AttendanceSummary } from 'src/app/core/models/report/report-pivot-reponse.model';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
 import { HeaderConfigService, HeaderConfig } from 'src/app/core/services/header-config.service';
 import { Subject, takeUntil } from 'rxjs';
 
-// Interfaces para el pivoteo de datos
-export interface EmployeePivotData {
-  personalId: string;
-  nroDoc: string;
-  colaborador: string;
-  sede: string;
-  area: string;
-  cargo: string;
-  centroCosto: string;
-  compania: string;
-  fechaIngreso: string;
-  dailyData: { [date: string]: DailyAttendanceData };
-  weeklyTotals: { [weekKey: string]: WeeklyTotals };
-  totalHoras: number;
-  horasExtras: number;
+// Usamos las interfaces del backend con extensiones para funcionalidades adicionales
+export interface EmployeePivotData extends BackendEmployeePivotData {
+  weeklyTotals?: { [weekKey: string]: WeeklyTotals };
 }
 
 export interface WeeklyTotals {
@@ -31,17 +20,8 @@ export interface WeeklyTotals {
   horasExtras: number;
 }
 
-export interface DailyAttendanceData {
-  diaSemana: string;
-  tipoDia: string;
-  turnoNombre: string;
-  entradaProgramada: string;
-  salidaProgramada: string;
-  marcacionesDelDia: string;
-  origenMarcaciones: string;
-  tipoPermiso: string;
-  entradaReal: string;
-  salidaReal: string;
+export interface DailyAttendanceData extends BackendDailyAttendanceData {
+  // Extendemos si necesitamos propiedades adicionales
 }
 
 @Component({
@@ -60,29 +40,19 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
   errorMessage = '';
   successMessage = '';
 
-  // Datos originales y procesados
-  originalData: ReportMatrixResponseData[] = [];
+  // Datos procesados (ya no necesitamos originalData)
   pivotedData: EmployeePivotData[] = [];
   dateRange: Date[] = [];
   weekStructure: { weekKey: string; weekStart: Date; weekEnd: Date; dates: Date[] }[] = [];
-  
-  // Flag para renderizado progresivo
-  renderComplete = false;
 
-  // Información del reporte
-  totalRecords = 0;
+  // Información del reporte desde el backend
+  summary: AttendanceSummary | null = null;
   generatedAt = '';
   executionTime = '';
 
-  // Paginación
+  // Paginación (ahora manejada por el backend)
   pageNumber = 1;
-  pageSize = 500; // Mostrar 50 empleados por página
-  totalPages = 0;
-  totalEmployees = 0;
-
-  // Totales globales
-  globalTotalHours = 0;
-  globalOvertimeHours = 0;
+  pageSize = 100;
 
   // Hacer Math disponible en el template
   Math = Math;
@@ -181,7 +151,7 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     const fechaFin = this.filterForm.get('fechaFin')?.value;
 
     if (fechaInicio && fechaFin) {
-      this.generateDateRange(new Date(fechaInicio), new Date(fechaFin));
+      // generateDateRange ya no es necesario - dateRange viene del backend
     }
   }
 
@@ -202,174 +172,81 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
-    this.renderComplete = false; // Reset flag
 
     const params: ReportMatrixParams = {
       ...this.filterForm.value,
       pageNumber: this.pageNumber,
-      pageSize: this.pageSize
+      pageSize: this.pageSize,
+      planillaId: this.headerConfig?.selectedPlanilla?.planillaId || '',
+      companiaId: this.headerConfig?.selectedEmpresa?.companiaId || ''
     };
 
-    console.log('Parámetros enviados al backend:', params);
+    console.log('Parámetros enviados al backend pivot:', params);
 
-    this.attendanceMatrixService.getAttendanceMatrixReport(params).subscribe({
-      next: (response: ReportMatrixResponse) => {
-        if (response.success) {
-          this.originalData = response.data;
-          this.totalRecords = response.totalRecords;
+    // Usar el nuevo endpoint pivot
+    this.attendanceMatrixService.getAttendanceMatrixPivotReport(params).subscribe({
+      next: (response: AttendanceMatrixPivotResponse) => {
+        console.log('Respuesta del servicio pivot:', response);
+        
+        if (response.success && response.employees && response.employees.length > 0) {
+          // Limpiar cache al cargar nuevos datos
+          this.dayValueCache.clear();
+          
+          // Los datos ya vienen pivoteados del backend
+          this.pivotedData = response.employees;
+          this.summary = response.summary;
           this.generatedAt = response.generatedAt;
           this.executionTime = response.executionTime;
+          
+          // Procesar dateRange del backend (convertir strings a Date)
+          this.dateRange = response.dateRange.map(dateStr => new Date(dateStr));
+          
+          // Generar estructura de semanas para totales semanales
+          this.generateWeekStructure();
+          
+          // Calcular totales semanales para cada empleado
+          this.calculateWeeklyTotalsForEmployees();
+          
+          // Pre-calcular todos los valores para evitar lazy rendering
+          this.preCalculateAllValues();
 
-          // Información de paginación
-          this.pageNumber = response.currentPage || 1;
-          this.pageSize = response.pageSize || 100;
-          this.totalPages = response.totalPages || 1;
-
-          // Totales globales
-          this.globalTotalHours = response.globalTotalHours || 0;
-          this.globalOvertimeHours = response.globalOvertimeHours || 0;
-
-          // Procesar datos para pivot primero
-          this.processDataForPivot();
-
-          // Calcular totalEmployees después del procesamiento
-          if (response.totalEmployees) {
-            this.totalEmployees = response.totalEmployees;
-          } else {
-            // Estimar basado en paginación y datos actuales
-            if (this.pageNumber === this.totalPages) {
-              // Última página: calcular exacto
-              this.totalEmployees = ((this.totalPages - 1) * this.pageSize) + this.pivotedData.length;
-            } else {
-              // No es la última página: estimar
-              this.totalEmployees = this.totalPages * this.pageSize;
-            }
-          }
-
-          console.log('Información de paginación procesada:', {
-            currentPage: response.currentPage,
-            pageSize: response.pageSize,
-            totalPages: response.totalPages,
-            totalEmployees: this.totalEmployees,
-            totalRecords: response.totalRecords,
-            pivotedDataLength: this.pivotedData.length
+          console.log('Datos procesados del endpoint pivot:', {
+            employees: this.pivotedData.length,
+            dateRange: this.dateRange.length,
+            weekStructure: this.weekStructure.length,
+            summary: this.summary
           });
 
-          console.log('Datos procesados para mostrar:', {
-            pivotedData: this.pivotedData,
-            weekStructure: this.weekStructure,
-            dateRange: this.dateRange,
-            totalEmployees: this.totalEmployees,
-            totalPages: this.totalPages,
-            pageNumber: this.pageNumber,
-            pageSize: this.pageSize
-          });
-
-          this.successMessage = `Reporte generado - Página ${this.pageNumber} de ${this.totalPages} (${this.pivotedData.length} empleados de ${this.totalEmployees} totales)`;
+          this.successMessage = `Reporte generado: ${this.pivotedData.length} empleados con datos desde ${this.dateRange[0]?.toLocaleDateString()} hasta ${this.dateRange[this.dateRange.length - 1]?.toLocaleDateString()}`;
           this.autoHideSuccess();
           
-          // Forzar re-renderizado después de procesar datos (solución simple para lazy rendering)
+          // SOLUCIÓN PARA LAZY RENDERING: Forzar renderización completa
           setTimeout(() => {
-            this.renderComplete = true;
-            // Forzar que Angular detecte cambios
+            // Forzar que Angular detecte todos los cambios
+            this.cdr.detectChanges();
+            
+            // Disparar eventos que fuercen re-renderizado
             window.dispatchEvent(new Event('resize'));
-          }, 50);
+            
+            // Forzar segundo pase
+            setTimeout(() => {
+              this.cdr.detectChanges();
+            }, 50);
+          }, 100);
           
         } else {
-          this.errorMessage = response.message || 'Error al cargar el reporte';
+          this.errorMessage = response.message || 'No se encontraron datos para los filtros seleccionados';
         }
         this.isLoading = false;
-        this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('Error al cargar reporte:', error);
+        console.error('Error al cargar reporte pivot:', error);
         this.errorMessage = 'Error de conexión al cargar el reporte';
         this.isLoading = false;
-        this.cdr.markForCheck();
       }
     });
   }
 
-  private processDataForPivot(): void {
-    if (!this.originalData.length) {
-      this.pivotedData = [];
-      return;
-    }
-
-    // Generar rango de fechas
-    const fechaInicio = new Date(this.filterForm.get('fechaInicio')?.value);
-    const fechaFin = new Date(this.filterForm.get('fechaFin')?.value);
-    this.generateDateRange(fechaInicio, fechaFin);
-
-    // Agrupar por empleado
-    const employeeGroups = this.originalData.reduce((groups, record) => {
-      const key = `${record.personalId}-${record.nroDoc}`;
-      if (!groups[key]) {
-        groups[key] = [];
-      }
-      groups[key].push(record);
-      return groups;
-    }, {} as { [key: string]: ReportMatrixResponseData[] });
-
-    // Procesar cada empleado
-    this.pivotedData = Object.values(employeeGroups).map(employeeRecords => {
-      const firstRecord = employeeRecords[0];
-      const dailyData: { [date: string]: DailyAttendanceData } = {};
-
-      // Procesar cada día del empleado
-      employeeRecords.forEach(dayRecord => {
-        const dateKey = this.formatDate(new Date(dayRecord.fecha));
-        dailyData[dateKey] = {
-          diaSemana: dayRecord.diaSemanaEs,
-          tipoDia: dayRecord.tipoDia,
-          turnoNombre: dayRecord.turnoNombre,
-          entradaProgramada: dayRecord.entradaProgramada,
-          salidaProgramada: dayRecord.salidaProgramada,
-          marcacionesDelDia: dayRecord.marcacionesDelDia,
-          origenMarcaciones: dayRecord.origenMarcaciones,
-          tipoPermiso: dayRecord.tipoPermiso,
-          entradaReal: this.extractFirstTime(dayRecord.marcacionesDelDia, dayRecord.tipoPermiso),
-          salidaReal: this.extractLastTime(dayRecord.marcacionesDelDia, dayRecord.tipoPermiso)
-        };
-      });
-
-      // Calcular totales semanales
-      const weeklyTotals = this.calculateWeeklyTotals(dailyData);
-      
-      // Calcular totales generales
-      const totalHoras = this.calculateTotalHours(dailyData);
-      const horasExtras = this.calculateOvertimeHours(dailyData);
-
-      return {
-        personalId: firstRecord.personalId,
-        nroDoc: firstRecord.nroDoc,
-        colaborador: firstRecord.colaborador,
-        sede: firstRecord.sede,
-        area: firstRecord.area,
-        cargo: firstRecord.cargo,
-        centroCosto: firstRecord.centroCosto,
-        compania: firstRecord.compania,
-        fechaIngreso: firstRecord.fechaIngreso,
-        dailyData,
-        weeklyTotals,
-        totalHoras,
-        horasExtras
-      };
-    }).sort((a, b) => a.colaborador.localeCompare(b.colaborador));
-  }
-
-  private generateDateRange(fechaInicio: Date, fechaFin: Date): void {
-    this.dateRange = [];
-    const currentDate = new Date(fechaInicio);
-
-    while (currentDate <= fechaFin) {
-      this.dateRange.push(new Date(currentDate));
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-
-    // Generar estructura de semanas
-    this.generateWeekStructure();
-  }
 
   private generateWeekStructure(): void {
     this.weekStructure = [];
@@ -471,121 +348,94 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     return horasUnicas[horasUnicas.length - 1] || 'FALTA';
   }
 
-  private calculateTotalHours(dailyData: { [date: string]: DailyAttendanceData }): number {
-    let totalHours = 0;
 
-    Object.values(dailyData).forEach(dayData => {
-      // Si hay permiso, no contar horas
-      if (dayData.tipoPermiso) return;
+  // Nuevo método simplificado para calcular totales semanales con datos pivoteados
+  private calculateWeeklyTotalsForEmployees(): void {
+    this.pivotedData.forEach(employee => {
+      const weeklyTotals: { [weekKey: string]: WeeklyTotals } = {};
 
-      // Si es FALTA, continuar
-      if (dayData.entradaReal === 'FALTA' || dayData.salidaReal === 'FALTA') return;
+      // Inicializar totales semanales
+      this.weekStructure.forEach(week => {
+        weeklyTotals[week.weekKey] = {
+          weekStart: week.weekStart,
+          weekEnd: week.weekEnd,
+          totalHoras: 0,
+          horasExtras: 0
+        };
+      });
 
-      // Solo calcular si hay entrada y salida válidas
-      if (dayData.entradaReal && dayData.salidaReal) {
-        const entrada = this.parseTime(dayData.entradaReal);
-        const salida = this.parseTime(dayData.salidaReal);
+      // Calcular totales por semana
+      this.weekStructure.forEach(week => {
+        let weekTotalHours = 0;
+        let weekOvertimeHours = 0;
+        const normalWorkDay = 8.0;
 
-        if (entrada && salida) {
-          const workedHours = (salida.getTime() - entrada.getTime()) / (1000 * 60 * 60);
-          if (workedHours > 0 && workedHours < 24) {
-            totalHours += workedHours;
-          }
-        }
-      }
-    });
+        week.dates.forEach(date => {
+          const dateKey = date.toISOString().split('T')[0] + 'T00:00:00'; // Backend usa formato ISO con 00:00:00
+          const dayData = employee.dailyData[dateKey];
 
-    return Math.round(totalHours * 100) / 100;
-  }
+          if (!dayData) return;
 
-  private calculateOvertimeHours(dailyData: { [date: string]: DailyAttendanceData }): number {
-    let overtimeHours = 0;
-    const normalWorkDay = 8.0;
+          // Si hay permiso, no contar horas
+          if (dayData.tipoPermiso) return;
 
-    Object.values(dailyData).forEach(dayData => {
-      // Si hay permiso, no contar horas extras
-      if (dayData.tipoPermiso) return;
+          // Si es FALTA, continuar
+          if (dayData.entradaReal === 'FALTA' || dayData.salidaReal === 'FALTA') return;
 
-      // Si es FALTA, continuar
-      if (dayData.entradaReal === 'FALTA' || dayData.salidaReal === 'FALTA') return;
+          // Solo calcular si hay entrada y salida válidas
+          if (dayData.entradaReal && dayData.salidaReal) {
+            const entrada = this.parseTime(dayData.entradaReal);
+            const salida = this.parseTime(dayData.salidaReal);
 
-      // Solo calcular si hay entrada y salida válidas
-      if (dayData.entradaReal && dayData.salidaReal) {
-        const entrada = this.parseTime(dayData.entradaReal);
-        const salida = this.parseTime(dayData.salidaReal);
-
-        if (entrada && salida) {
-          const workedHours = (salida.getTime() - entrada.getTime()) / (1000 * 60 * 60);
-          if (workedHours > normalWorkDay && workedHours < 24) {
-            overtimeHours += workedHours - normalWorkDay;
-          }
-        }
-      }
-    });
-
-    return Math.round(overtimeHours * 100) / 100;
-  }
-
-  private calculateWeeklyTotals(dailyData: { [date: string]: DailyAttendanceData }): { [weekKey: string]: WeeklyTotals } {
-    const weeklyTotals: { [weekKey: string]: WeeklyTotals } = {};
-
-    // Inicializar totales semanales
-    this.weekStructure.forEach(week => {
-      weeklyTotals[week.weekKey] = {
-        weekStart: week.weekStart,
-        weekEnd: week.weekEnd,
-        totalHoras: 0,
-        horasExtras: 0
-      };
-    });
-
-    // Calcular totales por semana
-    this.weekStructure.forEach(week => {
-      let weekTotalHours = 0;
-      let weekOvertimeHours = 0;
-      const normalWorkDay = 8.0;
-
-      week.dates.forEach(date => {
-        const dateKey = this.formatDate(date);
-        const dayData = dailyData[dateKey];
-
-        if (!dayData) return;
-
-        // Si hay permiso, no contar horas
-        if (dayData.tipoPermiso) return;
-
-        // Si es FALTA, continuar
-        if (dayData.entradaReal === 'FALTA' || dayData.salidaReal === 'FALTA') return;
-
-        // Solo calcular si hay entrada y salida válidas
-        if (dayData.entradaReal && dayData.salidaReal) {
-          const entrada = this.parseTime(dayData.entradaReal);
-          const salida = this.parseTime(dayData.salidaReal);
-
-          if (entrada && salida) {
-            const workedHours = (salida.getTime() - entrada.getTime()) / (1000 * 60 * 60);
-            if (workedHours > 0 && workedHours < 24) {
-              weekTotalHours += workedHours;
-              
-              // Calcular horas extras
-              if (workedHours > normalWorkDay) {
-                weekOvertimeHours += workedHours - normalWorkDay;
+            if (entrada && salida) {
+              const workedHours = (salida.getTime() - entrada.getTime()) / (1000 * 60 * 60);
+              if (workedHours > 0 && workedHours < 24) {
+                weekTotalHours += workedHours;
+                
+                // Calcular horas extras
+                if (workedHours > normalWorkDay) {
+                  weekOvertimeHours += workedHours - normalWorkDay;
+                }
               }
             }
           }
-        }
+        });
+
+        weeklyTotals[week.weekKey].totalHoras = Math.round(weekTotalHours * 100) / 100;
+        weeklyTotals[week.weekKey].horasExtras = Math.round(weekOvertimeHours * 100) / 100;
       });
 
-      weeklyTotals[week.weekKey].totalHoras = Math.round(weekTotalHours * 100) / 100;
-      weeklyTotals[week.weekKey].horasExtras = Math.round(weekOvertimeHours * 100) / 100;
+      // Asignar totales semanales al empleado
+      employee.weeklyTotals = weeklyTotals;
     });
+  }
 
-    return weeklyTotals;
+  // Pre-calcular todos los valores para evitar lazy rendering
+  private preCalculateAllValues(): void {
+    console.log('Pre-calculando valores para evitar lazy rendering...');
+    
+    // Pre-calcular todos los valores getDayValue
+    this.pivotedData.forEach(employee => {
+      this.dateRange.forEach(date => {
+        // Pre-calcular entrada y salida para cada día
+        this.getDayValue(employee, date, 'entrada');
+        this.getDayValue(employee, date, 'salida');
+      });
+      
+      // Pre-calcular totales semanales
+      this.weekStructure.forEach(week => {
+        this.getWeeklyTotal(employee, week.weekKey, 'totalHoras');
+        this.getWeeklyTotal(employee, week.weekKey, 'horasExtras');
+      });
+    });
+    
+    console.log(`Pre-cálculo completado. Cache size: ${this.dayValueCache.size}`);
   }
 
   private parseTime(timeStr: string): Date | null {
-    if (!timeStr || timeStr === 'FALTA') return null;
+    if (!timeStr || timeStr === 'FALTA' || timeStr === '-') return null;
 
+    // Las horas ya vienen formateadas del backend como "08:00", "17:30", etc.
     const timeParts = timeStr.match(/(\d{1,2}):(\d{2})/);
     if (!timeParts) return null;
 
@@ -594,13 +444,24 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     return date;
   }
 
+  // Cache para optimizar getDayValue
+  private dayValueCache = new Map<string, string>();
+
   getDayValue(employee: EmployeePivotData, date: Date, type: 'entrada' | 'salida'): string {
-    const dateKey = this.formatDate(date);
+    const cacheKey = `${employee.personalId}-${date.getTime()}-${type}`;
+    
+    if (this.dayValueCache.has(cacheKey)) {
+      return this.dayValueCache.get(cacheKey)!;
+    }
+
+    // Backend usa formato ISO con tiempo 00:00:00
+    const dateKey = date.toISOString().split('T')[0] + 'T00:00:00';
     const dayData = employee.dailyData[dateKey];
 
-    if (!dayData) return '-';
-
-    return type === 'entrada' ? dayData.entradaReal : dayData.salidaReal;
+    const result = dayData ? (type === 'entrada' ? dayData.entradaReal : dayData.salidaReal) : '-';
+    
+    this.dayValueCache.set(cacheKey, result);
+    return result;
   }
 
   getDayOfWeek(date: Date): string {
@@ -608,7 +469,7 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
   }
 
   getWeeklyTotal(employee: EmployeePivotData, weekKey: string, type: 'totalHoras' | 'horasExtras'): number {
-    const weeklyTotal = employee.weeklyTotals[weekKey];
+    const weeklyTotal = employee.weeklyTotals?.[weekKey];
     return weeklyTotal ? weeklyTotal[type] : 0;
   }
 
@@ -631,13 +492,17 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     return date.toISOString().split('T')[0];
   }
 
-  // Getter methods for template calculations (ahora usamos totales globales)
+  // Getter methods for template calculations (usamos summary del backend)
   get totalHours(): number {
-    return this.globalTotalHours || this.pivotedData.reduce((sum, emp) => sum + emp.totalHoras, 0);
+    return this.summary?.totalHours || this.pivotedData.reduce((sum, emp) => sum + emp.totalHoras, 0);
   }
 
   get totalOvertimeHours(): number {
-    return this.globalOvertimeHours || this.pivotedData.reduce((sum, emp) => sum + emp.horasExtras, 0);
+    return this.summary?.totalOvertimeHours || this.pivotedData.reduce((sum, emp) => sum + emp.horasExtras, 0);
+  }
+
+  get totalEmployees(): number {
+    return this.summary?.totalEmployees || this.pivotedData.length;
   }
 
   onExportExcel(): void {
@@ -685,19 +550,15 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     this.applyHeaderConfigToForm(); // Reaplicar filtros del header
     this.setDefaultDateRange();
     this.pivotedData = [];
-    this.originalData = [];
-    this.pageNumber = 1; // Reset pagination
     this.clearMessages();
-    this.cdr.markForCheck();
   }
 
-  // Método para manejar eventos del FioriPaginatorComponent
-  onPageChangeEvent(event: PaginatorEvent): void {
+  // PENDIENTE: Implementar paginación cuando el backend la soporte
+  /*onPageChangeEvent(event: PaginatorEvent): void {
     this.pageNumber = event.pageNumber;
     this.pageSize = event.pageSize;
     this.loadReportData();
-    this.cdr.markForCheck();
-  }
+  }*/
 
   private autoHideSuccess(): void {
     setTimeout(() => {

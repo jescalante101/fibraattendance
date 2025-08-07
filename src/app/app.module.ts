@@ -75,6 +75,7 @@ import { UsuarioSedeComponent } from './components/personal/organizacion/usuario
 import { SedeCcostoComponent } from './components/personal/organizacion/sede-ccosto/sede-ccosto.component';
 import { IclockTransactionComponent } from './components/personal/empleado/iclock-transaction/iclock-transaction.component';
 import { MatBadgeModule } from '@angular/material/badge';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { SpanishPaginatorIntl } from './spanish-paginator-intl.service';
@@ -160,6 +161,7 @@ registerLocaleData(localeEs);
     bootstrap: [AppComponent], imports: [
         MatDatepickerModule,
         MatBadgeModule,
+        ScrollingModule,
         MatStepperModule,
         MatProgressSpinnerModule,
         MatNativeDateModule,

@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { AttendanceMatrixReportService } from 'src/app/core/services/report/attendance-matrix-report.service';
+import { ReportMatrixParams } from 'src/app/core/models/report/report-matrix-params.model';
+import { HeaderConfigService, HeaderConfig } from 'src/app/core/services/header-config.service';
+import { Subject, takeUntil } from 'rxjs';
 
 interface EmpleadoAsistenciaMensual {
   item: number;
@@ -26,7 +30,7 @@ interface ResumenEmpleado {
   templateUrl: './reporte-asistencia-mensual.component.html',
   styleUrls: ['./reporte-asistencia-mensual.component.css']
 })
-export class ReporteAsistenciaMensualComponent implements OnInit {
+export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
   
   empleados: EmpleadoAsistenciaMensual[] = [];
   loading = false;
@@ -57,14 +61,40 @@ export class ReporteAsistenciaMensualComponent implements OnInit {
   totalDiasTrabajados = 0;
   totalFaltas = 0;
 
-  constructor() { }
+  // Estados de carga
+  isExporting = false;
+
+  // Header configuration
+  headerConfig: HeaderConfig | null = null;
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private attendanceMatrixService: AttendanceMatrixReportService,
+    private headerConfigService: HeaderConfigService
+  ) { }
 
   ngOnInit(): void {
+    this.loadHeaderConfig();
     this.initializeMeses();
     this.loadMockData();
     this.generateFilterOptions();
     this.generateDiasDelMes();
     this.calculateGeneralStatistics();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private loadHeaderConfig(): void {
+    this.headerConfig = this.headerConfigService.getCurrentHeaderConfig();
+    
+    this.headerConfigService.getHeaderConfig$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((config: HeaderConfig | null) => {
+        this.headerConfig = config;
+      });
   }
 
   private initializeMeses(): void {
@@ -350,7 +380,52 @@ export class ReporteAsistenciaMensualComponent implements OnInit {
   }
 
   exportToExcel(): void {
-    console.log('Exportando reporte asistencia mensual a Excel...');
+    if (this.isExporting) return;
+
+    // Generar parámetros del reporte basados en los filtros actuales
+    const fechaInicio = new Date(this.mesSeleccionado + '-01');
+    const fechaFin = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + 1, 0); // Último día del mes
+
+    const params: ReportMatrixParams = {
+      fechaInicio: fechaInicio.toISOString().split('T')[0],
+      fechaFin: fechaFin.toISOString().split('T')[0],
+      employeeId: '',
+      companiaId: this.headerConfig?.selectedEmpresa?.companiaId || '',
+      areaId: this.selectedArea || '',
+      sedeId: '',
+      cargoId: '',
+      centroCostoId: '',
+      sedeCodigo: '',
+      ccCodigo: '',
+      planillaId: this.headerConfig?.selectedPlanilla?.planillaId || this.selectedPlanilla || '',
+      pageNumber: 1,
+      pageSize: 1000
+    };
+
+    this.isExporting = true;
+
+    this.attendanceMatrixService.downloadExportWeeklyAttendanceReport(params).subscribe({
+      next: (blob) => {
+        this.downloadFile(blob, `Asistencia_Semanal_${params.fechaInicio}_${params.fechaFin}.xlsx`);
+        this.isExporting = false;
+      },
+      error: (error) => {
+        console.error('Error al descargar reporte:', error);
+        alert('Error al generar el reporte. Inténtalo de nuevo.');
+        this.isExporting = false;
+      }
+    });
+  }
+
+  private downloadFile(blob: Blob, filename: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   }
 
   trackByEmpleado(index: number, item: EmpleadoAsistenciaMensual): any {

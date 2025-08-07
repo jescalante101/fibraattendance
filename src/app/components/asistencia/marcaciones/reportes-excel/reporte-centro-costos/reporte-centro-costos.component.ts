@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { AttendanceMatrixReportService } from 'src/app/core/services/report/attendance-matrix-report.service';
+import { ReportMatrixParams } from 'src/app/core/models/report/report-matrix-params.model';
+import { HeaderConfigService, HeaderConfig } from 'src/app/core/services/header-config.service';
+import { Subject, takeUntil } from 'rxjs';
 
 interface EmpleadoCentroCosto {
   item: number;
@@ -24,7 +28,7 @@ interface SemanaInfo {
   templateUrl: './reporte-centro-costos.component.html',
   styleUrls: ['./reporte-centro-costos.component.css']
 })
-export class ReporteCentroCostosComponent implements OnInit {
+export class ReporteCentroCostosComponent implements OnInit, OnDestroy {
   
   empleados: EmpleadoCentroCosto[] = [];
   loading = false;
@@ -53,13 +57,39 @@ export class ReporteCentroCostosComponent implements OnInit {
   totalHorasTrabajadas = 0;
   promedioHorasPorEmpleado = 0;
 
-  constructor() { }
+  // Estados de carga
+  isExporting = false;
+
+  // Header configuration
+  headerConfig: HeaderConfig | null = null;
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private attendanceMatrixService: AttendanceMatrixReportService,
+    private headerConfigService: HeaderConfigService
+  ) { }
 
   ngOnInit(): void {
+    this.loadHeaderConfig();
     this.loadMockData();
     this.generateFilterOptions();
     this.generateSemanasInfo();
     this.calculateStatistics();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private loadHeaderConfig(): void {
+    this.headerConfig = this.headerConfigService.getCurrentHeaderConfig();
+    
+    this.headerConfigService.getHeaderConfig$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((config: HeaderConfig | null) => {
+        this.headerConfig = config;
+      });
   }
 
   private loadMockData(): void {
@@ -311,7 +341,52 @@ export class ReporteCentroCostosComponent implements OnInit {
   }
 
   exportToExcel(): void {
-    console.log('Exportando reporte centro de costos a Excel...');
+    if (this.isExporting) return;
+
+    // Usar fechas por defecto si no están establecidas
+    const fechaInicio = this.fechaInicio || '2025-06-23';
+    const fechaFin = this.fechaFin || '2025-07-31';
+
+    const params: ReportMatrixParams = {
+      fechaInicio,
+      fechaFin,
+      employeeId: '',
+      companiaId: this.headerConfig?.selectedEmpresa?.companiaId || '',
+      areaId: this.selectedArea || '',
+      sedeId: '',
+      cargoId: '',
+      centroCostoId: '',
+      sedeCodigo: '',
+      ccCodigo: '',
+      planillaId: this.headerConfig?.selectedPlanilla?.planillaId || this.selectedPlanilla || '',
+      pageNumber: 1,
+      pageSize: 1000
+    };
+
+    this.isExporting = true;
+
+    this.attendanceMatrixService.downloadCostCenterReport(params).subscribe({
+      next: (blob) => {
+        this.downloadFile(blob, `Reporte_Centro_Costos_${params.fechaInicio}_${params.fechaFin}.xlsx`);
+        this.isExporting = false;
+      },
+      error: (error) => {
+        console.error('Error al descargar reporte:', error);
+        alert('Error al generar el reporte. Inténtalo de nuevo.');
+        this.isExporting = false;
+      }
+    });
+  }
+
+  private downloadFile(blob: Blob, filename: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   }
 
   toggleViewMode(): void {

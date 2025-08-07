@@ -2,11 +2,10 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, type OnInit, OnD
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AttendanceMatrixReportService } from 'src/app/core/services/report/attendance-matrix-report.service';
 import { ReportMatrixParams } from 'src/app/core/models/report/report-matrix-params.model';
-import { ReportMatrixResponse, ReportMatrixResponseData } from 'src/app/core/models/report/report-matrix-response.model';
 import { AttendanceMatrixPivotResponse, EmployeePivotData as BackendEmployeePivotData, DailyAttendanceData as BackendDailyAttendanceData, AttendanceSummary } from 'src/app/core/models/report/report-pivot-reponse.model';
-import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
 import { HeaderConfigService, HeaderConfig } from 'src/app/core/services/header-config.service';
 import { Subject, takeUntil } from 'rxjs';
+import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
 
 // Usamos las interfaces del backend con extensiones para funcionalidades adicionales
 export interface EmployeePivotData extends BackendEmployeePivotData {
@@ -27,8 +26,8 @@ export interface DailyAttendanceData extends BackendDailyAttendanceData {
 @Component({
   selector: 'app-reporte-asistencia',
   templateUrl: './reporte-asistencia.component.html',
-  styleUrl: './reporte-asistencia.component.css'
-  // changeDetection: ChangeDetectionStrategy.OnPush // Comentado temporalmente para debug
+  styleUrl: './reporte-asistencia.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
 
@@ -52,7 +51,10 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
 
   // Paginación (ahora manejada por el backend)
   pageNumber = 1;
-  pageSize = 100;
+  pageSize = 200;
+  totalRecords = 0;
+  totalPages = 1;
+  currentPage = 1;
 
   // Hacer Math disponible en el template
   Math = Math;
@@ -79,6 +81,14 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     // Cargar con datos por defecto del mes actual
     this.setDefaultDateRange();
     
+    // Ejecutar búsqueda inicial automáticamente
+    setTimeout(() => {
+      if (this.filterForm.valid && this.headerConfig) {
+        console.log('Ejecutando búsqueda inicial automática');
+        this.loadReportData();
+      }
+    }, 500);
+    
     // Forzar detección inicial
     this.cdr.markForCheck();
   }
@@ -90,12 +100,12 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
 
   private initializeForm(): void {
     const now = new Date();
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1); // Primer día del mes
+    const today = new Date(); // Fecha actual (hoy)
 
     this.filterForm = this.fb.group({
       fechaInicio: [this.formatDate(firstDay), Validators.required],
-      fechaFin: [this.formatDate(lastDay), Validators.required],
+      fechaFin: [this.formatDate(today), Validators.required],
       employeeId: [''],
       companiaId: [''],
       planillaId: [''],
@@ -119,6 +129,13 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
       .subscribe((config: HeaderConfig | null) => {
         this.headerConfig = config;
         this.applyHeaderConfigToForm();
+        
+        // Si tenemos datos previos y la configuración cambió, recargar
+        if (this.pivotedData.length > 0 && this.filterForm.valid) {
+          console.log('Header config cambió, recargando datos');
+          this.loadReportData();
+        }
+        
         this.cdr.markForCheck();
       });
   }
@@ -173,15 +190,31 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     this.errorMessage = '';
     this.successMessage = '';
 
+    // Asegurarse de que los filtros del header están aplicados
+    const formValues = this.filterForm.value;
     const params: ReportMatrixParams = {
-      ...this.filterForm.value,
+      ...formValues,
       pageNumber: this.pageNumber,
       pageSize: this.pageSize,
-      planillaId: this.headerConfig?.selectedPlanilla?.planillaId || '',
-      companiaId: this.headerConfig?.selectedEmpresa?.companiaId || ''
+      // Sobrescribir con valores del header (más importante que form)
+      companiaId: this.headerConfig?.selectedEmpresa?.companiaId || formValues.companiaId || '',
+      planillaId: this.headerConfig?.selectedPlanilla?.planillaId || formValues.planillaId || ''
     };
 
+    // // Remover campos vacíos para evitar filtros innecesarios
+    // Object.keys(params).forEach(key => {
+    //   if (params[key] === '' || params[key] === null || params[key] === undefined) {
+    //     delete params[key];
+    //   }
+    // });
+
     console.log('Parámetros enviados al backend pivot:', params);
+    console.log('Header config aplicado:', {
+      empresa: this.headerConfig?.selectedEmpresa?.descripcion,
+      companiaId: this.headerConfig?.selectedEmpresa?.companiaId,
+      planilla: this.headerConfig?.selectedPlanilla?.descripcion,
+      planillaId: this.headerConfig?.selectedPlanilla?.planillaId
+    });
 
     // Usar el nuevo endpoint pivot
     this.attendanceMatrixService.getAttendanceMatrixPivotReport(params).subscribe({
@@ -197,6 +230,12 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
           this.summary = response.summary;
           this.generatedAt = response.generatedAt;
           this.executionTime = response.executionTime;
+          
+          // Datos de paginación del backend
+          this.totalRecords = response.totalRecords;
+          this.currentPage = response.currentPage;
+          this.pageSize = response.pageSize;
+          this.totalPages = response.totalPages;
           
           // Procesar dateRange del backend (convertir strings a Date)
           this.dateRange = response.dateRange.map(dateStr => new Date(dateStr));
@@ -220,29 +259,30 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
           this.successMessage = `Reporte generado: ${this.pivotedData.length} empleados con datos desde ${this.dateRange[0]?.toLocaleDateString()} hasta ${this.dateRange[this.dateRange.length - 1]?.toLocaleDateString()}`;
           this.autoHideSuccess();
           
-          // SOLUCIÓN PARA LAZY RENDERING: Forzar renderización completa
-          setTimeout(() => {
-            // Forzar que Angular detecte todos los cambios
-            this.cdr.detectChanges();
-            
-            // Disparar eventos que fuercen re-renderizado
-            window.dispatchEvent(new Event('resize'));
-            
-            // Forzar segundo pase
-            setTimeout(() => {
-              this.cdr.detectChanges();
-            }, 50);
-          }, 100);
+          // Forzar detección de cambios con OnPush
+          this.cdr.markForCheck();
           
         } else {
           this.errorMessage = response.message || 'No se encontraron datos para los filtros seleccionados';
+          // Resetear datos de paginación cuando no hay resultados
+          this.totalRecords = 0;
+          this.currentPage = 1;
+          this.totalPages = 1;
+          this.pivotedData = [];
         }
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
       error: (error) => {
         console.error('Error al cargar reporte pivot:', error);
         this.errorMessage = 'Error de conexión al cargar el reporte';
+        // Resetear datos en caso de error
+        this.totalRecords = 0;
+        this.currentPage = 1;
+        this.totalPages = 1;
+        this.pivotedData = [];
         this.isLoading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -444,8 +484,9 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     return date;
   }
 
-  // Cache para optimizar getDayValue
+  // Cache optimizado para getDayValue con límite
   private dayValueCache = new Map<string, string>();
+  private readonly maxCacheSize = 10000;
 
   getDayValue(employee: EmployeePivotData, date: Date, type: 'entrada' | 'salida'): string {
     const cacheKey = `${employee.personalId}-${date.getTime()}-${type}`;
@@ -459,6 +500,14 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     const dayData = employee.dailyData[dateKey];
 
     const result = dayData ? (type === 'entrada' ? dayData.entradaReal : dayData.salidaReal) : '-';
+    
+    // Limitar tamaño del cache
+    if (this.dayValueCache.size >= this.maxCacheSize) {
+      const firstKey = this.dayValueCache.keys().next().value;
+      if (firstKey) {
+        this.dayValueCache.delete(firstKey);
+      }
+    }
     
     this.dayValueCache.set(cacheKey, result);
     return result;
@@ -479,17 +528,25 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     return `${start} - ${end}`;
   }
 
-  // TrackBy functions para optimizar *ngFor
-  trackByEmployeeId(index: number, employee: EmployeePivotData): string {
-    return employee.personalId;
+  // TrackBy functions optimizadas para *ngFor
+  trackByEmployeeId = (index: number, employee: EmployeePivotData): string => {
+    return `${employee.personalId}-${employee.nroDoc}`;
   }
 
-  trackByWeekKey(index: number, week: { weekKey: string; weekStart: Date; weekEnd: Date; dates: Date[] }): string {
+  trackByWeekKey = (index: number, week: { weekKey: string; weekStart: Date; weekEnd: Date; dates: Date[] }): string => {
     return week.weekKey;
   }
 
-  trackByDate(index: number, date: Date): string {
-    return date.toISOString().split('T')[0];
+  trackByDate = (index: number, date: Date): number => {
+    return date.getTime(); // Más eficiente que string
+  }
+
+  trackByDateString = (index: number, dateStr: string): string => {
+    return dateStr;
+  }
+
+  trackByIndex = (index: number, item: any): number => {
+    return index;
   }
 
   // Getter methods for template calculations (usamos summary del backend)
@@ -512,7 +569,21 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     }
 
     this.isLoading = true;
-    const params: ReportMatrixParams = this.filterForm.value;
+    
+    // Usar la misma lógica de parámetros que loadReportData
+    const formValues = this.filterForm.value;
+    const params: ReportMatrixParams = {
+      ...formValues,
+      companiaId: this.headerConfig?.selectedEmpresa?.companiaId || formValues.companiaId || '',
+      planillaId: this.headerConfig?.selectedPlanilla?.planillaId || formValues.planillaId || ''
+    };
+    
+    // Remover campos vacíos
+    // Object.keys(params).forEach(key => {
+    //   if (params[key] === '' || params[key] === null || params[key] === undefined) {
+    //     delete params[key];
+    //   }
+    // });
 
     this.attendanceMatrixService.downloadAttendanceMatrixReport(params).subscribe({
       next: (blob: Blob) => {
@@ -551,14 +622,18 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     this.setDefaultDateRange();
     this.pivotedData = [];
     this.clearMessages();
+    this.cdr.markForCheck();
   }
 
-  // PENDIENTE: Implementar paginación cuando el backend la soporte
-  /*onPageChangeEvent(event: PaginatorEvent): void {
-    this.pageNumber = event.pageNumber;
-    this.pageSize = event.pageSize;
-    this.loadReportData();
-  }*/
+  // Evento del Fiori Paginator
+  onPageChangeEvent(event: PaginatorEvent): void {
+    if (event.pageNumber !== this.pageNumber || event.pageSize !== this.pageSize) {
+      this.pageNumber = event.pageNumber;
+      this.pageSize = event.pageSize;
+      this.loadReportData();
+      this.cdr.markForCheck();
+    }
+  }
 
   private autoHideSuccess(): void {
     setTimeout(() => {

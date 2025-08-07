@@ -6,6 +6,11 @@ export interface AttendanceMatrixPivotResponse {
     summary: AttendanceSummary;
     generatedAt: string;
     executionTime: string;
+    //
+    totalRecords: number;
+    currentPage: number;
+    pageSize: number;
+    totalPages: number;
 }
 
 export interface EmployeePivotData {

@@ -21,15 +21,36 @@ export class AttendanceMatrixReportService {
         return this.http.post<ReportMatrixResponse>(`${this.reportUrl}matrix`, params);
     }
 
-    // download excel file 
+    // download excel file , first report
     downloadAttendanceMatrixReport(params: ReportMatrixParams): Observable<Blob> {
         return this.http.post(`${this.reportUrl}export`, params, { responseType: 'blob' });
     }
+    //download cost-center report , second report
+    downloadCostCenterReport(params: ReportMatrixParams): Observable<Blob> {
+        return this.http.post(`${this.reportUrl}export-cost-center`, params, { responseType: 'blob' });
+    }
+
+    //download export-markings report , third report
+    downloadExportMarkingsReport(params: ReportMatrixParams): Observable<Blob> {
+        return this.http.post(`${this.reportUrl}export-markings`, params, { responseType: 'blob' });
+    }
+    // download export-weekly-attendance  report, fourth  report
+    downloadExportWeeklyAttendanceReport(params: ReportMatrixParams): Observable<Blob> {
+        return this.http.post(`${this.reportUrl}export-weekly-attendance`, params, { responseType: 'blob' });
+    }
+
+
+    
+
+
 
     // pivot data 
     getAttendanceMatrixPivotReport(params: ReportMatrixParams): Observable<AttendanceMatrixPivotResponse> {
         return this.http.post<AttendanceMatrixPivotResponse>(`${this.reportUrl}pivot`, params);
     }
+
+    
+
     
 }
 

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, type OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, type OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AttendanceMatrixReportService } from 'src/app/core/services/report/attendance-matrix-report.service';
 import { ReportMatrixParams } from 'src/app/core/models/report/report-matrix-params.model';
@@ -6,6 +6,8 @@ import { AttendanceMatrixPivotResponse, EmployeePivotData as BackendEmployeePivo
 import { HeaderConfigService, HeaderConfig } from 'src/app/core/services/header-config.service';
 import { Subject, takeUntil } from 'rxjs';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
+import { AgGridAngular } from 'ag-grid-angular';
+import { ColDef, ColGroupDef, GridOptions, GridReadyEvent, GridApi } from 'ag-grid-community';
 
 // Usamos las interfaces del backend con extensiones para funcionalidades adicionales
 export interface EmployeePivotData extends BackendEmployeePivotData {
@@ -31,6 +33,8 @@ export interface DailyAttendanceData extends BackendDailyAttendanceData {
 })
 export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
 
+  @ViewChild('agGrid') agGrid!: AgGridAngular;
+
   // Formulario de filtros
   filterForm!: FormGroup;
 
@@ -38,6 +42,12 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
+
+  // AG-Grid configuration
+  columnDefs: (ColDef | ColGroupDef)[] = [];
+  gridOptions: GridOptions = {};
+  rowData: any[] = [];
+  private gridApi!: GridApi;
 
   // Datos procesados (ya no necesitamos originalData)
   pivotedData: EmployeePivotData[] = [];
@@ -72,6 +82,8 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {
     this.initializeForm();
+    this.setupGridOptions();
+    this.setupInitialColumnDefs();
   }
 
   ngOnInit(): void {
@@ -124,7 +136,7 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     this.applyHeaderConfigToForm();
 
     // Suscribirse a cambios en la configuración del header
-    this.headerConfigService.getHeaderConfig$()
+    this.headerConfigService.headerConfig$
       .pipe(takeUntil(this.destroy$))
       .subscribe((config: HeaderConfig | null) => {
         this.headerConfig = config;
@@ -240,14 +252,8 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
           // Procesar dateRange del backend (convertir strings a Date)
           this.dateRange = response.dateRange.map(dateStr => new Date(dateStr));
           
-          // Generar estructura de semanas para totales semanales
-          this.generateWeekStructure();
-          
-          // Calcular totales semanales para cada empleado
-          this.calculateWeeklyTotalsForEmployees();
-          
-          // Pre-calcular todos los valores para evitar lazy rendering
-          this.preCalculateAllValues();
+          // Actualizar AG-Grid con los nuevos datos (esto incluye generar semanas y calcular totales)
+          this.updateGridData();
 
           console.log('Datos procesados del endpoint pivot:', {
             employees: this.pivotedData.length,
@@ -645,5 +651,516 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
   private clearMessages(): void {
     this.errorMessage = '';
     this.successMessage = '';
+  }
+
+  // =================== AG-GRID CONFIGURATION ===================
+
+  private setupInitialColumnDefs(): void {
+    // Configuración básica inicial para mostrar algo mientras carga
+    this.columnDefs = [
+      { field: 'colaborador', headerName: 'Colaborador', width: 200 },
+      { field: 'nroDoc', headerName: 'Documento', width: 120 },
+      { field: 'area', headerName: 'Área', width: 140 },
+      { field: 'cargo', headerName: 'Cargo', width: 140 },
+      { field: 'sede', headerName: 'Sede', width: 120 },
+      { field: 'totalHoras', headerName: 'Total Horas', width: 120 },
+      { field: 'horasExtras', headerName: 'H. Extras', width: 120 }
+    ] as ColDef[];
+  }
+
+  private setupGridOptions(): void {
+    this.gridOptions = {
+      defaultColDef: {
+        sortable: true,
+        filter: true,
+        resizable: true,
+        minWidth: 80,
+        // Auto-size columns to content
+        suppressSizeToFit: false
+      },
+      rowSelection: 'multiple',
+      enableRangeSelection: true,
+      suppressMenuHide: true,
+      animateRows: true,
+      rowHeight: 50,
+      headerHeight: 60,
+      suppressHorizontalScroll: false,
+      suppressColumnVirtualisation: false,
+      enableCellTextSelection: true,
+      // Auto-size all columns on first data render
+      onFirstDataRendered: (event) => {
+        this.autoSizeAllColumns();
+      },
+      onGridReady: (event: GridReadyEvent) => {
+        this.gridApi = event.api;
+      }
+    };
+  }
+
+  private setupColumnDefs(): void {
+    this.columnDefs = [
+      // Columnas básicas fijas del empleado
+      {
+        field: 'colaborador',
+        headerName: 'Colaborador',
+        pinned: 'left',
+        minWidth: 150,
+        maxWidth: 250
+      },
+      {
+        field: 'nroDoc',
+        headerName: 'Documento',
+        minWidth: 100,
+        maxWidth: 150
+      },
+      {
+        field: 'area',
+        headerName: 'Área',
+        minWidth: 120,
+        maxWidth: 200
+      },
+      {
+        field: 'cargo',
+        headerName: 'Cargo',
+        minWidth: 120,
+        maxWidth: 200
+      },
+      {
+        field: 'sede',
+        headerName: 'Sede',
+        minWidth: 100,
+        maxWidth: 150
+      }
+    ];
+
+    // Agregar columnas por semanas con headers agrupados
+    if (this.dateRange && this.dateRange.length > 0 && this.weekStructure.length > 0) {
+      this.weekStructure.forEach(week => {
+        // Crear grupos de columnas para cada día
+        const weekColumns: any[] = [];
+        
+        week.dates.forEach(date => {
+          const dateStr = date.toISOString().split('T')[0];
+          const dayName = date.toLocaleDateString('es-ES', { weekday: 'long' }); // "lunes", "martes", etc.
+          const dayDate = date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+
+          // Grupo de columnas para cada día (Entrada y Salida)
+          const dayGroup: ColGroupDef = {
+            headerName: `${dayName.charAt(0).toUpperCase() + dayName.slice(1)}`, // "Lunes"
+            headerTooltip: `${dayName} ${dayDate}`,
+            children: [
+              {
+                field: `entrada_${dateStr}`,
+                headerName: 'Entrada',
+                minWidth: 90,
+                maxWidth: 140,
+                cellStyle: (params: any) => this.getCellStyleByDayType(params, dateStr, 'entrada'),
+                cellRenderer: (params: any) => this.formatTimeCellWithDayType(params.value, dateStr, params.data, 'entrada')
+              } as ColDef,
+              {
+                field: `salida_${dateStr}`,
+                headerName: 'Salida',
+                minWidth: 90,
+                maxWidth: 140,
+                cellStyle: (params: any) => this.getCellStyleByDayType(params, dateStr, 'salida'),
+                cellRenderer: (params: any) => this.formatTimeCellWithDayType(params.value, dateStr, params.data, 'salida')
+              } as ColDef
+            ]
+          };
+          weekColumns.push(dayGroup);
+        });
+
+        // Grupo de totales semanales
+        const weekTotalsGroup: ColGroupDef = {
+          headerName: `Semana ${week.weekKey.split('-W')[1]}`,
+          headerClass: 'week-totals-header',
+          children: [
+            {
+              field: `week_${week.weekKey}_hours`,
+              headerName: 'T. Horas',
+              cellRenderer: (params: any) => `${params.value || 0}h`,
+              minWidth: 80,
+              maxWidth: 100,
+              cellStyle: { 
+                'font-weight': 'bold', 
+                'background-color': '#fffbeb', 
+                'text-align': 'center',
+                'color': '#d97706'
+              }
+            } as ColDef,
+            {
+              field: `week_${week.weekKey}_extras`,
+              headerName: 'H. Extras',
+              cellRenderer: (params: any) => `${params.value || 0}h`,
+              minWidth: 80,
+              maxWidth: 100,
+              cellStyle: { 
+                'font-weight': 'bold', 
+                'background-color': '#fff7ed', 
+                'text-align': 'center',
+                'color': '#ea580c'
+              }
+            } as ColDef
+          ]
+        };
+        weekColumns.push(weekTotalsGroup);
+
+        // Agregar todas las columnas de la semana al columnDefs
+        this.columnDefs.push(...weekColumns);
+      });
+    }
+
+    // Totales generales al final agrupados
+    const generalTotalsGroup: ColGroupDef = {
+      headerName: 'Totales Generales',
+      headerClass: 'general-totals-header',
+      children: [
+        {
+          field: 'totalHoras',
+          headerName: 'Total Horas',
+          cellRenderer: (params: any) => `${params.value}h`,
+          cellStyle: { 
+            'font-weight': 'bold', 
+            'background-color': '#f0f9ff', 
+            'text-align': 'center',
+            'color': '#1d4ed8'
+          },
+          minWidth: 100,
+          maxWidth: 120
+        } as ColDef,
+        {
+          field: 'horasExtras',
+          headerName: 'H. Extras',
+          cellRenderer: (params: any) => `${params.value}h`,
+          cellStyle: { 
+            'font-weight': 'bold', 
+            'background-color': '#fef3c7', 
+            'text-align': 'center',
+            'color': '#d97706'
+          },
+          minWidth: 100,
+          maxWidth: 120
+        } as ColDef
+      ]
+    };
+    this.columnDefs.push(generalTotalsGroup);
+  }
+
+  private prepareGridData(): void {
+    this.rowData = this.pivotedData.map((employee, index) => {
+      const row: any = {
+        colaborador: employee.colaborador || `Employee ${index}`,
+        nroDoc: employee.nroDoc || 'N/A',
+        area: employee.area || 'N/A',
+        cargo: employee.cargo || 'N/A',
+        sede: employee.sede || 'N/A',
+        totalHoras: employee.totalHoras || 0,
+        horasExtras: employee.horasExtras || 0
+      };
+
+      // Agregar datos por semanas (como en el pivot original)
+      if (this.weekStructure.length > 0) {
+        this.weekStructure.forEach(week => {
+          // Datos de entrada y salida para cada día de la semana con lógica mejorada
+          week.dates.forEach(date => {
+            const dateStr = date.toISOString().split('T')[0];
+            const dateKey = dateStr + 'T00:00:00'; // Formato que usa el backend
+            const dayData = employee.dailyData && employee.dailyData[dateKey];
+
+            // Aplicar lógica de prioridad para entrada y salida
+            row[`entrada_${dateStr}`] = this.getDayDisplayValue(dayData, 'entrada');
+            row[`salida_${dateStr}`] = this.getDayDisplayValue(dayData, 'salida');
+          });
+
+          // Totales semanales
+          const weeklyTotals = employee.weeklyTotals && employee.weeklyTotals[week.weekKey];
+          row[`week_${week.weekKey}_hours`] = weeklyTotals?.totalHoras || 0;
+          row[`week_${week.weekKey}_extras`] = weeklyTotals?.horasExtras || 0;
+        });
+      }
+
+      return row;
+    });
+  }
+
+  
+
+  private updateGridData(): void {
+    // Primero generar estructura de semanas (necesaria para las columnas)
+    this.generateWeekStructure();
+    
+    // Calcular totales semanales
+    this.calculateWeeklyTotalsForEmployees();
+    
+    // Configurar columnas basadas en la estructura de semanas
+    this.setupColumnDefs();
+    
+    // Preparar datos para la grilla
+    this.prepareGridData();
+    
+    // Forzar detección de cambios
+    this.cdr.markForCheck();
+  }
+
+  private autoSizeAllColumns(): void {
+    if (!this.gridApi) return;
+
+    // Obtener todas las columnas
+    const allColumnIds: string[] = [];
+    this.gridApi.getColumns()?.forEach((column: any) => {
+      allColumnIds.push(column.getId());
+    });
+
+    // Auto-size todas las columnas al contenido
+    this.gridApi.autoSizeColumns(allColumnIds, false);
+
+    // Para columnas muy anchas, aplicar un máximo usando setColumnWidths
+    const columnsToResize: { key: string; newWidth: number }[] = [];
+    this.gridApi.getColumns()?.forEach((column: any) => {
+      const currentWidth = column.getActualWidth();
+      if (currentWidth > 300) {
+        columnsToResize.push({ key: column.getId(), newWidth: 300 });
+      }
+    });
+
+    // Aplicar los nuevos anchos si hay columnas que redimensionar
+    if (columnsToResize.length > 0) {
+      this.gridApi.setColumnWidths(columnsToResize);
+    }
+  }
+
+  // Método público para que el usuario pueda redimensionar cuando quiera
+  public autoSizeColumns(): void {
+    this.autoSizeAllColumns();
+  }
+
+  // =================== VALIDACIÓN COMPLETA DE TIPO DE DÍA ===================
+
+  /**
+   * Obtiene el valor que debe mostrarse en la celda según la lógica de prioridad:
+   * 1. FERIADO → "Día Feriado"
+   * 2. DESCANSO → "Día de Descanso" 
+   * 3. tipoPermiso → "Vacaciones", "Permiso Personal", etc.
+   * 4. entradaReal/salidaReal → Hora real
+   * 5. Sin datos → "Falta"
+   */
+  private getDayDisplayValue(dayData: any, type: 'entrada' | 'salida'): string {
+    if (!dayData) return 'Sin Información';
+
+    const tipoDia = dayData.tipoDia || '';
+    const tipoPermiso = dayData.tipoPermiso || '';
+    const entradaReal = dayData.entradaReal || '';
+    const salidaReal = dayData.salidaReal || '';
+
+    // Prioridad 1: Días feriados
+    if (tipoDia === 'FERIADO') {
+      return 'Día Feriado';
+    }
+
+    // Prioridad 2: Días de descanso
+    if (tipoDia === 'DESCANSO') {
+      return 'Día de Descanso';
+    }
+
+    // Prioridad 3: Permisos y vacaciones
+    if (tipoPermiso) {
+      return this.getPermisoDisplayName(tipoPermiso);
+    }
+
+    // Prioridad 4: Marcaciones reales
+    const realValue = type === 'entrada' ? entradaReal : salidaReal;
+    if (realValue && realValue !== '' && realValue !== 'FALTA') {
+      return realValue;
+    }
+
+    // Prioridad 5: Sin marcación = Falta
+    return 'Falta';
+  }
+
+  /**
+   * Convierte códigos de permisos en nombres descriptivos para el usuario
+   */
+  private getPermisoDisplayName(tipoPermiso: string): string {
+    const permisos: { [key: string]: string } = {
+      'VAC': 'Vacaciones',
+      'PERM': 'Permiso Personal',
+      'MED': 'Permiso Médico',
+      'LIC': 'Licencia',
+      'COMP': 'Compensación',
+      'TRAB': 'Trabajo Remoto',
+      'CAP': 'Capacitación',
+      'COM': 'Comisión',
+      'DUE': 'Duelo',
+      'MAT': 'Maternidad',
+      'PAT': 'Paternidad',
+      'LAC': 'Lactancia',
+      'SIND': 'Sindical',
+      'JUDI': 'Judicial'
+    };
+
+    return permisos[tipoPermiso] || `Permiso (${tipoPermiso})`;
+  }
+
+  /**
+   * Obtiene el tipo de día desde los datos del empleado
+   */
+  private getDayTypeFromData(rowData: any, dateStr: string): string {
+    if (!rowData?.dailyData) return 'LABORABLE';
+    
+    const dateKey = dateStr + 'T00:00:00';
+    const dayData = rowData.dailyData[dateKey];
+    
+    return dayData?.tipoDia || 'LABORABLE';
+  }
+
+  /**
+   * Aplica estilos CSS según el tipo de día y el contenido
+   */
+  private getCellStyleByDayType(params: any, dateStr: string, fieldType: 'entrada' | 'salida'): any {
+    const tipoDia = this.getDayTypeFromData(params.data, dateStr);
+    const value = params.value;
+    
+    let baseStyle = {
+      'text-align': 'center' as const,
+      'font-size': '11px',
+      'padding': '6px 4px',
+      'border-radius': '4px',
+      'font-weight': '500'
+    };
+
+    // Estilos según tipo de día
+    if (tipoDia === 'FERIADO') {
+      return {
+        ...baseStyle,
+        'background-color': '#fee2e2',
+        'color': '#dc2626',
+        'border': '1px solid #fca5a5',
+        'font-weight': 'bold'
+      };
+    }
+
+    if (tipoDia === 'DESCANSO') {
+      return {
+        ...baseStyle,
+        'background-color': '#f3f4f6',
+        'color': '#4b5563',
+        'border': '1px solid #d1d5db',
+        'font-style': 'italic'
+      };
+    }
+
+    // LABORABLE - estilos según el contenido
+    if (value === 'Vacaciones' || value?.includes('Permiso') || value?.includes('Licencia') || value?.includes('Capacitación')) {
+      return {
+        ...baseStyle,
+        'background-color': '#fef3c7',
+        'color': '#d97706',
+        'border': '1px solid #fbbf24',
+        'font-weight': 'bold'
+      };
+    }
+
+    if (value === 'Falta' || value === 'Sin Información') {
+      return {
+        ...baseStyle,
+        'background-color': '#fee2e2',
+        'color': '#dc2626',
+        'border': '1px solid #fca5a5',
+        'font-weight': 'bold'
+      };
+    }
+
+    if (value && value !== '-' && !value.includes('Día')) {
+      // Horarios normales
+      return {
+        ...baseStyle,
+        'background-color': '#ecfdf5',
+        'color': '#16a34a',
+        'border': '1px solid #86efac',
+        'font-family': 'monospace',
+        'font-weight': 'bold'
+      };
+    }
+
+    return {
+      ...baseStyle,
+      'background-color': '#f9fafb',
+      'color': '#6b7280',
+      'border': '1px solid #e5e7eb'
+    };
+  }
+
+  /**
+   * Formatea la celda con iconos y colores según el tipo de día
+   */
+  private formatTimeCellWithDayType(value: string, dateStr: string, rowData: any, type: 'entrada' | 'salida'): string {
+    const tipoDia = this.getDayTypeFromData(rowData, dateStr);
+    
+    // Días feriados
+    if (tipoDia === 'FERIADO') {
+      return `<div class="flex items-center justify-center gap-1 px-2 py-1 text-xs font-bold text-red-700">
+                <span>🏛️</span>
+                <span>Día Feriado</span>
+              </div>`;
+    }
+    
+    // Días de descanso
+    if (tipoDia === 'DESCANSO') {
+      return `<div class="flex items-center justify-center gap-1 px-2 py-1 text-xs font-medium text-gray-600 italic">
+                <span>🛏️</span>
+                <span>Día de Descanso</span>
+              </div>`;
+    }
+
+    // Permisos y vacaciones
+    if (value?.includes('Vacaciones')) {
+      return `<div class="flex items-center justify-center gap-1 px-2 py-1 text-xs font-bold text-yellow-700">
+                <span>🌴</span>
+                <span>${value}</span>
+              </div>`;
+    }
+
+    if (value?.includes('Permiso') || value?.includes('Licencia')) {
+      return `<div class="flex items-center justify-center gap-1 px-2 py-1 text-xs font-bold text-yellow-700">
+                <span>📋</span>
+                <span>${value}</span>
+              </div>`;
+    }
+
+    if (value?.includes('Capacitación')) {
+      return `<div class="flex items-center justify-center gap-1 px-2 py-1 text-xs font-bold text-yellow-700">
+                <span>📚</span>
+                <span>${value}</span>
+              </div>`;
+    }
+
+    // Faltas
+    if (value === 'Falta') {
+      return `<div class="flex items-center justify-center gap-1 px-2 py-1 text-xs font-bold text-red-700">
+                <span>❌</span>
+                <span>Falta</span>
+              </div>`;
+    }
+
+    // Sin información
+    if (value === 'Sin Información') {
+      return `<div class="flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-500">
+                <span>❓</span>
+                <span>Sin Info</span>
+              </div>`;
+    }
+
+    // Horarios normales
+    if (value && value !== '-' && !value.includes('Día')) {
+      const icon = type === 'entrada' ? '🟢' : '🔴';
+      return `<div class="flex items-center justify-center gap-1 px-2 py-1 text-xs font-bold text-green-700 font-mono">
+                <span>${icon}</span>
+                <span>${value}</span>
+              </div>`;
+    }
+
+    return `<div class="flex items-center justify-center px-2 py-1 text-xs text-gray-500">
+              <span>-</span>
+            </div>`;
   }
 }

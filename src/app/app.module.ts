@@ -186,7 +186,7 @@ registerLocaleData(localeEs);
         MatSelectModule,
         MatRadioModule,
         MatSnackBarModule,
-        
+        ScrollingModule,
         NgxTinymceModule.forRoot({
             baseURL: '../../../assets/tinymce/'
         }),

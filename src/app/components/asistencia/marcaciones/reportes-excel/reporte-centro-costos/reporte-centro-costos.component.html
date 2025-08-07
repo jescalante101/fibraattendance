@@ -64,7 +64,7 @@
       </div>
 
       <!-- Employee ID -->
-      <div class="space-y-1 relative">
+      <div class="space-y-1 relative hidden">
         <div class="absolute inset-0 bg-gray-100/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-md border border-dashed">
           <span class="text-xs font-semibold text-gray-500 bg-white/80 px-3 py-1 rounded-full shadow-sm border">En desarrollo</span>
         </div>
@@ -80,7 +80,7 @@
       </div>
 
       <!-- Área -->
-      <div class="space-y-1 relative">
+      <div class="space-y-1 relative hidden">
         <div class="absolute inset-0 bg-gray-100/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-md border border-dashed">
           <span class="text-xs font-semibold text-gray-500 bg-white/80 px-3 py-1 rounded-full shadow-sm border">En desarrollo</span>
         </div>
@@ -97,7 +97,7 @@
     </div>
 
     <!-- Filtros adicionales (colapsables) -->
-    <details>
+    <details class="hidden">
       <summary class="flex items-center gap-2 text-sm font-medium text-orange-600 cursor-pointer hover:text-orange-800 transition-colors">
         <mat-icon class="text-base">filter_list</mat-icon>
         Filtros Avanzados
@@ -159,7 +159,7 @@
     </details>
 
     <!-- Botones de acción -->
-    <div class="flex items-center gap-3 mt-4 pt-4 border-t">
+    <div class="flex items-center gap-3 mt-4 pt-4 border-t hidden">
       <button 
         type="submit"
         [disabled]="isLoading || filterForm.invalid"
@@ -179,7 +179,7 @@
   </form>
 
   <!-- Estadísticas -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 hidden">
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
       <div class="text-2xl font-bold text-blue-700">{{ totalEmpleados }}</div>
       <div class="text-sm text-blue-600">Total Empleados</div>
@@ -195,7 +195,7 @@
   </div>
 
   <!-- Tabla principal -->
-  <div class="bg-white rounded-lg shadow-sm border overflow-hidden relative">
+  <div class="bg-white rounded-lg shadow-sm border overflow-hidden relative hidden">
 
     <!-- Overlay de desarrollo -->
     <div class="absolute inset-0 bg-gray-800/60 backdrop-blur-sm z-50 flex items-center justify-center">

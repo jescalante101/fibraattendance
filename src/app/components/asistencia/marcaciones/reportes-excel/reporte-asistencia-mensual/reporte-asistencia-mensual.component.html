@@ -73,7 +73,7 @@
       </div>
 
       <!-- Employee ID -->
-      <div class="space-y-1 relative">
+      <!-- <div class="space-y-1 relative">
         <div class="absolute inset-0 bg-gray-100/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-md border border-dashed">
           <span class="text-xs font-semibold text-gray-500 bg-white/80 px-3 py-1 rounded-full shadow-sm border">En desarrollo</span>
         </div>
@@ -86,10 +86,10 @@
           placeholder="Filtrar por empleado..."
           [disabled]="true"
           class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-      </div>
+      </div> -->
 
       <!-- Área -->
-      <div class="space-y-1 relative">
+      <!-- <div class="space-y-1 relative">
         <div class="absolute inset-0 bg-gray-100/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-md border border-dashed">
           <span class="text-xs font-semibold text-gray-500 bg-white/80 px-3 py-1 rounded-full shadow-sm border">En desarrollo</span>
         </div>
@@ -102,11 +102,12 @@
           placeholder="Filtrar por área..."
           [disabled]="true"
           class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-      </div>
+      </div> -->
+      
     </div>
 
     <!-- Filtros adicionales (colapsables) -->
-    <details>
+    <!-- <details>
       <summary class="flex items-center gap-2 text-sm font-medium text-blue-600 cursor-pointer hover:text-blue-800 transition-colors">
         <mat-icon class="text-base">filter_list</mat-icon>
         Filtros Avanzados
@@ -119,10 +120,10 @@
             <mat-icon class="text-lg text-yellow-600">construction</mat-icon>
             <span>Filtros avanzados en desarrollo</span>
           </div>
-        </div>
+        </div> -->
 
         <!-- Compañía -->
-        <div class="space-y-1">
+        <!-- <div class="space-y-1">
           <label class="block text-sm font-medium text-gray-500">Compañía</label>
           <input 
             type="text" 
@@ -130,10 +131,10 @@
             placeholder="ID Compañía..."
             [disabled]="true"
             class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
-        </div>
+        </div> -->
 
         <!-- Sede -->
-        <div class="space-y-1">
+        <!-- <div class="space-y-1">
           <label class="block text-sm font-medium text-gray-500">Sede</label>
           <input 
             type="text" 
@@ -141,10 +142,10 @@
             placeholder="ID Sede..."
             [disabled]="true"
             class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
-        </div>
+        </div> -->
 
         <!-- Cargo -->
-        <div class="space-y-1">
+        <!-- <div class="space-y-1">
           <label class="block text-sm font-medium text-gray-500">Cargo</label>
           <input 
             type="text" 
@@ -152,10 +153,10 @@
             placeholder="ID Cargo..."
             [disabled]="true"
             class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
-        </div>
+        </div> -->
 
         <!-- Centro de Costo -->
-        <div class="space-y-1">
+        <!-- <div class="space-y-1">
           <label class="block text-sm font-medium text-gray-500">Centro Costo</label>
           <input 
             type="text" 
@@ -165,10 +166,10 @@
             class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
         </div>
       </div>
-    </details>
+    </details> -->
 
     <!-- Botones de acción -->
-    <div class="flex items-center gap-3 mt-4 pt-4 border-t">
+    <!-- <div class="flex items-center gap-3 mt-4 pt-4 border-t">
       <button 
         type="submit"
         [disabled]="isLoading || filterForm.invalid"
@@ -184,11 +185,11 @@
         <mat-icon>refresh</mat-icon>
         <span>Limpiar</span>
       </button>
-    </div>
+    </div> -->
   </form>
 
   <!-- Estadísticas generales -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+  <!-- <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
       <div class="text-2xl font-bold text-blue-700">{{ totalEmpleados }}</div>
       <div class="text-sm text-blue-600">Total Empleados</div>
@@ -205,10 +206,10 @@
       <div class="text-2xl font-bold text-red-700">{{ totalFaltas }}</div>
       <div class="text-sm text-red-600">Total Faltas</div>
     </div>
-  </div>
+  </div> -->
 
   <!-- Tabla principal -->
-  <div class="bg-white rounded-lg shadow-sm border overflow-hidden relative">
+  <div class="bg-white rounded-lg shadow-sm border overflow-hidden relative hidden">
     
     <!-- Overlay de desarrollo -->
     <div class="absolute inset-0 bg-gray-800/60 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -222,7 +223,7 @@
     </div>
 
     <!-- Header sticky -->
-    <div class="sticky top-0 z-30 bg-green-600 text-white">
+    <div class="sticky top-0 z-30 bg-green-600 text-white ">
       <div class="overflow-x-auto">
         <table class="min-w-full table-fixed">
           <thead>

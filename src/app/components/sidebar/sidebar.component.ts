@@ -103,8 +103,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
       submenu: [
         { label: 'Reporte Marcaciones', link: '/panel/asistencia/marcaciones/reporte-asistencia-excel' },
         { label: 'Reporte Marcación Mensual', link: 'panel/asistencia/marcaciones/reportes-excel/asistencia-mensual' },
-        { label: 'Reporte Ccosto', link: 'panel/asistencia/marcaciones/reportes-excel/centro-costos' },
-        { label: 'Reporte Detalle', link: 'panel/asistencia/marcaciones/reportes-excel/marcaciones-detalle' },
+        { label: 'Reporte Centro Costo', link: 'panel/asistencia/marcaciones/reportes-excel/centro-costos' },
+        { label: 'Reporte Marcación Detalle', link: 'panel/asistencia/marcaciones/reportes-excel/marcaciones-detalle' },
         { label: 'Reporte Asistencia', link: 'panel/asistencia/marcaciones/reportes-excel/matrix' },
       ],
     }

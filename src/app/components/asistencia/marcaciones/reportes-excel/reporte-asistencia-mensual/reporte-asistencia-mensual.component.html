@@ -41,95 +41,151 @@
     </div>
   </div>
 
-  <!-- Filtros -->
-  <div class="mb-6 bg-white rounded-lg shadow-sm border p-4">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Mes</label>
-        <select 
-          [(ngModel)]="mesSeleccionado"
-          (ngModelChange)="onMesChange()"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-white">
-          <option *ngFor="let mes of mesesDisponibles" [value]="mes.value">{{ mes.label }}</option>
-        </select>
-      </div>
+  <!-- Formulario de filtros -->
+  <form [formGroup]="filterForm" (ngSubmit)="onSearch()" class="p-4 bg-gray-50 rounded-lg border shadow-sm mb-6">
+    <!-- Filtros de fechas principales -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
       
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Buscar Empleado</label>
-        <div class="relative" title="🚧 En desarrollo">
-          <input 
-            type="text" 
-            [(ngModel)]="filterText"
-            placeholder="Buscar empleado..." 
-            class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-yellow-50 border-yellow-300">
-          <mat-icon class="absolute left-3 top-2.5 text-yellow-600 text-sm">search</mat-icon>
-          <mat-icon class="absolute right-3 top-2.5 text-yellow-600 text-sm" title="En desarrollo">construction</mat-icon>
+      <!-- Fecha Inicio -->
+      <div class="space-y-1">
+        <label class="block text-sm font-medium text-gray-700">
+          Fecha Inicio <span class="text-red-500">*</span>
+        </label>
+        <input 
+          type="date" 
+          formControlName="fechaInicio"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+          [class.border-red-500]="filterForm.get('fechaInicio')?.hasError('required') && filterForm.get('fechaInicio')?.touched">
+      </div>
+
+      <!-- Fecha Fin -->
+      <div class="space-y-1">
+        <label class="block text-sm font-medium text-gray-700">
+          Fecha Fin <span class="text-red-500">*</span>
+        </label>
+        <input 
+          type="date" 
+          formControlName="fechaFin"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+          [class.border-red-500]="filterForm.get('fechaFin')?.hasError('required') && filterForm.get('fechaFin')?.touched">
+      </div>
+
+      <!-- Employee ID -->
+      <div class="space-y-1 relative">
+        <div class="absolute inset-0 bg-gray-100/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-md border border-dashed">
+          <span class="text-xs font-semibold text-gray-500 bg-white/80 px-3 py-1 rounded-full shadow-sm border">En desarrollo</span>
         </div>
-        <p class="text-xs text-yellow-600 mt-1">⚠️ En desarrollo</p>
+        <label class="block text-sm font-medium text-gray-500">
+          ID Empleado
+        </label>
+        <input 
+          type="text" 
+          formControlName="employeeId"
+          placeholder="Filtrar por empleado..."
+          [disabled]="true"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
       </div>
-      
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Área</label>
-        <select 
-          [(ngModel)]="selectedArea"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-white">
-          <option value="">Todas</option>
-          <option *ngFor="let area of areas" [value]="area">{{ area }}</option>
-        </select>
-      </div>
-      
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Planilla</label>
-        <select 
-          [(ngModel)]="selectedPlanilla"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-white">
-          <option value="">Todas</option>
-          <option *ngFor="let planilla of planillas" [value]="planilla">{{ planilla }}</option>
-        </select>
-      </div>
-      
-      <div class="flex items-end">
-        <button 
-          (click)="clearFilters()"
-          class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
-          <mat-icon class="text-sm">refresh</mat-icon>
-          Limpiar
-        </button>
+
+      <!-- Área -->
+      <div class="space-y-1 relative">
+        <div class="absolute inset-0 bg-gray-100/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-md border border-dashed">
+          <span class="text-xs font-semibold text-gray-500 bg-white/80 px-3 py-1 rounded-full shadow-sm border">En desarrollo</span>
+        </div>
+        <label class="block text-sm font-medium text-gray-500">
+          Área
+        </label>
+        <input 
+          type="text" 
+          formControlName="areaId"
+          placeholder="Filtrar por área..."
+          [disabled]="true"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
       </div>
     </div>
 
-    <!-- Leyenda de códigos -->
-    <div class="grid grid-cols-3 md:grid-cols-7 gap-2 pt-4 border-t border-gray-200">
-      <div class="flex items-center gap-2">
-        <div class="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
-        <span class="text-xs text-gray-600">A - Asistió</span>
+    <!-- Filtros adicionales (colapsables) -->
+    <details>
+      <summary class="flex items-center gap-2 text-sm font-medium text-blue-600 cursor-pointer hover:text-blue-800 transition-colors">
+        <mat-icon class="text-base">filter_list</mat-icon>
+        Filtros Avanzados
+      </summary>
+      
+      <div class="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-3 p-4 bg-gray-100/50 rounded-lg border">
+        
+        <div class="absolute inset-0 bg-gray-100/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+          <div class="flex items-center gap-2 text-sm font-semibold text-gray-600 px-4 py-2 bg-white/80 rounded-full border shadow-sm">
+            <mat-icon class="text-lg text-yellow-600">construction</mat-icon>
+            <span>Filtros avanzados en desarrollo</span>
+          </div>
+        </div>
+
+        <!-- Compañía -->
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-500">Compañía</label>
+          <input 
+            type="text" 
+            formControlName="companiaId"
+            placeholder="ID Compañía..."
+            [disabled]="true"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
+        </div>
+
+        <!-- Sede -->
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-500">Sede</label>
+          <input 
+            type="text" 
+            formControlName="sedeId"
+            placeholder="ID Sede..."
+            [disabled]="true"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
+        </div>
+
+        <!-- Cargo -->
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-500">Cargo</label>
+          <input 
+            type="text" 
+            formControlName="cargoId"
+            placeholder="ID Cargo..."
+            [disabled]="true"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
+        </div>
+
+        <!-- Centro de Costo -->
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-500">Centro Costo</label>
+          <input 
+            type="text" 
+            formControlName="centroCostoId"
+            placeholder="ID Centro Costo..."
+            [disabled]="true"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
+        </div>
       </div>
-      <div class="flex items-center gap-2">
-        <div class="w-4 h-4 bg-red-100 border border-red-300 rounded"></div>
-        <span class="text-xs text-gray-600">F - Falta</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <div class="w-4 h-4 bg-orange-100 border border-orange-300 rounded"></div>
-        <span class="text-xs text-gray-600">T - Tardanza</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <div class="w-4 h-4 bg-blue-100 border border-blue-300 rounded"></div>
-        <span class="text-xs text-gray-600">V - Vacaciones</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <div class="w-4 h-4 bg-purple-100 border border-purple-300 rounded"></div>
-        <span class="text-xs text-gray-600">DM - Desc. Médico</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <div class="w-4 h-4 bg-yellow-100 border border-yellow-300 rounded"></div>
-        <span class="text-xs text-gray-600">P - Permiso</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <div class="w-4 h-4 bg-gray-100 border border-gray-300 rounded"></div>
-        <span class="text-xs text-gray-600">D - Descanso</span>
-      </div>
+    </details>
+
+    <!-- Botones de acción -->
+    <div class="flex items-center gap-3 mt-4 pt-4 border-t">
+      <button 
+        type="submit"
+        [disabled]="isLoading || filterForm.invalid"
+        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-600 focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        <mat-icon [class]="isLoading ? 'animate-spin' : ''">{{ isLoading ? 'refresh' : 'search' }}</mat-icon>
+        <span>{{ isLoading ? 'Buscando...' : 'Generar Reporte' }}</span>
+      </button>
+
+      <button 
+        type="button"
+        (click)="onClearFilters()"
+        class="inline-flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-800 text-sm font-medium rounded-md hover:bg-gray-300 transition-colors">
+        <mat-icon>refresh</mat-icon>
+        <span>Limpiar</span>
+      </button>
     </div>
-  </div>
+  </form>
 
   <!-- Estadísticas generales -->
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -152,19 +208,16 @@
   </div>
 
   <!-- Tabla principal -->
-  <div class="bg-white rounded-lg shadow-sm border overflow-hidden relative"
-       title="🚧 Vista en desarrollo - Solo descarga de reportes disponible por el momento">
+  <div class="bg-white rounded-lg shadow-sm border overflow-hidden relative">
     
     <!-- Overlay de desarrollo -->
-    <div class="absolute inset-0 bg-gray-900/60 z-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-      <div class="bg-white border border-yellow-300 rounded-lg px-4 py-3 shadow-lg">
-        <div class="flex items-center gap-2 text-yellow-800">
-          <mat-icon class="text-lg">construction</mat-icon>
-          <div>
-            <p class="font-medium">🚧 Vista en Desarrollo</p>
-            <p class="text-sm">Solo descarga de reportes disponible</p>
-          </div>
+    <div class="absolute inset-0 bg-gray-800/60 backdrop-blur-sm z-50 flex items-center justify-center">
+      <div class="bg-white border border-yellow-400 rounded-lg px-6 py-4 shadow-xl text-center">
+        <div class="flex items-center justify-center gap-3 text-yellow-800 mb-2">
+          <mat-icon class="text-3xl">construction</mat-icon>
+          <p class="text-xl font-semibold">Vista en Desarrollo</p>
         </div>
+        <p class="text-sm text-gray-600">Esta sección se encuentra actualmente en construcción.<br>La funcionalidad de descarga de reportes ya está disponible.</p>
       </div>
     </div>
 
@@ -229,7 +282,7 @@
       <table class="min-w-full table-fixed">
         <tbody class="divide-y divide-gray-100">
           <!-- Loading state -->
-          <tr *ngIf="loading">
+          <tr *ngIf="isLoading">
             <td [attr.colspan]="9 + visibleDias.length + (showSummary ? 1 : 0)" class="text-center py-8">
               <div class="flex items-center justify-center gap-2">
                 <mat-spinner diameter="20"></mat-spinner>
@@ -239,7 +292,7 @@
           </tr>
 
           <!-- Empty state -->
-          <tr *ngIf="!loading && filteredEmpleados.length === 0">
+          <tr *ngIf="!isLoading && filteredEmpleados.length === 0">
             <td [attr.colspan]="9 + visibleDias.length + (showSummary ? 1 : 0)" class="text-center py-8">
               <div class="flex flex-col items-center gap-3">
                 <mat-icon class="text-gray-300 text-4xl">person_off</mat-icon>

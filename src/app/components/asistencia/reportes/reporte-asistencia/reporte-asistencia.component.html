@@ -92,7 +92,13 @@
       </div>
 
       <!-- Employee ID -->
-      <div class="space-y-2">
+      <div class="space-y-2 relative">
+        <div class="absolute inset-0 bg-fiori-surface/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+          <div class="flex items-center gap-2 text-xs font-semibold text-fiori-subtext px-3 py-1 bg-fiori-surface/80 rounded-full border border-fiori-border">
+            <lucide-icon name="construct" class="w-4 h-4 text-fiori-warning"></lucide-icon>
+            En desarrollo
+          </div>
+        </div>
         <label class="block text-sm font-medium text-fiori-text">
           <lucide-icon name="user" class="w-4 h-4 inline mr-1"></lucide-icon>
           ID Empleado
@@ -102,6 +108,7 @@
             type="text" 
             formControlName="employeeId"
             placeholder="Filtrar por empleado..."
+            [disabled]="true"
             class="w-full px-4 py-3 pl-10 border border-fiori-border rounded-lg bg-fiori-surface text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
           <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
             <lucide-icon name="user" class="w-4 h-4 text-fiori-subtext"></lucide-icon>
@@ -110,7 +117,13 @@
       </div>
 
       <!-- Área -->
-      <div class="space-y-2">
+      <div class="space-y-2 relative">
+        <div class="absolute inset-0 bg-fiori-surface/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+          <div class="flex items-center gap-2 text-xs font-semibold text-fiori-subtext px-3 py-1 bg-fiori-surface/80 rounded-full border border-fiori-border">
+            <lucide-icon name="construct" class="w-4 h-4 text-fiori-warning"></lucide-icon>
+            En desarrollo
+          </div>
+        </div>
         <label class="block text-sm font-medium text-fiori-text">
           <lucide-icon name="building-2" class="w-4 h-4 inline mr-1"></lucide-icon>
           Área
@@ -120,6 +133,7 @@
             type="text" 
             formControlName="areaId"
             placeholder="Filtrar por área..."
+            [disabled]="true"
             class="w-full px-4 py-3 pl-10 border border-fiori-border rounded-lg bg-fiori-surface text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
           <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
             <lucide-icon name="building-2" class="w-4 h-4 text-fiori-subtext"></lucide-icon>
@@ -135,8 +149,15 @@
         Filtros Avanzados
       </summary>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 p-4 bg-fiori-muted/30 rounded-lg border border-fiori-border/30">
+      <div class="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 p-4 bg-fiori-muted/30 rounded-lg border border-fiori-border/30">
         
+        <div class="absolute inset-0 bg-fiori-surface/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+          <div class="flex items-center gap-2 text-sm font-semibold text-fiori-subtext px-4 py-2 bg-fiori-surface/80 rounded-full border border-fiori-border shadow-sm">
+            <lucide-icon name="construct" class="w-5 h-5 text-fiori-warning"></lucide-icon>
+            <span>Filtros avanzados en desarrollo</span>
+          </div>
+        </div>
+
         <!-- Compañía -->
         <div class="space-y-2">
           <label class="block text-sm font-medium text-fiori-text">
@@ -147,6 +168,7 @@
             type="text" 
             formControlName="companiaId"
             placeholder="ID Compañía..."
+            [disabled]="true"
             class="w-full px-3 py-2 border border-fiori-border rounded-lg bg-fiori-surface text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all text-sm">
         </div>
 
@@ -160,6 +182,7 @@
             type="text" 
             formControlName="sedeId"
             placeholder="ID Sede..."
+            [disabled]="true"
             class="w-full px-3 py-2 border border-fiori-border rounded-lg bg-fiori-surface text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all text-sm">
         </div>
 
@@ -173,6 +196,7 @@
             type="text" 
             formControlName="cargoId"
             placeholder="ID Cargo..."
+            [disabled]="true"
             class="w-full px-3 py-2 border border-fiori-border rounded-lg bg-fiori-surface text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all text-sm">
         </div>
 
@@ -186,6 +210,7 @@
             type="text" 
             formControlName="centroCostoId"
             placeholder="ID Centro Costo..."
+            [disabled]="true"
             class="w-full px-3 py-2 border border-fiori-border rounded-lg bg-fiori-surface text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all text-sm">
         </div>
       </div>

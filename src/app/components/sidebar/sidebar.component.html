@@ -175,6 +175,15 @@
                     Sede-CCosto
                   </a>
                 </li>
+
+                <li>
+                  <a
+                    [routerLink]="['panel/personal/organizacion/holidays']"
+                    class="block px-2 py-1  font-semibold text-sm text-gray-700 hover:bg-gray-100 rounded"
+                  >
+                    Feriados
+                  </a>
+                </li>
               </ul>
             </div>
             <div data-popper-arrow></div>
@@ -227,6 +236,16 @@
                 routerLinkActive="bg-fiori-active"
               >
                 Sede-CCosto
+              </a>
+              <a
+                class="submenu-item block px-3 py-2 text-sm text-fiori-text hover:bg-fiori-hover rounded-fiori transition-colors"
+                [class.bg-fiori-active]="
+                  isRouteActive('panel/personal/organizacion/holidays')
+                "
+                [routerLink]="['panel/personal/organizacion/holidays']"
+                routerLinkActive="bg-fiori-active"
+              >
+                Feriados
               </a>
             </div>
           </div>

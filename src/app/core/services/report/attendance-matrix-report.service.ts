@@ -5,6 +5,9 @@ import { ReportMatrixParams } from "../../models/report/report-matrix-params.mod
 import { Observable } from "rxjs";
 import { ReportMatrixResponse } from "../../models/report/report-matrix-response.model";
 import { AttendanceMatrixPivotResponse } from "../../models/report/report-pivot-reponse.model";
+import { CostCenterReportData } from "../../models/report/cost-center-report.model";
+import { MarkingsReportData } from "../../models/report/markings-report.model";
+import { WeeklyAttendanceReportData } from "../../models/report/weekly-attendance-report.model";
 
 
 @Injectable({
@@ -40,16 +43,25 @@ export class AttendanceMatrixReportService {
     }
 
 
-    
-
-
-
     // pivot data 
     getAttendanceMatrixPivotReport(params: ReportMatrixParams): Observable<AttendanceMatrixPivotResponse> {
         return this.http.post<AttendanceMatrixPivotResponse>(`${this.reportUrl}pivot`, params);
     }
 
-    
+    // cost-center report
+    getCostCenterReport(params: ReportMatrixParams): Observable<CostCenterReportData> {
+        return this.http.post<CostCenterReportData>(`${this.reportUrl}cost-center-data`, params);
+    }
+
+    // markings report
+    getMarkingsReport(params: ReportMatrixParams): Observable<MarkingsReportData> {
+        return this.http.post<MarkingsReportData>(`${this.reportUrl}markings-data`, params);
+    }
+
+    // weekly-attendance report
+    getWeeklyAttendanceReport(params: ReportMatrixParams): Observable<WeeklyAttendanceReportData> {
+        return this.http.post<WeeklyAttendanceReportData>(`${this.reportUrl}weekly-attendance-data`, params);
+    }
 
     
 }

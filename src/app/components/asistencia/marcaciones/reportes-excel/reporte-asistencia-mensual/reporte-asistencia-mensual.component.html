@@ -9,31 +9,15 @@
       </div>
       <div class="ml-4 flex items-center gap-1 text-sm text-gray-500">
         <mat-icon class="text-base">calendar_today</mat-icon>
-        <span>{{ filteredEmpleados.length }}</span> empleados
+        <span>{{ reportData?.content?.employees?.length || 0 }}</span> empleados
       </div>
     </div>
     <div class="flex gap-2">
-      <button 
-        (click)="toggleWeekends()" 
-        class="inline-flex items-center gap-2 px-3 py-2 text-sm border rounded-md transition-colors"
-        [class]="showWeekends 
-          ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' 
-          : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'">
-        <mat-icon class="text-sm">{{ showWeekends ? 'visibility_off' : 'visibility' }}</mat-icon>
-        {{ showWeekends ? 'Ocultar' : 'Mostrar' }} Fines de Semana
-      </button>
-      <button 
-        (click)="toggleSummary()" 
-        class="inline-flex items-center gap-2 px-3 py-2 text-sm border rounded-md transition-colors"
-        [class]="showSummary 
-          ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' 
-          : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'">
-        <mat-icon class="text-sm">{{ showSummary ? 'visibility_off' : 'visibility' }}</mat-icon>
-        {{ showSummary ? 'Ocultar' : 'Mostrar' }} Resumen
-      </button>
+      
+      
       <button 
         (click)="exportToExcel()" 
-        [disabled]="isExporting"
+        [disabled]="isExporting || !reportData"
         class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-green-50 text-green-700 border border-green-200 rounded-md hover:bg-green-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
         <mat-icon class="text-sm" [class.animate-spin]="isExporting">{{ isExporting ? 'refresh' : 'download' }}</mat-icon>
         {{ isExporting ? 'Generando Reporte...' : 'Descargar Reporte Semanal' }}
@@ -73,7 +57,7 @@
       </div>
 
       <!-- Employee ID -->
-      <!-- <div class="space-y-1 relative">
+      <div class="space-y-1 relative">
         <div class="absolute inset-0 bg-gray-100/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-md border border-dashed">
           <span class="text-xs font-semibold text-gray-500 bg-white/80 px-3 py-1 rounded-full shadow-sm border">En desarrollo</span>
         </div>
@@ -86,10 +70,10 @@
           placeholder="Filtrar por empleado..."
           [disabled]="true"
           class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-      </div> -->
+      </div>
 
       <!-- Área -->
-      <!-- <div class="space-y-1 relative">
+      <div class="space-y-1 relative">
         <div class="absolute inset-0 bg-gray-100/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-md border border-dashed">
           <span class="text-xs font-semibold text-gray-500 bg-white/80 px-3 py-1 rounded-full shadow-sm border">En desarrollo</span>
         </div>
@@ -102,12 +86,12 @@
           placeholder="Filtrar por área..."
           [disabled]="true"
           class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-      </div> -->
+      </div>
       
     </div>
 
     <!-- Filtros adicionales (colapsables) -->
-    <!-- <details>
+    <details>
       <summary class="flex items-center gap-2 text-sm font-medium text-blue-600 cursor-pointer hover:text-blue-800 transition-colors">
         <mat-icon class="text-base">filter_list</mat-icon>
         Filtros Avanzados
@@ -120,10 +104,10 @@
             <mat-icon class="text-lg text-yellow-600">construction</mat-icon>
             <span>Filtros avanzados en desarrollo</span>
           </div>
-        </div> -->
+        </div>
 
         <!-- Compañía -->
-        <!-- <div class="space-y-1">
+        <div class="space-y-1">
           <label class="block text-sm font-medium text-gray-500">Compañía</label>
           <input 
             type="text" 
@@ -131,10 +115,10 @@
             placeholder="ID Compañía..."
             [disabled]="true"
             class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
-        </div> -->
+        </div>
 
         <!-- Sede -->
-        <!-- <div class="space-y-1">
+        <div class="space-y-1">
           <label class="block text-sm font-medium text-gray-500">Sede</label>
           <input 
             type="text" 
@@ -142,10 +126,10 @@
             placeholder="ID Sede..."
             [disabled]="true"
             class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
-        </div> -->
+        </div>
 
         <!-- Cargo -->
-        <!-- <div class="space-y-1">
+        <div class="space-y-1">
           <label class="block text-sm font-medium text-gray-500">Cargo</label>
           <input 
             type="text" 
@@ -153,10 +137,10 @@
             placeholder="ID Cargo..."
             [disabled]="true"
             class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
-        </div> -->
+        </div>
 
         <!-- Centro de Costo -->
-        <!-- <div class="space-y-1">
+        <div class="space-y-1">
           <label class="block text-sm font-medium text-gray-500">Centro Costo</label>
           <input 
             type="text" 
@@ -166,10 +150,10 @@
             class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
         </div>
       </div>
-    </details> -->
+    </details>
 
     <!-- Botones de acción -->
-    <!-- <div class="flex items-center gap-3 mt-4 pt-4 border-t">
+    <div class="flex items-center gap-3 mt-4 pt-4 border-t">
       <button 
         type="submit"
         [disabled]="isLoading || filterForm.invalid"
@@ -185,181 +169,91 @@
         <mat-icon>refresh</mat-icon>
         <span>Limpiar</span>
       </button>
-    </div> -->
+    </div>
   </form>
 
-  <!-- Estadísticas generales -->
-  <!-- <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-      <div class="text-2xl font-bold text-blue-700">{{ totalEmpleados }}</div>
-      <div class="text-sm text-blue-600">Total Empleados</div>
-    </div>
-    <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-      <div class="text-2xl font-bold text-green-700">{{ porcentajeAsistenciaGeneral | number:'1.1-1' }}%</div>
-      <div class="text-sm text-green-600">Asistencia General</div>
-    </div>
-    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center">
-      <div class="text-2xl font-bold text-purple-700">{{ totalDiasTrabajados }}</div>
-      <div class="text-sm text-purple-600">Días Trabajados</div>
-    </div>
-    <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-      <div class="text-2xl font-bold text-red-700">{{ totalFaltas }}</div>
-      <div class="text-sm text-red-600">Total Faltas</div>
-    </div>
-  </div> -->
-
-  <!-- Tabla principal -->
-  <div class="bg-white rounded-lg shadow-sm border overflow-hidden relative hidden">
+  <!-- AG-Grid Tabla matricial -->
+  <div *ngIf="!isLoading && reportData && reportData.content && reportData.content.employees.length > 0" 
+       class="bg-white rounded-lg shadow-sm border overflow-hidden">
     
-    <!-- Overlay de desarrollo -->
-    <div class="absolute inset-0 bg-gray-800/60 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div class="bg-white border border-yellow-400 rounded-lg px-6 py-4 shadow-xl text-center">
-        <div class="flex items-center justify-center gap-3 text-yellow-800 mb-2">
-          <mat-icon class="text-3xl">construction</mat-icon>
-          <p class="text-xl font-semibold">Vista en Desarrollo</p>
+    <!-- Header de la tabla -->
+    <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">
+          {{ reportData.content.title }}
+          <span class="text-sm font-normal text-gray-500 ml-2">
+            ({{ reportData.content.fechaInicio | date:'dd/MM/yyyy' }} - 
+             {{ reportData.content.fechaFin | date:'dd/MM/yyyy' }})
+          </span>
+        </h3>
+        <div class="flex items-center gap-2">
+          <div class="text-sm text-gray-500">
+            {{ reportData.content.employees.length }} empleado{{ reportData.content.employees.length !== 1 ? 's' : '' }}
+          </div>
+          <!-- Controles AG-Grid -->
+          <button 
+            type="button"
+            (click)="autoSizeColumns()"
+            class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 text-sm transition-colors">
+            <mat-icon class="text-sm">view_column</mat-icon>
+            Ajustar Columnas
+          </button>
         </div>
-        <p class="text-sm text-gray-600">Esta sección se encuentra actualmente en construcción.<br>La funcionalidad de descarga de reportes ya está disponible.</p>
       </div>
     </div>
 
-    <!-- Header sticky -->
-    <div class="sticky top-0 z-30 bg-green-600 text-white ">
-      <div class="overflow-x-auto">
-        <table class="min-w-full table-fixed">
-          <thead>
-            <tr class="bg-green-600">
-              <!-- Columnas fijas -->
-              <th class="sticky left-0 bg-green-600 z-40 border-r border-green-500 px-3 py-3 text-left w-20">
-                <span class="text-xs font-medium">ITEM</span>
-              </th>
-              <th class="sticky left-20 bg-green-600 z-40 border-r border-green-500 px-3 py-3 text-left w-24">
-                <span class="text-xs font-medium">PLANILLA</span>
-              </th>
-              <th class="sticky left-44 bg-green-600 z-40 border-r border-green-500 px-3 py-3 text-left w-28">
-                <span class="text-xs font-medium">NRO DOC</span>
-              </th>
-              <th class="sticky left-72 bg-green-600 z-40 border-r border-green-500 px-3 py-3 text-left w-64">
-                <span class="text-xs font-medium">APELLIDOS Y NOMBRES</span>
-              </th>
-              <th class="sticky left-80 bg-green-600 z-40 border-r border-green-500 px-3 py-3 text-left w-32">
-                <span class="text-xs font-medium">ÁREA</span>
-              </th>
-              <th class="sticky left-96 bg-green-600 z-40 border-r border-green-500 px-3 py-3 text-left w-24">
-                <span class="text-xs font-medium">CARGO</span>
-              </th>
-              <th class="sticky left-120 bg-green-600 z-40 border-r border-green-500 px-3 py-3 text-left w-24">
-                <span class="text-xs font-medium">SEDE</span>
-              </th>
-              <th class="sticky left-144 bg-green-600 z-40 border-r border-green-500 px-3 py-3 text-left w-28">
-                <span class="text-xs font-medium">F. INGRESO</span>
-              </th>
-              <th class="sticky left-172 bg-green-600 z-40 border-r border-green-500 px-3 py-3 text-left w-28">
-                <span class="text-xs font-medium">F. CESE</span>
-              </th>
-              
-              <!-- Días del mes -->
-              <th 
-                *ngFor="let dia of visibleDias"
-                class="px-2 py-3 text-center border-l border-green-500 min-w-[40px]">
-                <div class="text-xs font-medium">
-                  {{ getDayName(dia) }}<br>
-                  <span class="text-green-100">{{ formatDate(dia) }}</span>
-                </div>
-              </th>
-              
-              <!-- Columna resumen (si está habilitada) -->
-              <th *ngIf="showSummary" 
-                  class="px-3 py-3 text-center border-l-2 border-green-400 min-w-[120px]">
-                <span class="text-xs font-medium">RESUMEN</span>
-              </th>
-            </tr>
-          </thead>
-        </table>
-      </div>
+    <!-- AG-Grid Container -->
+    <div class="ag-theme-alpine" style="height: 600px; width: 100%;">
+      <ag-grid-angular
+        #agGrid
+        [columnDefs]="columnDefs"
+        [rowData]="rowData"
+        [gridOptions]="gridOptions"
+        style="height: 100%; width: 100%;">
+      </ag-grid-angular>
     </div>
 
-    <!-- Body scrollable -->
-    <div class="overflow-x-auto max-h-96 overflow-y-auto">
-      <table class="min-w-full table-fixed">
-        <tbody class="divide-y divide-gray-100">
-          <!-- Loading state -->
-          <tr *ngIf="isLoading">
-            <td [attr.colspan]="9 + visibleDias.length + (showSummary ? 1 : 0)" class="text-center py-8">
-              <div class="flex items-center justify-center gap-2">
-                <mat-spinner diameter="20"></mat-spinner>
-                <span class="text-gray-500 text-sm">Cargando datos...</span>
-              </div>
-            </td>
-          </tr>
+    <!-- Resumen de estadísticas -->
+    <div class="border-t border-gray-200 bg-gray-50/30 px-4 py-3" 
+         *ngIf="reportData.content.summary">
+      <div class="flex items-center justify-between text-sm">
+        <div class="flex items-center gap-6">
+          <span class="text-gray-700">
+            <strong>Empleados:</strong> {{ reportData.content.summary.totalEmployees }}
+          </span>
+          <span class="text-blue-600">
+            <strong>Horas Totales:</strong> {{ formatHours(reportData.content.summary.totalHorasGlobales) }}
+          </span>
+          <span class="text-orange-600">
+            <strong>H. Extras:</strong> {{ formatHours(reportData.content.summary.totalHorasExtrasGlobales) }}
+          </span>
+        </div>
+        <div class="text-gray-500">
+          Generado: {{ reportData.generatedAt | date:'dd/MM/yyyy HH:mm:ss' }}
+        </div>
+      </div>
+    </div>
+  </div>
 
-          <!-- Empty state -->
-          <tr *ngIf="!isLoading && filteredEmpleados.length === 0">
-            <td [attr.colspan]="9 + visibleDias.length + (showSummary ? 1 : 0)" class="text-center py-8">
-              <div class="flex flex-col items-center gap-3">
-                <mat-icon class="text-gray-300 text-4xl">person_off</mat-icon>
-                <div class="text-gray-500">
-                  <p class="text-sm font-medium">No se encontraron empleados</p>
-                  <p class="text-xs">Intenta ajustar los filtros</p>
-                </div>
-              </div>
-            </td>
-          </tr>
-
-          <!-- Filas de empleados -->
-          <tr *ngFor="let empleado of filteredEmpleados; trackBy: trackByEmpleado" 
-              class="hover:bg-gray-50 transition-colors">
-            
-            <!-- Columnas fijas -->
-            <td class="sticky left-0 bg-white z-10 border-r border-gray-200 px-3 py-2 text-center w-20">
-              <div class="text-sm font-medium text-gray-900">{{ empleado.item }}</div>
-            </td>
-            <td class="sticky left-20 bg-white z-10 border-r border-gray-200 px-3 py-2 text-center w-24">
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
-                    [ngClass]="{
-                      'bg-blue-100 text-blue-800': empleado.planilla === 'EMPLEADOS',
-                      'bg-green-100 text-green-800': empleado.planilla === 'OBREROS'
-                    }">
-                {{ empleado.planilla }}
-              </span>
-            </td>
-            <td class="sticky left-44 bg-white z-10 border-r border-gray-200 px-3 py-2 text-center w-28">
-              <div class="text-sm text-gray-900">{{ empleado.nroDoc }}</div>
-            </td>
-            <td class="sticky left-72 bg-white z-10 border-r border-gray-200 px-3 py-2 w-64">
-              <div class="text-sm font-medium text-gray-900 truncate" [title]="empleado.apellidosNombres">
-                {{ empleado.apellidosNombres }}
-              </div>
-            </td>
-            <td class="sticky left-80 bg-white z-10 border-r border-gray-200 px-3 py-2 w-32">
-              <div class="text-xs text-gray-700 truncate" [title]="empleado.area">{{ empleado.area }}</div>
-            </td>
-            <td class="sticky left-96 bg-white z-10 border-r border-gray-200 px-3 py-2 text-center w-24">
-              <div class="text-xs text-gray-700">{{ empleado.cargo }}</div>
-            </td>
-            <td class="sticky left-120 bg-white z-10 border-r border-gray-200 px-3 py-2 text-center w-24">
-              <div class="text-xs text-gray-700">{{ empleado.sede }}</div>
-            </td>
-            <td class="sticky left-144 bg-white z-10 border-r border-gray-200 px-3 py-2 text-center w-28">
-              <div class="text-xs text-gray-700">{{ formatDate(empleado.fechaIngreso) }}</div>
-            </td>
-            <td class="sticky left-172 bg-white z-10 border-r border-gray-200 px-3 py-2 text-center w-28">
-              <div class="text-xs text-gray-700">{{ empleado.fechaCese ? formatDate(empleado.fechaCese) : '-' }}</div>
-            </td>
-
-            <!-- Celdas de asistencia por día -->
-            <td *ngFor="let fecha of visibleDias" 
-                class="px-2 py-2 text-center border-l border-gray-200 min-w-[40px]"
-                [ngClass]="getCellClass(empleado, fecha)">
-              <div class="text-xs font-bold">{{ getCellValue(empleado, fecha) }}</div>
-            </td>
-            
-            <!-- Columna resumen -->
-            <td *ngIf="showSummary" class="px-3 py-2 border-l-2 border-gray-300 min-w-[120px]">
-              <ng-container *ngTemplateOutlet="resumenTemplate; context: { empleado: empleado }"></ng-container>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- Estado vacío -->
+  <div *ngIf="!isLoading && (!reportData || !reportData.content || reportData.content.employees.length === 0)" 
+       class="bg-white rounded-lg shadow-sm border p-12 text-center">
+    <div class="flex flex-col items-center">
+      <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+        <mat-icon class="text-4xl text-gray-400">calendar_view_month</mat-icon>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No hay datos para mostrar</h3>
+      <p class="text-sm text-gray-500 mb-6">
+        Ajusta los filtros y genera un nuevo reporte para ver los resultados
+      </p>
+      <button 
+        type="button"
+        (click)="onSearch()"
+        [disabled]="filterForm.invalid"
+        class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50">
+        <mat-icon>search</mat-icon>
+        Generar Reporte
+      </button>
     </div>
   </div>
 </div>

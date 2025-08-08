@@ -1,0 +1,136 @@
+/* Estilos específicos para el componente Holidays */
+
+/* AG-Grid custom styling */
+::ng-deep .ag-theme-alpine {
+  --ag-header-background-color: #f8f9fa;
+  --ag-header-foreground-color: #32363a;
+  --ag-border-color: #d1d1d1;
+  --ag-row-hover-color: #f5f5f5;
+  --ag-selected-row-background-color: #e3f2fd;
+  --ag-font-family: "72", "Segoe UI", Arial, sans-serif;
+  --ag-font-size: 0.875rem;
+}
+
+::ng-deep .ag-header-cell {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+::ng-deep .ag-cell {
+  line-height: 1.5;
+  padding: 8px 12px;
+}
+
+::ng-deep .ag-row {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+::ng-deep .ag-row:hover {
+  background-color: #f9fafb;
+  transition: background-color 0.2s ease;
+}
+
+/* Badges personalizados */
+.badge {
+  @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-current-year {
+  @apply bg-green-100 text-green-800;
+}
+
+.badge-other-year {
+  @apply bg-gray-100 text-gray-700;
+}
+
+.badge-single-day {
+  @apply bg-gray-100 text-gray-600;
+}
+
+.badge-multi-day {
+  @apply bg-blue-100 text-blue-800;
+}
+
+/* Estados de loading */
+.loading-spinner {
+  @apply animate-spin rounded-full border-b-2 border-fiori-primary;
+}
+
+/* Mensajes de estado */
+.message-success {
+  @apply bg-fiori-success/10 border border-fiori-success/20 text-fiori-success;
+}
+
+.message-error {
+  @apply bg-fiori-error/10 border border-fiori-error/20 text-fiori-error;
+}
+
+.message-warning {
+  @apply bg-fiori-warning/10 border border-fiori-warning/20 text-fiori-warning;
+}
+
+/* Buttons */
+.btn-sync {
+  @apply bg-fiori-warning text-white hover:bg-orange-600;
+}
+
+.btn-sync:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  ::ng-deep .ag-theme-alpine {
+    font-size: 0.75rem;
+  }
+  
+  ::ng-deep .ag-cell {
+    padding: 6px 8px;
+  }
+  
+  .stats-container {
+    @apply flex-col gap-2;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Custom scrollbar para AG-Grid */
+::ng-deep .ag-body-viewport {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d1d1 transparent;
+}
+
+::ng-deep .ag-body-viewport::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::ng-deep .ag-body-viewport::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::ng-deep .ag-body-viewport::-webkit-scrollbar-thumb {
+  background-color: #d1d1d1;
+  border-radius: 4px;
+}
+
+::ng-deep .ag-body-viewport::-webkit-scrollbar-thumb:hover {
+  background-color: #a1a1aa;
+}

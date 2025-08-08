@@ -1,54 +1,42 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { AttendanceMatrixReportService } from '../../../../core/services/report/attendance-matrix-report.service';
 import { HeaderConfigService, HeaderConfig } from '../../../../core/services/header-config.service';
 import { ReportMatrixResponse, ReportMatrixResponseData } from '../../../../core/models/report/report-matrix-response.model';
 import { ReportMatrixParams } from '../../../../core/models/report/report-matrix-params.model';
-
-interface MarcacionParseada {
-  hora: string;
-  dispositivo: string;
-  tipo: 'ENTRADA' | 'SALIDA' | 'BREAK_ENTRADA' | 'BREAK_SALIDA';
-}
-
-interface RegistroMarcacion {
-  nroDoc: string;
-  colaborador: string;
-  sede: string;
-  area: string;
-  cargo: string;
-  ccCodigo: string;
-  fechaIngreso: string;
-  fecha: string;
-  diaSemanaEs: string;
-  marcacionIngreso: string;
-  marcacionSalida: string;
-  marcacionesRaw: string; // Nueva propiedad para mostrar el dato crudo
-  // Datos originales completos
-  datosOriginales: ReportMatrixResponseData;
-}
+import { AgGridAngular } from 'ag-grid-angular';
+import { GridOptions, ColDef } from 'ag-grid-community';
 
 @Component({
   selector: 'app-reporte-asistencia-excel',
   templateUrl: './reporte-asistencia-excel.component.html',
-  styleUrls: ['./reporte-asistencia-excel.component.css']
 })
 export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
   
-  // Formulario de filtros
   filterForm!: FormGroup;
-  
-  // Datos principales
-  registros: RegistroMarcacion[] = [];
   loading = false;
   
   // Paginación
   totalCount = 0;
   page = 1;
-  pageSize = 20;
+  pageSize = 100; // Aumentamos el tamaño de página por defecto
   
-  // Configuración del header
+  // AG-Grid
+  @ViewChild('agGrid') agGrid!: AgGridAngular;
+  columnDefs: ColDef[] = [];
+  rowData: any[] = [];
+  gridOptions: GridOptions = {
+    defaultColDef: {
+      resizable: true,
+      sortable: true,
+      filter: true,
+    },
+    pagination: false, // La paginación la manejamos externamente
+    suppressPaginationPanel: true,
+    overlayNoRowsTemplate: '<span class="text-gray-500">No hay datos para mostrar. Ajuste los filtros y busque nuevamente.</span>'
+  };
+
   private headerConfig: HeaderConfig | null = null;
   private headerSubscription?: Subscription;
 
@@ -58,21 +46,17 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
     private headerConfigService: HeaderConfigService
   ) {
     this.initializeForm();
+    this.createColumnDefs();
   }
 
   ngOnInit(): void {
-    // Suscribirse a cambios en la configuración del header
     this.headerSubscription = this.headerConfigService.headerConfig$.subscribe(config => {
       this.headerConfig = config;
-      // Solo almacenar la config, no cargar automáticamente
-      console.log('🔧 Header config recibida:', config);
     });
   }
 
   ngOnDestroy(): void {
-    if (this.headerSubscription) {
-      this.headerSubscription.unsubscribe();
-    }
+    this.headerSubscription?.unsubscribe();
   }
 
   private initializeForm(): void {
@@ -82,77 +66,49 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
     this.filterForm = this.fb.group({
       fechaInicio: [firstDay.toISOString().split('T')[0], Validators.required],
       fechaFin: [today.toISOString().split('T')[0], Validators.required],
-      employeeId: [''],
-      areaId: [''],
-      sedeId: [''],
-      cargoId: [''],
-      centroCostoId: ['']
+      employeeId: ['']
     });
   }
 
   loadData(): void {
     if (!this.headerConfig || !this.filterForm.valid) {
+      console.warn("Faltan datos de configuración o el formulario es inválido.");
       return;
     }
 
     this.loading = true;
     
     const params: ReportMatrixParams = {
-      fechaInicio: this.filterForm.get('fechaInicio')?.value,
-      fechaFin: this.filterForm.get('fechaFin')?.value,
-      employeeId: this.filterForm.get('employeeId')?.value || '',
+      ...this.filterForm.value,
       companiaId: this.headerConfig.selectedEmpresa?.companiaId || '',
-      areaId: this.filterForm.get('areaId')?.value || '',
-      sedeId: this.filterForm.get('sedeId')?.value || '',
-      cargoId: this.filterForm.get('cargoId')?.value || '',
-      centroCostoId: this.filterForm.get('centroCostoId')?.value || '',
-      sedeCodigo: '',
-      ccCodigo: '',
       planillaId: this.headerConfig.selectedPlanilla?.planillaId || '',
       pageNumber: this.page,
       pageSize: this.pageSize
     };
 
-    console.log('🚀 Llamando al servicio con params:', params);
-    
     this.attendanceMatrixService.getAttendanceMatrixReport(params).subscribe({
       next: (response: ReportMatrixResponse) => {
-        console.log('📡 Respuesta recibida:', response);
         if (response.success && response.data) {
-          this.processData(response.data);
+          this.rowData = this.processDataForGrid(response.data);
           this.totalCount = response.totalRecords || 0;
-          console.log('✅ Total de registros:', this.totalCount);
-          console.log('✅ Registros procesados:', this.registros.length);
         } else {
-          console.error('❌ Error en respuesta:', response.message);
-          this.registros = [];
+          this.rowData = [];
+          this.totalCount = 0;
         }
         this.loading = false;
-        console.log('📊 Estado final: loading=', this.loading, 'registros.length=', this.registros.length);
       },
       error: (error) => {
-        console.error('❌ Error cargando datos:', error);
-        this.registros = [];
+        console.error('Error cargando datos:', error);
+        this.rowData = [];
+        this.totalCount = 0;
         this.loading = false;
-        console.log('📊 Estado final (error): loading=', this.loading, 'registros.length=', this.registros.length);
       }
     });
   }
 
-  private convertDdMmYyyyToYyyyMmDd(dateString: string): string {
-    if (!dateString) {
-      return '';
-    }
-    const parts = dateString.split('/');
-    if (parts.length === 3) {
-      return `${parts[2]}-${parts[1]}-${parts[0]}`;
-    }
-    return dateString; // Return original if format is not as expected
-  }
-
-  private processData(data: ReportMatrixResponseData[]): void {
-    // Mapeo directo sin procesamiento complejo
-    this.registros = data.map(item => {
+  private processDataForGrid(data: ReportMatrixResponseData[]): any[] {
+    return data.map(item => {
+      const { entrada, salida } = this.extractEntradaSalida(item.marcacionesDelDia);
       return {
         nroDoc: item.nroDoc,
         colaborador: item.colaborador,
@@ -163,56 +119,57 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
         fechaIngreso: this.convertDdMmYyyyToYyyyMmDd(item.fechaIngreso),
         fecha: this.convertDdMmYyyyToYyyyMmDd(item.fecha),
         diaSemanaEs: item.diaSemanaEs,
-        marcacionIngreso: '', // Se vacía para la prueba
-        marcacionSalida: '', // Se vacía para la prueba
-        marcacionesRaw: item.marcacionesDelDia || '', // Asignar el valor crudo
-        datosOriginales: item
+        entrada: entrada,
+        salida: salida
       };
     });
-
-    console.log('✅ Datos mapeados directamente:', this.registros.length);
   }
 
-  private parseMarcacionesDelDia(marcacionesString: string): MarcacionParseada[] {
-    if (!marcacionesString || marcacionesString.trim() === '') {
-      return [];
+  private extractEntradaSalida(marcacionesRaw: string): { entrada: string, salida: string } {
+    if (!marcacionesRaw) {
+      return { entrada: '-', salida: '-' };
     }
-
-    const marcaciones: MarcacionParseada[] = [];
-    const marcacionesArray = marcacionesString.split('|');
-
-    marcacionesArray.forEach(marcacion => {
-      const match = marcacion.match(/^(\d{2}:\d{2})\(([^-]+)\s*-\s*([^)]+)\)$/);
-      if (match) {
-        const [, hora, dispositivo, tipoRaw] = match;
-        const tipo = this.determinarTipoMarcacion(tipoRaw.trim());
-        
-        marcaciones.push({
-          hora: hora,
-          dispositivo: dispositivo.trim(),
-          tipo: tipo
-        });
-      }
-    });
-
-    return marcaciones.sort((a, b) => a.hora.localeCompare(b.hora));
+    const marcaciones = marcacionesRaw.match(/\d{2}:\d{2}/g) || [];
+    if (marcaciones.length === 0) {
+      return { entrada: '-', salida: '-' };
+    }
+    const entrada = marcaciones[0] || '-';
+    const salida = marcaciones.length > 1 ? marcaciones[marcaciones.length - 1] : '-';
+    return { entrada, salida };
   }
 
-  private determinarTipoMarcacion(tipoRaw: string): 'ENTRADA' | 'SALIDA' | 'BREAK_ENTRADA' | 'BREAK_SALIDA' {
-    const tipoLower = tipoRaw.toLowerCase();
-    
-    if (tipoLower.includes('ing') || tipoLower.includes('entrada')) {
-      return 'ENTRADA';
-    } else if (tipoLower.includes('sal') || tipoLower.includes('salida')) {
-      return 'SALIDA';
-    } else if (tipoLower.includes('break') && tipoLower.includes('ing')) {
-      return 'BREAK_ENTRADA';
-    } else if (tipoLower.includes('break') && tipoLower.includes('sal')) {
-      return 'BREAK_SALIDA';
-    }
-    
-    // Por defecto, asumimos entrada para el primer registro y salida para el último
-    return 'ENTRADA';
+  private convertDdMmYyyyToYyyyMmDd(dateString: string): string {
+    if (!dateString) return '';
+    const parts = dateString.split('/');
+    return parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : dateString;
+  }
+
+  createColumnDefs(): void {
+    this.columnDefs = [
+      { headerName: 'Nro Doc', field: 'nroDoc', width: 120, headerClass: 'fiori-header' },
+      { headerName: 'Colaborador', field: 'colaborador', width: 250, headerClass: 'fiori-header' },
+      { headerName: 'Sede', field: 'sede', width: 120, headerClass: 'fiori-header' },
+      { headerName: 'Área', field: 'area', width: 150, headerClass: 'fiori-header' },
+      { headerName: 'Cargo', field: 'cargo', width: 150, headerClass: 'fiori-header' },
+      { headerName: 'C. Costo', field: 'ccCodigo', width: 120, headerClass: 'fiori-header' },
+      { headerName: 'F. Ingreso', field: 'fechaIngreso', width: 120, headerClass: 'fiori-header', valueFormatter: params => params.value ? new Date(params.value).toLocaleDateString('es-PE') : '' },
+      { headerName: 'Fecha', field: 'fecha', width: 120, headerClass: 'fiori-header', valueFormatter: params => params.value ? new Date(params.value).toLocaleDateString('es-PE') : '' },
+      { headerName: 'Día', field: 'diaSemanaEs', width: 100, headerClass: 'fiori-header' },
+      {
+        headerName: 'Entrada',
+        field: 'entrada',
+        width: 100,
+        cellClass: 'text-center bg-fiori-active text-fiori-primary font-bold',
+        headerClass: 'fiori-header'
+      },
+      {
+        headerName: 'Salida',
+        field: 'salida',
+        width: 100,
+        cellClass: 'text-center bg-fiori-active text-fiori-primary font-bold',
+        headerClass: 'fiori-header'
+      },
+    ];
   }
 
   onFilter(): void {
@@ -221,13 +178,8 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
   }
 
   onPageChange(event: any): void {
-    console.log('📄 Página cambiada:', event);
-    this.page = event.pageNumber || event;
+    this.page = event.pageNumber || 1;
     this.pageSize = event.pageSize || this.pageSize;
     this.loadData();
-  }
-
-  trackByRegistro(index: number, registro: RegistroMarcacion): string {
-    return `${registro.nroDoc}-${registro.fecha}`;
   }
 }

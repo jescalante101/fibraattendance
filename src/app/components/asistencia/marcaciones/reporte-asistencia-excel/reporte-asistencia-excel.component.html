@@ -1,109 +1,81 @@
-<div class="h-full flex flex-col">
-  
-  <!-- Filtros -->
-  <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4">
-    <form [formGroup]="filterForm" (ngSubmit)="onFilter()" class="grid grid-cols-4 gap-4">
+<div class="p-4 max-w-full h-full flex flex-col">
+
+  <!-- Formulario de filtros -->
+  <form [formGroup]="filterForm" (ngSubmit)="onFilter()" class="p-4 bg-fiori-muted rounded-lg border border-fiori-border shadow-fioriSm mb-4">
+    <div class="flex flex-wrap items-end gap-4">
       
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Inicio</label>
+      <!-- Fecha Inicio -->
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-sm font-medium text-fiori-text mb-1">Fecha Inicio <span class="text-fiori-error">*</span></label>
         <input 
           type="date" 
           formControlName="fechaInicio"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          required
+          class="w-full px-3 py-2 border border-fiori-border rounded-md text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
       </div>
-      
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Fin</label>
+
+      <!-- Fecha Fin -->
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-sm font-medium text-fiori-text mb-1">Fecha Fin <span class="text-fiori-error">*</span></label>
         <input 
           type="date" 
           formControlName="fechaFin"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          required
+          class="w-full px-3 py-2 border border-fiori-border rounded-md text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
       </div>
-      
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Empleado</label>
+
+      <!-- Employee ID -->
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-sm font-medium text-fiori-text mb-1">ID Empleado (Opcional)</label>
         <input 
           type="text" 
           formControlName="employeeId"
-          placeholder="ID del empleado"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          placeholder="Filtrar por ID de empleado..."
+          class="w-full px-3 py-2 border border-fiori-border rounded-md text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
       </div>
-      
-      <div class="flex items-end">
+
+      <!-- Botones de acción -->
+      <div class="flex items-center gap-2">
         <button 
           type="submit"
-          class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors">
-          Buscar
+          [disabled]="loading"
+          class="btn-fiori inline-flex items-center gap-2 px-4 py-2 text-sm">
+          <mat-icon [class]="loading ? 'animate-spin' : ''">{{ loading ? 'refresh' : 'search' }}</mat-icon>
+          <span>{{ loading ? 'Buscando...' : 'Buscar' }}</span>
         </button>
       </div>
-      
-    </form>
-  </div>
+    </div>
+  </form>
 
-  <!-- Tabla de Marcaciones -->
-  <div class="flex-1 bg-white border border-gray-200 rounded-lg">
+  <!-- Contenedor de la tabla AG-Grid -->
+  <div class="flex-1 bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden">
     
     <!-- Loading -->
-    <div *ngIf="loading" class="flex items-center justify-center py-8">
+    <div *ngIf="loading" class="flex items-center justify-center h-full">
       <div class="flex items-center gap-2">
-        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-        <span class="text-gray-500 text-sm">Cargando datos...</span>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-fiori-primary"></div>
+        <span class="text-fiori-subtext text-sm">Cargando datos...</span>
       </div>
     </div>
 
-    <!-- Empty state -->
-    <div *ngIf="!loading && registros.length === 0" class="flex flex-col items-center justify-center py-12">
-      <div class="text-gray-400 text-6xl mb-4">📋</div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">No hay datos para mostrar</h3>
-      <p class="text-gray-500 text-sm">Ajusta los filtros y busca nuevamente</p>
+    <!-- AG-Grid -->
+    <div *ngIf="!loading" class="ag-theme-alpine" style="height: 100%; width: 100%;">
+      <ag-grid-angular
+        #agGrid
+        [columnDefs]="columnDefs"
+        [rowData]="rowData"
+        [gridOptions]="gridOptions"
+        style="height: 100%; width: 100%;">
+      </ag-grid-angular>
     </div>
 
-    <!-- Tabla con datos -->
-    <div *ngIf="!loading && registros.length > 0" class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200 bg-white border border-gray-200 rounded-lg">
-        <!-- Header -->
-        <thead class="bg-gray-50 sticky top-0 z-10">
-          <tr>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Nro Doc</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">Colaborador</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Sede</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Área</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Cargo</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">CC Código</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Fecha Ingreso</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Fecha</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Día Semana</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">Marcaciones Raw</th>
-          </tr>
-        </thead>
-      </table>
-    </div>
-    <cdk-virtual-scroll-viewport *ngIf="!loading && registros.length > 0" itemSize="48" class="overflow-x-auto h-[500px] overflow-y-auto">
-      <table class="min-w-full divide-y divide-gray-200 bg-white border border-gray-200 rounded-lg">
-        <!-- Body -->
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr *cdkVirtualFor="let registro of registros; trackBy: trackByRegistro" 
-              class="hover:bg-gray-50 transition-colors">
-            <td class="px-4 py-3 text-sm text-gray-900 w-1/12">{{ registro.nroDoc }}</td>
-            <td class="px-4 py-3 text-sm text-gray-900 w-2/12">{{ registro.colaborador }}</td>
-            <td class="px-4 py-3 text-sm text-gray-900 w-1/12">{{ registro.sede }}</td>
-            <td class="px-4 py-3 text-sm text-gray-900 w-1/12">{{ registro.area }}</td>
-            <td class="px-4 py-3 text-sm text-gray-900 w-1/12">{{ registro.cargo }}</td>
-            <td class="px-4 py-3 text-sm text-gray-900 w-1/12">{{ registro.ccCodigo }}</td>
-            <td class="px-4 py-3 text-sm text-gray-900 w-1/12">{{ registro.fechaIngreso | date:'dd/MM/yyyy' }}</td>
-            <td class="px-4 py-3 text-sm text-gray-900 w-1/12">{{ registro.fecha | date:'dd/MM/yyyy' }}</td>
-            <td class="px-4 py-3 text-sm text-gray-900 w-1/12">{{ registro.diaSemanaEs }}</td>
-            <td class="px-4 py-3 text-sm text-gray-900 w-2/12">{{ registro.marcacionesRaw }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </cdk-virtual-scroll-viewport>
-
+    <!-- Empty state (manejado por AG-Grid con overlay) -->
   </div>
 
   <!-- Paginador Fiori -->
   <app-fiori-paginator 
-    *ngIf="!loading && registros.length > 0"
+    *ngIf="!loading && totalCount > 0"
+    class="mt-4"
     [totalRecords]="totalCount"
     [pageNumber]="page"
     [pageSize]="pageSize"

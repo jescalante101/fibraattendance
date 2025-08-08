@@ -195,38 +195,7 @@
   </div>
 </div>
 
-<!-- Paginación con Fiori Paginator -->
-<div *ngIf="pivotedData.length > 0 || isLoading" class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border mt-4 overflow-hidden">
-  
-  <!-- Información adicional de reporte -->
-  <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted/10" *ngIf="summary && !isLoading">
-    <div class="flex items-center justify-center gap-6 text-sm">
-      <div class="flex items-center gap-2 text-fiori-info">
-        <lucide-icon name="clock" class="w-4 h-4"></lucide-icon>
-        <span class="font-medium">Total horas: {{ summary.totalHours | number:'1.1-1' }}h</span>
-      </div>
-      <div class="flex items-center gap-2 text-fiori-warning">
-        <lucide-icon name="plus-circle" class="w-4 h-4"></lucide-icon>
-        <span class="font-medium">Horas extras: {{ summary.totalOvertimeHours | number:'1.1-1' }}h</span>
-      </div>
-      <div class="flex items-center gap-2 text-fiori-success">
-        <lucide-icon name="users" class="w-4 h-4"></lucide-icon>
-        <span class="font-medium">Empleados: {{ summary.totalEmployees | number }}</span>
-      </div>
-    </div>
-  </div>
 
-  <!-- Fiori Paginator Component -->
-  <app-fiori-paginator
-    [totalRecords]="totalRecords"
-    [pageSize]="pageSize"
-    [pageNumber]="currentPage"
-    [pageSizeOptions]="[100, 250, 500, 1000]"
-    [showAllOption]="false"
-    [loading]="isLoading"
-    (pageChange)="onPageChangeEvent($event)">
-  </app-fiori-paginator>
-</div>
 
 <!-- Estado vacío -->
 <div *ngIf="!isLoading && pivotedData.length === 0" class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border p-12 text-center">

@@ -27,6 +27,7 @@ import { ReporteCentroCostosComponent } from "./components/asistencia/marcacione
 import { ReporteAsistenciaMensualComponent } from "./components/asistencia/marcaciones/reportes-excel/reporte-asistencia-mensual/reporte-asistencia-mensual.component";
 import { ReporteMarcacionesDetalleComponent } from "./components/asistencia/marcaciones/reportes-excel/reporte-marcaciones-detalle/reporte-marcaciones-detalle.component";
 import { ReporteAsistenciaComponent } from "./components/asistencia/reportes/reporte-asistencia/reporte-asistencia.component";
+import { HolidaysComponent } from "./components/asistencia/holidays/holidays.component";
 
 
 
@@ -45,7 +46,8 @@ const appRoutes: Routes = [
         {path:"personal/organizacion/area",component:AreaComponent},
         {path:"personal/organizacion/cargo",component:CargoComponent},
         {path:"personal/organizacion/usuario-sede",component:UsuarioSedeComponent},
-        {path:"personal/organizacion/sede-ccosto",component:SedeCcostoComponent},
+        { path: "personal/organizacion/sede-ccosto", component: SedeCcostoComponent },
+        { path: 'personal/organizacion/holidays', component: HolidaysComponent },
 
         {path:'personal/empleado/empleado',component:EmpleadoComponent},
         {path:'personal/empleado/cese',component:CeseComponent},
@@ -67,6 +69,7 @@ const appRoutes: Routes = [
         {path:'asistencia/marcaciones/reportes-excel/asistencia-mensual',component:ReporteAsistenciaMensualComponent},
         { path: 'asistencia/marcaciones/reportes-excel/marcaciones-detalle', component: ReporteMarcacionesDetalleComponent },
         { path: 'asistencia/marcaciones/reportes-excel/matrix', component: ReporteAsistenciaComponent },
+       
 
 
     ]},

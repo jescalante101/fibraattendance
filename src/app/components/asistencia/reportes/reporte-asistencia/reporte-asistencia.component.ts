@@ -5,7 +5,7 @@ import { ReportMatrixParams } from 'src/app/core/models/report/report-matrix-par
 import { AttendanceMatrixPivotResponse, EmployeePivotData as BackendEmployeePivotData, DailyAttendanceData as BackendDailyAttendanceData, AttendanceSummary } from 'src/app/core/models/report/report-pivot-reponse.model';
 import { HeaderConfigService, HeaderConfig } from 'src/app/core/services/header-config.service';
 import { Subject, takeUntil } from 'rxjs';
-import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
+
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, ColGroupDef, GridOptions, GridReadyEvent, GridApi } from 'ag-grid-community';
 
@@ -60,11 +60,7 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
   executionTime = '';
 
   // Paginación (ahora manejada por el backend)
-  pageNumber = 1;
-  pageSize = 200;
-  totalRecords = 0;
-  totalPages = 1;
-  currentPage = 1;
+  
 
   // Hacer Math disponible en el template
   Math = Math;
@@ -206,8 +202,6 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     const formValues = this.filterForm.value;
     const params: ReportMatrixParams = {
       ...formValues,
-      pageNumber: this.pageNumber,
-      pageSize: this.pageSize,
       // Sobrescribir con valores del header (más importante que form)
       companiaId: this.headerConfig?.selectedEmpresa?.companiaId || formValues.companiaId || '',
       planillaId: this.headerConfig?.selectedPlanilla?.planillaId || formValues.planillaId || ''
@@ -243,12 +237,6 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
           this.generatedAt = response.generatedAt;
           this.executionTime = response.executionTime;
           
-          // Datos de paginación del backend
-          this.totalRecords = response.totalRecords;
-          this.currentPage = response.currentPage;
-          this.pageSize = response.pageSize;
-          this.totalPages = response.totalPages;
-          
           // Procesar dateRange del backend (convertir strings a Date)
           this.dateRange = response.dateRange.map(dateStr => new Date(dateStr));
           
@@ -270,10 +258,6 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
           
         } else {
           this.errorMessage = response.message || 'No se encontraron datos para los filtros seleccionados';
-          // Resetear datos de paginación cuando no hay resultados
-          this.totalRecords = 0;
-          this.currentPage = 1;
-          this.totalPages = 1;
           this.pivotedData = [];
         }
         this.isLoading = false;
@@ -282,10 +266,6 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
       error: (error) => {
         console.error('Error al cargar reporte pivot:', error);
         this.errorMessage = 'Error de conexión al cargar el reporte';
-        // Resetear datos en caso de error
-        this.totalRecords = 0;
-        this.currentPage = 1;
-        this.totalPages = 1;
         this.pivotedData = [];
         this.isLoading = false;
         this.cdr.markForCheck();
@@ -631,15 +611,7 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  // Evento del Fiori Paginator
-  onPageChangeEvent(event: PaginatorEvent): void {
-    if (event.pageNumber !== this.pageNumber || event.pageSize !== this.pageSize) {
-      this.pageNumber = event.pageNumber;
-      this.pageSize = event.pageSize;
-      this.loadReportData();
-      this.cdr.markForCheck();
-    }
-  }
+  
 
   private autoHideSuccess(): void {
     setTimeout(() => {

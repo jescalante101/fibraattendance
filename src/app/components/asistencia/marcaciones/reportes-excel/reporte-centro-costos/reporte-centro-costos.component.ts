@@ -1,29 +1,13 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AttendanceMatrixReportService } from 'src/app/core/services/report/attendance-matrix-report.service';
 import { ReportMatrixParams } from 'src/app/core/models/report/report-matrix-params.model';
 import { HeaderConfigService, HeaderConfig } from 'src/app/core/services/header-config.service';
 import { Subject, takeUntil } from 'rxjs';
+import { AgGridAngular } from 'ag-grid-angular';
+import { ColDef, ColGroupDef, GridOptions } from 'ag-grid-community';
+import { CostCenterReportData } from 'src/app/core/models/report/cost-center-report.model';
 
-// Interfaces (pueden moverse a sus propios archivos de modelos)
-interface EmpleadoCentroCosto {
-  item: number;
-  planilla: string;
-  nroDoc: string;
-  apellidosNombres: string;
-  area: string;
-  cargo: string;
-  sede: string;
-  fechaIngreso: string;
-  fechaCese?: string;
-  datosSemana: { [fecha: string]: number | string };
-}
-
-interface SemanaInfo {
-  fechaInicio: string;
-  fechaFin: string;
-  dias: string[];
-}
 
 @Component({
   selector: 'app-reporte-centro-costos',
@@ -36,19 +20,25 @@ export class ReporteCentroCostosComponent implements OnInit, OnDestroy {
   filterForm!: FormGroup;
   isLoading = false;
 
+  // AG-Grid Configuration
+  @ViewChild('agGrid', { static: false }) agGrid!: AgGridAngular;
+  columnDefs: (ColDef | ColGroupDef)[] = [];
+  rowData: any[] = [];
+  gridOptions: GridOptions = {
+    defaultColDef: {
+      sortable: true,
+      filter: true,
+      resizable: true,
+      minWidth: 50
+    },
+    suppressHorizontalScroll: false,
+    enableRangeSelection: true,
+    rowSelection: 'multiple'
+  };
+
   // Datos del reporte
-  empleados: EmpleadoCentroCosto[] = [];
-  filteredEmpleados: EmpleadoCentroCosto[] = [];
-  semanasInfo: SemanaInfo[] = [];
-
-  // Configuración de vista
-  viewMode: 'semanal' | 'mensual' = 'semanal';
+  reportData: CostCenterReportData | null = null;
   
-  // Estadísticas
-  totalEmpleados = 0;
-  totalHorasTrabajadas = 0;
-  promedioHorasPorEmpleado = 0;
-
   // Estados de carga
   isExporting = false;
 
@@ -65,7 +55,6 @@ export class ReporteCentroCostosComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeForm();
     this.loadHeaderConfig();
-    // La carga de datos se hará con onSearch()
   }
 
   ngOnDestroy(): void {
@@ -121,8 +110,27 @@ export class ReporteCentroCostosComponent implements OnInit, OnDestroy {
       this.filterForm.markAllAsTouched();
       return;
     }
-    console.log('Buscando con:', this.filterForm.value);
-    // Lógica para cargar datos del backend con los filtros
+    
+    const params: ReportMatrixParams = {
+      ...this.filterForm.value,
+      pageNumber: 1,
+      pageSize: 10000
+    };
+
+    this.isLoading = true;
+    this.reportData = null;
+    
+    this.attendanceMatrixService.getCostCenterReport(params).subscribe({
+      next: (data) => {
+        this.reportData = data;
+        this.setupAgGrid();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar reporte:', error);
+        this.isLoading = false;
+      }
+    });
   }
 
   onClearFilters(): void {
@@ -174,33 +182,164 @@ export class ReporteCentroCostosComponent implements OnInit, OnDestroy {
     window.URL.revokeObjectURL(url);
   }
 
-  toggleViewMode(): void {
-    this.viewMode = this.viewMode === 'semanal' ? 'mensual' : 'semanal';
+  // AG-Grid Methods
+  setupAgGrid(): void {
+    if (!this.reportData || !this.reportData.content) return;
+
+    this.columnDefs = this.createColumnDefs();
+    this.rowData = this.createCostCenterRowData();
   }
 
-  // --- Métodos de utilidad (a revisar y adaptar) ---
+  createColumnDefs(): (ColDef | ColGroupDef)[] {
+    if (!this.reportData || !this.reportData.content) return [];
 
-  getAllDates(): string[] {
-    return this.semanasInfo.flatMap(semana => semana.dias);
+    const fixedColumns: ColDef[] = [
+      {
+        headerName: 'ITEM',
+        field: 'itemNumber',
+        width: 70,
+        pinned: 'left',
+        cellStyle: { textAlign: 'center' },
+        headerClass: 'fiori-header'
+      },
+      {
+        headerName: 'PLANILLA',
+        field: 'planilla',
+        width: 100,
+        pinned: 'left',
+        headerClass: 'fiori-header',
+        cellRenderer: (params: any) => {
+          const planilla = params.value;
+          const className = planilla === 'EMPLEADOS' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800';
+          return `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${className}">${planilla}</span>`;
+        }
+      },
+      {
+        headerName: 'NRO DOC',
+        field: 'nroDoc',
+        width: 120,
+        pinned: 'left',
+        headerClass: 'fiori-header'
+      },
+      {
+        headerName: 'COLABORADOR',
+        field: 'colaborador',
+        width: 250,
+        pinned: 'left',
+        headerClass: 'fiori-header'
+      },
+      {
+        headerName: 'ÁREA',
+        field: 'area',
+        width: 150,
+        pinned: 'left',
+        headerClass: 'fiori-header'
+      },
+      {
+        headerName: 'CARGO',
+        field: 'cargo',
+        width: 120,
+        headerClass: 'fiori-header'
+      },
+      {
+        headerName: 'F. INGRESO',
+        field: 'fechaIngreso',
+        width: 110,
+        headerClass: 'fiori-header',
+        valueFormatter: (params: any) => {
+          if (!params.value) return '-';
+          return new Date(params.value).toLocaleDateString('es-PE', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          });
+        }
+      }
+    ];
+
+    const dateColumns = this.createDateColumns();
+    
+    return [...fixedColumns, ...dateColumns];
   }
 
-  getCellValue(empleado: EmpleadoCentroCosto, fecha: string): string {
-    const valor = empleado.datosSemana[fecha];
-    if (valor === undefined || valor === null) return '-';
-    return valor.toString();
+  createDateColumns(): ColGroupDef[] {
+    if (!this.reportData || !this.reportData.content) return [];
+
+    const dateColumns: ColGroupDef[] = [];
+    
+    this.reportData.content.weekGroups.forEach(weekGroup => {
+      const weekColumnGroup: ColGroupDef = {
+        headerName: `SEMANA N° ${weekGroup.weekNumber}`,
+        headerClass: 'week-header',
+        children: [
+          {
+            headerName: 'TURNO',
+            field: `week_${weekGroup.weekNumber}_turno`,
+            width: 90,
+            headerClass: 'turno-header',
+            cellStyle: { textAlign: 'center', fontSize: '12px', fontWeight: 'bold' }
+          },
+          ...weekGroup.dates.map((date, index) => ({
+            headerName: `${weekGroup.dayNames[index]}\n${weekGroup.dayNumbers[index]}`,
+            field: `week_${weekGroup.weekNumber}_day_${index}`,
+            width: 80,
+            headerClass: 'day-group-header',
+            cellStyle: (params: any) => {
+              const type = params.data[`week_${weekGroup.weekNumber}_day_${index}_type`];
+              const baseStyle = { textAlign: 'center', fontSize: '11px', fontWeight: 'bold' };
+              
+              switch (type) {
+                case 'work':
+                  return { ...baseStyle, backgroundColor: '#dbeafe', color: '#1e40af' };
+                case 'permission':
+                  return { ...baseStyle, backgroundColor: '#fef3c7', color: '#d97706' };
+                case 'absence':
+                  return { ...baseStyle, backgroundColor: '#fecaca', color: '#dc2626' };
+                default:
+                  return { ...baseStyle, backgroundColor: '#f9fafb', color: '#6b7280' };
+              }
+            },
+            cellRenderer: (params: any) => params.value || '-' 
+          }))
+        ]
+      };
+      dateColumns.push(weekColumnGroup);
+    });
+    
+    return dateColumns;
   }
 
-  getCellClass(empleado: EmpleadoCentroCosto, fecha: string): string {
-    // Lógica de clases...
-    return '';
+  createCostCenterRowData(): any[] {
+    if (!this.reportData || !this.reportData.content) return [];
+    
+    return this.reportData.content.employees.map(employee => {
+      const row: any = {
+        itemNumber: employee.itemNumber,
+        planilla: employee.planilla,
+        nroDoc: employee.nroDoc,
+        colaborador: employee.colaborador,
+        area: employee.area,
+        cargo: employee.cargo,
+        fechaIngreso: employee.fechaIngreso
+      };
+
+      employee.weekData.forEach(week => {
+        row[`week_${week.weekNumber}_turno`] = week.turno || 'N/A';
+        
+        week.dayValues.forEach((day, dayIndex) => {
+          const fieldKey = `week_${week.weekNumber}_day_${dayIndex}`;
+          row[fieldKey] = day.displayValue;
+          row[`${fieldKey}_type`] = day.type;
+        });
+      });
+
+      return row;
+    });
   }
 
-  getDayName(fecha: string): string {
-    const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-    return dias[new Date(fecha).getDay()];
-  }
-
-  trackByEmpleado(index: number, item: EmpleadoCentroCosto): any {
-    return item.nroDoc;
+  autoSizeColumns(): void {
+    if (this.agGrid && this.agGrid.api) {
+      this.agGrid.api.sizeColumnsToFit();
+    }
   }
 }

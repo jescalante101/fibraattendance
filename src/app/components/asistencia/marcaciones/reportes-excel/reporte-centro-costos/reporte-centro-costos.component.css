@@ -1,92 +1,60 @@
-/* Estilos específicos para el reporte centro de costos */
-
-.fade-in {
-  animation: fadeIn 0.3s ease-in-out;
+/* Estilos para AG-Grid con temática Fiori (Naranja) */
+:host ::ng-deep .ag-theme-alpine {
+    --ag-header-height: 42px;
+    --ag-header-group-height: 48px; 
+    --ag-header-background-color: #f9f9f9;
+    --ag-header-foreground-color: #32363a;
+    --ag-border-color: #d1d1d1;
+    --ag-font-family: "72", "Segoe UI", Arial, sans-serif;
+    --ag-font-size: 0.875rem;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Centrado vertical y padding para todas las etiquetas de encabezado */
+:host ::ng-deep .ag-header-cell-label, 
+:host ::ng-deep .ag-header-group-cell-label {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 
-/* Scroll sincronizado para headers */
-.table-container {
-  position: relative;
-}
-
-/* Sticky columns con z-index escalonado */
-.sticky-col-1 { z-index: 35; }
-.sticky-col-2 { z-index: 34; }
-.sticky-col-3 { z-index: 33; }
-.sticky-col-4 { z-index: 32; }
-.sticky-col-5 { z-index: 31; }
-
-/* Hover effects mejorados */
-tbody tr:hover td {
-  background-color: rgba(249, 250, 251, 0.8);
-}
-
-tbody tr:hover td.sticky {
-  background-color: rgba(255, 255, 255, 0.95);
-}
-
-/* Colores específicos para valores de horas */
-.hora-normal {
-  background-color: #f0f9ff;
-  color: #1e40af;
-}
-
-.hora-extra {
-  background-color: #eff6ff;
-  color: #1d4ed8;
-}
-
-.hora-reducida {
-  background-color: #fefce8;
-  color: #a16207;
-}
-
-.falta {
-  background-color: #fef2f2;
-  color: #dc2626;
-}
-
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-  .sticky {
-    position: relative;
-  }
-  
-  table {
+/* Estilo base para encabezados fijos */
+:host ::ng-deep .fiori-header .ag-header-cell-label {
+    font-weight: 600;
+    text-transform: uppercase;
     font-size: 0.75rem;
-  }
+    color: #0854a0; /* Azul Fiori secundario para contraste */
 }
 
-/* Mejoras de performance para scroll */
-.overflow-x-auto {
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
+/* Estilo para los encabezados de semana (Naranja) */
+:host ::ng-deep .week-header {
+    background-color: #fff7ed; /* Naranja muy claro */
+    border-bottom: 2px solid #ea580c; /* Naranja principal */
+}
+:host ::ng-deep .week-header .ag-header-group-cell-label {
+    font-weight: 700;
+    color: #ea580c; /* Naranja principal */
+    font-size: 0.875rem;
+    justify-content: center;
 }
 
-.overflow-x-auto::-webkit-scrollbar {
-  height: 6px;
+/* Estilo para el encabezado de turno */
+:host ::ng-deep .turno-header {
+    background-color: #f8f9fa;
+}
+:host ::ng-deep .turno-header .ag-header-cell-label {
+    color: #6a6d70;
+    font-style: italic;
+    justify-content: center;
 }
 
-.overflow-x-auto::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-.overflow-x-auto::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
-}
-
-.overflow-x-auto::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+/* Estilo para los encabezados de día */
+:host ::ng-deep .day-group-header .ag-header-cell-label {
+    text-align: center;
+    white-space: pre-wrap;
+    line-height: 1.3;
+    font-weight: 600;
+    font-size: 0.8rem;
+    justify-content: center;
 }

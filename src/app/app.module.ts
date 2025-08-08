@@ -1,7 +1,7 @@
 import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule, ReactiveFormsModule }  from '@angular/forms';
-import { HttpClient, provideHttpClient, withInterceptorsFromDi }  from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 
 import { AppRoutingModule } from './app-routing.module';
@@ -49,7 +49,7 @@ import { TurnoComponent } from './components/asistencia/horarios/turno/turno.com
 import { ThorassemanalComponent } from './components/asistencia/horarios/turno/thorassemanal/thorassemanal.component';
 import { ModalNuevoTurnoComponent } from './components/asistencia/horarios/turno/modal-nuevo-turno/modal-nuevo-turno.component';
 import { MatTableModule } from '@angular/material/table';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle'; 
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { DescansoComponent } from './components/asistencia/horarios/descanso/descanso.component';
 import { NuevoHorarioComponent } from './components/asistencia/horarios/horario/nuevo-horario/nuevo-horario.component';
 import { ModalConfirmComponent } from './shared/modal-confirm/modal-confirm.component';
@@ -60,11 +60,11 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { AsignarTurnoMasivoComponent } from './components/personal/empleado/asignar-turno-masivo/asignar-turno-masivo.component';
-import {MatStepperModule} from '@angular/material/stepper';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {MatRadioModule} from '@angular/material/radio';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AppUserComponent } from './components/personal/organizacion/app-user/app-user.component';
 import { UserFormModalComponent } from './components/personal/organizacion/app-user/user-form-modal/user-form-modal.component';
 import { UserSiteFormModalComponent } from './components/personal/organizacion/usuario-sede/user-site-form-modal/user-site-form-modal.component';
@@ -91,15 +91,17 @@ import { ReporteMarcacionesDetalleComponent } from './components/asistencia/marc
 import { ModalVerHorarioComponent } from './components/personal/empleado/asignar-horario-empleado/modal-ver-horario/modal-ver-horario.component';
 import { ModalEditarAsignacionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-editar-asignacion/modal-editar-asignacion.component';
 import { ModalRegistrarExcepcionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-registrar-excepcion/modal-registrar-excepcion.component';
-import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, ChevronUp, Layers, Menu, Info, FileSpreadsheet, Search,  RefreshCw, Save, Plus, X, AlertCircle, UserPen, UserPlus, Table, Edit, Trash2, CheckCircle, XCircle, Eye, EyeOff, Play, Square, ArrowRight, Timer, Zap, Hand, BarChart3, Database, Download, Filter, CalendarRange, LogIn, LogOut as LogOutIcon, Columns, Globe, Coffee, Badge,  Group,  FileEdit, ClipboardList, Check, PlusCircle } from 'lucide-angular';
+import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, ChevronUp, Layers, Menu, Info, FileSpreadsheet, Search, RefreshCw, Save, Plus, X, AlertCircle, UserPen, UserPlus, Table, Edit, Trash2, CheckCircle, XCircle, Eye, EyeOff, Play, Square, ArrowRight, Timer, Zap, Hand, BarChart3, Database, Download, Filter, CalendarRange, LogIn, LogOut as LogOutIcon, Columns, Globe, Coffee, Badge, Group, FileEdit, ClipboardList, Check, PlusCircle, Star, TrendingUp, SearchX, CalendarX, RefreshCcw } from 'lucide-angular';
 import { ReporteAsistenciaComponent } from './components/asistencia/reportes/reporte-asistencia/reporte-asistencia.component';
+import { HolidaysComponent } from './components/asistencia/holidays/holidays.component';
 import { AgGridModule } from 'ag-grid-angular';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 
 // Registrar módulos de AG-Grid globalmente
 ModuleRegistry.registerModules([AllCommunityModule]);
 registerLocaleData(localeEs);
-@NgModule({ declarations: [
+@NgModule({
+    declarations: [
         AppComponent,
         LoginComponent,
         ConfigComponent,
@@ -152,6 +154,7 @@ registerLocaleData(localeEs);
         ModalEditarAsignacionComponent,
         ModalRegistrarExcepcionComponent,
         ReporteAsistenciaComponent,
+        HolidaysComponent,
     ],
     exports: [
         TerminalSyncComponent,
@@ -253,11 +256,17 @@ registerLocaleData(localeEs);
             ClipboardList,
             Check,
             PlusCircle,
-            
+            Star,
+            TrendingUp,
+            SearchX,
+            CalendarX,
+            RefreshCcw
+
         })
     ], providers: [
         provideHttpClient(withInterceptorsFromDi()),
         { provide: LOCALE_ID, useValue: 'es' },
         { provide: MatPaginatorIntl, useClass: SpanishPaginatorIntl }
-    ] })
+    ]
+})
 export class AppModule { }

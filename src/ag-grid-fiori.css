@@ -1,0 +1,185 @@
+/* src/ag-grid-fiori.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos personalizados para AG-Grid con temática Fiori */
+
+.ag-theme-alpine {
+    /* Fuentes y colores base */
+    @apply font-sans text-fiori-text bg-fiori-background;
+}
+
+/* Cabecera */
+.ag-theme-alpine .ag-header {
+    @apply bg-fiori-surface border-b border-fiori-border;
+}
+
+.ag-theme-alpine .ag-header-cell {
+    @apply text-fiori-text font-semibold;
+}
+
+.ag-theme-alpine .ag-header-cell-label {
+    @apply text-sm;
+}
+
+/* Filas */
+.ag-theme-alpine .ag-row {
+    @apply border-b border-fiori-border;
+}
+
+.ag-theme-alpine .ag-row-hover {
+    @apply bg-fiori-hover;
+}
+
+.ag-theme-alpine .ag-row-selected {
+    @apply bg-fiori-active;
+}
+
+/* Celdas */
+.ag-theme-alpine .ag-cell {
+    @apply text-sm;
+}
+
+/* Paginador */
+.ag-theme-alpine .ag-paging-panel {
+    @apply border-t border-fiori-border text-fiori-subtext;
+}
+
+/* Iconos */
+.ag-theme-alpine .ag-icon {
+    @apply text-fiori-subtext;
+}
+
+/* Bordes */
+.ag-theme-alpine .ag-root-wrapper {
+    @apply border-none;
+}
+
+/* Estilos para el menú de filtro y columnas (pop-ups) */
+.ag-theme-alpine .ag-menu {
+    @apply bg-fiori-surface border border-fiori-border rounded-fiori shadow-fiori;
+}
+
+.ag-theme-alpine .ag-menu-option-active {
+    @apply bg-fiori-hover;
+}
+
+.ag-theme-alpine .ag-filter-wrapper {
+    @apply bg-fiori-surface;
+}
+
+.ag-theme-alpine .ag-filter-apply-panel-button {
+    @apply btn-fiori;
+}
+
+/* Estilos para el campo de texto del filtro */
+.ag-theme-alpine .ag-text-field-input-wrapper {
+    @apply relative;
+}
+
+/* src/ag-grid-fiori.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos personalizados para AG-Grid con temática Fiori */
+
+.ag-theme-alpine {
+    /* Fuentes y colores base */
+    @apply font-sans text-fiori-text bg-fiori-background;
+}
+
+/* Cabecera */
+.ag-theme-alpine .ag-header {
+    @apply bg-fiori-surface border-b border-fiori-border;
+}
+
+.ag-theme-alpine .ag-header-cell {
+    @apply text-fiori-text font-semibold;
+}
+
+.ag-theme-alpine .ag-header-cell-label {
+    @apply text-sm;
+}
+
+/* Filas */
+.ag-theme-alpine .ag-row {
+    @apply border-b border-fiori-border;
+}
+
+.ag-theme-alpine .ag-row-hover {
+    @apply bg-fiori-hover;
+}
+
+.ag-theme-alpine .ag-row-selected {
+    @apply bg-fiori-active;
+}
+
+/* Celdas */
+.ag-theme-alpine .ag-cell {
+    @apply text-sm;
+}
+
+/* Paginador */
+.ag-theme-alpine .ag-paging-panel {
+    @apply border-t border-fiori-border text-fiori-subtext;
+}
+
+/* Iconos */
+.ag-theme-alpine .ag-icon {
+    @apply text-fiori-subtext;
+}
+
+/* Bordes */
+.ag-theme-alpine .ag-root-wrapper {
+    @apply border-none;
+}
+
+/* Estilos para el menú de filtro y columnas (pop-ups) */
+.ag-theme-alpine .ag-menu {
+    @apply bg-fiori-surface border border-fiori-border rounded-fiori shadow-fiori;
+}
+
+.ag-theme-alpine .ag-menu-option-active {
+    @apply bg-fiori-hover;
+}
+
+.ag-theme-alpine .ag-filter-wrapper {
+    @apply bg-fiori-surface;
+}
+
+.ag-theme-alpine .ag-filter-apply-panel-button {
+    @apply btn-fiori;
+}
+
+/* Corrección para el ícono del filtro */
+.ag-theme-alpine .ag-text-field-input-wrapper::before {
+    content: none; /* Elimina el ícono por defecto */
+}
+
+.ag-theme-alpine .ag-text-field-input-wrapper {
+    @apply relative;
+}
+
+.ag-theme-alpine .ag-text-field-input {
+    @apply w-full p-2 pl-8 border border-fiori-border rounded-fiori;
+}
+
+.ag-theme-alpine .ag-text-field-input-icon {
+    @apply absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none;
+}
+
+/* Mostrar el ícono de filtro en la cabecera */
+.ag-theme-alpine .ag-header-cell-filter-button {
+    @apply opacity-100;
+}
+/**
+class="ag-wrapper ag-picker-field-wrapper ag-picker-collapsed"
+*/
+.ag-theme-alpine .ag-picker-field-wrapper {
+    @apply bg-fiori-surface;
+}
+.ag-picker-field-display{
+    @apply bg-fiori-surface text-fiori-text border-fiori-border rounded-fiori shadow-fiori px-2 py-1;
+}

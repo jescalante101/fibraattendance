@@ -95,11 +95,13 @@ import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, I
 import { ReporteAsistenciaComponent } from './components/asistencia/reportes/reporte-asistencia/reporte-asistencia.component';
 import { HolidaysComponent } from './components/asistencia/holidays/holidays.component';
 import { AgGridModule } from 'ag-grid-angular';
-import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import { ModuleRegistry, AllCommunityModule, GridOptions } from 'ag-grid-community';
+import { AG_GRID_LOCALE_ES } from './ag-grid-locale.es';
 
 // Registrar módulos de AG-Grid globalmente
 ModuleRegistry.registerModules([AllCommunityModule]);
 registerLocaleData(localeEs);
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -266,6 +268,14 @@ registerLocaleData(localeEs);
     ], providers: [
         provideHttpClient(withInterceptorsFromDi()),
         { provide: LOCALE_ID, useValue: 'es' },
+        {
+            provide: 'gridOptions', // Provide GridOptions using a string token
+            useFactory: () => ({ // Use a factory to create the GridOptions object
+                localeText: AG_GRID_LOCALE_ES,
+                pagination: true,
+                paginationPageSize: 30,
+            }),
+        },
         { provide: MatPaginatorIntl, useClass: SpanishPaginatorIntl }
     ]
 })

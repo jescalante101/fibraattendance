@@ -48,3 +48,11 @@ export interface HolidayFilters {
   searchTerm: string;
   showCurrentYearOnly: boolean;
 }
+
+// Estadísticas de feriados
+export interface HolidayStats {
+  totalHolidays: number;
+  currentYearHolidays: number;
+  totalYears: number;
+  averagePerYear: number;
+}

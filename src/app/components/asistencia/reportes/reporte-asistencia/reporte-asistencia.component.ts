@@ -10,6 +10,7 @@ import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, ColGroupDef, GridOptions, GridReadyEvent, GridApi } from 'ag-grid-community';
+import { AG_GRID_LOCALE_ES } from 'src/app/ag-grid-locale.es';
 
 // Usamos las interfaces del backend con extensiones para funcionalidades adicionales
 export interface EmployeePivotData extends BackendEmployeePivotData {
@@ -751,6 +752,7 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
         // Auto-size columns to content
         suppressSizeToFit: false
       },
+      localeText: AG_GRID_LOCALE_ES,
       rowSelection: 'multiple',
       enableRangeSelection: true,
       suppressMenuHide: true,

@@ -64,77 +64,52 @@
     </div>
   </div>
 
-  <!-- Formulario de filtros compacto -->
-  <form [formGroup]="filterForm" class="p-4 bg-fiori-surface">
-    <div class="flex flex-wrap items-end gap-4 mb-4">
-      
-      <!-- Filtro por año -->
-      <div class="flex-1 min-w-[160px]">
-        <label class="block text-xs font-medium text-fiori-text mb-1">
-          <lucide-icon name="calendar-range" class="w-3 h-3 inline mr-1"></lucide-icon>
-          Filtrar por Año
-        </label>
-        <select 
-          formControlName="yearFilter"
-          class="w-full px-3 py-2 text-sm border border-fiori-border rounded-md bg-fiori-surface text-fiori-text focus:ring-1 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
-          <option value="all">Todos los años</option>
-          <option *ngFor="let year of availableYears" [value]="year">
-            {{ year }}{{ year == currentYear.toString() ? ' (Actual)' : '' }}
-          </option>
-        </select>
-      </div>
-
-      <!-- Búsqueda -->
-      <div class="flex-1 min-w-[200px]">
-        <label class="block text-xs font-medium text-fiori-text mb-1">
-          <lucide-icon name="search" class="w-3 h-3 inline mr-1"></lucide-icon>
-          Buscar en Descripción
-        </label>
-        <div class="relative">
-          <input 
-            type="text" 
-            formControlName="searchTerm"
-            placeholder="Buscar feriados..."
-            class="w-full px-3 py-2 pl-8 text-sm border border-fiori-border rounded-md bg-fiori-surface text-fiori-text focus:ring-1 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
-          <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
-            <lucide-icon name="search" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
-          </div>
+  <!-- Filtros con Flowbite -->
+<div class="p-4 bg-gray-50" [formGroup]="filterForm">
+    <div class="flex justify-end items-center">
+        <div>
+            <button id="dropdownFiltersButton" data-dropdown-toggle="dropdownFilters" class="text-white bg-fiori-primary hover:bg-fiori-secondary focus:ring-4 focus:outline-none focus:ring-fiori-primary font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center" type="button">
+                <svg class="w-4 h-4 mr-2" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 10a1 1 0 011-1h6a1 1 0 011 1v2a1 1 0 01-1 1h-6a1 1 0 01-1-1v-2z"></path></svg>
+                Filtros
+                <svg class="w-4 h-4 ml-2" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+            </button>
+            <!-- Dropdown menu -->
+            <div id="dropdownFilters" class="z-10 hidden w-80 p-3 bg-white rounded-lg shadow">
+                <h6 class="mb-3 text-sm font-medium text-gray-900">Filtros</h6>
+                <div class="space-y-4">
+                    <div>
+                        <label for="yearFilter" class="block mb-2 text-sm font-medium text-gray-900">Año</label>
+                        <select id="yearFilter" formControlName="yearFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
+                            <option value="all">Todos los años</option>
+                            <option *ngFor="let year of availableYears" [value]="year">
+                                {{ year }}{{ year == currentYear.toString() ? ' (Actual)' : '' }}
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="searchTerm" class="block mb-2 text-sm font-medium text-gray-900">Descripción</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg class="w-5 h-5 text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
+                            </div>
+                            <input type="text" id="searchTerm" formControlName="searchTerm" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5" placeholder="Buscar feriados...">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" formControlName="showCurrentYearOnly" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                            <span class="ml-3 text-sm font-medium text-gray-900">Solo {{ currentYear }}</span>
+                        </label>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="button" (click)="onClearFilters()" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 rounded-lg border border-gray-200 text-sm font-medium px-4 py-2 hover:text-gray-900 focus:z-10">Limpiar</button>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-
-      <!-- Toggle año actual -->
-      <div class="flex items-center gap-2">
-        <label class="inline-flex items-center">
-          <input 
-            type="checkbox" 
-            formControlName="showCurrentYearOnly"
-            class="w-4 h-4 text-fiori-primary border-fiori-border rounded focus:ring-fiori-primary focus:ring-2">
-          <span class="ml-2 text-sm font-medium text-fiori-text">Solo {{ currentYear }}</span>
-        </label>
-      </div>
-
-      <!-- Botones de acción -->
-      <div class="flex items-center gap-2">
-        <button 
-          type="button"
-          (click)="onClearFilters()"
-          class="inline-flex items-center gap-1 px-3 py-2 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-md hover:bg-fiori-hover transition-colors">
-          <lucide-icon name="x-circle" class="w-3 h-3"></lucide-icon>
-          <span class="hidden sm:inline">Limpiar</span>
-        </button>
-
-        <button 
-          type="button"
-          (click)="loadHolidays()"
-          [disabled]="isLoading"
-          class="inline-flex items-center gap-1 px-4 py-2 bg-fiori-primary text-white text-sm font-medium rounded-md hover:bg-fiori-secondary focus:ring-1 focus:ring-fiori-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-          <lucide-icon [name]="isLoading ? 'refresh-cw' : 'refresh'" 
-                       [class]="isLoading ? 'w-3 h-3 animate-spin' : 'w-3 h-3'"></lucide-icon>
-          <span class="hidden sm:inline">{{ isLoading ? 'Cargando...' : 'Actualizar' }}</span>
-        </button>
-      </div>
     </div>
-  </form>
+</div>
 </div>
 
 <!-- Mensajes de estado -->

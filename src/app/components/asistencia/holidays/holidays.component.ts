@@ -1,18 +1,20 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Subject, takeUntil, finalize } from 'rxjs';
+import { Subject, takeUntil, finalize, debounceTime, distinctUntilChanged } from 'rxjs';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, GridOptions } from 'ag-grid-community';
+import { initFlowbite } from 'flowbite';
 
 import { HolidaysService } from 'src/app/core/services/holidays.service';
-import { HolidayYear, HolidayTableRow, SynchronizationResult } from 'src/app/core/models/holiday.model';
+import { HolidayYear, HolidayTableRow, SynchronizationResult, HolidayStats } from 'src/app/core/models/holiday.model';
+import { AG_GRID_LOCALE_ES } from 'src/app/ag-grid-locale.es';
 
 @Component({
   selector: 'app-holidays',
   templateUrl: './holidays.component.html',
   styleUrls: ['./holidays.component.css']
 })
-export class HolidaysComponent implements OnInit, OnDestroy {
+export class HolidaysComponent implements OnInit, OnDestroy, AfterViewInit {
   
   // Formulario de filtros
   filterForm!: FormGroup;
@@ -29,6 +31,7 @@ export class HolidaysComponent implements OnInit, OnDestroy {
       resizable: true,
       minWidth: 100
     },
+    localeText: AG_GRID_LOCALE_ES,
     suppressHorizontalScroll: false,
     enableRangeSelection: true,
     rowSelection: 'multiple',
@@ -40,7 +43,7 @@ export class HolidaysComponent implements OnInit, OnDestroy {
   isLoading = false;
   isSynchronizing = false;
   availableYears: string[] = [];
-  holidayStats: any = {};
+  holidayStats: HolidayStats = { totalHolidays: 0, currentYearHolidays: 0, totalYears: 0, averagePerYear: 0 };
   
   // Mensajes
   successMessage = '';
@@ -61,6 +64,10 @@ export class HolidaysComponent implements OnInit, OnDestroy {
     this.loadHolidays();
   }
 
+  ngAfterViewInit(): void {
+    initFlowbite();
+  }
+
   get currentDate(): Date {
     return new Date();
   }
@@ -79,7 +86,11 @@ export class HolidaysComponent implements OnInit, OnDestroy {
 
     // Escuchar cambios en el formulario para filtrar datos
     this.filterForm.valueChanges
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(this.destroy$),
+        debounceTime(300), // Espera 300ms después de la última entrada
+        distinctUntilChanged() // Solo emite si el valor ha cambiado realmente
+      )
       .subscribe(() => {
         this.filterData();
       });

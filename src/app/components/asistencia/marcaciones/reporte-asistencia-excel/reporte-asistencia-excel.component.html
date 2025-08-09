@@ -33,19 +33,6 @@
           [class.border-fiori-error]="filterForm.get('fechaFin')?.hasError('required') && filterForm.get('fechaFin')?.touched">
       </div>
 
-      <!-- Employee ID -->
-      <div>
-        <label class="block text-sm font-medium text-fiori-text mb-1">
-          <mat-icon class="text-sm mr-1">person</mat-icon>
-          ID Empleado
-        </label>
-        <input 
-          type="text" 
-          formControlName="employeeId"
-          placeholder="Filtrar por empleado..."
-          class="w-full px-3 py-2 border border-fiori-border rounded-md text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
-      </div>
-
       <!-- Área -->
       <div>
         <label class="block text-sm font-medium text-fiori-text mb-1">
@@ -82,18 +69,7 @@
         </div>
       </div>
       
-    </div>
 
-    <!-- Filtros avanzados (colapsables) -->
-    <details>
-      <summary class="flex items-center gap-2 text-sm font-medium text-fiori-primary cursor-pointer hover:text-fiori-primaryHover transition-colors">
-        <mat-icon class="text-base">filter_list</mat-icon>
-        Filtros Avanzados
-      </summary>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-3 p-4 bg-fiori-surface/50 rounded-lg border border-fiori-border">
-        
-        <!-- Sede con Autocomplete -->
         <div>
           <label class="block text-sm font-medium text-fiori-text mb-1">
             <mat-icon class="text-sm mr-1">location_on</mat-icon>
@@ -129,17 +105,19 @@
           </div>
         </div>
 
-      </div>
-    </details>
+
+    </div>
+
+
 
     <!-- Botones de acción -->
     <div class="flex items-center gap-3 mt-4 pt-4 border-t border-fiori-border">
       <button 
         type="submit"
         [disabled]="loading || filterForm.invalid"
-        class="inline-flex items-center gap-2 px-4 py-2 bg-fiori-primary text-fiori-onPrimary text-sm font-medium rounded-md hover:bg-fiori-primaryHover focus:ring-2 focus:ring-fiori-primary focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        class="inline-flex items-center gap-2 px-4 py-2 text-white bg-fiori-primary surface-text text-sm font-medium rounded-md hover:bg-fiori-primaryHover focus:ring-2 focus:ring-fiori-primary focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
         <mat-icon [class]="loading ? 'animate-spin' : ''">{{ loading ? 'refresh' : 'search' }}</mat-icon>
-        <span>{{ loading ? 'Buscando...' : 'Buscar' }}</span>
+        <span >{{ loading ? 'Buscando...' : 'Buscar' }}</span>
       </button>
 
       <button 

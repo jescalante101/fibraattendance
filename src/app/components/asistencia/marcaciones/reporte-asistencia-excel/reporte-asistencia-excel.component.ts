@@ -9,6 +9,7 @@ import { AgGridAngular } from 'ag-grid-angular';
 import { GridOptions, ColDef } from 'ag-grid-community';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from '../../../../core/services/categoria-auxiliar.service';
 import { RhAreaService, RhArea } from '../../../../core/services/rh-area.service';
+import { AG_GRID_LOCALE_ES } from 'src/app/ag-grid-locale.es';
 
 @Component({
   selector: 'app-reporte-asistencia-excel',
@@ -34,6 +35,7 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
       sortable: true,
       filter: true,
     },
+    localeText: AG_GRID_LOCALE_ES,
     pagination: false, // La paginación la manejamos externamente
     suppressPaginationPanel: true,
     overlayNoRowsTemplate: '<span class="text-gray-500">No hay datos para mostrar. Ajuste los filtros y busque nuevamente.</span>'
@@ -102,6 +104,8 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
       ...this.filterForm.value,
       companiaId: this.headerConfig.selectedEmpresa?.companiaId || '',
       planillaId: this.headerConfig.selectedPlanilla?.planillaId || '',
+      areaId: this.filterForm.value.areaId || '',
+      sedeId: this.filterForm.value.sedeId || '',
       pageNumber: this.page,
       pageSize: this.pageSize
     };

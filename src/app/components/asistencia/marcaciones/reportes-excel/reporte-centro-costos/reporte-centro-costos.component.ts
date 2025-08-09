@@ -9,6 +9,7 @@ import { ColDef, ColGroupDef, GridOptions } from 'ag-grid-community';
 import { CostCenterReportData } from 'src/app/core/models/report/cost-center-report.model';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
+import { AG_GRID_LOCALE_ES } from 'src/app/ag-grid-locale.es';
 
 
 @Component({
@@ -33,6 +34,8 @@ export class ReporteCentroCostosComponent implements OnInit, OnDestroy {
       resizable: true,
       minWidth: 50
     },
+    localeText: AG_GRID_LOCALE_ES,
+
     suppressHorizontalScroll: false,
     enableRangeSelection: true,
     rowSelection: 'multiple'

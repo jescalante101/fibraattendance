@@ -10,6 +10,8 @@ import * as XLSX from 'xlsx-js-style';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
+import { ModalService } from 'src/app/shared/modal/modal.service';
+import { ModalRegistrarMarcacionComponent } from 'src/app/components/asistencia/marcaciones/analisis-marcaciones/modal-registrar-marcacion/modal-registrar-marcacion.component';
 
 @Component({
   selector: 'app-iclock-transaction',
@@ -57,11 +59,17 @@ export class IclockTransactionComponent implements OnInit {
   // Configuración del header
   headerConfig: HeaderConfig | null = null;
 
+  // Propiedades para menú contextual
+  showContextMenu = false;
+  contextMenuPosition = { x: 0, y: 0 };
+  selectedMarcacion: TransactionComplete | null = null;
+
   constructor(
     @Optional() public dialogRef: MatDialogRef<IclockTransactionComponent>,
     private transactionService: TransactionService,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
-    private HeaderConfigService: HeaderConfigService
+    private HeaderConfigService: HeaderConfigService,
+    private modalService: ModalService
   ) {}
 
   ngOnInit(): void {
@@ -72,6 +80,12 @@ export class IclockTransactionComponent implements OnInit {
       console.log('Configuración del header:', this.headerConfig);
     });
 
+    // Agregar listener global para cerrar menú contextual
+    document.addEventListener('click', (event) => {
+      if (this.showContextMenu) {
+        this.closeContextMenu();
+      }
+    });
 
     if (this.data && this.data.empleado) {
       this.empCode = this.data.empCode || this.data.empleado.nroDoc;
@@ -612,5 +626,121 @@ export class IclockTransactionComponent implements OnInit {
   }
 
   // Obtener el horario asignado al empleado
+
+  // ===== CONTEXT MENU METHODS =====
+  
+  onRightClick(event: MouseEvent, marcacion: TransactionComplete): void {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.selectedMarcacion = marcacion;
+    this.contextMenuPosition = {
+      x: event.clientX,
+      y: event.clientY
+    };
+    
+    // Ajustar posición si el menú se sale de la pantalla
+    const menuWidth = 192; // min-w-48 = 192px
+    const menuHeight = 150; // altura aproximada del menú simple
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    if (this.contextMenuPosition.x + menuWidth > windowWidth) {
+      this.contextMenuPosition.x = windowWidth - menuWidth - 10;
+    }
+    
+    if (this.contextMenuPosition.y + menuHeight > windowHeight) {
+      this.contextMenuPosition.y = windowHeight - menuHeight - 10;
+    }
+    
+    this.showContextMenu = true;
+  }
+
+  closeContextMenu(): void {
+    this.showContextMenu = false;
+    this.selectedMarcacion = null;
+  }
+
+  // ===== CONTEXT MENU CONDITION METHODS =====
+  
+  canRegisterEntrada(): boolean {
+    return this.selectedMarcacion ? !this.selectedMarcacion.horaEntrada : false;
+  }
+
+  canRegisterSalida(): boolean {
+    return this.selectedMarcacion ? !this.selectedMarcacion.horaSalida : false;
+  }
+
+  // ===== MODAL INTEGRATION METHODS =====
+  
+  abrirModalMarcacion(tipo: 'entrada' | 'salida'): void {
+    console.log('🚀 abrirModalMarcacion llamado con tipo:', tipo);
+    console.log('📋 selectedMarcacion:', this.selectedMarcacion);
+    console.log('👤 empleado:', this.empleado);
+    console.log('🔧 modalService:', this.modalService);
+    
+    // Guardar referencia ANTES de cerrar el menú
+    const marcacionSeleccionada = this.selectedMarcacion;
+    
+    this.closeContextMenu();
+    
+    if (!marcacionSeleccionada || !this.empleado) {
+      console.error('❌ Faltan datos requeridos:', { 
+        selectedMarcacion: marcacionSeleccionada, 
+        empleado: this.empleado 
+      });
+      return;
+    }
+
+    // Crear interface MarcacionData compatible
+    interface MarcacionData {
+      employeeId: string;
+      fullNameEmployee: string;
+      nroDoc: string;
+      areaDescription: string;
+      shiftName: string;
+      fecha: Date;
+      fechaFormateada: string;
+      tipo: 'entrada' | 'salida' | 'completa';
+      horaEntradaEsperada?: string;
+      horaSalidaEsperada?: string;
+    }
+
+    const marcacionData: MarcacionData = {
+      employeeId: this.empleado.personalId || '',
+      fullNameEmployee: this.empleado.nombres || '',
+      nroDoc: this.empleado.nroDoc || '',
+      areaDescription: marcacionSeleccionada.areaDescripcion || '',
+      shiftName: marcacionSeleccionada.horarioAlias || '',
+      fecha: new Date(marcacionSeleccionada.fechaMarcacion),
+      fechaFormateada: this.formatearFecha(marcacionSeleccionada.fechaMarcacion),
+      tipo: tipo,
+      horaEntradaEsperada: marcacionSeleccionada.horarioEntrada,
+      horaSalidaEsperada: marcacionSeleccionada.horarioSalida
+    };
+
+    console.log('📦 Datos preparados para modal:', marcacionData);
+    console.log('🎯 Intentando abrir modal...');
+
+    try {
+      this.modalService.open({
+        componentType: ModalRegistrarMarcacionComponent,
+        componentData: marcacionData,
+        width: '600px',
+        height: 'auto'
+      }).then((result) => {
+        console.log('✅ Modal cerrado con resultado:', result);
+        if (result?.success) {
+          console.log('Marcación manual creada exitosamente:', result);
+          // Recargar marcaciones para mostrar la nueva marcación
+          this.buscarMarcaciones();
+        }
+      }).catch(error => {
+        console.error('❌ Error en promesa del modal:', error);
+      });
+    } catch (error) {
+      console.error('❌ Error al abrir modal:', error);
+    }
+  }
   
 }

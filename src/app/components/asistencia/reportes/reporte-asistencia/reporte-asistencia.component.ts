@@ -5,6 +5,8 @@ import { ReportMatrixParams } from 'src/app/core/models/report/report-matrix-par
 import { AttendanceMatrixPivotResponse, EmployeePivotData as BackendEmployeePivotData, DailyAttendanceData as BackendDailyAttendanceData, AttendanceSummary } from 'src/app/core/models/report/report-pivot-reponse.model';
 import { HeaderConfigService, HeaderConfig } from 'src/app/core/services/header-config.service';
 import { Subject, takeUntil } from 'rxjs';
+import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
+import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, ColGroupDef, GridOptions, GridReadyEvent, GridApi } from 'ag-grid-community';
@@ -71,11 +73,23 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
   // Configuración del header (público para el template)
   headerConfig: HeaderConfig | null = null;
 
+  // Datos maestros para filtros
+  areas: RhArea[] = [];
+  sedes: CategoriaAuxiliar[] = [];
+  filteredAreas: RhArea[] = [];
+  filteredSedes: CategoriaAuxiliar[] = [];
+
+  // Estados de dropdowns
+  showAreaDropdown = false;
+  showSedeDropdown = false;
+
   constructor(
     private fb: FormBuilder,
     private attendanceMatrixService: AttendanceMatrixReportService,
     private headerConfigService: HeaderConfigService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private categoriaAuxiliarService: CategoriaAuxiliarService,
+    private rhAreaService: RhAreaService
   ) {
     this.initializeForm();
     this.setupGridOptions();
@@ -85,6 +99,9 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Cargar configuración del header y suscribirse a cambios
     this.loadHeaderConfig();
+
+    // Cargar datos maestros para filtros
+    this.loadMasterData();
 
     // Cargar con datos por defecto del mes actual
     this.setDefaultDateRange();
@@ -118,7 +135,9 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
       companiaId: [''],
       planillaId: [''],
       areaId: [''],
+      areaFilter: [''],
       sedeId: [''],
+      sedeFilter: [''],
       cargoId: [''],
       centroCostoId: [''],
       sedeCodigo: [''],
@@ -609,6 +628,88 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     this.pivotedData = [];
     this.clearMessages();
     this.cdr.markForCheck();
+  }
+
+  // ===== MASTER DATA LOADING =====
+  
+  private loadMasterData(): void {
+    // Cargar sedes
+    this.categoriaAuxiliarService.getCategoriasAuxiliar().subscribe({
+      next: (sedes) => {
+        this.sedes = sedes;
+        this.filteredSedes = [...sedes];
+      },
+      error: (error) => console.error('Error loading sedes:', error)
+    });
+
+    // Cargar áreas
+    this.rhAreaService.getAreas(this.headerConfig?.selectedEmpresa?.companiaId?.toString() || '').subscribe({
+      next: (areas) => {
+        this.areas = areas;
+        this.filteredAreas = [...areas];
+      },
+      error: (error) => console.error('Error loading areas:', error)
+    });
+  }
+
+  // ===== AUTOCOMPLETE METHODS =====
+  
+  onAreaFilterChange(event: any) {
+    const filterValue = event.target.value.toLowerCase();
+    this.filteredAreas = this.areas.filter(area =>
+      area.descripcion.toLowerCase().includes(filterValue)
+    );
+  }
+
+  onAreaSelected(area: RhArea | null) {
+    this.showAreaDropdown = false;
+    
+    if (area) {
+      this.filterForm.patchValue({
+        areaId: area.areaId,
+        areaFilter: area.descripcion
+      });
+    } else {
+      this.filterForm.patchValue({
+        areaId: '',
+        areaFilter: ''
+      });
+    }
+  }
+
+  onAreaBlur() {
+    setTimeout(() => {
+      this.showAreaDropdown = false;
+    }, 150);
+  }
+
+  onSedeFilterChange(event: any) {
+    const filterValue = event.target.value.toLowerCase();
+    this.filteredSedes = this.sedes.filter(sede =>
+      sede.descripcion.toLowerCase().includes(filterValue)
+    );
+  }
+
+  onSedeSelected(sede: CategoriaAuxiliar | null) {
+    this.showSedeDropdown = false;
+    
+    if (sede) {
+      this.filterForm.patchValue({
+        sedeId: sede.categoriaAuxiliarId,
+        sedeFilter: sede.descripcion
+      });
+    } else {
+      this.filterForm.patchValue({
+        sedeId: '',
+        sedeFilter: ''
+      });
+    }
+  }
+
+  onSedeBlur() {
+    setTimeout(() => {
+      this.showSedeDropdown = false;
+    }, 150);
   }
 
   

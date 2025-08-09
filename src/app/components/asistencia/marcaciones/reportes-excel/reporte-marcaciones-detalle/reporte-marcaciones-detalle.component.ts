@@ -7,6 +7,8 @@ import { Subject, takeUntil } from 'rxjs';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, ColGroupDef, GridOptions } from 'ag-grid-community';
 import { MarkingsReportData } from 'src/app/core/models/report/markings-report.model';
+import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
+import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 
 @Component({
   selector: 'app-reporte-marcaciones-detalle',
@@ -45,15 +47,28 @@ export class ReporteMarcacionesDetalleComponent implements OnInit, OnDestroy {
   headerConfig: HeaderConfig | null = null;
   private destroy$ = new Subject<void>();
 
+  // Datos maestros para filtros
+  areas: RhArea[] = [];
+  sedes: CategoriaAuxiliar[] = [];
+  filteredAreas: RhArea[] = [];
+  filteredSedes: CategoriaAuxiliar[] = [];
+
+  // Estados de dropdowns
+  showAreaDropdown = false;
+  showSedeDropdown = false;
+
   constructor(
     private fb: FormBuilder,
     private attendanceMatrixService: AttendanceMatrixReportService,
-    private headerConfigService: HeaderConfigService
+    private headerConfigService: HeaderConfigService,
+    private categoriaAuxiliarService: CategoriaAuxiliarService,
+    private rhAreaService: RhAreaService
   ) { }
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadHeaderConfig();
+    this.loadMasterData();
   }
 
   ngOnDestroy(): void {
@@ -63,15 +78,19 @@ export class ReporteMarcacionesDetalleComponent implements OnInit, OnDestroy {
 
   private initializeForm(): void {
     const now = new Date();
-    const today = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1); // Día 1 del mes actual
+    const today = new Date(); // Fecha actual
 
     this.filterForm = this.fb.group({
-      fechaInicio: [this.formatDate(today), Validators.required],
+      fechaInicio: [this.formatDate(firstDayOfMonth), Validators.required],
       fechaFin: [this.formatDate(today), Validators.required],
-      employeeId: [{ value: '', disabled: true }],
-      areaId: [{ value: '', disabled: true }],
-      companiaId: [{ value: '', disabled: true }],
-      sedeId: [{ value: '', disabled: true }],
+      employeeId: [''],
+      areaId: [''],
+      areaFilter: [''],
+      sedeId: [''],
+      sedeFilter: [''],
+      // Compañía viene del header global - no se expone al usuario
+      companiaId: [''],
       cargoId: [{ value: '', disabled: true }],
       centroCostoId: [{ value: '', disabled: true }]
     });
@@ -133,13 +152,17 @@ export class ReporteMarcacionesDetalleComponent implements OnInit, OnDestroy {
 
   onClearFilters(): void {
     const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    
     this.filterForm.reset({
-      fechaInicio: this.formatDate(now),
+      fechaInicio: this.formatDate(firstDayOfMonth),
       fechaFin: this.formatDate(now),
-      employeeId: { value: '', disabled: true },
-      areaId: { value: '', disabled: true },
-      companiaId: { value: this.headerConfig?.selectedEmpresa?.companiaId || '', disabled: true },
-      sedeId: { value: '', disabled: true },
+      employeeId: '',
+      areaId: '',
+      areaFilter: '',
+      sedeId: '',
+      sedeFilter: '',
+      companiaId: this.headerConfig?.selectedEmpresa?.companiaId || '',
       cargoId: { value: '', disabled: true },
       centroCostoId: { value: '', disabled: true }
     });
@@ -230,6 +253,7 @@ export class ReporteMarcacionesDetalleComponent implements OnInit, OnDestroy {
           switch (type) {
             case 'markings': return { ...baseStyle, backgroundColor: '#e0f2fe', color: '#075985' }; // Azul Fiori
             case 'permission': return { ...baseStyle, backgroundColor: '#fef3c7', color: '#d97706' }; // Amarillo Fiori
+            case 'holiday': return { ...baseStyle, backgroundColor: '#fed7aa', color: '#ea580c' }; // Naranja para feriados
             case 'absence': return { ...baseStyle, backgroundColor: '#fecaca', color: '#dc2626' }; // Rojo Fiori
             default: return { ...baseStyle, backgroundColor: '#f9fafb', color: '#6b7280' }; // Gris Fiori
           }
@@ -286,4 +310,87 @@ export class ReporteMarcacionesDetalleComponent implements OnInit, OnDestroy {
       this.agGrid.api.sizeColumnsToFit();
     }
   }
+
+  // ===== MASTER DATA LOADING =====
+  
+  private loadMasterData(): void {
+    // Cargar sedes
+    this.categoriaAuxiliarService.getCategoriasAuxiliar().subscribe({
+      next: (sedes) => {
+        this.sedes = sedes;
+        this.filteredSedes = [...sedes];
+      },
+      error: (error) => console.error('Error loading sedes:', error)
+    });
+
+    // Cargar áreas
+    this.rhAreaService.getAreas(this.headerConfig?.selectedEmpresa?.companiaId?.toString() || '').subscribe({
+      next: (areas) => {
+        this.areas = areas;
+        this.filteredAreas = [...areas];
+      },
+      error: (error) => console.error('Error loading areas:', error)
+    });
+  }
+
+  // ===== AUTOCOMPLETE METHODS =====
+  
+  onAreaFilterChange(event: any) {
+    const filterValue = event.target.value.toLowerCase();
+    this.filteredAreas = this.areas.filter(area =>
+      area.descripcion.toLowerCase().includes(filterValue)
+    );
+  }
+
+  onAreaSelected(area: RhArea | null) {
+    this.showAreaDropdown = false;
+    
+    if (area) {
+      this.filterForm.patchValue({
+        areaId: area.areaId,
+        areaFilter: area.descripcion
+      });
+    } else {
+      this.filterForm.patchValue({
+        areaId: '',
+        areaFilter: ''
+      });
+    }
+  }
+
+  onAreaBlur() {
+    setTimeout(() => {
+      this.showAreaDropdown = false;
+    }, 150);
+  }
+
+  onSedeFilterChange(event: any) {
+    const filterValue = event.target.value.toLowerCase();
+    this.filteredSedes = this.sedes.filter(sede =>
+      sede.descripcion.toLowerCase().includes(filterValue)
+    );
+  }
+
+  onSedeSelected(sede: CategoriaAuxiliar | null) {
+    this.showSedeDropdown = false;
+    
+    if (sede) {
+      this.filterForm.patchValue({
+        sedeId: sede.categoriaAuxiliarId,
+        sedeFilter: sede.descripcion
+      });
+    } else {
+      this.filterForm.patchValue({
+        sedeId: '',
+        sedeFilter: ''
+      });
+    }
+  }
+
+  onSedeBlur() {
+    setTimeout(() => {
+      this.showSedeDropdown = false;
+    }, 150);
+  }
+
 }

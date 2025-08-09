@@ -27,7 +27,7 @@
 
   <!-- Formulario de filtros -->
   <form [formGroup]="filterForm" (ngSubmit)="onSearch()" class="p-4 bg-gray-50 rounded-lg border shadow-sm mb-6">
-    <!-- Filtros de fechas principales -->
+    <!-- Filtros principales -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
       
       <!-- Fecha Inicio -->
@@ -56,81 +56,106 @@
           [class.border-red-500]="filterForm.get('fechaFin')?.hasError('required') && filterForm.get('fechaFin')?.touched">
       </div>
 
-      <!-- Employee ID -->
-      <div class="space-y-1 relative">
-        <div class="absolute inset-0 bg-gray-100/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-md border border-dashed">
-          <span class="text-xs font-semibold text-gray-500 bg-white/80 px-3 py-1 rounded-full shadow-sm border">En desarrollo</span>
-        </div>
-        <label class="block text-sm font-medium text-gray-500">
-          ID Empleado
-        </label>
-        <input 
-          type="text" 
-          formControlName="employeeId"
-          placeholder="Filtrar por empleado..."
-          [disabled]="true"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-      </div>
-
       <!-- Área -->
-      <div class="space-y-1 relative">
-        <div class="absolute inset-0 bg-gray-100/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-md border border-dashed">
-          <span class="text-xs font-semibold text-gray-500 bg-white/80 px-3 py-1 rounded-full shadow-sm border">En desarrollo</span>
-        </div>
-        <label class="block text-sm font-medium text-gray-500">
+      <div class="space-y-1">
+        <label class="block text-sm font-medium text-gray-700">
+          <mat-icon class="text-sm mr-1">business</mat-icon>
           Área
         </label>
-        <input 
-          type="text" 
-          formControlName="areaId"
-          placeholder="Filtrar por área..."
-          [disabled]="true"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
+        <div class="relative">
+          <input 
+            type="text" 
+            formControlName="areaFilter"
+            (input)="onAreaFilterChange($event)"
+            (focus)="showAreaDropdown = true"
+            (blur)="onAreaBlur()"
+            placeholder="Buscar área..."
+            class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+          <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">business</mat-icon>
+          
+          <!-- Dropdown -->
+          <div *ngIf="showAreaDropdown" 
+               class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+            <div 
+              (mousedown)="onAreaSelected(null)"
+              class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-2 border-b border-gray-200 sticky top-0 bg-white">
+              <mat-icon class="text-sm text-blue-600">public</mat-icon>
+              <span class="text-gray-700 font-medium">Todas las áreas</span>
+            </div>
+            <div *ngFor="let area of filteredAreas" 
+                 (mousedown)="onAreaSelected(area)"
+                 class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-2">
+              <mat-icon class="text-sm text-gray-400">business</mat-icon>
+              <span class="text-gray-700">{{ area.descripcion }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sede -->
+      <div class="space-y-1">
+        <label class="block text-sm font-medium text-gray-700">
+          <mat-icon class="text-sm mr-1">location_on</mat-icon>
+          Sede
+        </label>
+        <div class="relative">
+          <input 
+            type="text" 
+            formControlName="sedeFilter"
+            (input)="onSedeFilterChange($event)"
+            (focus)="showSedeDropdown = true"
+            (blur)="onSedeBlur()"
+            placeholder="Buscar sede..."
+            class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm">
+          <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">location_on</mat-icon>
+          
+          <!-- Dropdown -->
+          <div *ngIf="showSedeDropdown" 
+               class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+            <div 
+              (mousedown)="onSedeSelected(null)"
+              class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-2 border-b border-gray-200 sticky top-0 bg-white">
+              <mat-icon class="text-sm text-blue-600">public</mat-icon>
+              <span class="text-gray-700 font-medium">Todas las sedes</span>
+            </div>
+            <div *ngFor="let sede of filteredSedes" 
+                 (mousedown)="onSedeSelected(sede)"
+                 class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-2">
+              <mat-icon class="text-sm text-gray-400">location_on</mat-icon>
+              <span class="text-gray-700">{{ sede.descripcion }}</span>
+            </div>
+          </div>
+        </div>
       </div>
       
     </div>
 
-    <!-- Filtros adicionales (colapsables) -->
-    <details>
-      <summary class="flex items-center gap-2 text-sm font-medium text-blue-600 cursor-pointer hover:text-blue-800 transition-colors">
-        <mat-icon class="text-base">filter_list</mat-icon>
-        Filtros Avanzados
-      </summary>
-      
-      <div class="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-3 p-4 bg-gray-100/50 rounded-lg border">
+    <!-- Filtros de desarrollo (mostrados siempre) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 p-4 bg-gray-100/50 rounded-lg border">
         
-        <div class="absolute inset-0 bg-gray-100/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
-          <div class="flex items-center gap-2 text-sm font-semibold text-gray-600 px-4 py-2 bg-white/80 rounded-full border shadow-sm">
-            <mat-icon class="text-lg text-yellow-600">construction</mat-icon>
-            <span>Filtros avanzados en desarrollo</span>
-          </div>
-        </div>
-
-        <!-- Compañía -->
+        <!-- Compañía (desde header global) -->
         <div class="space-y-1">
-          <label class="block text-sm font-medium text-gray-500">Compañía</label>
+          <label class="block text-sm font-medium text-gray-500">
+            <mat-icon class="text-sm mr-1">business_center</mat-icon>
+            Compañía (Global)
+          </label>
           <input 
             type="text" 
             formControlName="companiaId"
-            placeholder="ID Compañía..."
+            placeholder="Auto desde header..."
             [disabled]="true"
             class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
         </div>
 
-        <!-- Sede -->
-        <div class="space-y-1">
-          <label class="block text-sm font-medium text-gray-500">Sede</label>
-          <input 
-            type="text" 
-            formControlName="sedeId"
-            placeholder="ID Sede..."
-            [disabled]="true"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
-        </div>
-
-        <!-- Cargo -->
-        <div class="space-y-1">
-          <label class="block text-sm font-medium text-gray-500">Cargo</label>
+        <!-- Cargo (En desarrollo) -->
+        <div class="space-y-1 relative">
+          <div class="absolute inset-0 bg-gray-100/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-md border border-dashed">
+            <span class="text-xs font-semibold text-gray-500 bg-white/80 px-2 py-1 rounded-full shadow-sm border">En desarrollo</span>
+          </div>
+          <label class="block text-sm font-medium text-gray-500">
+            <mat-icon class="text-sm mr-1">work</mat-icon>
+            Cargo
+          </label>
           <input 
             type="text" 
             formControlName="cargoId"
@@ -139,9 +164,15 @@
             class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
         </div>
 
-        <!-- Centro de Costo -->
-        <div class="space-y-1">
-          <label class="block text-sm font-medium text-gray-500">Centro Costo</label>
+        <!-- Centro de Costo (En desarrollo) -->
+        <div class="space-y-1 relative">
+          <div class="absolute inset-0 bg-gray-100/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-md border border-dashed">
+            <span class="text-xs font-semibold text-gray-500 bg-white/80 px-2 py-1 rounded-full shadow-sm border">En desarrollo</span>
+          </div>
+          <label class="block text-sm font-medium text-gray-500">
+            <mat-icon class="text-sm mr-1">account_balance</mat-icon>
+            Centro Costo
+          </label>
           <input 
             type="text" 
             formControlName="centroCostoId"
@@ -150,7 +181,6 @@
             class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
         </div>
       </div>
-    </details>
 
     <!-- Botones de acción -->
     <div class="flex items-center gap-3 mt-4 pt-4 border-t">

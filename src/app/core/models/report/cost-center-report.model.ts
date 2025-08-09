@@ -45,7 +45,7 @@ export interface CostCenterDayValue {
   date: string;
   value: string; // CC Código, "F" (Falta), "VA" (Vacaciones), etc.
   displayValue: string;
-  type: string; // "work", "absence", "empty"
+  type: 'work' | 'absence' | 'permission' | 'holiday' | 'empty'; // Agregado 'holiday'
   specificPermissionType: string; // Tipo específico de permiso de BD: "VACACIONES", "DESCANSO MEDICO", etc.
 }
 

@@ -45,7 +45,7 @@ export interface MarkingsDayValue {
   date: string;
   value: string; // "2", "4", "F", "VA", etc.
   displayValue: string;
-  type: string; // "markings", "absence", "empty"
+  type: 'markings' | 'absence' | 'permission' | 'holiday' | 'empty'; // Agregado 'holiday'
   markingsCount?: number; // Número de marcaciones cuando es tipo "markings"
   rawMarkings: string; // String original de marcaciones para debug
   specificPermissionType: string; // Tipo específico de permiso de BD: "VACACIONES", "DESCANSO MEDICO", etc.

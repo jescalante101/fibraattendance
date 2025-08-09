@@ -25,11 +25,15 @@
 
   <!-- Formulario de filtros -->
   <form [formGroup]="filterForm" (ngSubmit)="onSearch()" class="p-4 bg-fiori-muted rounded-lg border border-fiori-border shadow-fioriSm mb-6">
-    <div class="flex flex-wrap items-end gap-4">
+    <!-- Filtros principales -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
       
       <!-- Fecha Inicio -->
-      <div class="flex-1 min-w-[200px]">
-        <label class="block text-sm font-medium text-fiori-text mb-1">Fecha Inicio <span class="text-fiori-error">*</span></label>
+      <div>
+        <label class="block text-sm font-medium text-fiori-text mb-1">
+          <mat-icon class="text-sm mr-1">event</mat-icon>
+          Fecha Inicio <span class="text-fiori-error">*</span>
+        </label>
         <input 
           type="date" 
           formControlName="fechaInicio"
@@ -39,8 +43,11 @@
       </div>
 
       <!-- Fecha Fin -->
-      <div class="flex-1 min-w-[200px]">
-        <label class="block text-sm font-medium text-fiori-text mb-1">Fecha Fin <span class="text-fiori-error">*</span></label>
+      <div>
+        <label class="block text-sm font-medium text-fiori-text mb-1">
+          <mat-icon class="text-sm mr-1">event</mat-icon>
+          Fecha Fin <span class="text-fiori-error">*</span>
+        </label>
         <input 
           type="date" 
           formControlName="fechaFin"
@@ -49,24 +56,136 @@
           [class.border-fiori-error]="filterForm.get('fechaFin')?.hasError('required') && filterForm.get('fechaFin')?.touched">
       </div>
 
-      <!-- Botones de acción -->
-      <div class="flex items-center gap-2">
-        <button 
-          type="submit"
-          [disabled]="isLoading || filterForm.invalid"
-          class="btn-fiori inline-flex items-center gap-2 px-4 py-2 text-sm">
-          <mat-icon [class]="isLoading ? 'animate-spin' : ''">{{ isLoading ? 'refresh' : 'search' }}</mat-icon>
-          <span>{{ isLoading ? 'Buscando...' : 'Generar' }}</span>
-        </button>
-
-        <button 
-          type="button"
-          (click)="onClearFilters()"
-          class="btn-fiori-secondary inline-flex items-center gap-2 px-4 py-2 text-sm">
-          <mat-icon>refresh</mat-icon>
-          <span>Limpiar</span>
-        </button>
+      <!-- Área -->
+      <div>
+        <label class="block text-sm font-medium text-fiori-text mb-1">
+          <mat-icon class="text-sm mr-1">business</mat-icon>
+          Área
+        </label>
+        <div class="relative">
+          <input 
+            type="text" 
+            formControlName="areaFilter"
+            (input)="onAreaFilterChange($event)"
+            (focus)="showAreaDropdown = true"
+            (blur)="onAreaBlur()"
+            placeholder="Buscar área..."
+            class="w-full pl-10 pr-3 py-2 border border-fiori-border rounded-md text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
+          <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-fiori-subtext text-sm">business</mat-icon>
+          
+          <!-- Dropdown -->
+          <div *ngIf="showAreaDropdown" 
+               class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+            <div 
+              (mousedown)="onAreaSelected(null)"
+              class="px-3 py-2 text-sm cursor-pointer hover:bg-fiori-hover transition-colors flex items-center gap-2 border-b border-fiori-border sticky top-0 bg-fiori-surface">
+              <mat-icon class="text-sm text-fiori-primary">public</mat-icon>
+              <span class="text-fiori-text font-medium">Todas las áreas</span>
+            </div>
+            <div *ngFor="let area of filteredAreas" 
+                 (mousedown)="onAreaSelected(area)"
+                 class="px-3 py-2 text-sm cursor-pointer hover:bg-fiori-hover transition-colors flex items-center gap-2">
+              <mat-icon class="text-sm text-fiori-subtext">business</mat-icon>
+              <span class="text-fiori-text">{{ area.descripcion }}</span>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- Sede -->
+      <div>
+        <label class="block text-sm font-medium text-fiori-text mb-1">
+          <mat-icon class="text-sm mr-1">location_on</mat-icon>
+          Sede
+        </label>
+        <div class="relative">
+          <input 
+            type="text" 
+            formControlName="sedeFilter"
+            (input)="onSedeFilterChange($event)"
+            (focus)="showSedeDropdown = true"
+            (blur)="onSedeBlur()"
+            placeholder="Buscar sede..."
+            class="w-full pl-10 pr-3 py-2 border border-fiori-border rounded-md text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all text-sm">
+          <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-fiori-subtext text-sm">location_on</mat-icon>
+          
+          <!-- Dropdown -->
+          <div *ngIf="showSedeDropdown" 
+               class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+            <div 
+              (mousedown)="onSedeSelected(null)"
+              class="px-3 py-2 text-sm cursor-pointer hover:bg-fiori-hover transition-colors flex items-center gap-2 border-b border-fiori-border sticky top-0 bg-fiori-surface">
+              <mat-icon class="text-sm text-fiori-primary">public</mat-icon>
+              <span class="text-fiori-text font-medium">Todas las sedes</span>
+            </div>
+            <div *ngFor="let sede of filteredSedes" 
+                 (mousedown)="onSedeSelected(sede)"
+                 class="px-3 py-2 text-sm cursor-pointer hover:bg-fiori-hover transition-colors flex items-center gap-2">
+              <mat-icon class="text-sm text-fiori-subtext">location_on</mat-icon>
+              <span class="text-fiori-text">{{ sede.descripcion }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Filtros de desarrollo (mostrados siempre) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 p-4 bg-fiori-surface/50 rounded-lg border border-fiori-border">
+
+        <!-- Cargo (En desarrollo) -->
+        <div class="relative">
+          <div class="absolute inset-0 bg-fiori-muted/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-md border border-dashed border-fiori-border">
+            <span class="text-xs font-semibold text-fiori-subtext bg-fiori-surface/80 px-2 py-1 rounded-full shadow-sm border border-fiori-border">En desarrollo</span>
+          </div>
+          <label class="block text-sm font-medium text-fiori-subtext mb-1">
+            <mat-icon class="text-sm mr-1">work</mat-icon>
+            Cargo
+          </label>
+          <input 
+            type="text" 
+            formControlName="cargoId"
+            placeholder="ID Cargo..."
+            [disabled]="true"
+            class="w-full px-3 py-2 border border-fiori-border rounded-md bg-fiori-muted text-sm">
+        </div>
+
+        <!-- Centro de Costo (En desarrollo) -->
+        <div class="relative">
+          <div class="absolute inset-0 bg-fiori-muted/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-md border border-dashed border-fiori-border">
+            <span class="text-xs font-semibold text-fiori-subtext bg-fiori-surface/80 px-2 py-1 rounded-full shadow-sm border border-fiori-border">En desarrollo</span>
+          </div>
+          <label class="block text-sm font-medium text-fiori-subtext mb-1">
+            <mat-icon class="text-sm mr-1">account_balance</mat-icon>
+            Centro Costo
+          </label>
+          <input 
+            type="text" 
+            formControlName="centroCostoId"
+            placeholder="ID Centro Costo..."
+            [disabled]="true"
+            class="w-full px-3 py-2 border border-fiori-border rounded-md bg-fiori-muted text-sm">
+        </div>
+      </div>
+
+
+    <!-- Botones de acción -->
+    <div class="flex items-center gap-3 mt-4 pt-4 border-t border-fiori-border">
+      <button 
+        type="submit"
+        [disabled]="isLoading || filterForm.invalid"
+        class="btn-fiori inline-flex items-center gap-2 px-4 py-2 text-sm">
+        <mat-icon [class]="isLoading ? 'animate-spin' : ''">{{ isLoading ? 'refresh' : 'search' }}</mat-icon>
+        <span>{{ isLoading ? 'Buscando...' : 'Generar' }}</span>
+      </button>
+
+      <button 
+        type="button"
+        (click)="onClearFilters()"
+        class="btn-fiori-secondary inline-flex items-center gap-2 px-4 py-2 text-sm">
+        <mat-icon>refresh</mat-icon>
+        <span>Limpiar</span>
+      </button>
     </div>
   </form>
 

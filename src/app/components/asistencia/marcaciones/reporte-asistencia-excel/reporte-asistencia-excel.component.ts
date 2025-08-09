@@ -1,12 +1,14 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { AttendanceMatrixReportService } from '../../../../core/services/report/attendance-matrix-report.service';
 import { HeaderConfigService, HeaderConfig } from '../../../../core/services/header-config.service';
 import { ReportMatrixResponse, ReportMatrixResponseData } from '../../../../core/models/report/report-matrix-response.model';
 import { ReportMatrixParams } from '../../../../core/models/report/report-matrix-params.model';
 import { AgGridAngular } from 'ag-grid-angular';
 import { GridOptions, ColDef } from 'ag-grid-community';
+import { CategoriaAuxiliarService, CategoriaAuxiliar } from '../../../../core/services/categoria-auxiliar.service';
+import { RhAreaService, RhArea } from '../../../../core/services/rh-area.service';
 
 @Component({
   selector: 'app-reporte-asistencia-excel',
@@ -38,25 +40,37 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
   };
 
   private headerConfig: HeaderConfig | null = null;
-  private headerSubscription?: Subscription;
+  private destroy$ = new Subject<void>();
+
+  // Datos maestros para filtros
+  areas: RhArea[] = [];
+  sedes: CategoriaAuxiliar[] = [];
+  filteredAreas: RhArea[] = [];
+  filteredSedes: CategoriaAuxiliar[] = [];
+
+  // Estados de dropdowns
+  showAreaDropdown = false;
+  showSedeDropdown = false;
 
   constructor(
     private fb: FormBuilder,
     private attendanceMatrixService: AttendanceMatrixReportService,
-    private headerConfigService: HeaderConfigService
+    private headerConfigService: HeaderConfigService,
+    private categoriaAuxiliarService: CategoriaAuxiliarService,
+    private rhAreaService: RhAreaService
   ) {
     this.initializeForm();
     this.createColumnDefs();
   }
 
   ngOnInit(): void {
-    this.headerSubscription = this.headerConfigService.headerConfig$.subscribe(config => {
-      this.headerConfig = config;
-    });
+    this.loadHeaderConfig();
+    this.loadMasterData();
   }
 
   ngOnDestroy(): void {
-    this.headerSubscription?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private initializeForm(): void {
@@ -66,7 +80,13 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
     this.filterForm = this.fb.group({
       fechaInicio: [firstDay.toISOString().split('T')[0], Validators.required],
       fechaFin: [today.toISOString().split('T')[0], Validators.required],
-      employeeId: ['']
+      employeeId: [''],
+      areaId: [''],
+      areaFilter: [''],
+      sedeId: [''],
+      sedeFilter: [''],
+      companiaId: [''],
+      planillaId: ['']
     });
   }
 
@@ -181,5 +201,126 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
     this.page = event.pageNumber || 1;
     this.pageSize = event.pageSize || this.pageSize;
     this.loadData();
+  }
+
+  private loadHeaderConfig(): void {
+    this.headerConfig = this.headerConfigService.getCurrentHeaderConfig();
+    this.applyHeaderConfigToForm();
+
+    this.headerConfigService.getHeaderConfig$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((config: HeaderConfig | null) => {
+        this.headerConfig = config;
+        this.applyHeaderConfigToForm();
+      });
+  }
+
+  private applyHeaderConfigToForm(): void {
+    if (this.headerConfig && this.filterForm) {
+      this.filterForm.patchValue({
+        companiaId: this.headerConfig.selectedEmpresa?.companiaId || '',
+        planillaId: this.headerConfig.selectedPlanilla?.planillaId || ''
+      }, { emitEvent: false });
+    }
+  }
+
+  // ===== MASTER DATA LOADING =====
+  
+  private loadMasterData(): void {
+    // Cargar sedes
+    this.categoriaAuxiliarService.getCategoriasAuxiliar().subscribe({
+      next: (sedes) => {
+        this.sedes = sedes;
+        this.filteredSedes = [...sedes];
+      },
+      error: (error) => console.error('Error loading sedes:', error)
+    });
+
+    // Cargar áreas
+    this.rhAreaService.getAreas(this.headerConfig?.selectedEmpresa?.companiaId?.toString() || '').subscribe({
+      next: (areas) => {
+        this.areas = areas;
+        this.filteredAreas = [...areas];
+      },
+      error: (error) => console.error('Error loading areas:', error)
+    });
+  }
+
+  // ===== AUTOCOMPLETE METHODS =====
+  
+  onAreaFilterChange(event: any) {
+    const filterValue = event.target.value.toLowerCase();
+    this.filteredAreas = this.areas.filter(area =>
+      area.descripcion.toLowerCase().includes(filterValue)
+    );
+  }
+
+  onAreaSelected(area: RhArea | null) {
+    this.showAreaDropdown = false;
+    
+    if (area) {
+      this.filterForm.patchValue({
+        areaId: area.areaId,
+        areaFilter: area.descripcion
+      });
+    } else {
+      this.filterForm.patchValue({
+        areaId: '',
+        areaFilter: ''
+      });
+    }
+  }
+
+  onAreaBlur() {
+    setTimeout(() => {
+      this.showAreaDropdown = false;
+    }, 150);
+  }
+
+  onSedeFilterChange(event: any) {
+    const filterValue = event.target.value.toLowerCase();
+    this.filteredSedes = this.sedes.filter(sede =>
+      sede.descripcion.toLowerCase().includes(filterValue)
+    );
+  }
+
+  onSedeSelected(sede: CategoriaAuxiliar | null) {
+    this.showSedeDropdown = false;
+    
+    if (sede) {
+      this.filterForm.patchValue({
+        sedeId: sede.categoriaAuxiliarId,
+        sedeFilter: sede.descripcion
+      });
+    } else {
+      this.filterForm.patchValue({
+        sedeId: '',
+        sedeFilter: ''
+      });
+    }
+  }
+
+  onSedeBlur() {
+    setTimeout(() => {
+      this.showSedeDropdown = false;
+    }, 150);
+  }
+
+  onClearFilters(): void {
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    
+    this.filterForm.reset({
+      fechaInicio: firstDay.toISOString().split('T')[0],
+      fechaFin: today.toISOString().split('T')[0],
+      employeeId: '',
+      areaId: '',
+      areaFilter: '',
+      sedeId: '',
+      sedeFilter: '',
+      companiaId: this.headerConfig?.selectedEmpresa?.companiaId || '',
+      planillaId: this.headerConfig?.selectedPlanilla?.planillaId || ''
+    });
+    this.applyHeaderConfigToForm();
   }
 }

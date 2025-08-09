@@ -50,9 +50,9 @@ export interface WeeklyAttendanceDayData {
   entradaReal: string;
   salidaReal: string;
   horasTrabjadas: number;
-  type: string; // "work", "absence", "permission", "empty"
+  type: 'work' | 'absence' | 'permission' | 'holiday' | 'empty'; // Agregado 'holiday'
   tipoPermiso: string;
-  estadoColor: string; // Para frontend: "success", "danger", "warning", "secondary"
+  estadoColor: 'success' | 'danger' | 'warning' | 'primary' | 'secondary'; // Tipado estricto
 }
 
 export interface WeeklyAttendanceWeekTotals {

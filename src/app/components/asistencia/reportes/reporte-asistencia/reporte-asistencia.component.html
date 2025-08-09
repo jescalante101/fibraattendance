@@ -1,5 +1,5 @@
 <!-- Container principal con tema Fiori -->
-<div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border mb-4 overflow-hidden">
+<div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border mb-4">
   
   <!-- Header del reporte -->
   <div class="px-6 py-4 border-b border-fiori-border bg-fiori-muted">
@@ -52,11 +52,11 @@
 
   <!-- Formulario de filtros compacto -->
   <form [formGroup]="filterForm" (ngSubmit)="onSearch()" class="p-4 bg-fiori-surface">
-    <!-- Filtros principales en una línea -->
-    <div class="flex flex-wrap items-end gap-4 mb-4">
+    <!-- Filtros principales -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4" style="position: relative; z-index: 10;">
       
       <!-- Fecha Inicio -->
-      <div class="flex-1 min-w-[200px]">
+      <div>
         <label class="block text-xs font-medium text-fiori-text mb-1">
           <lucide-icon name="calendar-days" class="w-3 h-3 inline mr-1"></lucide-icon>
           Fecha Inicio <span class="text-fiori-error">*</span>
@@ -80,7 +80,7 @@
       </div>
 
       <!-- Fecha Fin -->
-      <div class="flex-1 min-w-[200px]">
+      <div>
         <label class="block text-xs font-medium text-fiori-text mb-1">
           <lucide-icon name="calendar-check" class="w-3 h-3 inline mr-1"></lucide-icon>
           Fecha Fin <span class="text-fiori-error">*</span>
@@ -103,25 +103,139 @@
         </p>
       </div>
 
-      <!-- Botones de acción compactos -->
-      <div class="flex items-center gap-2">
-        <button 
-          type="submit"
-          [disabled]="isLoading || filterForm.invalid"
-          class="inline-flex items-center gap-1 px-4 py-2 bg-fiori-primary text-white text-sm font-medium rounded-md hover:bg-fiori-secondary focus:ring-1 focus:ring-fiori-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-          <lucide-icon [name]="isLoading ? 'refresh-cw' : 'search'" 
-                       [class]="isLoading ? 'w-3 h-3 animate-spin' : 'w-3 h-3'"></lucide-icon>
-          <span class="hidden sm:inline">{{ isLoading ? 'Generando...' : 'Generar' }}</span>
-        </button>
-
-        <button 
-          type="button"
-          (click)="onClearFilters()"
-          class="inline-flex items-center gap-1 px-3 py-2 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-md hover:bg-fiori-hover transition-colors">
-          <lucide-icon name="x-circle" class="w-3 h-3"></lucide-icon>
-          <span class="hidden sm:inline">Limpiar</span>
-        </button>
+      <!-- Employee ID -->
+      <div>
+        <label class="block text-xs font-medium text-fiori-text mb-1">
+          <lucide-icon name="user" class="w-3 h-3 inline mr-1"></lucide-icon>
+          ID Empleado
+        </label>
+        <input 
+          type="text" 
+          formControlName="employeeId"
+          placeholder="Filtrar por empleado..."
+          class="w-full px-3 py-2 text-sm border border-fiori-border rounded-md bg-fiori-surface text-fiori-text focus:ring-1 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
       </div>
+
+      <!-- Área -->
+      <div>
+        <label class="block text-xs font-medium text-fiori-text mb-1">
+          <lucide-icon name="building-2" class="w-3 h-3 inline mr-1"></lucide-icon>
+          Área
+        </label>
+        <div class="relative" style="z-index: 1000;">
+          <input 
+            type="text" 
+            formControlName="areaFilter"
+            (input)="onAreaFilterChange($event)"
+            (focus)="showAreaDropdown = true"
+            (blur)="onAreaBlur()"
+            placeholder="Buscar área..."
+            class="w-full pl-8 pr-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all">
+          <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+            <lucide-icon name="building-2" class="w-3 h-3 text-gray-500"></lucide-icon>
+          </div>
+          
+          <!-- Dropdown -->
+          <div *ngIf="showAreaDropdown" 
+               class="absolute z-[10000] w-full mt-1 bg-white border border-gray-300 rounded-md shadow-xl max-h-48 overflow-y-auto"
+               style="position: absolute; top: 100%; left: 0; right: 0; background-color: white !important;">
+            <div 
+              (mousedown)="onAreaSelected(null)"
+              class="px-3 py-2 text-sm cursor-pointer hover:bg-blue-50 transition-colors flex items-center gap-2 border-b border-gray-200 sticky top-0 bg-white"
+              style="color: #000000 !important; font-weight: 500 !important; background-color: white !important;">
+              <lucide-icon name="globe" class="w-4 h-4" style="color: #2563eb !important;"></lucide-icon>
+              <span style="color: #000000 !important; font-weight: 500 !important;">Todas las áreas</span>
+            </div>
+            <!-- Debug: Mostrar cantidad de áreas -->
+            <div *ngIf="filteredAreas?.length === 0" 
+                 style="padding: 8px 12px; color: #ef4444 !important; font-size: 12px; background-color: #fef2f2;">
+              No hay áreas disponibles ({{ areas?.length || 0 }} áreas cargadas)
+            </div>
+            <!-- Elementos de áreas con estilos forzados -->
+            <div *ngFor="let area of filteredAreas; trackBy: trackByIndex" 
+                 (mousedown)="onAreaSelected(area)"
+                 class="px-3 py-2 text-sm cursor-pointer hover:bg-blue-50 transition-colors flex items-center gap-2"
+                 style="color: #000000 !important; background-color: white !important; border-bottom: 1px solid #e5e7eb;">
+              <lucide-icon name="building" class="w-4 h-4" style="color: #4b5563 !important;"></lucide-icon>
+              <span style="color: #000000 !important; font-weight: 400 !important;">{{ area.descripcion }}</span>
+              <!-- Debug: Mostrar datos del área -->
+              <small style="color: #6b7280 !important; margin-left: auto; font-size: 10px;">ID: {{ area.areaId }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Filtros avanzados (colapsables) -->
+    <details>
+      <summary class="flex items-center gap-2 text-xs font-medium text-fiori-primary cursor-pointer hover:text-fiori-secondary transition-colors">
+        <lucide-icon name="filter" class="w-3 h-3"></lucide-icon>
+        Filtros Avanzados
+      </summary>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200" style="position: relative; z-index: 5;">
+        
+        <!-- Sede con Autocomplete -->
+        <div>
+          <label class="block text-xs font-medium text-gray-700 mb-1">
+            <lucide-icon name="map-pin" class="w-3 h-3 inline mr-1"></lucide-icon>
+            Sede
+          </label>
+          <div class="relative" style="z-index: 999;">
+            <input 
+              type="text" 
+              formControlName="sedeFilter"
+              (input)="onSedeFilterChange($event)"
+              (focus)="showSedeDropdown = true"
+              (blur)="onSedeBlur()"
+              placeholder="Buscar sede..."
+              class="w-full pl-8 pr-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all">
+            <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+              <lucide-icon name="map-pin" class="w-3 h-3 text-gray-500"></lucide-icon>
+            </div>
+            
+            <!-- Dropdown -->
+            <div *ngIf="showSedeDropdown" 
+                 class="absolute z-[10001] w-full mt-1 bg-white border border-gray-300 rounded-md shadow-xl max-h-48 overflow-y-auto"
+                 style="position: absolute; top: 100%; left: 0; right: 0;">
+              <div 
+                (mousedown)="onSedeSelected(null)"
+                class="px-3 py-2 text-sm cursor-pointer hover:bg-blue-50 transition-colors flex items-center gap-2 border-b border-gray-200 sticky top-0 bg-white">
+                <lucide-icon name="globe" class="w-4 h-4 text-blue-600"></lucide-icon>
+                <span class="text-gray-900 font-medium">Todas las sedes</span>
+              </div>
+              <div *ngFor="let sede of filteredSedes" 
+                   (mousedown)="onSedeSelected(sede)"
+                   class="px-3 py-2 text-sm cursor-pointer hover:bg-blue-50 transition-colors flex items-center gap-2">
+                <lucide-icon name="map-pin" class="w-4 h-4 text-gray-600"></lucide-icon>
+                <span class="text-gray-900">{{ sede.descripcion }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- Botones de acción -->
+    <div class="flex items-center gap-3 mt-4 pt-4 border-t border-fiori-border">
+      <button 
+        type="submit"
+        [disabled]="isLoading || filterForm.invalid"
+        class="inline-flex items-center gap-2 px-4 py-2 bg-fiori-primary text-white text-sm font-medium rounded-md hover:bg-fiori-secondary focus:ring-1 focus:ring-fiori-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        <lucide-icon [name]="isLoading ? 'refresh-cw' : 'search'" 
+                     [class]="isLoading ? 'w-4 h-4 animate-spin' : 'w-4 h-4'"></lucide-icon>
+        <span>{{ isLoading ? 'Generando...' : 'Generar' }}</span>
+      </button>
+
+      <button 
+        type="button"
+        (click)="onClearFilters()"
+        class="inline-flex items-center gap-2 px-3 py-2 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-md hover:bg-fiori-hover transition-colors">
+        <lucide-icon name="x-circle" class="w-4 h-4"></lucide-icon>
+        <span>Limpiar</span>
+      </button>
     </div>
   </form>
 </div>

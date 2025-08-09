@@ -7,6 +7,8 @@ import { Subject, takeUntil } from 'rxjs';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, ColGroupDef, GridOptions } from 'ag-grid-community';
 import { WeeklyAttendanceReportData } from 'src/app/core/models/report/weekly-attendance-report.model';
+import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
+import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 
 
 @Component({
@@ -56,16 +58,28 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
   headerConfig: HeaderConfig | null = null;
   private destroy$ = new Subject<void>();
 
+  // Datos maestros para filtros
+  areas: RhArea[] = [];
+  sedes: CategoriaAuxiliar[] = [];
+  filteredAreas: RhArea[] = [];
+  filteredSedes: CategoriaAuxiliar[] = [];
+
+  // Estados de dropdowns
+  showAreaDropdown = false;
+  showSedeDropdown = false;
+
   constructor(
     private fb: FormBuilder,
     private attendanceMatrixService: AttendanceMatrixReportService,
-    private headerConfigService: HeaderConfigService
+    private headerConfigService: HeaderConfigService,
+    private categoriaAuxiliarService: CategoriaAuxiliarService,
+    private rhAreaService: RhAreaService
   ) { }
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadHeaderConfig();
-    // Aquí iría la lógica para cargar datos iniciales si es necesario
+    this.loadMasterData();
   }
 
   ngOnDestroy(): void {
@@ -81,10 +95,11 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
     this.filterForm = this.fb.group({
       fechaInicio: [this.formatDate(firstDay), Validators.required],
       fechaFin: [this.formatDate(today), Validators.required],
-      employeeId: [{ value: '', disabled: true }],
-      areaId: [{ value: '', disabled: true }],
+      areaId: [''],
+      areaFilter: [''],
       companiaId: [{ value: '', disabled: true }],
-      sedeId: [{ value: '', disabled: true }],
+      sedeId: [''],
+      sedeFilter: [''],
       cargoId: [{ value: '', disabled: true }],
       centroCostoId: [{ value: '', disabled: true }]
     });
@@ -282,6 +297,8 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
                       return { ...baseStyle, backgroundColor: '#fecaca', color: '#dc2626' };
                     case 'permission': 
                       return { ...baseStyle, backgroundColor: '#fef3c7', color: '#d97706' };
+                    case 'holiday': 
+                      return { ...baseStyle, backgroundColor: '#fed7aa', color: '#ea580c' }; // Naranja para feriados
                     default: 
                       return { ...baseStyle, backgroundColor: '#f9fafb', color: '#6b7280' };
                   }
@@ -289,6 +306,15 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
                 cellRenderer: (params: any) => {
                   const type = params.data[`week_${weekGroup.weekNumber}_day_${index}_type`];
                   const entrada = params.value || '';
+                  
+                  if (type === 'holiday') {
+                    // Para feriados: mostrar la marcación real si existe, sino mostrar "FER"
+                    if (entrada) {
+                      return entrada;
+                    }
+                    const tipoPermiso = params.data[`week_${weekGroup.weekNumber}_day_${index}_permission`];
+                    return 'FER';
+                  }
                   
                   if (type === 'permission') {
                     const tipoPermiso = params.data[`week_${weekGroup.weekNumber}_day_${index}_permission`];
@@ -322,6 +348,8 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
                       return { ...baseStyle, backgroundColor: '#fecaca', color: '#dc2626' };
                     case 'permission': 
                       return { ...baseStyle, backgroundColor: '#fef3c7', color: '#d97706' };
+                    case 'holiday': 
+                      return { ...baseStyle, backgroundColor: '#fed7aa', color: '#ea580c' }; // Naranja para feriados
                     default: 
                       return { ...baseStyle, backgroundColor: '#f9fafb', color: '#6b7280' };
                   }
@@ -330,6 +358,19 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
                   const type = params.data[`week_${weekGroup.weekNumber}_day_${index}_type`];
                   const salida = params.value || '';
                   const hours = params.data[`week_${weekGroup.weekNumber}_day_${index}_hours`] || 0;
+                  
+                  if (type === 'holiday') {
+                    // Para feriados: mostrar la marcación real si existe, sino mostrar "FER"
+                    if (salida) {
+                      return salida;
+                    }
+                    if (hours > 0) {
+                      const hoursInt = Math.floor(hours);
+                      const minutes = Math.round((hours - hoursInt) * 60);
+                      return `${hoursInt}:${minutes.toString().padStart(2, '0')}h`;
+                    }
+                    return 'FER';
+                  }
                   
                   if (type === 'permission') {
                     return '';
@@ -510,5 +551,86 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
     return `${hoursInt}:${minutes.toString().padStart(2, '0')}h`;
   }
 
+  // ===== MASTER DATA LOADING =====
+  
+  private loadMasterData(): void {
+    // Cargar sedes
+    this.categoriaAuxiliarService.getCategoriasAuxiliar().subscribe({
+      next: (sedes) => {
+        this.sedes = sedes;
+        this.filteredSedes = [...sedes];
+      },
+      error: (error) => console.error('Error loading sedes:', error)
+    });
+
+    // Cargar áreas
+    this.rhAreaService.getAreas(this.headerConfig?.selectedEmpresa?.companiaId?.toString() || '').subscribe({
+      next: (areas) => {
+        this.areas = areas;
+        this.filteredAreas = [...areas];
+      },
+      error: (error) => console.error('Error loading areas:', error)
+    });
+  }
+
+  // ===== AUTOCOMPLETE METHODS =====
+  
+  onAreaFilterChange(event: any) {
+    const filterValue = event.target.value.toLowerCase();
+    this.filteredAreas = this.areas.filter(area =>
+      area.descripcion.toLowerCase().includes(filterValue)
+    );
+  }
+
+  onAreaSelected(area: RhArea | null) {
+    this.showAreaDropdown = false;
+    
+    if (area) {
+      this.filterForm.patchValue({
+        areaId: area.areaId,
+        areaFilter: area.descripcion
+      });
+    } else {
+      this.filterForm.patchValue({
+        areaId: '',
+        areaFilter: ''
+      });
+    }
+  }
+
+  onAreaBlur() {
+    setTimeout(() => {
+      this.showAreaDropdown = false;
+    }, 150);
+  }
+
+  onSedeFilterChange(event: any) {
+    const filterValue = event.target.value.toLowerCase();
+    this.filteredSedes = this.sedes.filter(sede =>
+      sede.descripcion.toLowerCase().includes(filterValue)
+    );
+  }
+
+  onSedeSelected(sede: CategoriaAuxiliar | null) {
+    this.showSedeDropdown = false;
+    
+    if (sede) {
+      this.filterForm.patchValue({
+        sedeId: sede.categoriaAuxiliarId,
+        sedeFilter: sede.descripcion
+      });
+    } else {
+      this.filterForm.patchValue({
+        sedeId: '',
+        sedeFilter: ''
+      });
+    }
+  }
+
+  onSedeBlur() {
+    setTimeout(() => {
+      this.showSedeDropdown = false;
+    }, 150);
+  }
 
 }

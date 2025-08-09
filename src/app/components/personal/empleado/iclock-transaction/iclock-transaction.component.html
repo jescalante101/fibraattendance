@@ -145,7 +145,8 @@
         <tbody>
           <tr
             *ngFor="let marcacion of marcaciones; trackBy: trackByFn"
-            class="bg-fiori-surface border-b border-fiori-border hover:bg-fiori-hover transition-colors"
+            class="bg-fiori-surface border-b border-fiori-border hover:bg-fiori-hover transition-colors cursor-context-menu"
+            (contextmenu)="onRightClick($event, marcacion)"
           >
             <!-- Empleado -->
             <td class="px-4 py-4">
@@ -360,6 +361,52 @@
       [showAllOption]="true"
       (pageChange)="onPaginatorChange($event)">
     </app-fiori-paginator>
+  </div>
+
+  <!-- Menú Contextual Flotante -->
+  <div *ngIf="showContextMenu" 
+       class="fixed bg-white border border-gray-300 rounded-lg shadow-xl z-50 min-w-48 py-2"
+       [style.left.px]="contextMenuPosition.x"
+       [style.top.px]="contextMenuPosition.y"
+       (mouseleave)="closeContextMenu()">
+    
+    <!-- Header del menú con información del empleado -->
+    <div class="px-3 py-2 border-b border-gray-200 bg-gray-50">
+      <div class="text-sm font-medium text-gray-900">{{ empleado?.nombres }}</div>
+      <div class="text-xs text-gray-500">{{ formatearFecha(selectedMarcacion?.fechaMarcacion) }}</div>
+    </div>
+
+    <!-- Opciones del menú -->
+    <div class="py-1">
+      
+      <!-- Registrar Entrada (cuando falta entrada) -->
+      <button *ngIf="canRegisterEntrada()" 
+              (click)="abrirModalMarcacion('entrada'); $event.stopPropagation()"
+              class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+        <span class="text-green-600">🟢</span>
+        <div>
+          <div class="font-medium">Registrar Entrada</div>
+          <div class="text-xs text-gray-500">Agregar marcación de entrada faltante</div>
+        </div>
+      </button>
+      
+      <!-- Registrar Salida (cuando falta salida) -->
+      <button *ngIf="canRegisterSalida()" 
+              (click)="abrirModalMarcacion('salida'); $event.stopPropagation()"
+              class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+        <span class="text-red-600">🔴</span>
+        <div>
+          <div class="font-medium">Registrar Salida</div>
+          <div class="text-xs text-gray-500">Agregar marcación de salida faltante</div>
+        </div>
+      </button>
+
+      <!-- Mensaje cuando no se puede registrar nada -->
+      <div *ngIf="!canRegisterEntrada() && !canRegisterSalida()" 
+           class="px-3 py-2 text-xs text-gray-500">
+        ✅ Marcaciones completas para este día
+      </div>
+    </div>
   </div>
 
 </div>

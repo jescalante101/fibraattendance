@@ -1,8 +1,10 @@
-<div class="h-screen bg-fiori-background flex flex-col">
+<!-- Show full layout only when authenticated and not on login page -->
+<div *ngIf="showLayout && isAuthenticated" class="h-screen bg-fiori-background flex flex-col">
 
   <!-- Header fijo -->
   <app-custom-header
-    (collapsedChange)="onSidebarToggled($event)">
+    (collapsedChange)="onSidebarToggled($event)"
+    (userMenuAction)="handleUserMenuAction($event)">
   </app-custom-header>
 
   <!-- Contenedor debajo del header -->
@@ -21,4 +23,9 @@
     </main>
 
   </div>
+</div>
+
+<!-- Show only router-outlet for login page and unauthenticated users -->
+<div *ngIf="!showLayout || !isAuthenticated" class="h-screen">
+  <router-outlet></router-outlet>
 </div>

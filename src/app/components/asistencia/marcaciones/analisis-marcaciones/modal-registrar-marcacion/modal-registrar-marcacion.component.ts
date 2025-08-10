@@ -182,7 +182,7 @@ export class ModalRegistrarMarcacionComponent implements OnInit {
           fechaStr = `${year}-${month}-${day}`;
         }
 
-        punchTime = `${fechaStr}T${horaStr}:00`;
+        punchTime = `${fechaStr}T${horaStr}`;
       } else {
         const ahora = new Date();
         punchTime = ahora.toISOString();
@@ -204,7 +204,7 @@ export class ModalRegistrarMarcacionComponent implements OnInit {
         approver: '',
         employeeId: 0,
         isMask: false,
-        temperature: null,
+        temperature: 0,
         nroDoc: this.data.nroDoc
       };
 

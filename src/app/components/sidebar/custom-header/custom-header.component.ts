@@ -6,6 +6,7 @@ import { CompaniResponse } from '../../../core/models/compania-reponse.model';
 import { PlanillaResponse } from '../../../core/models/planilla-response.model';
 import { PeriodoResponse } from '../../../core/models/periodo-response.model';
 import { HeaderConfigService } from '../../../core/services/header-config.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { takeUntil } from 'rxjs/operators';
 
 interface NavigationItem {
@@ -49,10 +50,10 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
   anos: string[] = [];
   periodos: PeriodoResponse[] = [];
 
-  // Datos del usuario (estos deberían venir de un servicio)
-  userName: string = 'Manager';
-  userRole: string = 'Administrador';
-  userInitial: string = 'M';
+  // Datos del usuario (obtenidos del AuthService)
+  userName: string = 'Usuario';
+  userRole: string = 'Empleado';
+  userInitial: string = 'U';
 
   // Ya no necesitamos navigationItems
 
@@ -101,7 +102,8 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
 
   constructor(
     private mangerService: MangerService,
-    private headerConfigService: HeaderConfigService
+    private headerConfigService: HeaderConfigService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -152,9 +154,12 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
    * Inicializa los datos del usuario
    */
   private initializeUserData(): void {
-    // Aquí deberías obtener los datos del usuario desde un servicio
-    // Por ejemplo: this.userService.getCurrentUser().subscribe(user => { ... });
-    this.userInitial = this.userName.charAt(0).toUpperCase();
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.userName = currentUser.name;
+      this.userRole = currentUser.role;
+      this.userInitial = currentUser.name.charAt(0).toUpperCase();
+    }
   }
 
   /**
@@ -211,9 +216,8 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
    * Maneja el cierre de sesión
    */
   private handleLogout(): void {
-    // Aquí implementarías la lógica de cierre de sesión
     if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-      this.userMenuAction.emit('logout');
+      this.authService.logout();
     }
   }
 

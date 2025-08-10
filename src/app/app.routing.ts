@@ -2,6 +2,8 @@ import { Routes, RouterModule } from "@angular/router";
 
 import { ModuleWithProviders } from "@angular/core";
 import { LoginComponent } from "./components/login/login.component";
+import { AuthGuard } from "./core/guards/auth.guard";
+import { LoginGuard } from "./core/guards/login.guard";
 
 import { DispositivoComponent } from "./components/dispositivo/dispositivo.component";
 import { PersonalComponent } from "./components/personal/organizacion/empresa/personal.component";
@@ -32,48 +34,57 @@ import { HolidaysComponent } from "./components/asistencia/holidays/holidays.com
 
 
 const appRoutes: Routes = [
-    {path : '', redirectTo:'inicio', pathMatch : 'full'},
-    {path:'',component:EmpleadoComponent,},
-    {path: 'panel', children:[
-       
-
+    // Redirect root to login
+    { path: '', redirectTo: '/login', pathMatch: 'full' },
+    // Protected routes - all panel routes require authentication
+    { 
+      path: 'panel', 
+      canActivate: [AuthGuard],
+      canActivateChild: [AuthGuard],
+      children: [
+        // Default panel route
+        { path: '', component: EmpleadoComponent },
         
-        //TODO: Agregar las vistas para el panel de personal
-        {path: 'personal/organizacion',component:EmpleadoComponent},
-        {path:'personal/organizacion/app-user',component:AppUserComponent},
-        {path:'personal/organizacion/sede-area-costo',component:SedeAreaCostoComponent},
-        {path:'personal/organizacion/departamento',component:DepartamentoComponent},
-        {path:"personal/organizacion/area",component:AreaComponent},
-        {path:"personal/organizacion/cargo",component:CargoComponent},
-        {path:"personal/organizacion/usuario-sede",component:UsuarioSedeComponent},
-        { path: "personal/organizacion/sede-ccosto", component: SedeCcostoComponent },
+        // Personal/Organization routes
+        { path: 'personal/organizacion', component: EmpleadoComponent },
+        { path: 'personal/organizacion/app-user', component: AppUserComponent },
+        { path: 'personal/organizacion/sede-area-costo', component: SedeAreaCostoComponent },
+        { path: 'personal/organizacion/departamento', component: DepartamentoComponent },
+        { path: 'personal/organizacion/area', component: AreaComponent },
+        { path: 'personal/organizacion/cargo', component: CargoComponent },
+        { path: 'personal/organizacion/usuario-sede', component: UsuarioSedeComponent },
+        { path: 'personal/organizacion/sede-ccosto', component: SedeCcostoComponent },
         { path: 'personal/organizacion/holidays', component: HolidaysComponent },
 
-        {path:'personal/empleado/empleado',component:EmpleadoComponent},
-        {path:'personal/empleado/cese',component:CeseComponent},
-        {path:'personal/empleado/asignar-horario',component:AsignarHorarioEmpleadoComponent},
+        // Employee routes
+        { path: 'personal/empleado/empleado', component: EmpleadoComponent },
+        { path: 'personal/empleado/cese', component: CeseComponent },
+        { path: 'personal/empleado/asignar-horario', component: AsignarHorarioEmpleadoComponent },
 
-        //TODO:agregar las vistas para el panel de los dispositivos
-        {path: 'dispositivo',component: DispositivoComponent},
-        {path:'dispositivo/marcaciones',component:MarcacionesComponent},
+        // Device routes
+        { path: 'dispositivo', component: DispositivoComponent },
+        { path: 'dispositivo/marcaciones', component: MarcacionesComponent },
         
-        //TODO: Agregar las vistas para el panel de asistencia
-        {path: 'asistencia', component:AsistenciaComponent},
-        {path: 'asistencia/descansos', component:DescansoComponent},
-        {path: 'asistencia/horarios', component:HorarioComponent},
-        {path: 'asistencia/turno', component:TurnoComponent},
-        {path:'asistencia/aprobaciones/marcacion-manual',component:MarcacionManualComponent},
-        {path:'asistencia/marcaciones/analisis',component:AnalisisMarcacionesComponent},
-        {path:'asistencia/marcaciones/reporte-asistencia-excel',component:ReporteAsistenciaExcelComponent},
-        {path:'asistencia/marcaciones/reportes-excel/centro-costos',component:ReporteCentroCostosComponent},
-        {path:'asistencia/marcaciones/reportes-excel/asistencia-mensual',component:ReporteAsistenciaMensualComponent},
+        // Attendance routes
+        { path: 'asistencia', component: AsistenciaComponent },
+        { path: 'asistencia/descansos', component: DescansoComponent },
+        { path: 'asistencia/horarios', component: HorarioComponent },
+        { path: 'asistencia/turno', component: TurnoComponent },
+        { path: 'asistencia/aprobaciones/marcacion-manual', component: MarcacionManualComponent },
+        { path: 'asistencia/marcaciones/analisis', component: AnalisisMarcacionesComponent },
+        { path: 'asistencia/marcaciones/reporte-asistencia-excel', component: ReporteAsistenciaExcelComponent },
+        { path: 'asistencia/marcaciones/reportes-excel/centro-costos', component: ReporteCentroCostosComponent },
+        { path: 'asistencia/marcaciones/reportes-excel/asistencia-mensual', component: ReporteAsistenciaMensualComponent },
         { path: 'asistencia/marcaciones/reportes-excel/marcaciones-detalle', component: ReporteMarcacionesDetalleComponent },
-        { path: 'asistencia/marcaciones/reportes-excel/matrix', component: ReporteAsistenciaComponent },
-       
-
-
-    ]},
-    {path: 'login', component:LoginComponent}
+        { path: 'asistencia/marcaciones/reportes-excel/matrix', component: ReporteAsistenciaComponent }
+      ]
+    },
+    
+    // Public routes
+    { path: 'login', component: LoginComponent, canActivate: [LoginGuard] },
+    
+    // Wildcard route - redirect to login
+    { path: '**', redirectTo: '/login' }
     
 ];
 

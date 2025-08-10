@@ -1,12 +1,117 @@
+/* Custom styles for Fibra Asistencia Login */
 
-.background {
-    display: flex; /* <--- Este es el que faltaba */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    width: 100%;
-    height: 100vh; 
-    align-items: center;
-    justify-content: center;
-    transition: background-image 1s ease-in-out; 
+/* Animation for floating elements */
+@keyframes pulse-custom {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse {
+  animation: pulse-custom 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1s;
+}
+
+/* Custom gradient background patterns */
+.bg-pattern {
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(10, 110, 209, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(240, 171, 0, 0.1) 0%, transparent 50%);
+}
+
+/* Enhanced focus states */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-fiori-primary focus:ring-opacity-50 focus:border-fiori-primary;
+}
+
+/* Smooth transitions */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Button hover effects */
+.btn-gradient:hover {
+  background-image: linear-gradient(135deg, #0854a0 0%, #0a6ed1 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(10, 110, 209, 0.2);
+}
+
+/* Glass morphism effect */
+.glass-effect {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(10, 110, 209, 0.3);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(10, 110, 209, 0.5);
+}
+
+/* Loading spinner color override */
+::ng-deep .mat-progress-spinner circle,
+::ng-deep .mat-spinner circle {
+  stroke: white !important;
+}
+
+/* Form validation styles */
+.input-error {
+  @apply border-red-300 focus:border-red-500 focus:ring-red-500;
+}
+
+.input-success {
+  @apply border-green-300 focus:border-green-500 focus:ring-green-500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .login-container {
+    padding: 1rem;
+  }
+  
+  .login-card {
+    padding: 1.5rem;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .login-card {
+    border: 2px solid #000;
+  }
+  
+  .input-field {
+    border: 2px solid #000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse,
+  .transition-smooth,
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }

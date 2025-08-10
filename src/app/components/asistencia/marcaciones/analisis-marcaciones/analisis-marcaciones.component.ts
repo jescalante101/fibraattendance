@@ -1408,6 +1408,16 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
     this.closeContextMenu();
   }
 
+  // verifico si tiene horario()
+  tieneHorario(record: GroupedAttendanceRecord): boolean {
+    // verificamos que record.turnoAlias no sea undefined y que no tenga 'Sin horario'
+    if (record === undefined || record.shiftName === 'Sin horario') {
+      return false;
+    }
+    return true;
+  }
+
+
   registerSalidaManual(record: GroupedAttendanceRecord | null): void {
     if (!record) return;
     

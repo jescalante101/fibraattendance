@@ -302,7 +302,9 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
         employeeId: 0, // Valor null como especificado
         isMask: false, // Valor false como especificado
         temperature: null, // Valor null como especificado
-        nroDoc: emp.nroDoc
+        nroDoc: emp.nroDoc,
+        fullName: emp.fullNameEmployee,
+
       };
     });
     console.log(marcacionesManuales);

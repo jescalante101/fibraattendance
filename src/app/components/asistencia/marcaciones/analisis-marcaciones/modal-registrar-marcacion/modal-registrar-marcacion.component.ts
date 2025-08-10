@@ -205,7 +205,9 @@ export class ModalRegistrarMarcacionComponent implements OnInit {
         employeeId: 0,
         isMask: false,
         temperature: 0,
-        nroDoc: this.data.nroDoc
+        nroDoc: this.data.nroDoc,
+        fullName: this.data.fullNameEmployee,
+
       };
 
       console.log('Guardando marcación manual:', marcacionManual);

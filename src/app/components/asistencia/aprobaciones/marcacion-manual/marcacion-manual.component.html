@@ -133,13 +133,21 @@
           </tr>
         </thead>
         <tbody class="bg-fiori-surface divide-y divide-fiori-border">
-          <tr *ngFor="let item of marcacionesManuales" class="hover:bg-fiori-hover transition-colors duration-200">
+          <tr *ngFor="let item of marcacionesManuales" class="hover:bg-fiori-hover transition-colors duration-200 whitespace-nowrap">
             <td class="px-4 py-4 whitespace-nowrap">
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+              <div class="flex items-center gap-2 ">
+                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-3">
                   <lucide-icon name="user" class="w-4 h-4 text-fiori-primary"></lucide-icon>
                 </div>
-                <span class="text-sm font-medium text-fiori-text">{{ item.nroDoc }}</span>
+                 <div>
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ item.fullName || "-" }}
+                  </div>
+                  <div class="text-sm text-gray-500">
+                    {{ item.nroDoc }}
+                  </div>
+                 </div>
+               
               </div>
             </td>
             <td class="px-4 py-4 whitespace-nowrap">
@@ -190,7 +198,8 @@
                 </button>
                 <!-- Botón Eliminar -->
                 <button 
-                data-modal-target="popup-modal" data-modal-toggle="popup-modal"
+                  (click)="deleteMarcacionManual(item)"
+
                   class="inline-flex items-center px-3 py-2 text-sm bg-fiori-surface border border-fiori-border rounded-lg hover:bg-fiori-error/10 hover:border-fiori-error transition-all duration-200 group"
                   title="Eliminar marcación">
                   <lucide-icon name="trash-2" class="w-4 h-4 text-fiori-error group-hover:text-fiori-error"></lucide-icon>
@@ -234,7 +243,7 @@
     </app-fiori-paginator>
 
 
-  <div id="popup-modal" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <!-- <div id="popup-modal" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-md max-h-full">
         <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
             <button type="button" class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="popup-modal">
@@ -255,6 +264,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
+<div id="toast-container" class="fixed top-5 right-5 z-50"></div>
 
 </div>

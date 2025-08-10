@@ -1,88 +1,57 @@
-/* ===== Encabezado ===== */
-.alert-header {
-  display: flex;
-  align-items: center;
-  padding: 20px 20px 8px 20px;
-  background: #fff;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  border-bottom: 1px solid #e5e5e5;
-  box-shadow: none;
-}
-.alert-header.success { border-top: 3px solid #107e3e; }
-.alert-header.error { border-top: 3px solid #bb0000; }
-.alert-header.info { border-top: 3px solid #0a6ed1; }
-.alert-header.danger { border-top: 3px solid #e9730c; }
+/* Modern Modal Styles - Clean and minimal */
 
-.alert-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  margin-right: 18px;
-}
-.alert-title {
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: #32363a;
-  letter-spacing: 0.01em;
+/* Animation for modal entrance */
+:host {
+  animation: modalFadeIn 0.3s ease-out;
 }
 
-.alert-divider {
-  height: 2px;
-  margin: 0 20px 16px 20px;
-  border-radius: 1px;
-  background: #e5e5e5;
-}
-.alert-divider.success { background: #107e3e; }
-.alert-divider.error { background: #bb0000; }
-.alert-divider.info { background: #0a6ed1; }
-.alert-divider.danger { background: #e9730c; }
-
-.alert-body {
-  padding: 0 20px 18px 20px;
-  font-size: 1rem;
-  color: #32363a;
-  background: #fff;
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
-.alert-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 10px 20px 18px 20px;
-  border-top: 1px solid #e5e5e5;
-  background: #fff;
-  border-bottom-right-radius: 8px;
-  border-bottom-left-radius: 8px;
+/* Custom focus rings that match Fiori theme */
+button:focus-visible {
+  outline: none !important;
 }
 
-.alert-footer button {
-  border-radius: 4px;
-  font-size: 15px;
-  min-width: 90px;
-  font-weight: 500;
-  box-shadow: none;
-  text-transform: none;
-  letter-spacing: 0.01em;
-}
-.alert-footer button[mat-button] {
-  color: #0a6ed1;
-}
-.alert-footer button[mat-raised-button] {
-  background: #0a6ed1;
-  color: #fff;
-}
-.alert-footer button[mat-raised-button]:hover {
-  background: #0854a0;
+/* Hover effects for better interactivity */
+button:hover {
+  transform: translateY(-1px);
 }
 
-.cdk-overlay-dark-backdrop {
-  background: rgba(0, 0, 0, .18);
+button:active {
+  transform: translateY(0);
 }
 
-mat-card {
-  box-shadow: 0 2px 8px rgba(50,54,58,0.08);
-  border-radius: 8px !important;
+/* Custom scrollbar if content is too long */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.5);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.7);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .max-w-md {
+    max-width: calc(100vw - 2rem);
+    margin: 1rem;
+  }
 }

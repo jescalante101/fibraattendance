@@ -17,5 +17,7 @@ export interface AttManualLog {
     isMask: boolean;
     temperature: number | null;
     nroDoc: string | null;
+    fullName: string | null;
+
 }
 

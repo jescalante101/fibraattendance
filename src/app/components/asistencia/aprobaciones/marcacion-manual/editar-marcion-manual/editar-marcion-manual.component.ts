@@ -128,7 +128,9 @@ export class EditarMarcionManualComponent implements OnInit {
         employeeId: this.id,
         isMask: false,
         temperature: null,
-        nroDoc: this.empleadoLabel // Se mantendrá el valor existente en el backend
+        nroDoc: this.empleadoLabel, // Se mantendrá el valor existente en el backend,
+        fullName: this.empleadoLabel,
+
       };
 
       console.log('Actualizando marcación manual:', marcacionActualizada);

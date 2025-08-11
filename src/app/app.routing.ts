@@ -4,6 +4,7 @@ import { ModuleWithProviders } from "@angular/core";
 import { LoginComponent } from "./components/login/login.component";
 import { AuthGuard } from "./core/guards/auth.guard";
 import { LoginGuard } from "./core/guards/login.guard";
+import { PermissionsGuard } from "./core/guards/permissions.guard";
 
 import { DispositivoComponent } from "./components/dispositivo/dispositivo.component";
 import { PersonalComponent } from "./components/personal/organizacion/empresa/personal.component";
@@ -30,17 +31,18 @@ import { ReporteAsistenciaMensualComponent } from "./components/asistencia/marca
 import { ReporteMarcacionesDetalleComponent } from "./components/asistencia/marcaciones/reportes-excel/reporte-marcaciones-detalle/reporte-marcaciones-detalle.component";
 import { ReporteAsistenciaComponent } from "./components/asistencia/reportes/reporte-asistencia/reporte-asistencia.component";
 import { HolidaysComponent } from "./components/asistencia/holidays/holidays.component";
+import { NoPermissionsComponent } from "./components/no-permissions/no-permissions.component";
 
 
 
 const appRoutes: Routes = [
     // Redirect root to login
     { path: '', redirectTo: '/login', pathMatch: 'full' },
-    // Protected routes - all panel routes require authentication
+    // Protected routes - all panel routes require authentication and permissions
     { 
       path: 'panel', 
-      canActivate: [AuthGuard],
-      canActivateChild: [AuthGuard],
+      canActivate: [AuthGuard, PermissionsGuard],
+      canActivateChild: [AuthGuard, PermissionsGuard],
       children: [
         // Default panel route
         { path: '', component: EmpleadoComponent },
@@ -82,6 +84,7 @@ const appRoutes: Routes = [
     
     // Public routes
     { path: 'login', component: LoginComponent, canActivate: [LoginGuard] },
+    { path: 'no-permissions', component: NoPermissionsComponent, canActivate: [AuthGuard] },
     
     // Wildcard route - redirect to login
     { path: '**', redirectTo: '/login' }

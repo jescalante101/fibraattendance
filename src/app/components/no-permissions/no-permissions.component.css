@@ -1,0 +1,29 @@
+/* Animation delays for floating elements */
+.animation-delay-1000 {
+  animation-delay: 1s;
+}
+
+/* Smooth transitions */
+.transition-all {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom hover effects */
+button:hover {
+  transform: translateY(-1px);
+}
+
+/* Gradient animations */
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.bg-gradient-to-r:hover {
+  animation: gradient-shift 3s ease infinite;
+  background-size: 200% 200%;
+}

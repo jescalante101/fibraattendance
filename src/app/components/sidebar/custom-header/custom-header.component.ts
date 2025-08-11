@@ -37,6 +37,7 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
   // Estados del componente
   isCollapsed: boolean = false;
   showUserMenu: boolean = false;
+  showLogoutModal: boolean = false;
 
   // Estados para los dropdowns
   selectedEmpresa: CompaniResponse | null = null;
@@ -52,7 +53,7 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
 
   // Datos del usuario (obtenidos del AuthService)
   userName: string = 'Usuario';
-  userRole: string = 'Empleado';
+  userPermissions: string[] = [];
   userInitial: string = 'U';
 
   // Ya no necesitamos navigationItems
@@ -157,7 +158,7 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
       this.userName = currentUser.name;
-      this.userRole = currentUser.role;
+      this.userPermissions = currentUser.permissions;
       this.userInitial = currentUser.name.charAt(0).toUpperCase();
     }
   }
@@ -216,9 +217,22 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
    * Maneja el cierre de sesión
    */
   private handleLogout(): void {
-    if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-      this.authService.logout();
-    }
+    this.showLogoutModal = true;
+  }
+
+  /**
+   * Confirma el logout
+   */
+  confirmLogout(): void {
+    this.showLogoutModal = false;
+    this.authService.logout();
+  }
+
+  /**
+   * Cancela el logout
+   */
+  cancelLogout(): void {
+    this.showLogoutModal = false;
   }
 
   /**
@@ -249,6 +263,42 @@ export class CustomHeaderComponent implements OnInit, OnDestroy {
    */
   get sidebarCollapsed(): boolean {
     return this.isCollapsed;
+  }
+
+  /**
+   * Obtiene el rol del usuario basado en sus permisos
+   */
+  get userRole(): string {
+    // Determinar rol basado en permisos (puedes ajustar esta lógica)
+    if (this.userPermissions.length === 0) {
+      return 'Usuario';
+    }
+    
+    // Si tiene permisos de personal y asistencia, es admin
+    const hasPersonalPerms = this.userPermissions.some(p => p.startsWith('personal'));
+    const hasAsistenciaPerms = this.userPermissions.some(p => p.startsWith('asistencia'));
+    
+    if (hasPersonalPerms && hasAsistenciaPerms) {
+      return 'Administrador';
+    } else if (hasAsistenciaPerms) {
+      return 'Supervisor';
+    } else {
+      return 'Empleado';
+    }
+  }
+
+  /**
+   * Verifica si el usuario tiene un permiso específico
+   */
+  hasPermission(permission: string): boolean {
+    return this.authService.hasPermission(permission);
+  }
+
+  /**
+   * Obtiene el total de permisos del usuario
+   */
+  get totalUserPermissions(): number {
+    return this.userPermissions.length;
   }
 
   /**

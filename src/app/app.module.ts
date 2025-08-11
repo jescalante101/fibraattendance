@@ -1,7 +1,8 @@
 import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 
 
 import { AppRoutingModule } from './app-routing.module';
@@ -91,9 +92,10 @@ import { ReporteMarcacionesDetalleComponent } from './components/asistencia/marc
 import { ModalVerHorarioComponent } from './components/personal/empleado/asignar-horario-empleado/modal-ver-horario/modal-ver-horario.component';
 import { ModalEditarAsignacionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-editar-asignacion/modal-editar-asignacion.component';
 import { ModalRegistrarExcepcionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-registrar-excepcion/modal-registrar-excepcion.component';
-import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, ChevronUp, Layers, Menu, Info, FileSpreadsheet, Search, RefreshCw, Save, Plus, X, AlertCircle, UserPen, UserPlus, Table, Edit, Trash2, CheckCircle, XCircle, Eye, EyeOff, Play, Square, ArrowRight, Timer, Zap, Hand, BarChart3, Database, Download, Filter, CalendarRange, LogIn, LogOut as LogOutIcon, Columns, Globe, Coffee, Badge, Group, FileEdit, ClipboardList, Check, PlusCircle, Star, TrendingUp, SearchX, CalendarX, RefreshCcw, AlertTriangle, HelpCircle, RotateCw } from 'lucide-angular';
+import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, ChevronUp, Layers, Menu, Info, FileSpreadsheet, Search, RefreshCw, Save, Plus, X, AlertCircle, UserPen, UserPlus, Table, Edit, Trash2, CheckCircle, XCircle, Eye, EyeOff, Play, Square, ArrowRight, Timer, Zap, Hand, BarChart3, Database, Download, Filter, CalendarRange, LogIn, LogOut as LogOutIcon, Columns, Globe, Coffee, Badge, Group, FileEdit, ClipboardList, Check, PlusCircle, Star, TrendingUp, SearchX, CalendarX, RefreshCcw, AlertTriangle, HelpCircle, RotateCw, ShieldX, Mail, Shield } from 'lucide-angular';
 import { ReporteAsistenciaComponent } from './components/asistencia/reportes/reporte-asistencia/reporte-asistencia.component';
 import { HolidaysComponent } from './components/asistencia/holidays/holidays.component';
+import { NoPermissionsComponent } from './components/no-permissions/no-permissions.component';
 import { AgGridModule } from 'ag-grid-angular';
 import { ModuleRegistry, AllCommunityModule, GridOptions } from 'ag-grid-community';
 import { AG_GRID_LOCALE_ES } from './ag-grid-locale.es';
@@ -157,6 +159,7 @@ registerLocaleData(localeEs);
         ModalRegistrarExcepcionComponent,
         ReporteAsistenciaComponent,
         HolidaysComponent,
+        NoPermissionsComponent,
     ],
     exports: [
         TerminalSyncComponent,
@@ -265,7 +268,10 @@ registerLocaleData(localeEs);
             RefreshCcw,
             AlertTriangle,
             HelpCircle,
-            RotateCw
+            RotateCw,
+            ShieldX,
+            Mail,
+            Shield
 
         })
     ], providers: [
@@ -279,7 +285,12 @@ registerLocaleData(localeEs);
                 paginationPageSize: 30,
             }),
         },
-        { provide: MatPaginatorIntl, useClass: SpanishPaginatorIntl }
+        { provide: MatPaginatorIntl, useClass: SpanishPaginatorIntl },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthInterceptor,
+            multi: true
+        }
     ]
 })
 export class AppModule { }

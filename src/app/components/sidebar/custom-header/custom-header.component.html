@@ -15,7 +15,7 @@
     <div class="mx-6 h-8 w-px bg-gradient-to-b from-transparent via-fiori-border to-transparent"></div>
 
     <!-- Controles centrales (Empresa, Sede, Periodo) -->
-    <div class="hidden md:flex items-center space-x-4 flex-1 pl-4">
+    <div class="hidden md:flex items-center space-x-4 flex-1 pl-4" *ngIf="totalUserPermissions > 0">
       
       <!-- Dropdown Empresa -->
       <div class="relative">
@@ -238,7 +238,7 @@
   </div>
 
   <!-- Menú colapsable para móvil -->
-  <div class="hidden w-full md:hidden" id="navbar-dropdown">
+  <div class="hidden w-full md:hidden" id="navbar-dropdown" *ngIf="totalUserPermissions > 0">
     <div class="px-4 py-3 border-t border-fiori-border bg-fiori-muted">
       <div class="space-y-3">
         
@@ -363,3 +363,44 @@
     </div>
   </div>
 </nav>
+
+<!-- Modal de confirmación de logout -->
+<div id="logout-modal" tabindex="-1" [class.hidden]="!showLogoutModal" class="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow-xl border border-fiori-border">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-fiori-border">
+                <h3 class="text-lg font-semibold text-fiori-text">
+                    <lucide-icon name="log-out" class="text-red-500 mr-2 inline" size="20"></lucide-icon>
+                    Confirmar Cierre de Sesión
+                </h3>
+                <button (click)="cancelLogout()" type="button" class="text-fiori-subtext bg-transparent hover:bg-fiori-hover hover:text-fiori-text rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center transition-colors">
+                    <lucide-icon name="x" size="16"></lucide-icon>
+                    <span class="sr-only">Cerrar modal</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-4 md:p-5">
+                <div class="flex items-start space-x-3 mb-6">
+                    <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <lucide-icon name="alert-triangle" class="text-orange-600" size="20"></lucide-icon>
+                    </div>
+                    <div>
+                        <p class="text-fiori-text font-medium mb-2">¿Estás seguro de que deseas cerrar sesión?</p>
+                        <p class="text-sm text-fiori-subtext">Se cerrará tu sesión actual y serás redirigido a la página de inicio de sesión.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal footer -->
+            <div class="flex items-center p-4 md:p-5 border-t border-fiori-border rounded-b space-x-3">
+                <button (click)="confirmLogout()" type="button" class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors flex items-center space-x-2">
+                    <lucide-icon name="log-out" size="16"></lucide-icon>
+                    <span>Cerrar Sesión</span>
+                </button>
+                <button (click)="cancelLogout()" type="button" class="py-2.5 px-5 text-sm font-medium text-fiori-text focus:outline-none bg-white rounded-lg border border-fiori-border hover:bg-fiori-hover focus:z-10 focus:ring-4 focus:ring-fiori-primary/20 transition-colors">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

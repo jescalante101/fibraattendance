@@ -1,0 +1,103 @@
+<!-- No Permissions Screen - Fiori Style -->
+<div class="min-h-screen bg-gradient-to-br from-fiori-surface via-fiori-hover to-fiori-surface flex items-center justify-center p-4">
+  
+  <!-- Main Card -->
+  <div class="w-full max-w-2xl">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 border border-fiori-border">
+      
+      <!-- Icon Section -->
+      <div class="text-center mb-8">
+        <div class="w-24 h-24 mx-auto bg-gradient-to-br from-orange-100 to-orange-200 rounded-full flex items-center justify-center shadow-lg mb-6">
+          <lucide-icon 
+            name="shield-x" 
+            class="text-orange-600" 
+            size="48"
+            [strokeWidth]="1.5">
+          </lucide-icon>
+        </div>
+        
+        <h1 class="text-3xl font-bold text-fiori-text mb-2">
+          Acceso Restringido
+        </h1>
+        
+        <div class="w-20 h-1 bg-gradient-to-r from-orange-400 to-orange-600 mx-auto rounded-full mb-4"></div>
+        
+        <p class="text-lg text-fiori-subtext">
+          Tu cuenta no tiene permisos asignados para acceder al sistema
+        </p>
+      </div>
+
+      <!-- User Info -->
+      <div class="bg-fiori-surface rounded-xl p-6 mb-8 border border-fiori-border">
+        <div class="flex items-center space-x-4">
+          <div class="w-12 h-12 bg-fiori-primary rounded-full flex items-center justify-center">
+            <lucide-icon name="user" class="text-white" size="24"></lucide-icon>
+          </div>
+          <div>
+            <h3 class="font-semibold text-fiori-text">{{ userName || 'Usuario' }}</h3>
+            <p class="text-sm text-fiori-subtext">{{ userEmail || 'No disponible' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Information Card -->
+      <div class="bg-orange-50 border border-orange-200 rounded-xl p-6 mb-8">
+        <div class="flex items-start space-x-3">
+          <lucide-icon name="info" class="text-orange-600 mt-0.5" size="20"></lucide-icon>
+          <div>
+            <h4 class="font-semibold text-orange-800 mb-2">¿Por qué veo esta pantalla?</h4>
+            <ul class="text-sm text-orange-700 space-y-1">
+              <li>• Tu cuenta existe pero no tiene permisos configurados</li>
+              <li>• Es posible que tu administrador aún no haya asignado permisos</li>
+              <li>• Los permisos pueden estar en proceso de actualización</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="space-y-4">
+        
+        <!-- Contact Support -->
+        <button 
+          (click)="contactSupport()"
+          class="w-full bg-gradient-to-r from-fiori-primary to-fiori-secondary text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center space-x-3">
+          <lucide-icon name="mail" size="20"></lucide-icon>
+          <span>Contactar Soporte</span>
+        </button>
+
+        <!-- Logout -->
+        <button 
+          (click)="logout()"
+          class="w-full bg-white border-2 border-fiori-border text-fiori-text font-medium py-3 px-6 rounded-lg transition-all duration-300 hover:bg-fiori-hover flex items-center justify-center space-x-3">
+          <lucide-icon name="log-out" size="20"></lucide-icon>
+          <span>Cerrar Sesión</span>
+        </button>
+
+      </div>
+
+      <!-- Footer Info -->
+      <div class="mt-8 pt-6 border-t border-fiori-border text-center">
+        <p class="text-xs text-fiori-subtext">
+          Si crees que esto es un error, contacta a tu administrador del sistema
+        </p>
+        <div class="flex items-center justify-center space-x-4 mt-3 text-xs text-fiori-subtext">
+          <div class="flex items-center space-x-1">
+            <lucide-icon name="shield" size="12"></lucide-icon>
+            <span>Sistema Seguro</span>
+          </div>
+          <div class="w-1 h-1 bg-fiori-subtext rounded-full"></div>
+          <div class="flex items-center space-x-1">
+            <lucide-icon name="clock" size="12"></lucide-icon>
+            <span>24/7 Disponible</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    
+    <!-- Floating Elements -->
+    <div class="absolute top-10 right-10 w-8 h-8 bg-orange-200 rounded-full opacity-20 animate-pulse"></div>
+    <div class="absolute bottom-20 left-10 w-12 h-12 bg-fiori-primary/10 rounded-full opacity-30 animate-pulse animation-delay-1000"></div>
+  </div>
+</div>

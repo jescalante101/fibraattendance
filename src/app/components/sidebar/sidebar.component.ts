@@ -8,10 +8,12 @@ import {
 } from '@angular/core';
 import { initFlowbite } from 'flowbite';
 import { Router } from '@angular/router';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 export interface SubMenuItem {
   label: string;
   link: string | null;
+  permission?: string; // Para futura implementación de permisos
 }
 
 export interface MenuItem {
@@ -19,6 +21,14 @@ export interface MenuItem {
   label: string;
   icon: string;
   submenu: SubMenuItem[];
+  permission?: string; // Para futura implementación de permisos
+}
+
+export interface MenuSection {
+  key: string;
+  label: string;
+  items: MenuItem[];
+  permission?: string; // Para futura implementación de permisos
 }
 
 @Component({
@@ -34,7 +44,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
   openMenus: { [level: number]: string | null } = {};
   activePopovers: { [key: string]: boolean } = {};
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     // Inicializar Flowbite para componentes como popovers y collapses
@@ -66,47 +79,89 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.reinitializeFlowbite();
   }
 
-  // Ya no necesitamos dispositivoMenu - solo Personal y Asistencia según HEADER.MD
-
-  // Menú de Asistencia según especificación HEADER.MD
-  asistenciaMenu: MenuItem[] = [
+  // 📋 CONFIGURACIÓN COMPLETA DEL MENÚ
+  // Todo el menú ahora se maneja desde TypeScript para facilitar el manejo de permisos
+  
+  menuSections: MenuSection[] = [
+    // 👥 SECCIÓN PERSONAL
     {
-      key: 'horarioturno',
-      label: 'Horario-Turno',
-      icon: 'clock',
-      submenu: [
-        { label: 'Descanso', link: '/panel/asistencia/descansos' },
-        { label: 'Horario', link: '/panel/asistencia/horarios' },
-        { label: 'Turno', link: '/panel/asistencia/turno' },
-      ],
+      key: 'personal',
+      label: 'Personal',
+      items: [
+        {
+          key: 'organizacion',
+          label: 'Definiciones',
+          icon: 'building',
+          permission: 'personal.organizacion.view',
+          submenu: [
+            { label: 'Usuario', link: '/panel/personal/organizacion/app-user', permission: 'personal.usuarios.view' },
+            { label: 'Usuario-Sede', link: '/panel/personal/organizacion/usuario-sede', permission: 'personal.usuario_sede.view' },
+            { label: 'Sede-Área-Centro de Costo', link: '/panel/personal/organizacion/sede-area-costo', permission: 'personal.sede_area_costo.view' },
+            { label: 'Sede-Centro de Costo', link: '/panel/personal/organizacion/sede-ccosto', permission: 'personal.sede_ccosto.view' },
+            { label: 'Feriados', link: '/panel/personal/organizacion/holidays', permission: 'personal.holidays.view' }
+          ]
+        },
+        {
+          key: 'empleado',
+          label: 'Empleados',
+          icon: 'id-card',
+          permission: 'personal.empleado.view',
+          submenu: [
+            { label: 'Empleados', link: '/panel/personal/empleado/empleado', permission: 'personal.empleado.list' },
+            { label: 'Empleados con Turnos', link: '/panel/personal/empleado/asignar-horario', permission: 'personal.empleado.horarios' }
+          ]
+        }
+      ]
     },
+    
+    // ⏰ SECCIÓN ASISTENCIA  
     {
-      key: 'aprobaciones',
-      label: 'Aprobaciones',
-      icon: 'check-square',
-      submenu: [
-        { label: 'Marcaciones Manuales', link: '/panel/asistencia/aprobaciones/marcacion-manual' },
-      ],
-    },
-    {
-      key: 'marcaciones',
-      label: 'Marcaciones',
-      icon: 'file-text',
-      submenu: [
-        { label: 'Análisis de Marcaciones', link: '/panel/asistencia/marcaciones/analisis' },
-      ],
-    },
-    {
-      key: 'Reportes',
-      label: 'Reportes',
-      icon: 'file-spreadsheet',
-      submenu: [
-        { label: 'Reporte Marcaciones', link: '/panel/asistencia/marcaciones/reporte-asistencia-excel' },
-        { label: 'Reporte Marcación Mensual', link: 'panel/asistencia/marcaciones/reportes-excel/asistencia-mensual' },
-        { label: 'Reporte Centro Costo', link: 'panel/asistencia/marcaciones/reportes-excel/centro-costos' },
-        { label: 'Reporte Marcación Detalle', link: 'panel/asistencia/marcaciones/reportes-excel/marcaciones-detalle' },
-        { label: 'Reporte Asistencia', link: 'panel/asistencia/marcaciones/reportes-excel/matrix' },
-      ],
+      key: 'asistencia',
+      label: 'Asistencia',
+      items: [
+        {
+          key: 'horarioturno',
+          label: 'Horario-Turno',
+          icon: 'clock',
+          permission: 'asistencia.horarios.view',
+          submenu: [
+            { label: 'Descanso', link: '/panel/asistencia/descansos', permission: 'asistencia.descansos.view' },
+            { label: 'Horario', link: '/panel/asistencia/horarios', permission: 'asistencia.horarios.manage' },
+            { label: 'Turno', link: '/panel/asistencia/turno', permission: 'asistencia.turnos.manage' }
+          ]
+        },
+        {
+          key: 'aprobaciones',
+          label: 'Aprobaciones',
+          icon: 'check-square',
+          permission: 'asistencia.aprobaciones.view',
+          submenu: [
+            { label: 'Marcaciones Manuales', link: '/panel/asistencia/aprobaciones/marcacion-manual', permission: 'asistencia.marcaciones_manuales.approve' }
+          ]
+        },
+        {
+          key: 'marcaciones',
+          label: 'Marcaciones',
+          icon: 'file-text',
+          permission: 'asistencia.marcaciones.view',
+          submenu: [
+            { label: 'Análisis de Marcaciones', link: '/panel/asistencia/marcaciones/analisis', permission: 'asistencia.marcaciones.analyze' }
+          ]
+        },
+        {
+          key: 'reportes',
+          label: 'Reportes',
+          icon: 'file-spreadsheet',
+          permission: 'asistencia.reportes.view',
+          submenu: [
+            { label: 'Reporte Marcaciones', link: '/panel/asistencia/marcaciones/reporte-asistencia-excel', permission: 'asistencia.reportes.marcaciones' },
+            { label: 'Reporte Marcación Mensual', link: '/panel/asistencia/marcaciones/reportes-excel/asistencia-mensual', permission: 'asistencia.reportes.mensual' },
+            { label: 'Reporte Centro Costo', link: '/panel/asistencia/marcaciones/reportes-excel/centro-costos', permission: 'asistencia.reportes.centro_costos' },
+            { label: 'Reporte Marcación Detalle', link: '/panel/asistencia/marcaciones/reportes-excel/marcaciones-detalle', permission: 'asistencia.reportes.detalle' },
+            { label: 'Reporte Asistencia', link: '/panel/asistencia/marcaciones/reportes-excel/matrix', permission: 'asistencia.reportes.matrix' }
+          ]
+        }
+      ]
     }
   ];
 
@@ -138,25 +193,100 @@ export class SidebarComponent implements OnInit, OnDestroy {
   isMenuActive(menuKey: string): boolean {
     const currentUrl = this.router.url;
     
-    // Para la sección personal
-    switch (menuKey) {
-      case 'organizacion':
-        return currentUrl.includes('/panel/personal/organizacion');
-      case 'empleado':
-        return currentUrl.includes('/panel/personal/empleado');
-      default:
-        break;
-    }
-    
-    // Para la sección asistencia
-    const menuItem = this.asistenciaMenu.find(item => item.key === menuKey);
-    if (menuItem) {
-      return menuItem.submenu.some(sub => 
-        sub.link && currentUrl.includes(sub.link)
-      );
+    // Buscar en todas las secciones del menú
+    for (const section of this.menuSections) {
+      const menuItem = section.items.find(item => item.key === menuKey);
+      if (menuItem) {
+        return menuItem.submenu.some(sub => 
+          sub.link && currentUrl.includes(sub.link)
+        );
+      }
     }
     
     return false;
+  }
+
+  /**
+   * Obtiene la sección del menú por clave
+   * @param sectionKey - Clave de la sección
+   * @returns MenuSection o undefined
+   */
+  getMenuSection(sectionKey: string): MenuSection | undefined {
+    return this.menuSections.find(section => section.key === sectionKey);
+  }
+
+  /**
+   * Obtiene un item del menú por clave de sección y clave de item
+   * @param sectionKey - Clave de la sección
+   * @param itemKey - Clave del item
+   * @returns MenuItem o undefined
+   */
+  getMenuItem(sectionKey: string, itemKey: string): MenuItem | undefined {
+    const section = this.getMenuSection(sectionKey);
+    return section?.items.find(item => item.key === itemKey);
+  }
+
+  /**
+   * Verifica si el usuario tiene permisos para ver un elemento del menú
+   * @param permission - Permiso a verificar
+   * @returns true si tiene permiso
+   */
+  hasPermission(permission?: string): boolean {
+    if (!permission) return true;
+    
+    // Integrar con AuthService.hasPermission()
+    return this.authService.hasPermission(permission);
+  }
+
+  /**
+   * Obtiene los items de menú filtrados por permisos
+   * @param sectionKey - Clave de la sección
+   * @returns Array de MenuItem filtrados
+   */
+  getFilteredMenuItems(sectionKey: string): MenuItem[] {
+    const section = this.getMenuSection(sectionKey);
+    if (!section) return [];
+    
+    return section.items.filter(item => {
+      // Verificar si el item tiene permiso
+      if (!this.hasPermission(item.permission)) return false;
+      
+      // Verificar si al menos un subitem tiene permiso
+      const hasVisibleSubitems = item.submenu.some(sub => this.hasPermission(sub.permission));
+      return hasVisibleSubitems;
+    });
+  }
+
+  /**
+   * Obtiene los submenu items filtrados por permisos
+   * @param menuItem - Item del menú
+   * @returns Array de SubMenuItem filtrados
+   */
+  getFilteredSubMenuItems(menuItem: MenuItem): SubMenuItem[] {
+    return menuItem.submenu.filter(sub => this.hasPermission(sub.permission));
+  }
+
+  /**
+   * Verifica si una sección completa debe mostrarse (tiene al menos un item visible)
+   * @param sectionKey - Clave de la sección
+   * @returns true si la sección debe mostrarse
+   */
+  shouldShowSection(sectionKey: string): boolean {
+    const section = this.getMenuSection(sectionKey);
+    if (!section) return false;
+    
+    // Verificar si la sección tiene permiso
+    if (!this.hasPermission(section.permission)) return false;
+    
+    // Verificar si hay al menos un item visible en la sección
+    return this.getFilteredMenuItems(sectionKey).length > 0;
+  }
+
+  /**
+   * Obtiene el total de permisos del usuario
+   */
+  get totalUserPermissions(): number {
+    return this.authService.getPermissions().length;
   }
 
   /**
@@ -208,5 +338,35 @@ export class SidebarComponent implements OnInit, OnDestroy {
     
     // Verificar si la URL actual coincide exactamente o contiene la ruta
     return currentUrl === normalizedRoute || currentUrl.includes(normalizedRoute);
+  }
+
+  /**
+   * TrackBy function for menu sections to improve *ngFor performance
+   * @param index - Índice del elemento
+   * @param section - Sección del menú
+   * @returns Identificador único para el trackBy
+   */
+  trackBySection = (index: number, section: MenuSection): string => {
+    return section.key;
+  }
+
+  /**
+   * TrackBy function for menu items to improve *ngFor performance
+   * @param index - Índice del elemento
+   * @param item - Item del menú
+   * @returns Identificador único para el trackBy
+   */
+  trackByMenuItem = (index: number, item: MenuItem): string => {
+    return item.key;
+  }
+
+  /**
+   * TrackBy function for submenu items to improve *ngFor performance
+   * @param index - Índice del elemento
+   * @param sub - Sub-item del menú
+   * @returns Identificador único para el trackBy
+   */
+  trackBySubMenuItem = (index: number, sub: SubMenuItem): string => {
+    return sub.link || sub.label;
   }
 }

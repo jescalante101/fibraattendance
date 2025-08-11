@@ -155,12 +155,12 @@
     </div>
   </div>
 
-  <!-- AG-Grid Container -->
+  <!-- AG-Grid Container sin paginación -->
   <div class="ag-theme-alpine" style="height: 600px; width: 100%;">
     <ag-grid-angular
       #agGrid
       [columnDefs]="columnDefs"
-      [rowData]="filteredRowData"
+      [rowData]="paginatedData"
       [gridOptions]="gridOptions"
       style="height: 100%; width: 100%;">
     </ag-grid-angular>
@@ -185,11 +185,21 @@
         </span>
       </div>
       <div class="text-fiori-subtext">
-        Mostrando: {{ filteredRowData.length }} de {{ holidayStats.totalHolidays }}
+        Mostrando: {{ paginatedData.length }} de {{ filteredRowData.length }} filtrados ({{ holidayStats.totalHolidays }} total)
       </div>
     </div>
   </div>
 </div>
+  <!-- Paginador Fiori -->
+  <app-fiori-paginator
+    [totalRecords]="filteredRowData.length"
+    [pageSize]="pageSize"
+    [pageNumber]="pageNumber"
+    [pageSizeOptions]="[10, 25, 50, 100]"
+    [showAllOption]="true"
+    [loading]="isLoading"
+    (pageChange)="onPageChange($event)">
+  </app-fiori-paginator>
 
 <!-- Estado vacío -->
 <div *ngIf="!isLoading && filteredRowData.length === 0 && rowData.length > 0" class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border p-12 text-center">

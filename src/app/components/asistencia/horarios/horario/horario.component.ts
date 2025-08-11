@@ -17,6 +17,8 @@ import { ModalService } from 'src/app/shared/modal/modal.service';
 export class HorarioComponent implements OnInit {
 
   dataHorarios: any[] = [];
+  dataHorariosFiltrados: any[] = [];
+  filtroTexto: string = '';
 
   totalRecords: number = 0;
   pageSize: number = 15;
@@ -38,6 +40,7 @@ export class HorarioComponent implements OnInit {
       (data)=>{
         console.log(data);
         this.dataHorarios=data.data;
+        this.dataHorariosFiltrados = [...data.data];
         this.totalRecords=data.totalRecords;
         loadinngRef.close();
       },
@@ -54,7 +57,16 @@ export class HorarioComponent implements OnInit {
   onPageChangeCustom(event: any) {
     this.pageNumber = event.pageNumber;
     this.pageSize = event.pageSize;
-    this.loadHoraiosData();
+    
+    // Si pageSize es 0 (mostrar todos), no recargar del servidor
+    // Solo actualizar los datos filtrados localmente
+    if (this.pageSize === 0) {
+      // No hacer nada, los datos ya están filtrados
+      return;
+    } else {
+      // Comportamiento normal: recargar datos del servidor
+      this.loadHoraiosData();
+    }
   }
 
   // Método para abrir el modal de nuevo horario usando el modal personalizado
@@ -166,5 +178,30 @@ export class HorarioComponent implements OnInit {
 
   getHorariosFlexibles(): number {
     return this.dataHorarios?.filter(h => h.tipo !== 0)?.length || 0;
+  }
+
+  // Métodos para filtrado local
+  filtrarDatos(): void {
+    if (!this.filtroTexto || this.filtroTexto.trim() === '') {
+      this.dataHorariosFiltrados = [...this.dataHorarios];
+      return;
+    }
+
+    const filtro = this.filtroTexto.toLowerCase().trim();
+    this.dataHorariosFiltrados = this.dataHorarios.filter(horario => 
+      horario.nombre?.toLowerCase().includes(filtro) ||
+      horario.idHorio?.toString().includes(filtro) ||
+      horario.horaEntrada?.toLowerCase().includes(filtro) ||
+      horario.horaSalida?.toLowerCase().includes(filtro) ||
+      (horario.tipo === 0 ? 'estandar' : 'flexible').includes(filtro) ||
+      horario.diasLaboral?.toString().includes(filtro) ||
+      horario.tiempoTrabajo?.toString().includes(filtro) ||
+      horario.descanso?.toString().includes(filtro)
+    );
+  }
+
+  limpiarFiltro(): void {
+    this.filtroTexto = '';
+    this.dataHorariosFiltrados = [...this.dataHorarios];
   }
 }

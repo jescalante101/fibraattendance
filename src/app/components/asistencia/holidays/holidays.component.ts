@@ -24,7 +24,14 @@ export class HolidaysComponent implements OnInit, OnDestroy, AfterViewInit {
   columnDefs: ColDef[] = [];
   rowData: HolidayTableRow[] = [];
   filteredRowData: HolidayTableRow[] = [];
+  paginatedData: HolidayTableRow[] = [];
+  
+  // Propiedades de paginación
+  pageNumber = 1;
+  pageSize = 25;
+  
   gridOptions: GridOptions = {
+    theme: 'legacy', // Usar temas CSS legacy (ag-grid.css, ag-theme-alpine.css)
     defaultColDef: {
       sortable: true,
       filter: true,
@@ -33,10 +40,9 @@ export class HolidaysComponent implements OnInit, OnDestroy, AfterViewInit {
     },
     localeText: AG_GRID_LOCALE_ES,
     suppressHorizontalScroll: false,
-    enableRangeSelection: true,
+    // enableRangeSelection: true, // Comentado: requiere AG-Grid Enterprise
     rowSelection: 'multiple',
-    pagination: true,
-    paginationPageSize: 25
+    pagination: false // Deshabilitamos la paginación de AG-Grid
   };
 
   // Estados
@@ -100,7 +106,10 @@ export class HolidaysComponent implements OnInit, OnDestroy, AfterViewInit {
     this.columnDefs = [
       {
         headerName: '#',
-        valueGetter: 'node.rowIndex + 1',
+        valueGetter: (params: any) => {
+          const baseIndex = (this.pageNumber - 1) * (this.pageSize || this.filteredRowData.length);
+          return baseIndex + params.node.rowIndex + 1;
+        },
         width: 60,
         pinned: 'left',
         cellStyle: { textAlign: 'center' },
@@ -195,6 +204,7 @@ export class HolidaysComponent implements OnInit, OnDestroy, AfterViewInit {
           this.rowData = this.holidaysService.transformToTableData(data);
           this.availableYears = this.holidaysService.getAvailableYears(this.rowData);
           this.holidayStats = this.holidaysService.getHolidayStats(this.rowData);
+          this.pageNumber = 1; // Reset página al cargar datos
           this.filterData();
           
           this.successMessage = `Se cargaron ${this.rowData.length} feriados correctamente`;
@@ -244,6 +254,8 @@ export class HolidaysComponent implements OnInit, OnDestroy, AfterViewInit {
   private filterData(): void {
     const formValues = this.filterForm.value;
     this.filteredRowData = this.holidaysService.filterTableData(this.rowData, formValues);
+    this.pageNumber = 1; // Reset a primera página cuando se filtra
+    this.updatePaginatedData();
   }
 
   onClearFilters(): void {
@@ -252,6 +264,7 @@ export class HolidaysComponent implements OnInit, OnDestroy, AfterViewInit {
       searchTerm: '',
       showCurrentYearOnly: false
     });
+    this.pageNumber = 1; // Reset página al limpiar filtros
   }
 
   autoSizeColumns(): void {
@@ -282,5 +295,24 @@ export class HolidaysComponent implements OnInit, OnDestroy, AfterViewInit {
   // Getter para template
   get currentYear(): number {
     return new Date().getFullYear();
+  }
+
+  // Métodos de paginación
+  private updatePaginatedData(): void {
+    if (this.pageSize === 0) {
+      // Mostrar todos
+      this.paginatedData = [...this.filteredRowData];
+    } else {
+      // Paginación normal
+      const startIndex = (this.pageNumber - 1) * this.pageSize;
+      const endIndex = startIndex + this.pageSize;
+      this.paginatedData = this.filteredRowData.slice(startIndex, endIndex);
+    }
+  }
+
+  onPageChange(event: { pageNumber: number; pageSize: number }): void {
+    this.pageNumber = event.pageNumber;
+    this.pageSize = event.pageSize;
+    this.updatePaginatedData();
   }
 }

@@ -28,6 +28,7 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
   columnDefs: ColDef[] = [];
   rowData: any[] = [];
   gridOptions: GridOptions = {
+    theme: 'legacy', // Usar temas CSS legacy (ag-grid.css, ag-theme-alpine.css)
     defaultColDef: {
       sortable: true,
       filter: true,
@@ -36,7 +37,7 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
     },
     localeText: AG_GRID_LOCALE_ES,
     suppressHorizontalScroll: false,
-    enableRangeSelection: true,
+    // enableRangeSelection: true, // Comentado: requiere AG-Grid Enterprise
     rowSelection: 'multiple'
   };
   

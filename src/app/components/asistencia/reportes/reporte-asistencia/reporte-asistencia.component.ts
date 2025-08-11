@@ -48,7 +48,9 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
 
   // AG-Grid configuration
   columnDefs: (ColDef | ColGroupDef)[] = [];
-  gridOptions: GridOptions = {};
+  gridOptions: GridOptions = {
+    theme: 'legacy' // Usar temas CSS legacy (ag-grid.css, ag-theme-alpine.css)
+  };
   rowData: any[] = [];
   private gridApi!: GridApi;
 
@@ -754,7 +756,7 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
       },
       localeText: AG_GRID_LOCALE_ES,
       rowSelection: 'multiple',
-      enableRangeSelection: true,
+      // enableRangeSelection: true, // Comentado: requiere AG-Grid Enterprise
       suppressMenuHide: true,
       animateRows: true,
       rowHeight: 50,

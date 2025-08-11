@@ -16,6 +16,8 @@ import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confir
 export class TurnoComponent implements OnInit {
 
   dataHorarios: Shift[] = [];
+  dataHorariosFiltrados: Shift[] = [];
+  filtroTexto: string = '';
   isLoading: boolean = false;
   errorMessage: string = '';
 
@@ -43,6 +45,7 @@ export class TurnoComponent implements OnInit {
       (data) => {
         console.log(data);
         this.dataHorarios = data.data;
+        this.dataHorariosFiltrados = [...data.data];
         this.totalRecords = data.totalRecords;
         this.isLoading = false;
       },
@@ -51,6 +54,7 @@ export class TurnoComponent implements OnInit {
         this.errorMessage = 'No se pudieron cargar los turnos. Por favor, intente nuevamente.';
         this.isLoading = false;
         this.dataHorarios = [];
+        this.dataHorariosFiltrados = [];
         this.totalRecords = 0;
       }
     );
@@ -98,7 +102,16 @@ export class TurnoComponent implements OnInit {
   onPageChangeCustom(event: any) {
     this.pageNumber = event.pageNumber;
     this.pageSize = event.pageSize;
-    this.loadTurnosData();
+    
+    // Si pageSize es 0 (mostrar todos), no recargar del servidor
+    // Solo actualizar los datos filtrados localmente
+    if (this.pageSize === 0) {
+      // No hacer nada, los datos ya están filtrados
+      return;
+    } else {
+      // Comportamiento normal: recargar datos del servidor
+      this.loadTurnosData();
+    }
   }
 
   openNuevoTurnoModal(): void {
@@ -179,5 +192,27 @@ export class TurnoComponent implements OnInit {
     
   }
 
+  // Métodos para filtrado local
+  filtrarDatos(): void {
+    if (!this.filtroTexto || this.filtroTexto.trim() === '') {
+      this.dataHorariosFiltrados = [...this.dataHorarios];
+      return;
+    }
+
+    const filtro = this.filtroTexto.toLowerCase().trim();
+    this.dataHorariosFiltrados = this.dataHorarios.filter(turno => 
+      turno.alias?.toLowerCase().includes(filtro) ||
+      turno.id?.toString().includes(filtro) ||
+      this.getAreas(turno.horario)?.toLowerCase().includes(filtro) ||
+      (turno.cycleUnit === 1 ? 'semanal' : 'diario').includes(filtro) ||
+      turno.shiftCycle?.toString().includes(filtro) ||
+      (turno.autoShift ? 'automatico' : 'manual').includes(filtro)
+    );
+  }
+
+  limpiarFiltro(): void {
+    this.filtroTexto = '';
+    this.dataHorariosFiltrados = [...this.dataHorarios];
+  }
 
 }

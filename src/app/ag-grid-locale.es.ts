@@ -15,7 +15,8 @@ export const AG_GRID_LOCALE_ES = {
     // Para set filter
     selectAll: 'Seleccionar todo',
     searchOoo: 'Buscar...',
-    blanks: 'En blanco',
+    blank: 'Vacio',
+    notBlank: 'No Vacio',
 
     // Para filtros de número y texto
     filterOoo: 'Filtrar...',
@@ -84,4 +85,12 @@ export const AG_GRID_LOCALE_ES = {
     
     // Total de filas
     rowCount: 'filas',
+    
+    // ag grid page size
+    pageSizeSelectorLabel: 'Tamaño de página:',
+    ariaPageSizeSelector: 'Tamaño de página',
+
+    // Si usas el paginador personalizado
+    thousandSeparator: '.',
+    decimalSeparator: ',',
 };

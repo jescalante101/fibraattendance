@@ -20,12 +20,14 @@ import { SedeCcostoFormModalComponent, SedeCcostoFormResult, SedeCcostoData } fr
 export class SedeCcostoComponent implements OnInit,OnDestroy {
   form: FormGroup;
   sedeCcostoList: SedeCcosto[] = [];
+  sedeCcostoListFiltrada: SedeCcosto[] = [];
   sedes: CategoriaAuxiliar[] = [];
   ccostos: CostCenter[] = [];
   editing = false;
   selected?: SedeCcosto;
   loading = false;
   error = '';
+  filtroTexto = '';
 
   // Dropdown states for Flowbite components
   showSedeDropdown = false;
@@ -89,17 +91,20 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
     this.sedeCcostoService.getAll().subscribe({
       next: (data) => {
         this.sedeCcostoList = data;
+        this.sedeCcostoListFiltrada = [...data];
         this.loading = false;
       },
       error: (err) => {
         if (err.status === 404 || err.status === 400) {
           this.sedeCcostoList = [];
+          this.sedeCcostoListFiltrada = [];
           this.loading = false;
           this.error = '';
           return;
         } else {
           this.error = 'Error al cargar los datos';
           this.sedeCcostoList = [];
+          this.sedeCcostoListFiltrada = [];
           this.loading = false;
         }
       }
@@ -417,5 +422,27 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
 
   trackBySedeCcostoId(index: number, item: SedeCcosto): string {
     return `${item.siteId}-${item.costCenterId}`;
+  }
+
+  // Métodos para filtrado local
+  filtrarDatos(): void {
+    if (!this.filtroTexto.trim()) {
+      this.sedeCcostoListFiltrada = [...this.sedeCcostoList];
+      return;
+    }
+
+    const filtro = this.filtroTexto.toLowerCase().trim();
+    this.sedeCcostoListFiltrada = this.sedeCcostoList.filter(item => 
+      item.siteName.toLowerCase().includes(filtro) ||
+      item.costCenterName.toLowerCase().includes(filtro) ||
+      item.siteId.toLowerCase().includes(filtro) ||
+      item.costCenterId.toLowerCase().includes(filtro) ||
+      (item.observation && item.observation.toLowerCase().includes(filtro))
+    );
+  }
+
+  limpiarFiltro(): void {
+    this.filtroTexto = '';
+    this.sedeCcostoListFiltrada = [...this.sedeCcostoList];
   }
 }

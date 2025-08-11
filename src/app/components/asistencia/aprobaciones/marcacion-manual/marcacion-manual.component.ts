@@ -94,8 +94,17 @@ export class MarcacionManualComponent implements OnInit {
   onPageChangeCustom(event: PaginatorEvent) {
     this.pageNumber = event.pageNumber;
     this.pageSize = event.pageSize;
-    this.totalRecords=event.totalRecords
-    this.loadMarcacionesManuales();
+    this.totalRecords = event.totalRecords;
+    
+    // Si pageSize es 0 (mostrar todos), no recargar del servidor
+    // Solo actualizar los datos filtrados localmente
+    if (this.pageSize === 0) {
+      // No hacer nada, los datos ya están filtrados
+      return;
+    } else {
+      // Comportamiento normal: recargar datos del servidor
+      this.loadMarcacionesManuales();
+    }
   }
 
   onPageSizeChange(pageSize: number) {

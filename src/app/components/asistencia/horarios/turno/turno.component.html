@@ -11,7 +11,10 @@
             </div>
             <div>
               <div class="text-lg font-semibold text-fiori-text">Gestión de Turnos</div>
-              <div class="text-xs text-fiori-subtext">{{ totalRecords }} turnos ({{ getTurnosAutomaticos() }} automáticos, {{ getTurnosManuales() }} manuales)</div>
+              <div class="text-xs text-fiori-subtext">
+                {{ filtroTexto ? dataHorariosFiltrados.length + ' de ' + totalRecords : totalRecords }} turnos 
+                ({{ getTurnosAutomaticos() }} automáticos, {{ getTurnosManuales() }} manuales)
+              </div>
             </div>
           </div>
         </div>
@@ -28,7 +31,7 @@
       </div>
 
       <!-- Tabla mejorada -->
-      <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden" *ngIf="dataHorarios && dataHorarios.length > 0">
+      <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden" *ngIf="dataHorariosFiltrados && dataHorariosFiltrados.length > 0">
         <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
           <div class="flex items-center justify-between">
             <div class="text-lg font-semibold text-fiori-text">Lista de Turnos</div>
@@ -36,10 +39,20 @@
               <div class="relative">
                 <input 
                   type="text" 
+                  [(ngModel)]="filtroTexto"
+                  (keyup)="filtrarDatos()"
                   placeholder="Buscar turnos..." 
-                  class="pl-8 pr-4 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface"
+                  class="pl-8 pr-10 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface"
                 >
-                <lucide-icon name="search" class="w-4 h-4 absolute left-2.5 top-2.5 text-fiori-subtext"></lucide-icon>
+                <div  class="absolute left-2 top-1/2 transform -translate-y-1/2">
+                  <lucide-icon name="search" class="w-4 h-4 text-fiori-subtext"></lucide-icon>
+                </div>
+                <button 
+                  *ngIf="filtroTexto" 
+                  (click)="limpiarFiltro()" 
+                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-fiori-subtext hover:text-fiori-error transition-colors">
+                  <lucide-icon name="x" class="w-4 h-4"></lucide-icon>
+                </button>
               </div>
             </div>
           </div>
@@ -61,7 +74,7 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr *ngFor="let item of dataHorarios" 
+              <tr *ngFor="let item of dataHorariosFiltrados" 
                   class="hover:bg-gray-50 transition-colors cursor-pointer"
                   (click)="updateThorarioSelect(item.horario)">
                 <td class="px-6 py-4 whitespace-nowrap">
@@ -149,7 +162,7 @@
       
 
          <app-fiori-paginator
-          [totalRecords]="totalRecords"
+          [totalRecords]="dataHorariosFiltrados.length"
           [pageSize]="pageSize"
           [pageNumber]="pageNumber"
           [pageSizeOptions]="[5, 10, 25, 50]"
@@ -157,6 +170,19 @@
           [loading]="false"
           (pageChange)="onPageChangeCustom($event)">
         </app-fiori-paginator>
+      </div>
+
+      <!-- Estado sin resultados de filtro -->
+      <div *ngIf="!isLoading && !errorMessage && dataHorarios && dataHorarios.length > 0 && (!dataHorariosFiltrados || dataHorariosFiltrados.length === 0)" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+        <lucide-icon name="search-x" class="w-16 h-16 text-gray-400 mx-auto mb-4"></lucide-icon>
+        <div class="text-lg font-medium text-gray-900 mb-2">No se encontraron turnos</div>
+        <p class="text-gray-500 mb-6 max-w-sm mx-auto">Intenta con otros términos de búsqueda</p>
+        <button 
+          (click)="limpiarFiltro()" 
+          class="inline-flex items-center px-4 py-2 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors">
+          <lucide-icon name="x" class="w-4 h-4 mr-2"></lucide-icon>
+          Limpiar filtros
+        </button>
       </div>
 
       <!-- Loading State -->

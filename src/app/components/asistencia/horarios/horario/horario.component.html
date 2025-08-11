@@ -9,7 +9,10 @@
         </div>
         <div>
           <div class="text-lg font-semibold text-fiori-text">Gestión de Horarios</div>
-          <div class="text-xs text-fiori-subtext">{{ totalRecords }} horarios ({{ getHorariosEstandar() }} estándar, {{ getHorariosFlexibles() }} flexibles)</div>
+          <div class="text-xs text-fiori-subtext">
+            {{ filtroTexto ? dataHorariosFiltrados.length + ' de ' + totalRecords : totalRecords }} horarios 
+            ({{ getHorariosEstandar() }} estándar, {{ getHorariosFlexibles() }} flexibles)
+          </div>
         </div>
       </div>
     </div>
@@ -42,10 +45,20 @@
           <div class="relative">
             <input 
               type="text" 
+              [(ngModel)]="filtroTexto"
+              (keyup)="filtrarDatos()"
               placeholder="Buscar horarios..." 
-              class="pl-8 pr-4 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface"
+              class="pl-8 pr-10 py-2 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface"
             >
-            <lucide-icon name="search" class="w-4 h-4 absolute left-2.5 top-2.5 text-fiori-subtext"></lucide-icon>
+            <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+              <lucide-icon name="search" class="w-4 h-4 text-fiori-subtext"></lucide-icon>
+            </div>
+            <button 
+              *ngIf="filtroTexto" 
+              (click)="limpiarFiltro()" 
+              class="absolute right-2 top-1/2 transform -translate-y-1/2 text-fiori-subtext hover:text-fiori-error transition-colors">
+              <lucide-icon name="x" class="w-4 h-4"></lucide-icon>
+            </button>
           </div>
         </div>
       </div>
@@ -67,7 +80,7 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let item of dataHorarios" class="hover:bg-gray-50 transition-colors">
+          <tr *ngFor="let item of dataHorariosFiltrados" class="hover:bg-gray-50 transition-colors">
             <td class="px-6 py-4 whitespace-nowrap">
               <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
             </td>
@@ -158,7 +171,7 @@
 
 
      <app-fiori-paginator
-      [totalRecords]="totalRecords"
+      [totalRecords]="dataHorariosFiltrados.length"
       [pageSize]="pageSize"
       [pageNumber]="pageNumber"
       [pageSizeOptions]="[5, 10, 25, 50]"
@@ -172,7 +185,7 @@
   </div>
 
   <!-- Estado vacío -->
-  <div *ngIf="!dataHorarios || dataHorarios.length === 0" class="text-center py-12">
+  <div *ngIf="(!dataHorariosFiltrados || dataHorariosFiltrados.length === 0) && (!dataHorarios || dataHorarios.length === 0)" class="text-center py-12">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-gray-400 mx-auto mb-4">
       <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
@@ -185,6 +198,19 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
       Crear primer horario
+    </button>
+  </div>
+
+  <!-- Estado sin resultados de filtro -->
+  <div *ngIf="dataHorarios && dataHorarios.length > 0 && (!dataHorariosFiltrados || dataHorariosFiltrados.length === 0)" class="text-center py-12">
+    <lucide-icon name="search-x" class="w-16 h-16 text-gray-400 mx-auto mb-4"></lucide-icon>
+    <div class="text-lg font-medium text-gray-900 mb-2">No se encontraron horarios</div>
+    <p class="text-gray-500 mb-6">Intenta con otros términos de búsqueda</p>
+    <button 
+      (click)="limpiarFiltro()" 
+      class="inline-flex items-center px-4 py-2 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors">
+      <lucide-icon name="x" class="w-4 h-4 mr-2"></lucide-icon>
+      Limpiar filtros
     </button>
   </div>
 </div>

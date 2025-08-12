@@ -115,7 +115,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         this.sedes = sedesAreas.map(sede => ({
           categoriaAuxiliarId: sede.siteId,
           descripcion: sede.siteName,
-          companiaId: '1', // Valor por defecto
+          companiaId: '01', // Valor por defecto
           codigoAuxiliar: sede.siteId // Usar el siteId como código auxiliar
         }));
         
@@ -221,9 +221,11 @@ export class AsignarTurnoMasivoComponent implements OnInit {
       planillaId: planillaId, // Puedes ajustar esto según tu lógica
       companiaId: companiaId // Valor por defecto
     };
-      
+    console.log("Params:", employeeParams);
+    
     this.personService.getPersonalActivo(employeeParams).subscribe({
       next: res => {
+        console.log("Response:", res);
         if (res.exito && res.data && res.data.items) {
           this.personalTotal = res.data.items;
           this.personalFiltrado = [...this.personalTotal];
@@ -246,6 +248,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         this.seleccionados.clear();
         this.empleados.clear();
         this.loadingPersonal = false;
+        console.log("Error al cargar personal");
       }
     });
   }
@@ -353,6 +356,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     console.log('Registros:', registros);
     this.employeeScheduleAssignmentService.insertEmployeeScheduleAssignment(registros).subscribe({
       next: (response) => {
+        console.log('Response:', response);
         if (response && response.exito) {
           this.dialogRef.close(response); // Cierra el modal y pasa la respuesta al padre
         } else {

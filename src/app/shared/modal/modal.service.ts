@@ -43,6 +43,8 @@ export class ModalService {
 
       // Suscribirse al evento de cierre
       this.modalRef.instance.closeEvent.subscribe((data?: any) => {
+        console.log('Modal Service - Evento closeEvent recibido con data:', data);
+        console.log('Modal Service - Resolviendo promesa con:', data || null);
         resolve(data || null);
         this.close();
       });

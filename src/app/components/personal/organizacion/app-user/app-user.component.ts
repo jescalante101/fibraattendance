@@ -4,6 +4,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { UserFormModalComponent, UserFormResult, UserData } from './user-form-modal/user-form-modal.component';
+import { UserPermissionsModalComponent, UserPermissionsResult } from './user-permissions-modal/user-permissions-modal.component';
+import { UpdateAppUser, CreateAppUser } from 'src/app/core/models/app-user.model';
+import { ColDef, GridOptions, ICellRendererParams } from 'ag-grid-community';
 
 // Interfaz para tipos de Toast
 interface ToastConfig {
@@ -25,14 +28,22 @@ export class AppUserComponent implements OnInit {
   loading = false;
   searchTerm = '';
   private toastCounter = 0;
+  
+  // AG-Grid Configuration
+  columnDefs: ColDef[] = [];
+  gridOptions: GridOptions = {};
+  gridApi: any = null;
+  loadingOverlayComponent: any = null;
+  noRowsOverlayComponent: any = null;
 
   constructor(
-    private appUserService: AppUserService, 
+    private appUserService: AppUserService,
     private dialog: MatDialog,
     private modalService: ModalService
   ) { }
 
   ngOnInit() {
+    this.setupAgGrid();
     this.loadUsers();
   }
 
@@ -56,6 +67,7 @@ export class AppUserComponent implements OnInit {
 
   // Abrir modal para nuevo usuario
   openNewUserModal() {
+    console.log('Abriendo modal para nuevo usuario');
     this.modalService.open({
       title: 'Nuevo Usuario',
       componentType: UserFormModalComponent,
@@ -63,27 +75,47 @@ export class AppUserComponent implements OnInit {
         userData: null,
         isEditMode: false
       },
-      width: '500px',
-      height: '450px'
+      width: '600px',
     }).then((result: UserFormResult | null) => {
+
+      console.log('✅ Resultado del modal finalmente recibido:', result);
       if (result && result.action === 'save' && result.data) {
+        console.log('✅ Modal cerrado con datos válidos, creando usuario... ', result.data);
         this.createUser(result.data);
+      } else {
+        console.log('❌ Modal cerrado sin datos o cancelado');
       }
+    }).catch((error) => {
+      console.error('❌ Error en la promesa del modal:', error);
     });
   }
 
   // Crear usuario
   private createUser(userData: UserData) {
+    console.log('Datos recibidos del modal:', userData);
     this.loading = true;
-    this.appUserService.addUser(userData.userName).subscribe({
-      next: _ => {
+    const newUser: CreateAppUser = {
+      userName: userData.userName,
+      email: userData.email,
+      password: userData.password,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      isActive: userData.isActive
+    };
+
+    console.log('Datos que se enviarán al API:', newUser);
+
+    this.appUserService.addUser(newUser).subscribe({
+      next: (response) => {
+        console.log('Respuesta del servidor:', response);
         this.showToast('success', 'Usuario creado', `El usuario "${userData.userName}" ha sido registrado exitosamente.`);
         this.loadUsers();
       },
       error: (error) => {
         this.loading = false;
-        this.showToast('error', 'Error al crear', 'No se pudo crear el usuario. Verifica los datos e inténtalo de nuevo.');
         console.error('Error creating user:', error);
+        console.error('Error details:', error.error);
+        this.showToast('error', 'Error al crear', `Error: ${error.error?.message || error.message || 'No se pudo crear el usuario.'}`);
       }
     });
   }
@@ -91,10 +123,17 @@ export class AppUserComponent implements OnInit {
   // Actualizar usuario
   private updateUser(userData: UserData) {
     if (!userData.userId) return;
-    
+
     this.loading = true;
-    const updatedUser: User = { userId: userData.userId, userName: userData.userName };
-    this.appUserService.updateUser(updatedUser).subscribe({
+    const updatedUser: UpdateAppUser = {
+      userName: userData.userName,
+      email: userData.email,
+      password: userData.password,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      isActive: userData.isActive
+    };
+    this.appUserService.updateUser(updatedUser, userData.userId).subscribe({
       next: _ => {
         this.showToast('success', 'Usuario actualizado', `El usuario "${userData.userName}" ha sido actualizado correctamente.`);
         this.loadUsers();
@@ -111,17 +150,20 @@ export class AppUserComponent implements OnInit {
     this.modalService.open({
       title: 'Editar Usuario',
       componentType: UserFormModalComponent,
-      
       componentData: {
         userData: {
           userId: user.userId,
-          userName: user.userName
+          userName: user.userName,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          password: '', // No cargar password por seguridad
+          isActive: user.isActive
         },
         isEditMode: true
       },
-      width: '500px',
-      height: '450px'
-    }).then((result: UserFormResult | null) => {
+      width: '600px',
+    }).then((result: UserFormResult| null) => {
       if (result && result.action === 'save' && result.data) {
         this.updateUser(result.data);
       }
@@ -139,7 +181,7 @@ export class AppUserComponent implements OnInit {
         textoConfirmar: 'Eliminar'
       }
     });
-  
+
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.appUserService.deleteUser(user.userId).subscribe({
@@ -157,22 +199,155 @@ export class AppUserComponent implements OnInit {
   }
 
 
-  // Search functionality for table
-  onSearchChange() {
-    if (!this.searchTerm.trim()) {
-      this.filteredUsers = [...this.users];
-      return;
-    }
+  // Gestionar permisos de usuario
+  managePermissions(user: User) {
+    console.log('Abriendo modal de permisos para:', user);
+    this.modalService.open({
+      title: 'Gestionar Permisos',
+      componentType: UserPermissionsModalComponent,
+      componentData: {
+        user: user
+      },
+      width: '800px',
+    }).then((result: UserPermissionsResult | null) => {
+      if (result && result.action === 'close') {
+        console.log('Modal de permisos cerrado');
+        this.showToast('info', 'Permisos gestionados', `Los permisos de "${user.userName}" han sido gestionados.`);
+      }
+    }).catch((error) => {
+      console.error('Error en el modal de permisos:', error);
+      this.showToast('error', 'Error', 'Ocurrió un error al gestionar los permisos.');
+    });
+  }
 
-    const term = this.searchTerm.toLowerCase();
-    this.filteredUsers = this.users.filter(user => 
-      user.userName.toLowerCase().includes(term)
-    );
+  // Setup AG-Grid configuration
+  private setupAgGrid(): void {
+    this.columnDefs = [
+      {
+        headerName: 'Usuario',
+        field: 'userName',
+        width: 150,
+        cellRenderer: this.userCellRenderer,
+        filter: 'agTextColumnFilter'
+      },
+      {
+        headerName: 'Nombre',
+        field: 'firstName',
+        width: 140,
+        filter: 'agTextColumnFilter'
+      },
+      {
+        headerName: 'Apellido',
+        field: 'lastName',
+        width: 140,
+        filter: 'agTextColumnFilter'
+      },
+      {
+        headerName: 'Email',
+        field: 'email',
+        width: 200,
+        filter: 'agTextColumnFilter'
+      },
+      {
+        headerName: 'Estado',
+        field: 'isActive',
+        width: 100,
+        cellRenderer: this.statusCellRenderer,
+        filter: 'agSetColumnFilter'
+      },
+      {
+        headerName: 'Creado',
+        field: 'createdAt',
+        width: 120,
+        cellRenderer: this.createdDateCellRenderer,
+        filter: 'agDateColumnFilter'
+      },
+      {
+        headerName: 'Actualizado',
+        field: 'updatedAt',
+        width: 120,
+        cellRenderer: this.updatedDateCellRenderer,
+        filter: 'agDateColumnFilter'
+      },
+      {
+        headerName: 'Acciones',
+        width: 150,
+        cellRenderer: this.actionsCellRenderer,
+        sortable: false,
+        filter: false,
+        pinned: 'right'
+      }
+    ];
+
+    this.gridOptions = {
+      theme: 'legacy',
+      rowHeight: 60,
+      headerHeight: 45,
+      defaultColDef: {
+        sortable: true,
+        filter: true,
+        resizable: true,
+        minWidth: 100
+      },
+      pagination: false,
+      paginationPageSize: 10,
+      paginationPageSizeSelector: [10, 25, 50, 100],
+      animateRows: true,
+      suppressHorizontalScroll: false,
+      onCellClicked: (event) => this.onCellClicked(event),
+      onGridReady: (params) => {
+        this.gridApi = params.api;
+        // Ajustar columnas al contenedor para evitar espacios en blanco
+        params.api.sizeColumnsToFit();
+      }
+    };
+  }
+
+  // Search functionality for AG-Grid
+  onSearchChange() {
+    if (this.gridApi) {
+      this.gridApi.setGlobalFilter(this.searchTerm);
+    }
+  }
+
+  // Handle cell clicks for action buttons
+  onCellClicked(event: any) {
+    const target = event.event.target;
+    const action = target.closest('button')?.getAttribute('data-action');
+    const userId = target.closest('button')?.getAttribute('data-user-id');
+    
+    if (action && userId) {
+      const user = this.users.find(u => u.userId.toString() === userId);
+      if (user) {
+        switch (action) {
+          case 'permissions':
+            this.managePermissions(user);
+            break;
+          case 'edit':
+            this.editUser(user);
+            break;
+          case 'delete':
+            this.deleteUser(user);
+            break;
+        }
+      }
+    }
   }
 
   // Helper methods for statistics
   getActiveCount(): number {
-    return this.users.length; // Assuming all users are active for now
+    return this.users.filter(user => user.isActive).length;
+  }
+
+  // Formatear fecha para mostrar en la tabla
+  formatDate(dateString: string): string {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   }
 
   // TrackBy function para mejorar rendimiento
@@ -184,20 +359,20 @@ export class AppUserComponent implements OnInit {
   private showToast(type: ToastConfig['type'], title: string, message: string, duration: number = 5000) {
     const toastId = `toast-${++this.toastCounter}`;
     const toast: ToastConfig = { id: toastId, type, title, message, duration };
-    
+
     // Crear el elemento toast
     const toastElement = this.createToastElement(toast);
     const container = document.getElementById('toast-container');
-    
+
     if (container) {
       container.appendChild(toastElement);
-      
+
       // Mostrar con animación
       setTimeout(() => {
         toastElement.classList.add('translate-x-0');
         toastElement.classList.remove('translate-x-full');
       }, 100);
-      
+
       // Auto-remove después del duration
       setTimeout(() => {
         this.removeToast(toastId);
@@ -209,7 +384,7 @@ export class AppUserComponent implements OnInit {
     const toastDiv = document.createElement('div');
     toastDiv.id = toast.id;
     toastDiv.className = `flex items-center w-full max-w-xs p-4 mb-4 text-fiori-text bg-fiori-surface rounded-lg shadow-fioriHover transform translate-x-full transition-transform duration-300 ease-in-out border border-fiori-border`;
-    
+
     // Configurar colores según el tipo
     const typeClasses = {
       success: 'text-fiori-success',
@@ -217,14 +392,14 @@ export class AppUserComponent implements OnInit {
       warning: 'text-fiori-warning',
       info: 'text-fiori-info'
     };
-    
+
     const iconNames = {
       success: 'check-circle',
       error: 'x-circle',
       warning: 'alert-triangle',
       info: 'info'
     };
-    
+
     toastDiv.innerHTML = `
       <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 ${typeClasses[toast.type]} rounded-lg">
         <lucide-icon name="${iconNames[toast.type]}" class="w-5 h-5"></lucide-icon>
@@ -237,7 +412,7 @@ export class AppUserComponent implements OnInit {
         <lucide-icon name="x" class="w-4 h-4"></lucide-icon>
       </button>
     `;
-    
+
     return toastDiv;
   }
 
@@ -255,4 +430,92 @@ export class AppUserComponent implements OnInit {
   focusUserNameInput() {
     this.openNewUserModal();
   }
+
+  // Cell Renderers personalizados para AG-Grid
+  userCellRenderer = (params: ICellRendererParams) => {
+    const user = params.data;
+    return `
+      <div class="flex items-center h-full py-2">
+        <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center mr-3">
+          <svg class="w-4 h-4 text-fiori-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="text-sm font-medium text-fiori-text">${user.userName}</div>
+          <div class="text-xs text-fiori-subtext">ID: ${user.userId}</div>
+        </div>
+      </div>
+    `;
+  };
+
+  createdDateCellRenderer = (params: ICellRendererParams) => {
+    const date = params.data.createdAt;
+    if (!date) return '<span class="text-fiori-subtext">-</span>';
+    return `<span class="text-sm text-fiori-text">${this.formatDate(date)}</span>`;
+  };
+
+  updatedDateCellRenderer = (params: ICellRendererParams) => {
+    const date = params.data.updatedAt;
+    if (!date) return '<span class="text-fiori-subtext">-</span>';
+    return `<span class="text-sm text-fiori-text">${this.formatDate(date)}</span>`;
+  };
+
+  statusCellRenderer = (params: ICellRendererParams) => {
+    const user = params.data;
+    if (user.isActive) {
+      return `
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+          <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+          </svg>
+          Activo
+        </span>
+      `;
+    } else {
+      return `
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+          <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+          </svg>
+          Inactivo
+        </span>
+      `;
+    }
+  };
+
+  actionsCellRenderer = (params: ICellRendererParams) => {
+    const user = params.data;
+    return `
+      <div class="flex items-center justify-end space-x-2 h-full">
+        <button 
+          data-action="permissions" 
+          data-user-id="${user.userId}"
+          class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors" 
+          title="Gestionar permisos">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+          </svg>
+        </button>
+        <button 
+          data-action="edit" 
+          data-user-id="${user.userId}"
+          class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors" 
+          title="Editar usuario">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+        </button>
+        <button 
+          data-action="delete" 
+          data-user-id="${user.userId}"
+          class="inline-flex items-center p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors" 
+          title="Eliminar usuario">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+        </button>
+      </div>
+    `;
+  };
 }

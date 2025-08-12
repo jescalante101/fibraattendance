@@ -56,11 +56,13 @@ export class ModalComponent implements OnInit, OnDestroy {
       this.componentRef.destroy();
       this.componentRef = null;
     }
-    this.dynamicContent.clear();
+    if (this.dynamicContent) {
+      this.dynamicContent.clear();
+    }
   }
 
   private loadComponent() {
-    if (!this.componentType) return;
+    if (!this.componentType || !this.dynamicContent) return;
     this.dynamicContent.clear();
     this.componentRef = this.dynamicContent.createComponent(this.componentType);
   
@@ -100,6 +102,7 @@ export class ModalComponent implements OnInit, OnDestroy {
 
   // Método público para cerrar el modal desde el componente hijo
   closeModalFromChild(data?: any) {
+    console.log('Modal Component - closeModalFromChild llamado con data:', data);
     this.isOpen = false;
     this.closeEvent.emit(data);
   }

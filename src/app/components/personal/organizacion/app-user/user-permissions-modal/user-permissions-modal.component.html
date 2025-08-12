@@ -1,0 +1,207 @@
+<!-- Container con tema Fiori -->
+<div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden">
+  
+  <!-- Header -->
+  <div class="bg-fiori-muted border-b border-fiori-border px-6 py-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+        <lucide-icon name="shield-check" class="w-6 h-6 text-fiori-primary"></lucide-icon>
+      </div>
+      <div>
+        <h2 class="text-xl font-semibold text-fiori-text">Permisos de Usuario</h2>
+        <p class="text-sm text-fiori-subtext" *ngIf="user">
+          Gestionar permisos para: <strong>{{ user.firstName }} {{ user.lastName }}</strong> ({{ user.userName }})
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="p-8 text-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-fiori-primary mx-auto mb-4"></div>
+    <p class="text-fiori-subtext">Cargando permisos...</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading" class="p-6">
+    
+    <!-- Search and Summary -->
+    <div class="mb-6 space-y-4">
+      <!-- Search Input -->
+      <div class="relative">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+          placeholder="Buscar permisos..." 
+          class="w-full pl-10 pr-4 py-3 border border-fiori-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-fiori-primary focus:border-transparent bg-fiori-surface">
+        <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+          <lucide-icon name="search" class="w-4 h-4 text-fiori-subtext"></lucide-icon>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="flex items-center justify-between p-3 bg-fiori-muted/30 rounded-lg">
+        <div class="text-sm text-fiori-text">
+          <span class="font-medium">{{ getSelectedCount() }}</span> de 
+          <span class="font-medium">{{ getTotalPermissions() }}</span> permisos asignados
+        </div>
+        <div class="flex items-center space-x-2" *ngIf="saving">
+          <div class="w-4 h-4 border-2 border-fiori-primary border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-xs text-fiori-primary">Sincronizando...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Permissions Tree View -->
+    <div class="space-y-2 max-h-[500px] overflow-y-auto">
+      <div *ngFor="let module of filteredModules" class="border border-fiori-border rounded-lg overflow-hidden">
+        
+        <!-- Module Node -->
+        <div 
+          class="flex items-center justify-between px-4 py-3 bg-fiori-muted/30 hover:bg-fiori-muted/50 transition-colors cursor-pointer"
+          (click)="toggleModuleExpansion(module)">
+          
+          <div class="flex items-center space-x-3">
+            <!-- Expand/Collapse Icon -->
+            <div class="w-5 h-5 flex items-center justify-center">
+              <lucide-icon 
+                [name]="module.isExpanded ? 'chevron-down' : 'chevron-right'" 
+                class="w-4 h-4 text-fiori-subtext">
+              </lucide-icon>
+            </div>
+            
+            <!-- Module Checkbox -->
+            <div 
+              class="relative cursor-pointer"
+              (click)="onModuleToggle(module, $event)">
+              <input 
+                type="checkbox"
+                [checked]="module.allSelected"
+                [indeterminate]="module.someSelected"
+                class="w-4 h-4 text-fiori-primary bg-fiori-surface border-fiori-border rounded focus:ring-fiori-primary focus:ring-2"
+                readonly>
+            </div>
+            
+            <!-- Module Info -->
+            <div class="flex items-center space-x-3">
+              <lucide-icon name="folder" class="w-5 h-5 text-fiori-primary"></lucide-icon>
+              <div>
+                <h3 class="text-sm font-semibold text-fiori-text">{{ module.moduleName }}</h3>
+                <p class="text-xs text-fiori-subtext">
+                  {{ getModuleSelectedCount(module) }} / {{ getModuleTotalCount(module) }} permisos
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Module Actions Indicator -->
+          <div class="flex items-center space-x-2" *ngIf="module.hasChanges">
+            <div class="w-2 h-2 bg-fiori-warning rounded-full"></div>
+            <span class="text-xs text-fiori-warning">Modificando...</span>
+          </div>
+        </div>
+
+        <!-- Permissions List (Collapsed/Expanded) -->
+        <div *ngIf="module.isExpanded" class="bg-fiori-surface">
+          <div *ngFor="let permission of module.permissions" class="tree-node-permission">
+            <div 
+              class="flex items-center space-x-3 px-4 py-2 ml-8 hover:bg-fiori-hover transition-colors cursor-pointer"
+              (click)="onPermissionToggle(module, permission)">
+              
+              <!-- Tree Line Connector -->
+              <div class="w-5 h-5 flex items-center justify-center">
+                <div class="w-2 h-2 bg-fiori-border rounded-full"></div>
+              </div>
+              
+              <!-- Permission Checkbox -->
+              <div class="relative">
+                <input 
+                  type="checkbox"
+                  [checked]="permission.isSelected"
+                  class="w-4 h-4 text-fiori-primary bg-fiori-surface border-fiori-border rounded focus:ring-fiori-primary focus:ring-2"
+                  readonly>
+              </div>
+              
+              <!-- Permission Content -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-2">
+                    <lucide-icon name="shield" class="w-4 h-4 text-fiori-subtext"></lucide-icon>
+                    <h4 class="text-sm text-fiori-text truncate">{{ permission.permissionName }}</h4>
+                  </div>
+                  
+                  <!-- Permission Status -->
+                  <div class="flex items-center space-x-2">
+                    <span 
+                      class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                      [class]="permission.isSelected ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'">
+                      {{ permission.isSelected ? 'Activo' : 'Inactivo' }}
+                    </span>
+                    
+                    <!-- Loading for this specific permission -->
+                    <div *ngIf="permission.isUpdating" class="w-3 h-3 border border-fiori-primary border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                </div>
+                
+                <p class="text-xs text-fiori-subtext mt-1 ml-6" *ngIf="permission.description">
+                  {{ permission.description }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredModules.length === 0 && !loading" class="text-center py-12">
+      <div class="w-16 h-16 bg-fiori-muted rounded-full flex items-center justify-center mx-auto mb-4">
+        <lucide-icon 
+          [name]="searchTerm ? 'search-x' : 'shield-x'" 
+          class="w-8 h-8 text-fiori-subtext">
+        </lucide-icon>
+      </div>
+      <h3 class="text-lg font-medium text-fiori-text mb-2">
+        {{ searchTerm ? 'No se encontraron permisos' : 'No hay permisos disponibles' }}
+      </h3>
+      <p class="text-sm text-fiori-subtext">
+        {{ searchTerm ? 
+           'Intenta ajustar los términos de búsqueda' : 
+           'No se han configurado permisos en el sistema o no se pudieron cargar'
+        }}
+      </p>
+      
+      <!-- Debug info cuando no hay permisos del sistema -->
+      <div *ngIf="!searchTerm" class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-left max-w-md mx-auto">
+        <div class="flex items-start space-x-2">
+          <lucide-icon name="alert-triangle" class="w-4 h-4 text-amber-600 mt-0.5"></lucide-icon>
+          <div class="text-xs text-amber-800">
+            <p class="font-medium">Posibles causas:</p>
+            <ul class="mt-1 space-y-1">
+              <li>• No hay permisos creados en el sistema</li>
+              <li>• Error de conexión con la API</li>
+              <li>• Problema en el endpoint /api/permission</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer with Close Button -->
+  <div class="border-t border-fiori-border bg-fiori-muted/30 px-6 py-4">
+    <div class="flex justify-between items-center">
+      <div class="text-sm text-fiori-subtext">
+        Los cambios se aplican automáticamente
+      </div>
+      <button 
+        type="button" 
+        (click)="onClose()"
+        class="inline-flex items-center px-4 py-2 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-lg hover:bg-fiori-hover transition-colors">
+        <lucide-icon name="x" class="w-4 h-4 mr-2"></lucide-icon>
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>

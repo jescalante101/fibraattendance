@@ -68,6 +68,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AppUserComponent } from './components/personal/organizacion/app-user/app-user.component';
 import { UserFormModalComponent } from './components/personal/organizacion/app-user/user-form-modal/user-form-modal.component';
+import { UserPermissionsModalComponent } from './components/personal/organizacion/app-user/user-permissions-modal/user-permissions-modal.component';
 import { UserSiteFormModalComponent } from './components/personal/organizacion/usuario-sede/user-site-form-modal/user-site-form-modal.component';
 import { SedeCcostoFormModalComponent } from './components/personal/organizacion/sede-ccosto/sede-ccosto-form-modal/sede-ccosto-form-modal.component';
 import { SedeAreaCostoComponent } from './components/personal/organizacion/sede-area-costo/sede-area-costo.component';
@@ -92,7 +93,7 @@ import { ReporteMarcacionesDetalleComponent } from './components/asistencia/marc
 import { ModalVerHorarioComponent } from './components/personal/empleado/asignar-horario-empleado/modal-ver-horario/modal-ver-horario.component';
 import { ModalEditarAsignacionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-editar-asignacion/modal-editar-asignacion.component';
 import { ModalRegistrarExcepcionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-registrar-excepcion/modal-registrar-excepcion.component';
-import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, ChevronUp, Layers, Menu, Info, FileSpreadsheet, Search, RefreshCw, Save, Plus, X, AlertCircle, UserPen, UserPlus, Table, Edit, Trash2, CheckCircle, XCircle, Eye, EyeOff, Play, Square, ArrowRight, Timer, Zap, Hand, BarChart3, Database, Download, Filter, CalendarRange, LogIn, LogOut as LogOutIcon, Columns, Globe, Coffee, Badge, Group, FileEdit, ClipboardList, Check, PlusCircle, Star, TrendingUp, SearchX, CalendarX, RefreshCcw, AlertTriangle, HelpCircle, RotateCw, ShieldX, Mail, Shield } from 'lucide-angular';
+import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, ChevronUp, Layers, Menu, Info, FileSpreadsheet, Search, RefreshCw, Save, Plus, X, AlertCircle, UserPen, UserPlus, Table, Edit, Trash2, CheckCircle, XCircle, Eye, EyeOff, Play, Square, ArrowRight, Timer, Zap, Hand, BarChart3, Database, Download, Filter, CalendarRange, LogIn, LogOut as LogOutIcon, Columns, Globe, Coffee, Badge, Group, FileEdit, ClipboardList, Check, PlusCircle, Star, TrendingUp, SearchX, CalendarX, RefreshCcw, AlertTriangle, HelpCircle, RotateCw, ShieldX, Mail, Shield, UserCheck, Lock, UserCheck2, ShieldCheck, Folder } from 'lucide-angular';
 import { ReporteAsistenciaComponent } from './components/asistencia/reportes/reporte-asistencia/reporte-asistencia.component';
 import { HolidaysComponent } from './components/asistencia/holidays/holidays.component';
 import { NoPermissionsComponent } from './components/no-permissions/no-permissions.component';
@@ -138,6 +139,7 @@ registerLocaleData(localeEs);
         AsignarTurnoMasivoComponent,
         AppUserComponent,
         UserFormModalComponent,
+        UserPermissionsModalComponent,
         UserSiteFormModalComponent,
         SedeCcostoFormModalComponent,
         SedeAreaCostoComponent,
@@ -268,10 +270,15 @@ registerLocaleData(localeEs);
             RefreshCcw,
             AlertTriangle,
             HelpCircle,
+            UserCheck,
+            UserCheck2,
+            Lock,
             RotateCw,
             ShieldX,
             Mail,
-            Shield
+            Shield,
+            ShieldCheck,
+            Folder
 
         })
     ], providers: [

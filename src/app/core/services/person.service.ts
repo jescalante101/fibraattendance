@@ -40,7 +40,6 @@ export class PersonService {
 
 
 getPersonalActivo(employeeParams:EmployeesParameters): Observable<ApiResponse<Employee>> {
-
   return this.http.post<ApiResponse<Employee>>(`${this.apiUrlScire}api/Personal/search`,employeeParams);
 }
 

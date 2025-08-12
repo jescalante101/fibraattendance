@@ -1,0 +1,88 @@
+/* Estilos específicos para el modal de permisos */
+
+/* Checkbox indeterminate state */
+input[type="checkbox"]:indeterminate {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M4 8h8'/%3e%3c/svg%3e");
+}
+
+/* Smooth transitions */
+.permission-item {
+  transition: all 0.2s ease-in-out;
+}
+
+.permission-item:hover {
+  transform: translateX(2px);
+}
+
+/* Custom scrollbar for permissions list */
+.max-h-96::-webkit-scrollbar {
+  width: 6px;
+}
+
+.max-h-96::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.max-h-96::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.max-h-96::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Module header hover effect */
+.module-header:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Permission card styling */
+.permission-card {
+  border-left: 3px solid transparent;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.permission-card.selected {
+  border-left-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+/* Loading animation enhancement */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Focus states for accessibility */
+input[type="checkbox"]:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .permission-card {
+    padding: 0.75rem;
+  }
+  
+  .module-header {
+    padding: 0.75rem 1rem;
+  }
+}

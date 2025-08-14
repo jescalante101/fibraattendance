@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
-import { SedeAreaCosto } from 'src/app/models/site-area-ccost.model';
+import { SedeAreaCosto, SedeAreaCostoUpdate } from 'src/app/models/site-area-ccost.model';
 
 
 
@@ -31,7 +31,7 @@ export class SedeAreaCostoService {
  
 
   // Actualizar
-  update(siteId: string, areaId: string, data: SedeAreaCosto) {
+  update(siteId: string, areaId: string, data: SedeAreaCostoUpdate) {
     return this.http.put<any>(`${this.resource}/${siteId}/${areaId}`, data);
   }
 

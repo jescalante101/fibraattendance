@@ -31,6 +31,24 @@ export interface ShiftRegister {
     workDayOff:  boolean;
     dayOffType:  number;
     autoShift:   boolean;
+    createdBy:   string;
+    createdAt:   string;
+    active:      string;
+    detalles:    Detalle[];
+}
+
+export interface ShiftRegisterUpdate {
+    alias:       string;
+    cycleUnit:   number;
+    shiftCycle:  number;
+    workWeekend: boolean;
+    weekendType: number;
+    workDayOff:  boolean;
+    dayOffType:  number;
+    autoShift:   boolean;
+    updatedBy:   string;
+    updatedAt:   string;
+    active:      string;
     detalles:    Detalle[];
 }
 
@@ -139,7 +157,7 @@ export class ShiftsService{
      * @param id 
      * @returns 
      */
-    updateShift(shift: ShiftRegister, id: number): Observable<any> {
+    updateShift(shift: ShiftRegisterUpdate, id: number): Observable<any> {
         return this.http.put<any>(`${this.apiUrl}api/Shift/actualizarShift/${id}`,  shift );
     }
     /**

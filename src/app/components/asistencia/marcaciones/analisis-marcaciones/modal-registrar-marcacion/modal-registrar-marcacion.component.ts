@@ -2,7 +2,8 @@ import { Component, EventEmitter, Input, OnInit, Optional, Output } from '@angul
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AttManualLogService } from 'src/app/core/services/att-manual-log.service';
-import { AttManualLog } from 'src/app/models/att-manual-log/att-maunual-log.model';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { AttManualLog, AttManualLogInsert } from 'src/app/models/att-manual-log/att-maunual-log.model';
 
 interface MarcacionData {
   employeeId: string;
@@ -29,15 +30,30 @@ export class ModalRegistrarMarcacionComponent implements OnInit {
   marcacionForm!: FormGroup;
   loading = false;
 
+  userLogin: string = '';
+
+
+
   constructor(
     private fb: FormBuilder,
     private attManualLogService: AttManualLogService,
-    @Optional() public dialogRef: MatDialogRef<ModalRegistrarMarcacionComponent>
+    @Optional() public dialogRef: MatDialogRef<ModalRegistrarMarcacionComponent>,
+    private authService: AuthService,
+
   ) { }
 
   ngOnInit(): void {
     this.initializeForm();
+    this.getCurrentUserLogin();
   }
+  private getCurrentUserLogin(): void {
+    const user = this.authService.getCurrentUser();
+   if(user){
+    this.userLogin=user.username;
+   }
+  }
+
+
 
   private initializeForm(): void {
     // Obtener fecha en formato YYYY-MM-DD para el input date
@@ -189,8 +205,8 @@ export class ModalRegistrarMarcacionComponent implements OnInit {
       }
 
       // Crear el objeto AttManualLog usando la misma estructura que guardarMarcacion()
-      const marcacionManual: AttManualLog = {
-        manualLogId: 0,
+      const marcacionManual: AttManualLogInsert = {
+
         abstractexceptionPtrId: 1,
         punchTime: punchTime,
         punchState: this.getPunchStateValue(estadoFinal),
@@ -207,6 +223,9 @@ export class ModalRegistrarMarcacionComponent implements OnInit {
         temperature: 0,
         nroDoc: this.data.nroDoc,
         fullName: this.data.fullNameEmployee,
+        //
+        createdAt: new Date().toISOString(),
+        createdBy: this.userLogin,
 
       };
 

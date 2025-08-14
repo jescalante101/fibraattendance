@@ -6,8 +6,11 @@ export interface UserSiteData {
   userId: number;
   siteId: string;
   observation?: string;
-  creationDate?: string;
+  createdAt?: string;
   active?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  updatedAt?: string;
 }
 
 export interface UserSiteFormResult {
@@ -84,7 +87,7 @@ export class UserSiteFormModalComponent implements OnInit {
           siteId: this.userSiteData.siteId,
           usuarioFilter: selectedUsuario?.userName || '',
           sedeFilter: selectedSede?.descripcion || '',
-          creationDate: this.userSiteData.creationDate || '',
+          createdAt: this.userSiteData.createdAt || '',
           observation: this.userSiteData.observation || ''
         });
       } else {

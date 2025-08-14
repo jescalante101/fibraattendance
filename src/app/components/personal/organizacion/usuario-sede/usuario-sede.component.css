@@ -1,0 +1,105 @@
+/* AG-Grid Fiori Theme Customization */
+.ag-theme-fiori {
+  --ag-background-color: #f9f9f9;
+  --ag-foreground-color: #32363a;
+  --ag-border-color: #d1d1d1;
+  --ag-secondary-border-color: #e5e7eb;
+  
+  --ag-header-background-color: #f8f9fa;
+  --ag-header-foreground-color: #6a6d70;
+  --ag-header-cell-hover-background-color: #f5f5f5;
+  --ag-header-cell-moving-background-color: #e3f2fd;
+  
+  --ag-odd-row-background-color: #ffffff;
+  --ag-even-row-background-color: #ffffff;
+  --ag-row-hover-color: #f5f5f5;
+  --ag-selected-row-background-color: #e3f2fd;
+  
+  --ag-cell-horizontal-padding: 12px;
+  --ag-cell-vertical-padding: 8px;
+  
+  --ag-font-family: "72", "Segoe UI", Arial, sans-serif;
+  --ag-font-size: 14px;
+  
+  --ag-primary-color: #0a6ed1;
+  --ag-accent-color: #f0ab00;
+  --ag-secondary-foreground-color: #6a6d70;
+  
+  /* Grid borders */
+  --ag-borders: solid 1px;
+  --ag-border-radius: 0.25rem;
+  
+  /* Icons */
+  --ag-icon-font-family: "ag-theme-alpine";
+}
+
+/* Custom header styling */
+.ag-theme-fiori .ag-header {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #d1d1d1;
+  font-weight: 600;
+}
+
+.ag-theme-fiori .ag-header-cell {
+  border-right: 1px solid #e5e7eb;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6a6d70;
+}
+
+/* Row styling */
+.ag-theme-fiori .ag-row {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.ag-theme-fiori .ag-row:hover {
+  background-color: #f5f5f5;
+}
+
+.ag-theme-fiori .ag-row.ag-row-selected {
+  background-color: #dbeafe !important;
+}
+
+/* Tree data specific styling */
+.ag-theme-fiori .ag-group-expanded .ag-icon {
+  color: #0a6ed1;
+}
+
+.ag-theme-fiori .ag-group-contracted .ag-icon {
+  color: #6a6d70;
+}
+
+/* Custom scrollbar */
+.ag-theme-fiori .ag-body-horizontal-scroll::-webkit-scrollbar,
+.ag-theme-fiori .ag-body-vertical-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.ag-theme-fiori .ag-body-horizontal-scroll::-webkit-scrollbar-track,
+.ag-theme-fiori .ag-body-vertical-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.ag-theme-fiori .ag-body-horizontal-scroll::-webkit-scrollbar-thumb,
+.ag-theme-fiori .ag-body-vertical-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.ag-theme-fiori .ag-body-horizontal-scroll::-webkit-scrollbar-thumb:hover,
+.ag-theme-fiori .ag-body-vertical-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Custom button styling within cells */
+.ag-theme-fiori button {
+  transition: all 0.2s ease-in-out;
+}
+
+.ag-theme-fiori button:focus {
+  outline: 2px solid #0a6ed1;
+  outline-offset: 2px;
+}

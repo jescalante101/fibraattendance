@@ -365,8 +365,10 @@ export class AddNewSacComponent implements OnInit,OnDestroy {
       costCenterId: value.costCenterId,
       costCenterName: value.costCenterName,
       observation: value.observation,
-      creationDate: value.creationDate,
+      createdAt: value.creationDate,
       createdBy: 'Admin',
+      updatedBy: 'Admin',
+      updateDate: value.creationDate,
       active: 'Y',
     };
     

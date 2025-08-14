@@ -7,6 +7,7 @@ import { UserFormModalComponent, UserFormResult, UserData } from './user-form-mo
 import { UserPermissionsModalComponent, UserPermissionsResult } from './user-permissions-modal/user-permissions-modal.component';
 import { UpdateAppUser, CreateAppUser } from 'src/app/core/models/app-user.model';
 import { ColDef, GridOptions, ICellRendererParams } from 'ag-grid-community';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 // Interfaz para tipos de Toast
 interface ToastConfig {
@@ -36,16 +37,33 @@ export class AppUserComponent implements OnInit {
   loadingOverlayComponent: any = null;
   noRowsOverlayComponent: any = null;
 
+  // Usuario logueado
+  usernameLogueado: string = '';
+
+
   constructor(
     private appUserService: AppUserService,
     private dialog: MatDialog,
-    private modalService: ModalService
+    private modalService: ModalService,
+    private authService: AuthService,
+
   ) { }
 
   ngOnInit() {
     this.setupAgGrid();
     this.loadUsers();
+    this.loadCurrentUser();
   }
+
+ // cargamos el usuario logueado
+ private loadCurrentUser() {
+  const user = this.authService.getCurrentUser();
+  if (user) {
+    this.usernameLogueado = user.username;
+  }
+
+ }
+
 
   loadUsers() {
     this.loading = true;
@@ -100,6 +118,8 @@ export class AppUserComponent implements OnInit {
       password: userData.password,
       firstName: userData.firstName,
       lastName: userData.lastName,
+      createdAt: new Date().toISOString(),
+      createdBy: this.usernameLogueado,
       isActive: userData.isActive
     };
 
@@ -128,11 +148,17 @@ export class AppUserComponent implements OnInit {
     const updatedUser: UpdateAppUser = {
       userName: userData.userName,
       email: userData.email,
-      password: userData.password,
+      password: userData.password.length > 0 ? userData.password : null,
       firstName: userData.firstName,
+      updatedAt: new Date().toISOString(),
+      updatedBy: this.usernameLogueado,
       lastName: userData.lastName,
       isActive: userData.isActive
     };
+    console.log('Datos que se enviarán al API:', updatedUser);
+    console.log('ID del usuario a actualizar:', userData.userId);
+
+
     this.appUserService.updateUser(updatedUser, userData.userId).subscribe({
       next: _ => {
         this.showToast('success', 'Usuario actualizado', `El usuario "${userData.userName}" ha sido actualizado correctamente.`);

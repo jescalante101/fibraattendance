@@ -6,12 +6,13 @@ import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 import { PersonService } from 'src/app/core/services/person.service';
 import { Employee } from 'src/app/components/personal/empleado/empleado/model/employeeDto';
 import { AttManualLogService } from 'src/app/core/services/att-manual-log.service';
-import { AttManualLog } from 'src/app/models/att-manual-log/att-maunual-log.model';
+import { AttManualLog, AttManualLogInsert } from 'src/app/models/att-manual-log/att-maunual-log.model';
 import { EmployeeScheduleAssignmentService } from 'src/app/core/services/employee-schedule-assignment.service';
 import { EmployeeScheduleHours } from 'src/app/models/employee-schedule/employee-schedule-hours.model';
 import { Subject, takeUntil } from 'rxjs';
 import { HeaderConfig, HeaderConfigService } from '../../../../../core/services/header-config.service';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-nueva-marcacion-manual',
@@ -64,6 +65,11 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
   expandedEmployee: EmployeeScheduleHours | null = null;
   displayedColumnsWithExpand: string[] = [];
 
+  // Datos de login
+  userLogin: string = '';
+
+  // Datos de marcación
+
   //Destroy
   // Aquí puedes agregar un Subject para manejar la limpieza de recursos si es necesario
    private destroy$ = new Subject<void>();
@@ -76,6 +82,8 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
     private attManualLogService: AttManualLogService,
     private employeeScheduleAssignmentService: EmployeeScheduleAssignmentService,
     private HeaderConfigService: HeaderConfigService,
+    private authService: AuthService,
+
   ) {
     this.empleadoForm = this.fb.group({
       departamento: ['']
@@ -107,7 +115,15 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
         this.displayedColumnsWithExpand = ['expand', ...this.displayedColumns];
       }); 
 
-    
+    // Obtener usuario logueado
+    this.getCurrentUserLogin();
+  }
+
+  private getCurrentUserLogin(): void {
+    const user = this.authService.getCurrentUser();
+    if(user){
+      this.userLogin=user.username;
+    }
   }
 
   ngOnDestroy(): void {
@@ -255,7 +271,8 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
     console.log('Tipo de hora:', typeof formValue.horaMarcacion);
     
     // Crear lista de marcaciones manuales
-    const marcacionesManuales: AttManualLog[] = this.empleadosSeleccionados.map(emp => {
+    const marcacionesManuales: AttManualLogInsert[] = this.empleadosSeleccionados.map(emp => {
+
       
       // Combinar fecha y hora para crear punchTime
       let punchTime: string;
@@ -304,6 +321,9 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
         temperature: null, // Valor null como especificado
         nroDoc: emp.nroDoc,
         fullName: emp.fullNameEmployee,
+        createdAt: new Date().toISOString(),
+        createdBy: this.userLogin,
+
 
       };
     });

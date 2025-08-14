@@ -21,9 +21,10 @@ export interface EmployeeScheduleAssignment {
   areaName: string;
   locationId: number;
   locationName: string;
-
+  createdBy: string | null;
+  updatedBy: string | null;
+  updatedAt: string | null;
 }
-
 export interface EmployeeScheduleAssignmentInsert {
   assignmentId:     number;
   employeeId:       string;
@@ -41,6 +42,27 @@ export interface EmployeeScheduleAssignmentInsert {
   locationId:       string;
   locationName:     string;
 }
+
+export interface EmployeeScheduleAssignmentUpdate {
+  assignmentId: number;
+  employeeId: string;
+  nroDoc: string;
+  fullNameEmployee: string | null;
+  scheduleName: string | null;
+  scheduleId: number;
+  startDate: string;
+  endDate: string;
+  remarks: string;
+  createdWeek: number;
+  areaId: number;
+  areaName: string;
+  locationId: number;
+  locationName: string;
+  updatedBy: string | null;
+  updatedAt: string | null;
+}
+
+
 
 export interface EmployeeHorario {
   id: number;
@@ -90,7 +112,7 @@ export class EmployeeScheduleAssignmentService {
   }
 
   //update employee schedule assignment
-  updateEmployeeScheduleAssignment( body: EmployeeScheduleAssignment[]): Observable<ApiResponse<EmployeeScheduleAssignment>> {
+  updateEmployeeScheduleAssignment( body: EmployeeScheduleAssignmentUpdate[]): Observable<ApiResponse<EmployeeScheduleAssignment>> {
     return this.http.put<ApiResponse<EmployeeScheduleAssignment>>(
       `${this.apiUrl}api/employee-schedule-assignment/update/`,
       body

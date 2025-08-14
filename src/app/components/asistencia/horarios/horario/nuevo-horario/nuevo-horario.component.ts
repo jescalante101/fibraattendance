@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { AttendanceService } from 'src/app/core/services/attendance.service';
+import { AuthService } from 'src/app/core/services/auth.service';
 import { Horario } from 'src/app/models/horario.model';
 import { ModalLoadingComponent } from 'src/app/shared/modal-loading/modal-loading.component';
 
@@ -28,11 +29,17 @@ export class NuevoHorarioComponent implements OnInit {
   isEditMode: boolean = false;
   loading = false;
 
+  // Datos de login
+  userLogin: string = '';
+
+
   constructor(
     @Optional() public dialogRef: MatDialogRef<NuevoHorarioComponent>,
     private attendanceService: AttendanceService,
     private fb: FormBuilder,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
+    private authService: AuthService
+
   ) {}
 
   ngOnInit() {
@@ -74,12 +81,22 @@ export class NuevoHorarioComponent implements OnInit {
       horaCambio: [''],
       totalMarcaciones: [4, [Validators.min(1)]],
       diasLaboral: [0, [Validators.required, Validators.min(0), Validators.max(1)]],
+      
     });
 
     this.loadDescansoData();
+    this.getCurrentUserLogin();
 
     
   }
+
+  private getCurrentUserLogin() {
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.userLogin = user.username;
+    }
+  }
+
 
   ngOnChanges(changes: SimpleChanges) {
     console.log('componentData',this.componentData);
@@ -182,9 +199,10 @@ export class NuevoHorarioComponent implements OnInit {
 
     
     const form = this.horarioForm.value;
-    const baseDate = '2000-01-01';
+    const baseDate = '2000-01-01';   
 
-    const horarioApi = {
+    if (this.idHorario !== 0) {
+      const horarioApi = {
       idHorio: this.idHorario || 0,
       nombre: form.nombre,
       tipo: this.useMode,
@@ -215,9 +233,8 @@ export class NuevoHorarioComponent implements OnInit {
       basadoM: form.basadoM,
       diasLaboral: form.diasLaboral,
       totalMarcaciones: form.totalMarcaciones,
+      updatedBy:this.userLogin,
     };
-
-    if (this.idHorario !== 0) {
       this.attendanceService.updateHorario(horarioApi).subscribe({
         next: (response) => {
           
@@ -233,7 +250,41 @@ export class NuevoHorarioComponent implements OnInit {
         }
       });
     } else {
-      this.attendanceService.saveHorario(horarioApi).subscribe({
+      const horarioApiInsert = {
+      idHorio: this.idHorario || 0,
+      nombre: form.nombre,
+      tipo: this.useMode,
+      horaEntrada: `${baseDate}T${form.horaEntrada}`,
+      horaSalida: `${baseDate}T${form.horaSalida}`,
+      tiempoTrabajo: "",
+      descanso: form.breakTimeId,
+      tipoTrabajo: "",
+      horaEntradaDesde: `${baseDate}T${form.horaEntradaDesde}`,
+      horaEntradaHasta: `${baseDate}T${form.horaEntradaHasta}`,
+      horaSalidaDesde: `${baseDate}T${form.horaSalidaDesde}`,
+      horaSalidaHasta: `${baseDate}T${form.horaSalidaHasta}`,
+      entradaTemprana: form.entradaTemprana,
+      entradaTarde: form.entradaTarde,
+      minEntradaTemprana: form.minEntradaTemprana,
+      minSalidaTarde: form.minSalidaTarde,
+      hnivel: form.hNivel,
+      hNivel1: form.hNivel1,
+      hNivel2: form.hNivel2,
+      hNivel3: form.hNivel3,
+      marcarEntrada: form.marcarEntrada,
+      marcarSalida: form.marcarSalida,
+      pLlegadaT: form.permiteLLegarT,
+      pSalidaT: form.permiteSalidaT,
+      tipoIntervalo: form.tipoIntervalo,
+      periodoMarcacion: form.periodoMarcacion,
+      hCambioDia: form.horaCambio ? `${baseDate}T${form.horaCambio}` : "",
+      basadoM: form.basadoM,
+      diasLaboral: form.diasLaboral,
+      totalMarcaciones: form.totalMarcaciones,
+      createdBy: this.userLogin,
+    };
+
+      this.attendanceService.saveHorario(horarioApiInsert).subscribe({
         next: (response) => {
           // Cerrar el modal padre con los datos de respuesta
           if (this.modalRef) {

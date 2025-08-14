@@ -335,7 +335,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         remarks: turno.observaciones || '',
         createdAt: now,
         crearteBY: createdBy,
-        fullNameEmployee: empleado ? `${empleado.nombres} ${empleado.apellidoPaterno} ${empleado.apellidoMaterno}` : '',
+        fullNameEmployee: empleado ? `${empleado.apellidoPaterno} ${empleado.apellidoMaterno}, ${empleado.nombres}` : '',
         shiftDescription: turnoSeleccionado ? turnoSeleccionado.alias : '',
         nroDoc: empleado ? empleado.nroDoc : '',
         areaId: area ? area.areaId : '',

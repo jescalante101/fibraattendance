@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
-import { AttManualLog } from 'src/app/models/att-manual-log/att-maunual-log.model';
+import { AttManualLog, AttManualLogInsert, AttManualLogUpdate } from 'src/app/models/att-manual-log/att-maunual-log.model';
 // Suponiendo que ApiResponse está definido en algún lugar del proyecto
 import { ApiResponse } from '../models/api-response.model';
 
@@ -22,7 +22,8 @@ export class AttManualLogService {
   }
 
   // POST: Crear una nueva marcación manual
-  createManualLog(log: AttManualLog[]): Observable<ApiResponse<AttManualLog>> {
+  createManualLog(log: AttManualLogInsert[]): Observable<ApiResponse<AttManualLog>> {
+
     return this.http.post<ApiResponse<AttManualLog>>(
       `${this.apiUrl}api/attmanuallog`,
       log
@@ -30,7 +31,8 @@ export class AttManualLogService {
   }
 
   // PUT: Actualizar una marcación manual existente
-  updateManualLog(id: number, log: AttManualLog): Observable<ApiResponse<AttManualLog>> {
+  updateManualLog(id: number, log: AttManualLogUpdate): Observable<ApiResponse<AttManualLog>> {
+
     return this.http.put<ApiResponse<AttManualLog>>(
       `${this.apiUrl}api/attmanuallog/${id}`,
       log

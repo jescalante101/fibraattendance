@@ -2,7 +2,8 @@ import { Component, Inject, Input, OnInit, Optional } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AttManualLogService } from 'src/app/core/services/att-manual-log.service';
-import { AttManualLog } from 'src/app/models/att-manual-log/att-maunual-log.model';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { AttManualLog, AttManualLogUpdate } from 'src/app/models/att-manual-log/att-maunual-log.model';
 
 @Component({
   selector: 'app-editar-marcion-manual',
@@ -17,11 +18,17 @@ export class EditarMarcionManualComponent implements OnInit {
   modalRef: any; // Referencia al modal para poder cerrarlo
   saving: boolean = false; // Estado de guardado
 
+  // Datos de login
+  userLogin: string = '';
+
+
   constructor(
     private fb: FormBuilder,
     private attManualLogService: AttManualLogService,
     @Optional() public dialogRef: MatDialogRef<EditarMarcionManualComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
+    private authService: AuthService,
+
   ) {
     this.editForm = this.fb.group({
       fecha: [null, Validators.required],
@@ -63,7 +70,17 @@ export class EditarMarcionManualComponent implements OnInit {
         }
       });
     }
+    this.getUserLogin()
   }
+
+  // Obtener el login del usuario
+  getUserLogin() {
+    const user= this.authService.getCurrentUser();
+    if(user){
+      this.userLogin=user.username;
+    }
+  }
+
 
   getEstadoMarcacionFromPunchState(punchState: number): string {
     switch (punchState) {
@@ -112,7 +129,8 @@ export class EditarMarcionManualComponent implements OnInit {
       }
 
       // Crear el objeto AttManualLog actualizado
-      const marcacionActualizada: AttManualLog = {
+      const marcacionActualizada: AttManualLogUpdate = {
+
         manualLogId: this.id,
         abstractexceptionPtrId: 1,
         punchTime: punchTime,
@@ -130,6 +148,8 @@ export class EditarMarcionManualComponent implements OnInit {
         temperature: null,
         nroDoc: this.empleadoLabel, // Se mantendrá el valor existente en el backend,
         fullName: this.empleadoLabel,
+        updatedAt: new Date().toISOString(),
+        updatedBy: this.userLogin,
 
       };
 

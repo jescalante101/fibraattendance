@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { SedeCcosto } from '../models/sede-ccosto.model';
+import { SedeCcosto, SedeCcostoInsert, SedeCcostoUpdate } from '../models/sede-ccosto.model';
 
 @Injectable({
   providedIn: 'root'
@@ -17,11 +17,11 @@ export class SedeCcostoService {
     return this.http.get<SedeCcosto[]>(this.resource);
   }
 
-  create(sedeCcosto: SedeCcosto): Observable<SedeCcosto> {
+  create(sedeCcosto: SedeCcostoInsert): Observable<SedeCcosto> {
     return this.http.post<SedeCcosto>(this.resource, sedeCcosto);
   }
 
-  update(siteId: string, costCenterId: string, sedeCcosto: SedeCcosto): Observable<SedeCcosto> {
+  update(siteId: string, costCenterId: string, sedeCcosto: SedeCcostoUpdate): Observable<SedeCcosto> {
     return this.http.put<SedeCcosto>(`${this.resource}/${siteId}/${costCenterId}`, sedeCcosto);
   }
 

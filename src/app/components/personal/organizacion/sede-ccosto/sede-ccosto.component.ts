@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SedeCcostoService } from 'src/app/core/services/sede-ccosto.service';
-import { SedeCcosto } from 'src/app/core/models/sede-ccosto.model';
+import { SedeCcosto, SedeCcostoInsert, SedeCcostoUpdate } from 'src/app/core/models/sede-ccosto.model';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { CostCenterService, CostCenter } from 'src/app/core/services/cost-center.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -11,6 +11,17 @@ import { HeaderConfigService } from 'src/app/core/services/header-config.service
 import { Subject, takeUntil } from 'rxjs';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { SedeCcostoFormModalComponent, SedeCcostoFormResult, SedeCcostoData } from './sede-ccosto-form-modal/sede-ccosto-form-modal.component';
+import { AuthService } from '../../../../core/services/auth.service';
+
+// Interfaces for tree data
+interface GroupedSite {
+  siteName: string;
+  siteId: string;
+  relations: SedeCcosto[];
+  relationCount: number;
+}
+
+export type DisplayItem = (GroupedSite & { isGroup: true }) | (SedeCcosto & { isGroup: false });
 
 @Component({
   selector: 'app-sede-ccosto',
@@ -29,6 +40,11 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
   error = '';
   filtroTexto = '';
 
+  // Tree data properties
+  groupedSites: GroupedSite[] = [];
+  displayItems: DisplayItem[] = [];
+  expandedSites = new Set<string>();
+
   // Dropdown states for Flowbite components
   showSedeDropdown = false;
   showCcostoDropdown = false;
@@ -43,6 +59,9 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
   //destroy subject for unsubscribing
   private destroy$ = new Subject<void>();
 
+  //
+  userLogin:string='';
+
   constructor(
     private fb: FormBuilder,
     private sedeCcostoService: SedeCcostoService,
@@ -51,7 +70,8 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private headerConfigService: HeaderConfigService,
-    private modalService: ModalService
+    private modalService: ModalService,
+    private AuthService: AuthService
   ) {
     this.form = this.fb.group({
       siteId: ['', Validators.required],
@@ -75,10 +95,18 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
     this.loadSedes();
     this.loadCostCenters();
 
-      });
+      });    
 
-    
+    this.getUserCurrent();
   }
+
+  private getUserCurrent(){
+    const user= this.AuthService.getCurrentUser();
+    if(user){
+      this.userLogin=user.username;
+    }
+  }
+
 
   ngOnDestroy(): void {
       this.destroy$.next();
@@ -92,12 +120,14 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
       next: (data) => {
         this.sedeCcostoList = data;
         this.sedeCcostoListFiltrada = [...data];
+        this.applySearchFilter();
         this.loading = false;
       },
       error: (err) => {
         if (err.status === 404 || err.status === 400) {
           this.sedeCcostoList = [];
           this.sedeCcostoListFiltrada = [];
+          this.applySearchFilter();
           this.loading = false;
           this.error = '';
           return;
@@ -105,6 +135,7 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
           this.error = 'Error al cargar los datos';
           this.sedeCcostoList = [];
           this.sedeCcostoListFiltrada = [];
+          this.applySearchFilter();
           this.loading = false;
         }
       }
@@ -128,41 +159,7 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
     });
   }
 
-  onSubmit() {
-    if (this.form.invalid) return;
-    const value = this.form.getRawValue();
-    const sede = this.sedes.find(s => s.categoriaAuxiliarId === value.siteId);
-    const ccosto = this.ccostos.find(c => c.ccostoId === value.costCenterId);
-    const model: SedeCcosto = {
-      siteId: value.siteId,
-      siteName: sede?.descripcion || '',
-      costCenterId: value.costCenterId,
-      costCenterName: ccosto?.descripcion || '',
-      observation: value.observation,
-      createdBy: 'Admin',
-      creationDate: value.creationDate || new Date().toISOString(),
-      active: 'Y',
-    };
-    if (this.editing && this.selected) {
-      this.sedeCcostoService.update(this.selected.siteId, this.selected.costCenterId, model).subscribe({
-        next: () => {
-          this.snackBar.open('Registro actualizado', 'Cerrar', { duration: 3000 });
-          this.loadSedeCcosto();
-          this.cancelEdit();
-        },
-        error: () => this.snackBar.open('Error al actualizar', 'Cerrar', { duration: 3000 })
-      });
-    } else {
-      this.sedeCcostoService.create(model).subscribe({
-        next: () => {
-          this.snackBar.open('Registro creado', 'Cerrar', { duration: 3000 });
-          this.loadSedeCcosto();
-          this.form.reset({ creationDate: new Date().toISOString().substring(0, 16) });
-        },
-        error: () => this.snackBar.open('Error al crear', 'Cerrar', { duration: 3000 })
-      });
-    }
-  }
+  
 
   onEdit(item: SedeCcosto) {
     this.modalService.open({
@@ -174,7 +171,10 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
           siteId: item.siteId,
           costCenterId: item.costCenterId,
           observation: item.observation,
-          creationDate: item.creationDate,
+          createdAt: item.createdAt,
+          createdBy: item.createdBy,
+          updateDate: item.updateDate,
+          updatedBy: item.updatedBy,
           active: item.active
         },
         isEditMode: true,
@@ -190,15 +190,6 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
     });
   }
 
-  cancelEdit() {
-    this.editing = false;
-    this.selected = undefined;
-    this.form.reset({ 
-      creationDate: new Date().toISOString().substring(0, 16),
-      sedeFilter: '',
-      ccostoFilter: ''
-    });
-  }
 
   onDelete(item: SedeCcosto) {
     const dialogRef = this.dialog.open(ModalConfirmComponent, {
@@ -359,14 +350,15 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
     const sede = this.sedes.find(s => s.categoriaAuxiliarId === sedeCcostoData.siteId);
     const ccosto = this.ccostos.find(c => c.ccostoId === sedeCcostoData.costCenterId);
     
-    const sedeCcosto: SedeCcosto = {
+    const sedeCcosto: SedeCcostoInsert = {
+
       siteId: sedeCcostoData.siteId,
       siteName: sede?.descripcion || '',
       costCenterId: sedeCcostoData.costCenterId,
       costCenterName: ccosto?.descripcion || '',
       observation: sedeCcostoData.observation || '',
-      createdBy: 'Admin',
-      creationDate: sedeCcostoData.creationDate || new Date().toISOString(),
+      createdBy: this.userLogin,
+      createdAt: sedeCcostoData.creationDate || new Date().toISOString(),
       active: 'Y',
     };
 
@@ -388,14 +380,12 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
     const sede = this.sedes.find(s => s.categoriaAuxiliarId === sedeCcostoData.siteId);
     const ccosto = this.ccostos.find(c => c.ccostoId === sedeCcostoData.costCenterId);
     
-    const sedeCcosto: SedeCcosto = {
-      siteId: sedeCcostoData.siteId,
+    const sedeCcosto: SedeCcostoUpdate = {
       siteName: sede?.descripcion || '',
-      costCenterId: sedeCcostoData.costCenterId,
       costCenterName: ccosto?.descripcion || '',
       observation: sedeCcostoData.observation || '',
-      createdBy: originalItem.createdBy,
-      creationDate: sedeCcostoData.creationDate || originalItem.creationDate,
+      updatedBy: this.userLogin,
+      updateDate: new Date().toISOString(),
       active: sedeCcostoData.active || 'Y',
     };
 
@@ -424,25 +414,103 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
     return `${item.siteId}-${item.costCenterId}`;
   }
 
-  // Métodos para filtrado local
+  // Métodos para filtrado local y agrupación
   filtrarDatos(): void {
-    if (!this.filtroTexto.trim()) {
-      this.sedeCcostoListFiltrada = [...this.sedeCcostoList];
-      return;
+    this.applySearchFilter();
+  }
+
+  applySearchFilter() {
+    const term = this.filtroTexto.trim().toLowerCase();
+    const allGroups = this.createGroupedSites(this.sedeCcostoList);
+
+    if (!term) {
+      this.groupedSites = allGroups;
+      this.expandedSites.clear();
+    } else {
+      this.groupedSites = allGroups.filter(group => {
+        const groupNameMatch = group.siteName.toLowerCase().includes(term);
+        const relationMatch = group.relations.some(relation =>
+          relation.costCenterName.toLowerCase().includes(term) ||
+          relation.siteId.toLowerCase().includes(term) ||
+          relation.costCenterId.toLowerCase().includes(term) ||
+          (relation.observation && relation.observation.toLowerCase().includes(term))
+        );
+        return groupNameMatch || relationMatch;
+      });
+
+      // Auto-expand groups when searching
+      this.expandedSites.clear();
+      this.groupedSites.forEach(group => this.expandedSites.add(group.siteName));
     }
 
-    const filtro = this.filtroTexto.toLowerCase().trim();
-    this.sedeCcostoListFiltrada = this.sedeCcostoList.filter(item => 
-      item.siteName.toLowerCase().includes(filtro) ||
-      item.costCenterName.toLowerCase().includes(filtro) ||
-      item.siteId.toLowerCase().includes(filtro) ||
-      item.costCenterId.toLowerCase().includes(filtro) ||
-      (item.observation && item.observation.toLowerCase().includes(filtro))
-    );
+    this.updateDisplayItems();
+  }
+
+  createGroupedSites(sites: SedeCcosto[]): GroupedSite[] {
+    const groups = new Map<string, { siteId: string, relations: SedeCcosto[] }>();
+    
+    sites.forEach(site => {
+      if (!groups.has(site.siteName)) {
+        groups.set(site.siteName, { siteId: site.siteId, relations: [] });
+      }
+      groups.get(site.siteName)!.relations.push(site);
+    });
+
+    return Array.from(groups.entries()).map(([siteName, data]) => ({
+      siteName,
+      siteId: data.siteId,
+      relations: data.relations,
+      relationCount: data.relations.length
+    }));
+  }
+
+  updateDisplayItems() {
+    this.displayItems = [];
+    this.groupedSites.forEach(group => {
+      this.displayItems.push({ ...group, isGroup: true });
+      if (this.expandedSites.has(group.siteName)) {
+        group.relations.forEach(relation => {
+          this.displayItems.push({ ...relation, isGroup: false });
+        });
+      }
+    });
+  }
+
+  toggleGroup(siteName: string) {
+    if (this.expandedSites.has(siteName)) {
+      this.expandedSites.delete(siteName);
+    } else {
+      this.expandedSites.add(siteName);
+    }
+    this.updateDisplayItems();
+  }
+
+  isGroupExpanded(siteName: string): boolean {
+    return this.expandedSites.has(siteName);
+  }
+
+  getActiveCountForSite(siteName: string): number {
+    return this.sedeCcostoList.filter(site => site.siteName === siteName && site.active === 'Y').length;
+  }
+
+  trackByItem(index: number, item: DisplayItem): string {
+    return item.isGroup ? item.siteId : item.siteId + '-' + item.costCenterId;
+  }
+
+  formatDate(dateString?: string): string {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 
   limpiarFiltro(): void {
     this.filtroTexto = '';
-    this.sedeCcostoListFiltrada = [...this.sedeCcostoList];
+    this.applySearchFilter();
   }
 }

@@ -2,10 +2,11 @@ import { Component, Inject, OnInit, Optional } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { ShiftsService, Shift } from 'src/app/core/services/shifts.service';
-import { EmployeeScheduleAssignmentService, EmployeeScheduleAssignment, EmployeeScheduleAssignmentInsert } from 'src/app/core/services/employee-schedule-assignment.service';
+import { EmployeeScheduleAssignmentService, EmployeeScheduleAssignment, EmployeeScheduleAssignmentInsert, EmployeeScheduleAssignmentUpdate } from 'src/app/core/services/employee-schedule-assignment.service';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 export interface EditarAsignacionData {
   assignmentIds: number[];
@@ -40,12 +41,18 @@ export class ModalEditarAsignacionComponent implements OnInit {
   // Días de la semana
   diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
+  // usuario logueado
+  userLogin: string =''
+
+
   constructor(
     private fb: FormBuilder,
     private shiftsService: ShiftsService,
     private employeeScheduleService: EmployeeScheduleAssignmentService,
     private snackBar: MatSnackBar,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
+    private authService: AuthService
+
   ) {
     this.editForm = this.fb.group({
       scheduleId: [null, Validators.required],
@@ -63,6 +70,16 @@ export class ModalEditarAsignacionComponent implements OnInit {
       this.initializeData();
     }, 100);
   }
+
+  private getCurrentUserLogin(): void {
+   const user=this.authService.getCurrentUser();
+   if(user){
+    this.userLogin=user.username;
+   }
+
+  }
+
+
 
   initializeData(): void {
     console.log('initializeData ejecutándose...');
@@ -204,7 +221,7 @@ export class ModalEditarAsignacionComponent implements OnInit {
     this.loading = true;
     
     // Crear array de asignaciones para actualizar
-    const updateDataArray: EmployeeScheduleAssignment[] = this.datat.assignmentIds.map((assignmentId) => ({
+    const updateDataArray: EmployeeScheduleAssignmentUpdate[] = this.datat.assignmentIds.map((assignmentId) => ({
       assignmentId: assignmentId, // Incluir el ID de la asignación
       employeeId: this.datat.employeeId || '',
       nroDoc: this.datat.nroDoc || '',
@@ -219,7 +236,9 @@ export class ModalEditarAsignacionComponent implements OnInit {
       areaId: this.datat.areaId || 0,
       areaName: this.datat.areaName || '',
       locationId: this.datat.locationId || 0,
-      locationName: this.datat.locationName || ''
+      locationName: this.datat.locationName || '',
+      updatedAt: new Date().toISOString(),
+      updatedBy: this.userLogin || ''
     }));
 
     console.log('Datos a enviar al API:', updateDataArray);

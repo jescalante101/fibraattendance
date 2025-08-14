@@ -1,4 +1,3 @@
-// sede-area-costo.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,6 +9,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 
+interface GroupedSite {
+  siteName: string;
+  siteId: string;
+  relations: SedeAreaCosto[];
+  relationCount: number;
+}
+
+export type DisplayItem = (GroupedSite & { isGroup: true }) | (SedeAreaCosto & { isGroup: false });
 
 @Component({
   selector: 'app-sede-area-costo',
@@ -19,7 +26,9 @@ import { ModalService } from 'src/app/shared/modal/modal.service';
 export class SedeAreaCostoComponent implements OnInit {
   searchTerm = '';
   sites: SedeAreaCosto[] = [];
-  filteredSites: SedeAreaCosto[] = [];
+  groupedSites: GroupedSite[] = [];
+  displayItems: DisplayItem[] = [];
+  expandedSites = new Set<string>();
   loading = false;
   error = '';
   lastUpdate: string = new Date().toLocaleString('es-ES');
@@ -41,31 +50,87 @@ export class SedeAreaCostoComponent implements OnInit {
     this.sedeAreaCostoService.getAll().subscribe({
       next: (data) => {
         this.sites = data;
-        this.filteredSites = [...this.sites];
+        this.applySearchFilter();
         this.loading = false;
       },
       error: (err) => {
         this.error = 'Error al cargar los sitios';
         this.sites = [];
-        this.filteredSites = [];
+        this.applySearchFilter();
         this.loading = false;
       }
     });
   }
 
-  onSearchChange() {
-    if (!this.searchTerm.trim()) {
-      this.filteredSites = [...this.sites];
-      return;
+  applySearchFilter() {
+    const term = this.searchTerm.trim().toLowerCase();
+    const allGroups = this.createGroupedSites(this.sites);
+
+    if (!term) {
+      this.groupedSites = allGroups;
+      this.expandedSites.clear();
+    } else {
+      this.groupedSites = allGroups.filter(group => {
+        const groupNameMatch = group.siteName.toLowerCase().includes(term);
+        const relationMatch = group.relations.some(relation =>
+          relation.areaName.toLowerCase().includes(term) ||
+          relation.costCenterName.toLowerCase().includes(term) ||
+          relation.createdBy.toLowerCase().includes(term)
+        );
+        return groupNameMatch || relationMatch;
+      });
+
+      this.expandedSites.clear();
+      this.groupedSites.forEach(group => this.expandedSites.add(group.siteName));
     }
 
-    const term = this.searchTerm.toLowerCase();
-    this.filteredSites = this.sites.filter(site => 
-      site.siteName.toLowerCase().includes(term) ||
-      site.areaName.toLowerCase().includes(term) ||
-      site.costCenterName.toLowerCase().includes(term) ||
-      site.createdBy.toLowerCase().includes(term)
-    );
+    this.updateDisplayItems();
+  }
+
+  createGroupedSites(sites: SedeAreaCosto[]): GroupedSite[] {
+    const groups = new Map<string, { siteId: string, relations: SedeAreaCosto[] }>();
+    sites.forEach(site => {
+      if (!groups.has(site.siteName)) {
+        groups.set(site.siteName, { siteId: site.siteId, relations: [] });
+      }
+      groups.get(site.siteName)!.relations.push(site);
+    });
+
+    return Array.from(groups.entries()).map(([siteName, data]) => ({
+      siteName,
+      siteId: data.siteId,
+      relations: data.relations,
+      relationCount: data.relations.length
+    }));
+  }
+
+  updateDisplayItems() {
+    this.displayItems = [];
+    this.groupedSites.forEach(group => {
+      this.displayItems.push({ ...group, isGroup: true });
+      if (this.expandedSites.has(group.siteName)) {
+        group.relations.forEach(relation => {
+          this.displayItems.push({ ...relation, isGroup: false });
+        });
+      }
+    });
+  }
+
+  toggleGroup(siteName: string) {
+    if (this.expandedSites.has(siteName)) {
+      this.expandedSites.delete(siteName);
+    } else {
+      this.expandedSites.add(siteName);
+    }
+    this.updateDisplayItems();
+  }
+
+  isGroupExpanded(siteName: string): boolean {
+    return this.expandedSites.has(siteName);
+  }
+
+  onSearchChange() {
+    this.applySearchFilter();
   }
 
   onAddNew() {
@@ -76,12 +141,11 @@ export class SedeAreaCostoComponent implements OnInit {
       width: '700px'
     }).then((result: SedeAreaCosto[] | null) => {
       if (result) {
-        
         this.sedeAreaCostoService.create(result).subscribe({
           next: () => {
             this.loadSites();
             this.snackBar.open('Registro creado exitosamente', 'Cerrar', 
-              { 
+              {
                 duration: 3000 ,
                 verticalPosition: 'top',
                 horizontalPosition: 'end',
@@ -93,7 +157,7 @@ export class SedeAreaCostoComponent implements OnInit {
             this.snackBar.open(
               'Error al crear el registro', 
               'Cerrar', 
-              { 
+              {
                 duration: 3000 ,
                 verticalPosition: 'top',
                 horizontalPosition: 'end',
@@ -121,7 +185,7 @@ export class SedeAreaCostoComponent implements OnInit {
             this.snackBar.open(
               'Registro actualizado exitosamente', 
               'Cerrar', 
-              { 
+              {
                 duration: 3000 ,
                 verticalPosition: 'top',
                 horizontalPosition: 'end',
@@ -133,7 +197,7 @@ export class SedeAreaCostoComponent implements OnInit {
             console.log('error al actualizar el registro', error);
             this.snackBar.open(
               'Error al actualizar el registro', 
-              'Cerrar', 
+              'Cerrar',
               {
                  duration: 3000 ,
                  verticalPosition: 'top',
@@ -155,7 +219,8 @@ export class SedeAreaCostoComponent implements OnInit {
       data: {
         tipo: 'warning',
         titulo: 'Confirmar desactivación',
-        mensaje: `¿Estás seguro de que deseas ${site.active === 'Y' ? 'desactivar' : 'activar'} el registro de la sede ${site.siteName} \n y área${site.areaName}?`,
+        mensaje: `¿Estás seguro de que deseas ${site.active === 'Y' ? 'desactivar' : 'activar'} el registro de la sede ${site.siteName} 
+ y área${site.areaName}?`,
         confirmacion: true,
         textoConfirmar: 'Desactivar'
       }
@@ -189,7 +254,8 @@ export class SedeAreaCostoComponent implements OnInit {
       data: {
         tipo: 'danger',
         titulo: 'Confirmar eliminación',
-        mensaje: `¿Estás seguro de que deseas eliminar el registro de la sede ${site.siteName} \n y área${site.areaName}?`,
+        mensaje: `¿Estás seguro de que deseas eliminar el registro de la sede ${site.siteName} 
+ y área${site.areaName}?`,
         confirmacion: true,
         textoConfirmar: 'Eliminar'
       }
@@ -228,8 +294,10 @@ export class SedeAreaCostoComponent implements OnInit {
     });
   }
 
-  formatDate(dateString: string): string {
+  formatDate(dateString?: string): string {
+    if (!dateString) return '-';
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '-';
     return date.toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'short',
@@ -239,8 +307,8 @@ export class SedeAreaCostoComponent implements OnInit {
     });
   }
 
-  trackBySiteId(index: number, site: SedeAreaCosto): string {
-    return site.siteId;
+  trackByItem(index: number, item: DisplayItem): string {
+    return item.isGroup ? item.siteId : `${item.siteId}-${item.areaId}-${item.costCenterId}`;
   }
 
   getActiveCount(): number {
@@ -249,5 +317,9 @@ export class SedeAreaCostoComponent implements OnInit {
 
   getInactiveCount(): number {
     return this.sites.filter(site => site.active !== 'Y').length;
+  }
+
+  getActiveCountForSite(siteName: string): number {
+    return this.sites.filter(site => site.siteName === siteName && site.active === 'Y').length;
   }
 }

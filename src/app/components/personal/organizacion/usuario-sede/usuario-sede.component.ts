@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AppUserSiteService } from 'src/app/core/services/app-user-site.service';
-import { UserSite } from 'src/app/models/user-site.model';
+import { UserSite, UserSiteUpdate } from 'src/app/models/user-site.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { AppUserService, User } from 'src/app/core/services/app-user.services';
@@ -8,6 +8,15 @@ import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confir
 import { MatDialog } from '@angular/material/dialog';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { UserSiteFormModalComponent, UserSiteFormResult, UserSiteData, Usuario, Sede } from './user-site-form-modal/user-site-form-modal.component';
+import { AuthService } from 'src/app/core/services/auth.service';
+// Removed AG-Grid imports - using Flowbite + Tailwind instead
+
+// Interface for grouped user data
+export interface UserSiteGroup {
+  user: User;
+  userSites: UserSite[];
+  expanded: boolean;
+}
 
 @Component({
   selector: 'app-usuario-sede',
@@ -22,27 +31,49 @@ export class UsuarioSedeComponent implements OnInit {
   usuarios: User[] = [];
   searchTerm = '';
 
+  // usuario logueado
+  userId: number = 0;
+  userName: string = '';
+
+  // Flowbite Accordion Configuration
+  userSiteGroups: UserSiteGroup[] = [];
+  expandedGroups: { [userId: number]: boolean } = {};
+
+
   constructor(
     private userSiteService: AppUserSiteService,
     private categoriaAuxiliarService: CategoriaAuxiliarService,
     private appUserService: AppUserService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
-    private modalService: ModalService
+    private modalService: ModalService,
+    private authService: AuthService,
+
   ) {}
 
   ngOnInit() {
     this.loadUserSites();
     this.loadSedes();
     this.loadUsuarios();
+    this.getUserId();
   }
+  // obtener el usuario logueado
+  getUserId() {
+    const user= this.authService.getCurrentUser()
+    if (user) {
+      this.userId = user.id;
+      this.userName = user.username;
+    }
+  }
+
 
   loadUserSites() {
     this.loading = true;
     this.userSiteService.getAll().subscribe({
-      next: (data) => {
-        this.userSites = data;
-        this.filteredUserSites = [...this.userSites];
+      next: (userSites: UserSite[]) => {
+        this.userSites = userSites;
+        this.filteredUserSites = [...userSites];
+        this.groupUserSitesByUser(userSites);
         this.loading = false;
       },
       error: () => {
@@ -105,8 +136,8 @@ export class UsuarioSedeComponent implements OnInit {
         siteId: userSiteData.siteId,
         siteName: sede?.descripcion || '',
         observation: userSiteData.observation || '',
-        createdBy: 'Admin',
-        creationDate: userSiteData.creationDate || new Date().toISOString(),
+        createdBy: this.userName,
+        createdAt: userSiteData.createdAt || new Date().toISOString(),
         active: 'Y',
       };
     });
@@ -129,34 +160,7 @@ export class UsuarioSedeComponent implements OnInit {
     });
   }
 
-  // Crear asignación usuario-sede (método legacy para edición)
-  private createUserSite(userSiteData: UserSiteData) {
-    this.loading = true;
-    const user = this.usuarios.find(u => u.userId === userSiteData.userId);
-    const sede = this.sedes.find(s => s.categoriaAuxiliarId === userSiteData.siteId);
-    
-    const userSite: UserSite = {
-      userId: userSiteData.userId,
-      userName: user?.userName || '',
-      siteId: userSiteData.siteId,
-      siteName: sede?.descripcion || '',
-      observation: userSiteData.observation || '',
-      createdBy: 'Admin',
-      creationDate: userSiteData.creationDate || new Date().toISOString(),
-      active: 'Y',
-    };
-
-    this.userSiteService.create(userSite).subscribe({
-      next: () => {
-        this.snackBar.open('Asignación creada exitosamente', 'Cerrar', { duration: 3000 });
-        this.loadUserSites();
-      },
-      error: () => {
-        this.loading = false;
-        this.snackBar.open('Error al crear la asignación', 'Cerrar', { duration: 3000 });
-      }
-    });
-  }
+  
 
   // Actualizar asignación usuario-sede
   private updateUserSite(userSiteData: UserSiteData) {
@@ -166,15 +170,14 @@ export class UsuarioSedeComponent implements OnInit {
     const user = this.usuarios.find(u => u.userId === userSiteData.userId);
     const sede = this.sedes.find(s => s.categoriaAuxiliarId === userSiteData.siteId);
     
-    const userSite: UserSite = {
+    const userSite: UserSiteUpdate = {
       userId: userSiteData.userId,
-      userName: user?.userName || '',
       siteId: userSiteData.siteId,
-      siteName: sede?.descripcion || '',
       observation: userSiteData.observation || '',
-      createdBy: 'Admin',
-      creationDate: userSiteData.creationDate || new Date().toISOString(),
-      active: userSiteData.active || 'Y',
+      userName: user?.userName || '',
+      updatedBy: this.userName,
+      updatedAt: userSiteData.updatedAt || new Date().toISOString(),  
+      active: userSiteData.active || 'Y' 
     };
 
     // Use the original userSite IDs for update
@@ -203,7 +206,7 @@ export class UsuarioSedeComponent implements OnInit {
           userId: userSite.userId,
           siteId: userSite.siteId,
           observation: userSite.observation,
-          creationDate: userSite.creationDate,
+          createdAt: userSite.createdAt,
           active: userSite.active
         },
         isEditMode: true,
@@ -259,10 +262,16 @@ export class UsuarioSedeComponent implements OnInit {
         textoConfirmar: userSite.active === 'Y' ? 'Desactivar' : 'Activar'
       }
     });
-    const updated = { ...userSite, active: userSite.active === 'Y' ? 'N' : 'Y' };
+    // Add updatedBy and updatedAt
+    const userSiteUpdate: UserSiteUpdate = {
+      ...userSite,
+      active: userSite.active === 'Y' ? 'N' : 'Y',
+      updatedBy: this.userName, // Replace with actual user ID
+      updatedAt: new Date().toISOString()
+    };
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (confirmed) {
-        this.userSiteService.update(userSite.userId, userSite.siteId, updated).subscribe({
+        this.userSiteService.update(userSite.userId, userSite.siteId, userSiteUpdate).subscribe({
           next: () => {
             this.snackBar.open(
               userSite.active === 'Y' ? 'Registro desactivado' : 'Registro activado',
@@ -283,10 +292,10 @@ export class UsuarioSedeComponent implements OnInit {
     return `${userSite.userId}-${userSite.siteId}`;
   }
 
-  // Search functionality for table
   onSearchChange() {
     if (!this.searchTerm.trim()) {
       this.filteredUserSites = [...this.userSites];
+      this.groupUserSitesByUser(this.userSites);
       return;
     }
 
@@ -296,6 +305,7 @@ export class UsuarioSedeComponent implements OnInit {
       us.siteName.toLowerCase().includes(term) ||
       us.observation?.toLowerCase().includes(term)
     );
+    this.groupUserSitesByUser(this.filteredUserSites);
   }
 
   // Helper methods for statistics
@@ -306,4 +316,56 @@ export class UsuarioSedeComponent implements OnInit {
   getInactiveCount(): number {
     return this.userSites.filter(us => us.active !== 'Y').length;
   }
+
+  // ===================== Removed AG-Grid Configuration =====================
+
+  // Group user sites by user for accordion display
+  groupUserSitesByUser(userSites: UserSite[]) {
+    const userGroups: { [userId: number]: UserSite[] } = {};
+    
+    userSites.forEach(userSite => {
+      if (!userGroups[userSite.userId]) {
+        userGroups[userSite.userId] = [];
+      }
+      userGroups[userSite.userId].push(userSite);
+    });
+
+    this.userSiteGroups = Object.keys(userGroups).map(userIdStr => {
+      const userId = Number(userIdStr);
+      const userSites = userGroups[userId];
+      const user = this.usuarios.find(u => u.userId === userId);
+      
+      return {
+        user: user || { userId, userName: userSites[0]?.userName || 'Usuario Desconocido' } as User,
+        userSites: userSites,
+        expanded: this.expandedGroups[userId] || false
+      };
+    });
+  }
+
+  // Toggle accordion expansion
+  toggleGroup(userId: number) {
+    this.expandedGroups[userId] = !this.expandedGroups[userId];
+    const group = this.userSiteGroups.find(g => g.user.userId === userId);
+    if (group) {
+      group.expanded = this.expandedGroups[userId];
+    }
+  }
+
+  // Check if group is expanded
+  isGroupExpanded(userId: number): boolean {
+    return this.expandedGroups[userId] || false;
+  }
+
+  // Get active count for specific user
+  getActiveCountForUser(userSites: UserSite[]): number {
+    return userSites.filter(us => us.active === 'Y').length;
+  }
+
+  // TrackBy functions for performance
+  trackByUserId(index: number, group: UserSiteGroup): number {
+    return group.user.userId;
+  }
+
+
 }

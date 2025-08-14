@@ -2,6 +2,7 @@ import { Component, Inject, Input, OnInit, Optional } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AttendanceService } from 'src/app/core/services/attendance.service';
+import { AuthService } from 'src/app/core/services/auth.service';
 import { ModalLoadingComponent } from 'src/app/shared/modal-loading/modal-loading.component';
 
 @Component({
@@ -26,15 +27,28 @@ export class NuevoDescansoComponent implements OnInit {
   // Tab state
   activeTab = 'basic';
 
+  // Datos de login
+  userLogin: string = '';
+
+
   constructor(
     private fb: FormBuilder,
     @Optional() public dialogRef: MatDialogRef<NuevoDescansoComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     private attendanceService: AttendanceService,
-    private dialogLoading: MatDialog
+    private dialogLoading: MatDialog,
+    private authService: AuthService
+
   ) {
     
   }
+  private getCurrentUserLogin() {
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.userLogin = user.username;
+    }
+  }
+
 
   ngOnInit() {
     this.descansoForm = this.fb.group({
@@ -92,6 +106,8 @@ export class NuevoDescansoComponent implements OnInit {
       if (this.idDescanso) {
         // Si hay un id de descanso, actualizamos el descanso
         formValue.id = this.idDescanso;
+        formValue.updatedBy = this.userLogin;
+
         this.attendanceService.updateDescanso(formValue).subscribe({
          next: (response) => {
          this.modalRef.closeModalFromChild(response);
@@ -101,6 +117,7 @@ export class NuevoDescansoComponent implements OnInit {
          }
         });
       }else{
+        formValue.createdBy = this.userLogin;
          this.attendanceService.saveDescanso(formValue).subscribe({
         next: (response) => {
          this.modalRef.closeModalFromChild(response);

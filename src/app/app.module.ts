@@ -8,12 +8,9 @@ import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { routing } from './app.routing';
-import { InicioComponent } from './components/inicio/inicio.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { LoginComponent } from './components/login/login.component';
 import { NgxTinymceModule } from 'ngx-tinymce';
-import { ConfigComponent } from './components/config/config.component';
-import { TableComponent } from './components/table/table.component';
 
 import { FilterOrdenesPipe } from './filter-ordenes.pipe';
 import { NgxPaginationModule } from 'ngx-pagination';
@@ -93,7 +90,7 @@ import { ReporteMarcacionesDetalleComponent } from './components/asistencia/marc
 import { ModalVerHorarioComponent } from './components/personal/empleado/asignar-horario-empleado/modal-ver-horario/modal-ver-horario.component';
 import { ModalEditarAsignacionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-editar-asignacion/modal-editar-asignacion.component';
 import { ModalRegistrarExcepcionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-registrar-excepcion/modal-registrar-excepcion.component';
-import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, ChevronUp, Layers, Menu, Info, FileSpreadsheet, Search, RefreshCw, Save, Plus, X, AlertCircle, UserPen, UserPlus, Table, Edit, Trash2, CheckCircle, XCircle, Eye, EyeOff, Play, Square, ArrowRight, Timer, Zap, Hand, BarChart3, Database, Download, Filter, CalendarRange, LogIn, LogOut as LogOutIcon, Columns, Globe, Coffee, Badge, Group, FileEdit, ClipboardList, Check, PlusCircle, Star, TrendingUp, SearchX, CalendarX, RefreshCcw, AlertTriangle, HelpCircle, RotateCw, ShieldX, Mail, Shield, UserCheck, Lock, UserCheck2, ShieldCheck, Folder } from 'lucide-angular';
+import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, ChevronUp, Layers, Menu, Info, FileSpreadsheet, Search, RefreshCw, Save, Plus, X, AlertCircle, UserPen, UserPlus, Table, Edit, Trash2, CheckCircle, XCircle, Eye, EyeOff, Play, Square, ArrowRight, Timer, Zap, Hand, BarChart3, Database, Download, Filter, CalendarRange, LogIn, LogOut as LogOutIcon, Columns, Globe, Coffee, Badge, Group, FileEdit, ClipboardList, Check, PlusCircle, Star, TrendingUp, SearchX, CalendarX, RefreshCcw, AlertTriangle, HelpCircle, RotateCw, ShieldX, Mail, Shield, UserCheck, Lock, UserCheck2, ShieldCheck, Folder, Building2 } from 'lucide-angular';
 import { ReporteAsistenciaComponent } from './components/asistencia/reportes/reporte-asistencia/reporte-asistencia.component';
 import { HolidaysComponent } from './components/asistencia/holidays/holidays.component';
 import { NoPermissionsComponent } from './components/no-permissions/no-permissions.component';
@@ -109,10 +106,7 @@ registerLocaleData(localeEs);
     declarations: [
         AppComponent,
         LoginComponent,
-        ConfigComponent,
-        InicioComponent,
         SidebarComponent,
-        TableComponent,
         FilterOrdenesPipe,
         InvLecturaComponent,
         ModalComponent,
@@ -278,7 +272,9 @@ registerLocaleData(localeEs);
             Mail,
             Shield,
             ShieldCheck,
-            Folder
+            Folder,
+            Building2,
+            
 
         })
     ], providers: [

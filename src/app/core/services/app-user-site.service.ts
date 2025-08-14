@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { UserSite } from 'src/app/models/user-site.model';
+import { UserSite, UserSiteUpdate } from 'src/app/models/user-site.model';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -32,7 +32,7 @@ export class AppUserSiteService {
   }
   
   // update by userId and siteId
-  update(userId: number, siteId: string, userSite: UserSite): Observable<UserSite> {
+  update(userId: number, siteId: string, userSite: UserSiteUpdate): Observable<UserSite> {
     return this.http.put<UserSite>(`${this.resource}/${userId}/${siteId}`, userSite);
   }
 

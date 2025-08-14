@@ -1,7 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { AttendanceService } from 'src/app/core/services/attendance.service';
-import { ShiftsService, ShiftRegister, Detalle } from 'src/app/core/services/shifts.service';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { ShiftsService, ShiftRegister, Detalle, ShiftRegisterUpdate } from 'src/app/core/services/shifts.service';
+import { ModalService } from 'src/app/shared/modal/modal.service';
 
 @Component({
   selector: 'app-modal-nuevo-turno',
@@ -52,9 +54,12 @@ export class ModalNuevoTurnoComponent implements OnInit {
   // Para Mes: array de filas, cada fila es un array de días, cada día es un array de horarios
   horariosMesPorFila: any[][][] = [];
 
+
   constructor(
     private attendanceService: AttendanceService,
-    private shiftsService: ShiftsService
+    private shiftsService: ShiftsService,
+    private modalService: ModalService,
+
   ) {}
 
   ngOnInit() {
@@ -199,9 +204,10 @@ export class ModalNuevoTurnoComponent implements OnInit {
       return;
     }
 
-    const shiftRegister: ShiftRegister = this.buildShiftRegister();
+    
     
     if (this.modalMode === 'edit' && this.turnoId) {
+      const shiftRegister: ShiftRegisterUpdate = this.buildShiftRegisterUpdate();
       // Actualizar turno existente
       this.shiftsService.updateShift(shiftRegister, this.turnoId).subscribe(
         (response) => {
@@ -216,6 +222,7 @@ export class ModalNuevoTurnoComponent implements OnInit {
         }
       );
     } else {
+      const shiftRegister: ShiftRegister = this.buildShiftRegister();
       // Crear nuevo turno
       this.shiftsService.registerShift(shiftRegister).subscribe(
         (response) => {
@@ -310,7 +317,46 @@ export class ModalNuevoTurnoComponent implements OnInit {
       workDayOff: false, // Valor por defecto
       dayOffType: 0,     // Valor por defecto
       autoShift: this.turnoAutomatico,
-      detalles: detalles
+      detalles: detalles,
+      createdBy: '',
+      createdAt: new Date().toISOString(),
+
+
+      active: 'Y'
+    };
+  }
+
+  /**
+   * Construye el objeto ShiftRegister desde los datos del formulario
+   */
+  private buildShiftRegisterUpdate(): ShiftRegisterUpdate {
+    const detalles: Detalle[] = [];
+
+    // Mapear según el tipo de vista seleccionada
+    if (this.tipoVistaHorario === 'Semana') {
+      detalles.push(...this.buildDetallesFromSemana());
+    } else if (this.tipoVistaHorario === 'Dia') {
+      detalles.push(...this.buildDetallesFromDia());
+    } else if (this.tipoVistaHorario === 'Mes') {
+      detalles.push(...this.buildDetallesFromMes());
+    }
+
+    return {
+      alias: this.nombreTurno,
+      cycleUnit: this.getCycleUnit(),
+      shiftCycle: this.cicloValor,
+      workWeekend: true, // Valor por defecto, se puede hacer configurable
+      weekendType: 0,    // Valor por defecto
+      workDayOff: false, // Valor por defecto
+      dayOffType: 0,     // Valor por defecto
+      autoShift: this.turnoAutomatico,
+      detalles: detalles,
+      updatedBy: '',
+      updatedAt: new Date().toISOString(),
+
+
+
+      active: 'Y'
     };
   }
 

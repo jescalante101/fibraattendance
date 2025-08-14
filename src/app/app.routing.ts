@@ -7,7 +7,6 @@ import { LoginGuard } from "./core/guards/login.guard";
 import { PermissionsGuard } from "./core/guards/permissions.guard";
 
 import { DispositivoComponent } from "./components/dispositivo/dispositivo.component";
-import { PersonalComponent } from "./components/personal/organizacion/empresa/personal.component";
 import { AsistenciaComponent } from "./components/asistencia/asistencia/asistencia.component";
 import { DepartamentoComponent } from "./components/personal/organizacion/departamento/departamento.component";
 import { MarcacionesComponent } from "./components/dispositivo/marcaciones/marcaciones.component";

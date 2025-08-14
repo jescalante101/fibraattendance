@@ -49,6 +49,26 @@
           <lucide-icon name="download" class="w-4 h-4"></lucide-icon>
           <span>CSV</span>
         </button>
+
+        <!-- Botón exportar Excel -->
+        <button 
+          type="button"
+          (click)="exportToExcel()"
+          [disabled]="isLoading || !filteredRowData.length"
+          class="inline-flex items-center gap-2 px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          <lucide-icon name="file-spreadsheet" class="w-4 h-4"></lucide-icon>
+          <span>Excel</span>
+        </button>
+
+        <!-- Botón exportar PDF -->
+        <button 
+          type="button"
+          (click)="exportToPdf()"
+          [disabled]="isLoading || !filteredRowData.length"
+          class="inline-flex items-center gap-2 px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          <lucide-icon name="file-text" class="w-4 h-4"></lucide-icon>
+          <span>PDF</span>
+        </button>
         
         <!-- Botón de sincronización -->
         <button 

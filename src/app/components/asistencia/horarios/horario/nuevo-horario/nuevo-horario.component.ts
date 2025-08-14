@@ -6,6 +6,7 @@ import { AttendanceService } from 'src/app/core/services/attendance.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { Horario } from 'src/app/models/horario.model';
 import { ModalLoadingComponent } from 'src/app/shared/modal-loading/modal-loading.component';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-nuevo-horario',
@@ -38,8 +39,8 @@ export class NuevoHorarioComponent implements OnInit {
     private attendanceService: AttendanceService,
     private fb: FormBuilder,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
-    private authService: AuthService
-
+    private authService: AuthService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit() {
@@ -122,6 +123,7 @@ export class NuevoHorarioComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading descansos:', error);
+        this.toastService.error('Error al cargar', 'No se pudieron cargar los descansos disponibles');
       }
     });
   }
@@ -182,6 +184,7 @@ export class NuevoHorarioComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar horario para editar:', error);
+        this.toastService.error('Error al cargar', 'No se pudieron cargar los datos del horario para editar');
       }
     });
   }
@@ -193,6 +196,7 @@ export class NuevoHorarioComponent implements OnInit {
       this.horarioForm.markAllAsTouched();
       console.log('formulario invalido', this.horarioForm);
       console.log('Errores del formulario:', this.getFormErrors());
+      this.toastService.warning('Formulario incompleto', 'Por favor completa todos los campos requeridos');
       this.loading = false;
       return;
     }
@@ -247,6 +251,8 @@ export class NuevoHorarioComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error al actualizar horario:', error);
+          this.toastService.error('Error al actualizar', 'No se pudo actualizar el horario. Verifica los datos e intenta nuevamente');
+          this.loading = false;
         }
       });
     } else {
@@ -295,6 +301,8 @@ export class NuevoHorarioComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error al guardar horario:', error);
+          this.toastService.error('Error al crear', 'No se pudo crear el horario. Verifica los datos e intenta nuevamente');
+          this.loading = false;
         }
       });
     }

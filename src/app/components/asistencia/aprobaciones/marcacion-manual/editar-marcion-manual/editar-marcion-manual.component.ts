@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AttManualLogService } from 'src/app/core/services/att-manual-log.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { AttManualLog, AttManualLogUpdate } from 'src/app/models/att-manual-log/att-maunual-log.model';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-editar-marcion-manual',
@@ -28,6 +29,7 @@ export class EditarMarcionManualComponent implements OnInit {
     @Optional() public dialogRef: MatDialogRef<EditarMarcionManualComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     private authService: AuthService,
+    private toastService: ToastService
 
   ) {
     this.editForm = this.fb.group({
@@ -159,6 +161,7 @@ export class EditarMarcionManualComponent implements OnInit {
       this.attManualLogService.updateManualLog(this.id, marcacionActualizada).subscribe({
         next: (response) => {
           console.log('Marcación actualizada exitosamente:', response);
+          this.toastService.success('Marcación actualizada', 'La marcación manual se actualizó correctamente');
           this.isLoading = false;
 
           // Cerrar modal con resultado exitoso
@@ -176,6 +179,7 @@ export class EditarMarcionManualComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error al actualizar marcación:', error);
+          this.toastService.error('Error al actualizar', 'No se pudo actualizar la marcación manual. Verifica los datos e intenta nuevamente');
           this.isLoading = false;
 
           // Cerrar modal con error
@@ -205,12 +209,14 @@ export class EditarMarcionManualComponent implements OnInit {
     this.attManualLogService.deleteManualLog(id).subscribe({
       next: (response) => {
         console.log('Marcación eliminada exitosamente:', response);
+        this.toastService.success('Marcación eliminada', 'La marcación manual se eliminó correctamente');
         this.isLoading = false;
         this.onCancel();
         this.modalRef.closeModalFromChild(response);
       },
       error: (error) => {
         console.error('Error al eliminar marcación:', error);
+        this.toastService.error('Error al eliminar', 'No se pudo eliminar la marcación manual. Inténtalo nuevamente');
         this.isLoading = false;
       }
     });

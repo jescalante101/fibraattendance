@@ -27,13 +27,22 @@
     </div>
     
     <!-- Botón de acción compacto -->
-    <div class="mt-3 pt-3 border-t border-fiori-border">
+    <div class="mt-3 pt-3 border-t border-fiori-border flex items-center">
       <button 
         (click)="openNewUserSiteModal()"
         class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors">
-        <lucide-icon name="plus" class="w-4 h-4 mr-1"></lucide-icon>
+        <lucide-icon name="plus" class="w-4 h-4 mr-1.5"></lucide-icon>
         Nueva Asignación
       </button>
+      <div class="flex-grow"></div>
+      <div class="flex items-center space-x-2">
+        <button (click)="exportToExcel()" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-fiori-success/10 text-fiori-success hover:bg-fiori-success/20 transition-colors" aria-label="Exportar a Excel" title="Exportar a Excel">
+          <lucide-icon name="file-spreadsheet" class="w-4 h-4"></lucide-icon>
+        </button>
+        <button (click)="exportToPdf()" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-fiori-error/10 text-fiori-error hover:bg-fiori-error/20 transition-colors" aria-label="Exportar a PDF" title="Exportar a PDF">
+          <lucide-icon name="file-text" class="w-4 h-4"></lucide-icon>
+        </button>
+      </div>
     </div>
   </div>
 

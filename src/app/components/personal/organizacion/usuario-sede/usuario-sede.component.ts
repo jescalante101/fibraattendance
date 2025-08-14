@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AppUserSiteService } from 'src/app/core/services/app-user-site.service';
 import { UserSite, UserSiteUpdate } from 'src/app/models/user-site.model';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { AppUserService, User } from 'src/app/core/services/app-user.services';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
@@ -9,6 +8,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { UserSiteFormModalComponent, UserSiteFormResult, UserSiteData, Usuario, Sede } from './user-site-form-modal/user-site-form-modal.component';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { ToastService } from 'src/app/shared/services/toast.service';
+import * as XLSX from 'xlsx-js-style';
+import * as FileSaver from 'file-saver';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 // Removed AG-Grid imports - using Flowbite + Tailwind instead
 
 // Interface for grouped user data
@@ -44,11 +48,10 @@ export class UsuarioSedeComponent implements OnInit {
     private userSiteService: AppUserSiteService,
     private categoriaAuxiliarService: CategoriaAuxiliarService,
     private appUserService: AppUserService,
-    private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private modalService: ModalService,
     private authService: AuthService,
-
+    private toastService: ToastService
   ) {}
 
   ngOnInit() {
@@ -56,6 +59,110 @@ export class UsuarioSedeComponent implements OnInit {
     this.loadSedes();
     this.loadUsuarios();
     this.getUserId();
+  }
+
+  exportToExcel() {
+    const dataToExport = this.getGridDataForExport();
+    if (dataToExport.length === 0) {
+      this.toastService.warning('Advertencia', 'No hay datos para exportar.');
+      return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    this.styleExcelSheet(worksheet);
+
+    const workbook = { Sheets: { 'UsuarioSedes': worksheet }, SheetNames: ['UsuarioSedes'] };
+    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    
+    this.saveAsExcelFile(excelBuffer, 'reporte_usuario_sede');
+  }
+
+  private getGridDataForExport(): any[] {
+    const data: any[] = [];
+    this.userSiteGroups.forEach(group => {
+      group.userSites.forEach(site => {
+        data.push({
+          'Usuario': group.user.userName,
+          'Sede': site.siteName,
+          'Observación': site.observation,
+          'Estado': site.active === 'Y' ? 'Activo' : 'Inactivo',
+          'Creado por': site.createdBy,
+          'Fecha de Creación': new Date(site.createdAt).toLocaleDateString('es-ES')
+        });
+      });
+    });
+    return data;
+  }
+
+  private styleExcelSheet(worksheet: XLSX.WorkSheet) {
+    const headerStyle = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: "0A6ED1" } }, // Fiori Primary
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    const columnWidths = [
+      { wch: 25 }, // Usuario
+      { wch: 25 }, // Sede
+      { wch: 30 }, // Observación
+      { wch: 15 }, // Estado
+      { wch: 20 }, // Creado por
+      { wch: 20 }  // Fecha de Creación
+    ];
+    worksheet['!cols'] = columnWidths;
+
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:F1');
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const address = XLSX.utils.encode_cell({ r: 0, c: C });
+      if (worksheet[address]) {
+        worksheet[address].s = headerStyle;
+      }
+    }
+  }
+
+  private saveAsExcelFile(buffer: any, fileName: string): void {
+    const data: Blob = new Blob([buffer], { type: 'application/octet-stream' });
+    FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + '.xlsx');
+    this.toastService.success('Éxito', 'El reporte ha sido exportado a Excel.');
+  }
+
+  exportToPdf() {
+    const dataToExport = this.getGridDataForExport();
+    if (dataToExport.length === 0) {
+      this.toastService.warning('Advertencia', 'No hay datos para exportar.');
+      return;
+    }
+
+    const doc = new jsPDF();
+    const head = [['Usuario', 'Sede', 'Observación', 'Estado', 'Creado por', 'Fecha de Creación']];
+    const body = dataToExport.map(row => [
+      row.Usuario,
+      row.Sede,
+      row.Observación,
+      row.Estado,
+      row['Creado por'],
+      row['Fecha de Creación']
+    ]);
+
+    doc.setFontSize(18);
+    doc.setTextColor(40);
+    doc.text('Reporte de Usuario por Sede', 14, 22);
+
+    autoTable(doc, {
+      head: head,
+      body: body,
+      styles: {
+        halign: 'center',
+        fontSize: 8
+      },
+      headStyles: {
+        fillColor: [10, 110, 209] // fiori-primary
+      },
+      startY: 30
+    });
+
+    doc.save('reporte_usuario_sede_' + new Date().getTime() + '.pdf');
+    this.toastService.success('Éxito', 'El reporte ha sido exportado a PDF.');
   }
   // obtener el usuario logueado
   getUserId() {
@@ -77,7 +184,7 @@ export class UsuarioSedeComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.snackBar.open('Error al cargar los registros', 'Cerrar', { duration: 3000 });
+        this.toastService.error('Error al cargar', 'No se pudieron cargar los registros de usuario-sede');
         this.loading = false;
       }
     });
@@ -120,7 +227,7 @@ export class UsuarioSedeComponent implements OnInit {
     this.loading = true;
     
     if (!Array.isArray(userSiteDataArray) || userSiteDataArray.length === 0) {
-      this.snackBar.open('No hay datos para procesar', 'Cerrar', { duration: 3000 });
+      this.toastService.warning('Sin datos', 'No hay datos para procesar');
       this.loading = false;
       return;
     }
@@ -146,16 +253,12 @@ export class UsuarioSedeComponent implements OnInit {
     this.userSiteService.createBlock(userSitesToCreate).subscribe({
       next: () => {
         this.loading = false;
-        this.snackBar.open(
-          `${userSitesToCreate.length} asignación(es) creada(s) exitosamente`, 
-          'Cerrar', 
-          { duration: 3000 }
-        );
+        this.toastService.success('Asignaciones creadas', `${userSitesToCreate.length} asignación(es) creada(s) exitosamente`);
         this.loadUserSites();
       },
       error: () => {
         this.loading = false;
-        this.snackBar.open('Error al crear las asignaciones', 'Cerrar', { duration: 3000 });
+        this.toastService.error('Error al crear', 'No se pudieron crear las asignaciones usuario-sede');
       }
     });
   }
@@ -187,12 +290,12 @@ export class UsuarioSedeComponent implements OnInit {
     if (originalUserSite) {
       this.userSiteService.update(originalUserSite.userId, originalUserSite.siteId, userSite).subscribe({
         next: () => {
-          this.snackBar.open('Asignación actualizada exitosamente', 'Cerrar', { duration: 3000 });
+          this.toastService.success('Asignación actualizada', 'La asignación usuario-sede se actualizó correctamente');
           this.loadUserSites();
         },
         error: () => {
           this.loading = false;
-          this.snackBar.open('Error al actualizar la asignación', 'Cerrar', { duration: 3000 });
+          this.toastService.error('Error al actualizar', 'No se pudo actualizar la asignación usuario-sede');
         }
       });
     }
@@ -247,10 +350,10 @@ export class UsuarioSedeComponent implements OnInit {
       if (confirmed) {
         this.userSiteService.delete(userSite.userId, userSite.siteId).subscribe({
           next: () => {
-            this.snackBar.open('Registro eliminado', 'Cerrar', { duration: 3000 });
+            this.toastService.success('Registro eliminado', `La asignación de ${userSite.userName} en ${userSite.siteName} fue eliminada`);
             this.loadUserSites();
           },
-          error: () => this.snackBar.open('Error al eliminar', 'Cerrar', { duration: 3000 })
+          error: () => this.toastService.error('Error al eliminar', 'No se pudo eliminar la asignación usuario-sede')
         });
       }
     });
@@ -278,14 +381,13 @@ export class UsuarioSedeComponent implements OnInit {
       if (confirmed) {
         this.userSiteService.update(userSite.userId, userSite.siteId, userSiteUpdate).subscribe({
           next: () => {
-            this.snackBar.open(
+            this.toastService.success(
               userSite.active === 'Y' ? 'Registro desactivado' : 'Registro activado',
-              'Cerrar',
-              { duration: 3000 }
+              `El estado de ${userSite.userName} en ${userSite.siteName} fue ${userSite.active === 'Y' ? 'desactivado' : 'activado'}`
             );
             this.loadUserSites();
           },
-          error: () => this.snackBar.open('Error al actualizar el estado', 'Cerrar', { duration: 3000 })
+          error: () => this.toastService.error('Error al actualizar', 'No se pudo cambiar el estado de la asignación')
         });
       }
     });

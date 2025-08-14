@@ -4,6 +4,7 @@ import { AttendanceService } from 'src/app/core/services/attendance.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { ShiftsService, ShiftRegister, Detalle, ShiftRegisterUpdate } from 'src/app/core/services/shifts.service';
 import { ModalService } from 'src/app/shared/modal/modal.service';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-modal-nuevo-turno',
@@ -64,8 +65,7 @@ export class ModalNuevoTurnoComponent implements OnInit {
     private shiftsService: ShiftsService,
     private modalService: ModalService,
     private authService: AuthService,
-
-
+    private toastService: ToastService
   ) {}
 
   ngOnInit() {
@@ -101,7 +101,8 @@ export class ModalNuevoTurnoComponent implements OnInit {
         }
       },
       (error) => {
-        alert('Error al cargar los horarios');
+        this.toastService.error('Error al cargar', 'No se pudieron cargar los horarios disponibles');
+        console.error('Error al cargar los horarios:', error);
       }
     );
   }
@@ -214,7 +215,7 @@ export class ModalNuevoTurnoComponent implements OnInit {
 
   guardarTurno() {
     if (!this.nombreTurno.trim()) {
-      alert('Debe ingresar un nombre para el turno');
+      this.toastService.warning('Campo requerido', 'Debe ingresar un nombre para el turno');
       return;
     }
 
@@ -229,13 +230,14 @@ export class ModalNuevoTurnoComponent implements OnInit {
       this.shiftsService.updateShift(shiftRegister, this.turnoId).subscribe(
         (response) => {
           console.log('Turno actualizado exitosamente:', response);
+          this.toastService.success('Turno actualizado', 'El turno ha sido actualizado correctamente');
           if (this.modalRef) {
             this.modalRef.closeModalFromChild(response);
           }
         },
         (error) => {
           console.error('Error al actualizar turno:', error);
-          alert('Error al actualizar el turno. Por favor intente nuevamente.');
+          this.toastService.error('Error al actualizar', 'No se pudo actualizar el turno. Verifique los datos e intente nuevamente');
         }
       );
     } else {
@@ -244,13 +246,14 @@ export class ModalNuevoTurnoComponent implements OnInit {
       this.shiftsService.registerShift(shiftRegister).subscribe(
         (response) => {
           console.log('Turno registrado exitosamente:', response);
+          this.toastService.success('Turno creado', 'El turno ha sido creado exitosamente');
           if (this.modalRef) {
             this.modalRef.closeModalFromChild(response);
           }
         },
         (error) => {
           console.error('Error al registrar turno:', error);
-          alert('Error al registrar el turno. Por favor intente nuevamente.');
+          this.toastService.error('Error al crear', 'No se pudo crear el turno. Verifique los datos e intente nuevamente');
         }
       );
     }

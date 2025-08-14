@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AttendanceService } from '../../../../../core/services/attendance.service';
 import { ShiftsService, ScheduleExceptionRegister, HorarioShift } from '../../../../../core/services/shifts.service';
+import { ToastService } from '../../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-modal-registrar-excepcion',
@@ -25,7 +26,8 @@ export class ModalRegistrarExcepcionComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private attendanceService: AttendanceService,
-    private shiftsService: ShiftsService
+    private shiftsService: ShiftsService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -66,6 +68,7 @@ export class ModalRegistrarExcepcionComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar horarios:', error);
+        this.toastService.error('Error al cargar', 'No se pudieron cargar los horarios disponibles');
         this.loading = false;
       }
     });
@@ -138,6 +141,7 @@ export class ModalRegistrarExcepcionComponent implements OnInit {
       this.shiftsService.registerShiftException(exceptionData).subscribe({
         next: (response) => {
           console.log('Excepción registrada exitosamente:', response);
+          this.toastService.success('Excepción registrada', 'La excepción de horario se registró correctamente');
           this.loading = false;
           // Cerrar modal y devolver resultado
           this.modalRef?.closeModalFromChild({ 
@@ -148,6 +152,7 @@ export class ModalRegistrarExcepcionComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error al registrar excepción:', error);
+          this.toastService.error('Error al registrar', 'No se pudo registrar la excepción. Verifica los datos e intenta nuevamente');
           this.loading = false;
           // Mostrar error pero mantener modal abierto
         }
@@ -157,6 +162,7 @@ export class ModalRegistrarExcepcionComponent implements OnInit {
       Object.keys(this.exceptionForm.controls).forEach(key => {
         this.exceptionForm.get(key)?.markAsTouched();
       });
+      this.toastService.warning('Formulario incompleto', 'Por favor completa todos los campos requeridos');
     }
   }
 

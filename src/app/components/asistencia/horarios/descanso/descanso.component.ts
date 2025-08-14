@@ -6,6 +6,11 @@ import { NuevoDescansoComponent } from './nuevo-descanso/nuevo-descanso.componen
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
+import { ToastService } from 'src/app/shared/services/toast.service';
+import * as XLSX from 'xlsx-js-style';
+import * as FileSaver from 'file-saver';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-descanso',
@@ -25,12 +30,111 @@ export class DescansoComponent implements OnInit {
 
   constructor(
     private attendanceService: AttendanceService,
-    private dialog:MatDialog,
-    private modalService: ModalService
+    private dialog: MatDialog,
+    private modalService: ModalService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
     this.loadDescansos();
+  }
+
+  exportToExcel() {
+    const dataToExport = this.getGridDataForExport();
+    if (dataToExport.length === 0) {
+      this.toastService.warning('Advertencia', 'No hay datos para exportar.');
+      return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    this.styleExcelSheet(worksheet);
+
+    const workbook = { Sheets: { 'Descansos': worksheet }, SheetNames: ['Descansos'] };
+    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    
+    this.saveAsExcelFile(excelBuffer, 'reporte_descansos');
+  }
+
+  private getGridDataForExport(): any[] {
+    return this.filteredDescansos.map(item => ({
+      'ID': item.id,
+      'Nombre': item.alias,
+      'Inicio': this.extraerHora(item.periodStart),
+      'Fin': this.calcularHoraFin(this.extraerHora(item.periodStart), item.duration),
+      'Duración (min)': item.duration,
+      'Tipo de Cálculo': item.calcType === 0 ? 'Auto Deducir' : 'Manual'
+    }));
+  }
+
+  private styleExcelSheet(worksheet: XLSX.WorkSheet) {
+    const headerStyle = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: "0A6ED1" } }, // Fiori Primary
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    const columnWidths = [
+      { wch: 10 }, // ID
+      { wch: 25 }, // Nombre
+      { wch: 15 }, // Inicio
+      { wch: 15 }, // Fin
+      { wch: 20 }, // Duración (min)
+      { wch: 20 }  // Tipo de Cálculo
+    ];
+    worksheet['!cols'] = columnWidths;
+
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:F1');
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const address = XLSX.utils.encode_cell({ r: 0, c: C });
+      if (worksheet[address]) {
+        worksheet[address].s = headerStyle;
+      }
+    }
+  }
+
+  private saveAsExcelFile(buffer: any, fileName: string): void {
+    const data: Blob = new Blob([buffer], { type: 'application/octet-stream' });
+    FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + '.xlsx');
+    this.toastService.success('Éxito', 'El reporte ha sido exportado a Excel.');
+  }
+
+  exportToPdf() {
+    const dataToExport = this.getGridDataForExport();
+    if (dataToExport.length === 0) {
+      this.toastService.warning('Advertencia', 'No hay datos para exportar.');
+      return;
+    }
+
+    const doc = new jsPDF();
+    const head = [['ID', 'Nombre', 'Inicio', 'Fin', 'Duración (min)', 'Tipo de Cálculo']];
+    const body = dataToExport.map(row => [
+      row.ID,
+      row.Nombre,
+      row.Inicio,
+      row.Fin,
+      row['Duración (min)'],
+      row['Tipo de Cálculo']
+    ]);
+
+    doc.setFontSize(18);
+    doc.setTextColor(40);
+    doc.text('Reporte de Descansos', 14, 22);
+
+    autoTable(doc, {
+      head: head,
+      body: body,
+      styles: {
+        halign: 'center',
+        fontSize: 8
+      },
+      headStyles: {
+        fillColor: [10, 110, 209] // fiori-primary
+      },
+      startY: 30
+    });
+
+    doc.save('reporte_descansos_' + new Date().getTime() + '.pdf');
+    this.toastService.success('Éxito', 'El reporte ha sido exportado a PDF.');
   }
 
   loadDescansos() {
@@ -45,6 +149,7 @@ export class DescansoComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading descansos:', error);
+        this.toastService.error('Error al cargar', 'No se pudieron cargar los descansos. Verifica tu conexión.');
       }
     });
   }
@@ -143,12 +248,7 @@ calcularHoraFin(horaInicio: string, duracionEnMinutos: number): string {
         console.log('Resultado del modal:', result);
         // Recargar los descansos después de cerrar el modal
         this.loadDescansos();
-        this.dialog.open(ModalConfirmComponent, {
-          data: {
-            tipo: 'success',
-            mensaje: 'El Descanso se guardó correctamente.'
-          }
-        });
+        this.toastService.success('Descanso creado', 'El descanso se guardó correctamente');
       }
     });
     console.log('Abrir modal para nuevo descanso');
@@ -166,26 +266,10 @@ calcularHoraFin(horaInicio: string, duracionEnMinutos: number): string {
       }
     }).afterClosed().subscribe(result => {
       if (result) {
-        if (result) {
-          console.log('Resultado del modal:', result);
-          this.loadDescansos();
-           this.dialog.open(ModalConfirmComponent, {
-                data: {
-                  tipo: 'success',
-                  mensaje: 'El Descanso se guardó correctamente.'
-                }
-              });
-        }else{
-          this.dialog.open(ModalConfirmComponent, {
-            data: {
-              tipo: 'error',
-              mensaje: 'Error al guardar el descanso.'
-            }
-          });
-        }
-        
+        console.log('Resultado del modal:', result);
+        this.loadDescansos();
+        this.toastService.success('Descanso actualizado', 'El descanso se guardó correctamente');
       }
-      
     });
     console.log('Abrir modal para editar descanso');
   }
@@ -199,23 +283,9 @@ calcularHoraFin(horaInicio: string, duracionEnMinutos: number): string {
       // Clase personalizada para el fondo
     }).then(result => {
       if (result) {
-        if (result) {
-          console.log('Resultado del modal:', result);
-          this.loadDescansos();
-          this.dialog.open(ModalConfirmComponent, {
-            data: {
-              tipo: 'success',
-              mensaje: 'El Descanso se guardó correctamente.'
-            }
-          });
-        } else {  
-          this.dialog.open(ModalConfirmComponent, {
-            data: {
-              tipo: 'error',
-              mensaje: 'Error al guardar el descanso.'
-            }
-          });
-        }
+        console.log('Resultado del modal:', result);
+        this.loadDescansos();
+        this.toastService.success('Descanso actualizado', 'El descanso se actualizó correctamente');
       }
     });
     console.log('Abrir modal para editar descanso');
@@ -227,21 +297,11 @@ calcularHoraFin(horaInicio: string, duracionEnMinutos: number): string {
       next: (response) => {
         console.log('Descanso eliminado:', response);
         this.loadDescansos();
-        this.dialog.open(ModalConfirmComponent, {
-          data: {
-            tipo: 'success',
-            mensaje: 'El Descanso se eliminó correctamente.'
-          }
-        });
+        this.toastService.success('Descanso eliminado', 'El descanso se eliminó correctamente');
       },
       error: (error) => {
         console.error('Error al eliminar descanso:', error);
-        this.dialog.open(ModalConfirmComponent, {
-          data: {
-            tipo: 'error',
-            mensaje: 'Error al eliminar el descanso.'
-          }
-        });
+        this.toastService.error('Error al eliminar', 'No se pudo eliminar el descanso. Inténtalo nuevamente');
       }
     });
   }

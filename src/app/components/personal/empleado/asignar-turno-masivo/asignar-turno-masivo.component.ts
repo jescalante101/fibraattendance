@@ -9,7 +9,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { EmployeeScheduleAssignmentService, EmployeeScheduleAssignmentInsert } from 'src/app/core/services/employee-schedule-assignment.service';
 import { forkJoin } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from 'src/app/shared/services/toast.service';
 import { HeaderConfig, HeaderConfigService } from 'src/app/core/services/header-config.service';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
 
@@ -19,7 +19,7 @@ import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.c
   styleUrls: ['./asignar-turno-masivo.component.css']
 })
 export class AsignarTurnoMasivoComponent implements OnInit {
-
+  modalRef: any; // Referencia al modal padre
 
   filtroForm!: FormGroup;
   personalForm!: FormGroup;
@@ -73,7 +73,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     private shiftsService: ShiftsService,
     private employeeScheduleAssignmentService: EmployeeScheduleAssignmentService,
     @Optional() public dialogRef: MatDialogRef<AsignarTurnoMasivoComponent>,
-    private snackBar: MatSnackBar,
+    private toastService: ToastService,
     private headerConfigService: HeaderConfigService,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     
@@ -133,6 +133,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
 
       error: err => {
         console.error('Error al cargar sedes y áreas:', err);
+        this.toastService.error('Error al cargar', 'No se pudieron cargar las sedes y áreas disponibles');
         this.sedesAreas = [];
         this.sedes = [];
         this.areas = [];
@@ -152,6 +153,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar turnos:', error);
+        this.toastService.error('Error al cargar', 'No se pudieron cargar los turnos disponibles');
         this.turnos = [];
         this.loadingTurnos = false;
       }
@@ -241,14 +243,15 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         //this.empleados.clear();
         this.loadingPersonal = false;
       },
-      error: _ => {
+      error: (error) => {
+        console.error('Error al cargar personal:', error);
+        this.toastService.error('Error al cargar', 'No se pudo cargar el personal. Verifica los filtros seleccionados');
         this.personalFiltrado = [];
         this.totalCount = 0;
         this.hayMasPaginas = false;
         this.seleccionados.clear();
         this.empleados.clear();
         this.loadingPersonal = false;
-        console.log("Error al cargar personal");
       }
     });
   }
@@ -358,23 +361,21 @@ export class AsignarTurnoMasivoComponent implements OnInit {
       next: (response) => {
         console.log('Response:', response);
         if (response && response.exito) {
-          this.dialogRef.close(response); // Cierra el modal y pasa la respuesta al padre
+          this.toastService.success('Asignaciones creadas', `Se asignaron turnos a ${registros.length} empleados correctamente`);
+          
+          // Cerrar modal usando la referencia apropiada
+          if (this.modalRef) {
+            this.modalRef.closeModalFromChild(response);
+          } else if (this.dialogRef) {
+            this.dialogRef.close(response);
+          }
         } else {
-          this.snackBar.open('No se pudo registrar la asignación.', 'Cerrar', {
-            duration: 4000,
-            verticalPosition: 'top',
-            horizontalPosition: 'end',
-            panelClass: ['snackbar-error']
-          });
+          this.toastService.error('Error en asignación', 'No se pudo registrar la asignación de turnos. Verifica los datos');
         }
       },
       error: (error) => {
-        this.snackBar.open('Error al registrar asignaciones.', 'Cerrar', {
-          duration: 4000,
-          verticalPosition: 'top',
-          horizontalPosition: 'end',
-          panelClass: ['snackbar-error']
-        });
+        console.error('Error al registrar asignaciones:', error);
+        this.toastService.error('Error al asignar', 'No se pudieron crear las asignaciones de turno. Intenta nuevamente');
       }
     });
   }

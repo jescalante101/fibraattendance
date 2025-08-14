@@ -11,6 +11,7 @@ import { ModalVerHorarioComponent } from './modal-ver-horario/modal-ver-horario.
 import { ModalEditarAsignacionComponent } from './modal-editar-asignacion/modal-editar-asignacion.component';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
+import { GenericFilterConfig, FilterState, FilterChangeEvent } from 'src/app/shared/generic-filter/filter-config.interface';
 
 @Component({
   selector: 'app-asignar-horario-empleado',
@@ -52,7 +53,47 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
   // Exponer Math para usar en el template
   Math = Math;
 
+  // Configuración del filtro genérico
+  filterConfig: GenericFilterConfig = {
+    sections: [
+      {
+        title: 'Búsqueda General',
+        filters: [
+          {
+            type: 'text',
+            key: 'searchText',
+            label: 'Buscar Empleado',
+            placeholder: 'Nombre, documento o ID...'
+          }
+        ]
+      },
+      {
+        title: 'Rango de Fechas',
+        filters: [
+          {
+            type: 'date',
+            key: 'startDate',
+            label: 'Fecha Inicio',
+            placeholder: ''
+          },
+          {
+            type: 'date',
+            key: 'endDate', 
+            label: 'Fecha Fin',
+            placeholder: ''
+          }
+        ]
+      }
+    ],
+    showApplyButton: true,
+    showClearAll: true,
+    position: 'left'
+  };
+
+  currentFilters: FilterState = {};
+
   ngOnInit(): void {
+    this.setupGenericFilter();
     this.cargarAsignaciones();
   }
 
@@ -150,23 +191,8 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       width: '80vw',
       height: 'auto'
     }).then(result => {
-      if (result && result.exito) {
-        this.snackBar.open('Asignación masiva realizada correctamente.', 'Cerrar', {
-          duration: 4000,
-          verticalPosition: 'top',
-          horizontalPosition: 'end',
-          panelClass: ['snackbar-success']
-        });
-        // Si quieres refrescar la lista de empleados, llama aquí a this.cargarAsignaciones();
-        this.cargarAsignaciones();
-      } else if (result && result.exito === false) {
-        this.snackBar.open('No se pudo realizar la asignación masiva.', 'Cerrar', {
-          duration: 4000,
-          verticalPosition: 'top',
-          horizontalPosition: 'end',
-          panelClass: ['snackbar-error']
-        });
-      }
+     //TODO: refrescar la lista
+     this.cargarAsignaciones()
     });
   }
 
@@ -233,6 +259,52 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
     console.log('Eliminar asignación:', asignacion);
   }
 
-  
+  // ============ MÉTODOS PARA FILTRO GENÉRICO ============
+
+  setupGenericFilter() {
+    // Configurar valores iniciales del filtro genérico
+    this.currentFilters = {
+      searchText: this.filtro,
+      startDate: this.startDate,
+      endDate: this.endDate
+    };
+  }
+
+  onGenericFilterChange(event: FilterChangeEvent) {
+    console.log('Filtro cambiado:', event);
+    // Actualizar filtros actuales
+    this.currentFilters = { ...event.allFilters };
+  }
+
+  onGenericFiltersApply(filters: FilterState) {
+    console.log('Aplicando filtros:', filters);
+    
+    // Mapear filtros genéricos a las propiedades del componente
+    this.filtro = filters['searchText'] || '';
+    this.startDate = filters['startDate'] || '';
+    this.endDate = filters['endDate'] || '';
+    
+    // Resetear página a 1 cuando se apliquen filtros
+    this.pageNumber = 1;
+    
+    // Ejecutar búsqueda
+    this.cargarAsignaciones();
+  }
+
+  onGenericFiltersClear() {
+    console.log('Limpiando todos los filtros');
+    
+    // Limpiar todas las propiedades de filtro
+    this.filtro = '';
+    this.startDate = '';
+    this.endDate = '';
+    this.pageNumber = 1;
+    
+    // Actualizar filtros actuales
+    this.currentFilters = {};
+    
+    // Ejecutar búsqueda
+    this.cargarAsignaciones();
+  }
 
 }

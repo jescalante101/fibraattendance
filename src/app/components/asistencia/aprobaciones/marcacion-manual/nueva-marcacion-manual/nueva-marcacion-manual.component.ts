@@ -13,6 +13,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { HeaderConfig, HeaderConfigService } from '../../../../../core/services/header-config.service';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-nueva-marcacion-manual',
@@ -83,7 +84,7 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
     private employeeScheduleAssignmentService: EmployeeScheduleAssignmentService,
     private HeaderConfigService: HeaderConfigService,
     private authService: AuthService,
-
+    private toastService: ToastService
   ) {
     this.empleadoForm = this.fb.group({
       departamento: ['']
@@ -146,6 +147,7 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
       },
       error: (error) => {
         console.error('Error cargando áreas:', error);
+        this.toastService.error('Error al cargar', 'No se pudieron cargar las áreas disponibles');
         this.departamentos = [];
         this.filteredDepartamentos = [];
         this.loadingAreas = false;
@@ -183,6 +185,7 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
         this.totalEmpleados = 0;
         this.updateEmpleadosTable();
         console.error('Error cargando empleados con horarios:', error);
+        this.toastService.error('Error al cargar', 'No se pudieron cargar los empleados');
         this.loadingEmpleados = false;
       }
     });
@@ -332,6 +335,7 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
     this.attManualLogService.createManualLog(marcacionesManuales).subscribe({
       next: (response) => {
         console.log('Marcaciones guardadas exitosamente:', response);
+        this.toastService.success('Marcaciones creadas', `Se crearon ${marcacionesManuales.length} marcaciones manuales correctamente`);
         this.loadingGuardado = false;
         // Aquí puedes agregar un mensaje de éxito o cerrar el modal
         if (this.modalRef) {
@@ -340,8 +344,8 @@ export class NuevaMarcacionManualComponent implements OnInit,OnDestroy {
       },
       error: (error) => {
         console.error('Error al guardar marcaciones:', error);
+        this.toastService.error('Error al crear', 'No se pudieron crear las marcaciones manuales. Verifica los datos e intenta nuevamente');
         this.loadingGuardado = false;
-        // Aquí puedes agregar un mensaje de error
       }
     });
   }

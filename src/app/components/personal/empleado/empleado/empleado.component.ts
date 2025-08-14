@@ -15,6 +15,8 @@ import { ModalService } from 'src/app/shared/modal/modal.service';
 import { HeaderConfigService, HeaderConfig } from 'src/app/core/services/header-config.service';
 import { EmployeesParameters } from '../../../../core/services/person.service';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
+import { GenericFilterConfig, FilterState, FilterChangeEvent } from 'src/app/shared/generic-filter/filter-config.interface';
+import { ColumnManagerConfig, ColumnConfig, ColumnChangeEvent } from 'src/app/shared/column-manager/column-config.interface';
 
 @Component({
   selector: 'app-empleado',
@@ -75,6 +77,67 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
   showAreaDropdown = false;
   highlightedAreaIndex = -1;
 
+  // Configuración del filtro genérico
+  filterConfig: GenericFilterConfig = {
+    sections: [
+      {
+        title: 'Búsqueda General',
+        filters: [
+          {
+            type: 'text',
+            key: 'searchText',
+            label: 'Buscar Empleado',
+            placeholder: 'Nombre, documento...'
+          }
+        ]
+      },
+      {
+        title: 'Ubicación',
+        filters: [
+          {
+            type: 'autocomplete',
+            key: 'sede',
+            label: 'Sede',
+            placeholder: 'Buscar sede...',
+            options: [],
+            displayField: 'descripcion',
+            valueField: 'categoriaAuxiliarId'
+          },
+          {
+            type: 'autocomplete',
+            key: 'area',
+            label: 'Área',
+            placeholder: 'Buscar área...',
+            options: [],
+            displayField: 'descripcion',
+            valueField: 'areaId'
+          }
+        ]
+      }
+    ],
+    // position: undefined, // Permitir cálculo automático de posición
+    showApplyButton: true,
+    showClearAll: true
+  };
+
+  currentFilters: FilterState = {};
+
+  // Configuración del gestor de columnas
+  columnManagerConfig: ColumnManagerConfig = {
+    title: 'Gestionar Columnas',
+    showSelectAll: true,
+    showReset: true,
+    groupByCategory: true,
+    persistKey: 'empleado-columns-visibility',
+    minVisibleColumns: 2,
+    maxVisibleColumns: 10,
+    searchable: true,
+    position: 'left'
+  };
+
+  tableColumns: ColumnConfig[] = [];
+  visibleColumns: string[] = [];
+
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       this.mostrarBotonAsignar = params['modoAsignar'] === 'true' || params['modoAsignar'] === true;
@@ -92,8 +155,9 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
       });
     
     this.setDisplayedColumns();
+    this.initializeTableColumns();
     this.getCategoriasAuxiliar();
-  
+    this.setupGenericFilter();
   }
 
   ngOnDestroy() {
@@ -141,6 +205,9 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: res => {
+          console.log("Respuesta del servicio:", res);
+          
+          
           if (res.exito && res.data) {
             this.employees = res.data.items.map(emp => ({ ...emp, selected: this.mostrarBotonAsignar ? false : undefined }));
             this.totalCount = res.data.totalCount;
@@ -163,6 +230,7 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.categoriaAuxiliarList = data;
         this.sedesFiltradas = [...data]; // Inicializar autocomplete
+        this.updateFilterOptions(); // Actualizar opciones del filtro genérico
       },
       error: (err) => {
         this.categoriaAuxiliarList = [];
@@ -177,6 +245,7 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.rhAreaList = data;
         this.areasFiltradas = [...data]; // Inicializar autocomplete
+        this.updateFilterOptions(); // Actualizar opciones del filtro genérico
       },
       error: (err) => {
         this.rhAreaList = [];
@@ -257,24 +326,7 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
       componentType: AsignarTurnoMasivoComponent,
       width: '80vw',
       height: 'auto'
-    }).then(result => {
-      if (result && result.exito) {
-        this.snackBar.open('Asignación masiva realizada correctamente.', 'Cerrar', {
-          duration: 4000,
-          verticalPosition: 'top',
-          horizontalPosition: 'end',
-          panelClass: ['snackbar-success']
-        });
-        // Si quieres refrescar la lista de empleados, llama aquí a this.getEmployees();
-      } else if (result && result.exito === false) {
-        this.snackBar.open('No se pudo realizar la asignación masiva.', 'Cerrar', {
-          duration: 4000,
-          verticalPosition: 'top',
-          horizontalPosition: 'end',
-          panelClass: ['snackbar-error']
-        });
-      }
-    });
+    })
   }
 
 
@@ -437,5 +489,239 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
         this.highlightedAreaIndex = -1;
         break;
     }
+  }
+
+  // ============ MÉTODOS PARA FILTRO GENÉRICO ============
+
+  setupGenericFilter() {
+    // Configurar valores iniciales del filtro genérico
+    this.currentFilters = {
+      searchText: this.filtro,
+      sede: this.selectedCategoriaAuxiliar,
+      area: this.selectedRhArea
+    };
+    
+    // Actualizar opciones cuando se carguen los datos
+    this.updateFilterOptions();
+  }
+
+  updateFilterOptions() {
+    // Actualizar opciones de sede
+    const sedeFilter = this.filterConfig.sections?.[1]?.filters.find(f => f.key === 'sede');
+    if (sedeFilter) {
+      sedeFilter.options = this.categoriaAuxiliarList;
+    }
+
+    // Actualizar opciones de área
+    const areaFilter = this.filterConfig.sections?.[1]?.filters.find(f => f.key === 'area');
+    if (areaFilter) {
+      areaFilter.options = this.rhAreaList;
+    }
+  }
+
+  onGenericFilterChange(event: FilterChangeEvent) {
+    console.log('Filtro cambiado:', event);
+    // Actualizar filtros actuales
+    this.currentFilters = { ...event.allFilters };
+  }
+
+  onGenericFiltersApply(filters: FilterState) {
+    console.log('Aplicando filtros:', filters);
+    
+    // Mapear filtros genéricos a las propiedades del componente
+    this.filtro = filters['searchText'] || '';
+    this.selectedCategoriaAuxiliar = filters['sede'] || '';
+    this.selectedRhArea = filters['area'] || '';
+    
+    // Resetear página a 1 cuando se apliquen filtros
+    this.page = 1;
+    
+    // Ejecutar búsqueda
+    this.getEmployees();
+  }
+
+  onGenericFiltersClear() {
+    console.log('Limpiando todos los filtros');
+    
+    // Limpiar todas las propiedades de filtro
+    this.filtro = '';
+    this.selectedCategoriaAuxiliar = '';
+    this.selectedRhArea = '';
+    this.sedeSearchTerm = '';
+    this.areaSearchTerm = '';
+    this.page = 1;
+    
+    // Actualizar filtros actuales
+    this.currentFilters = {};
+    
+    // Ejecutar búsqueda
+    this.getEmployees();
+  }
+
+  // ============ MÉTODOS PARA GESTOR DE COLUMNAS ============
+
+  initializeTableColumns() {
+    // Definir las columnas disponibles para la tabla
+    this.tableColumns = [
+      {
+        key: 'personalId',
+        label: 'ID',
+        visible: !this.mostrarBotonAsignar,
+        required: false,
+        sortable: true,
+        type: 'number',
+        width: '80px'
+      },
+      {
+        key: 'select',
+        label: 'Seleccionar',
+        visible: this.mostrarBotonAsignar,
+        required: this.mostrarBotonAsignar,
+        sortable: false,
+        type: 'custom',
+        width: '60px'
+      },
+      {
+        key: 'nroDoc',
+        label: 'Documento',
+        visible: true,
+        required: true,
+        sortable: true,
+        type: 'text',
+        width: '120px'
+      },
+      {
+        key: 'empleado',
+        label: 'Empleado',
+        visible: true,
+        required: true,
+        sortable: true,
+        type: 'text'
+      },
+      {
+        key: 'categoriaAuxiliarDescripcion',
+        label: 'Sede',
+        visible: true,
+        required: false,
+        sortable: true,
+        type: 'text'
+      },
+      {
+        key: 'areaDescripcion',
+        label: 'Área',
+        visible: true,
+        required: false,
+        sortable: true,
+        type: 'text'
+      },
+      {
+        key: 'fechaIngreso',
+        label: 'Fecha Ingreso',
+        visible: false,
+        required: false,
+        sortable: true,
+        type: 'date',
+        width: '120px'
+      },
+      {
+        key: 'fechaCese',
+        label: 'Fecha Cese',
+        visible: false,
+        required: false,
+        sortable: true,
+        type: 'date',
+        width: '120px'
+      },
+      {
+        key: 'cargoDescripcion',
+        label: 'Cargo',
+        visible: false,
+        required: false,
+        sortable: true,
+        type: 'text'
+      },
+      {
+        key: 'ccostoDescripcion',
+        label: 'Centro de Costo',
+        visible: false,
+        required: false,
+        sortable: true,
+        type: 'text'
+      },
+      {
+        key: 'email',
+        label: 'Correo Electrónico',
+        visible: false,
+        required: false,
+        sortable: true,
+        type: 'email'
+      },
+      {
+        key: 'telefono',
+        label: 'Teléfono',
+        visible: false,
+        required: false,
+        sortable: true,
+        type: 'phone',
+        width: '120px'
+      },
+      {
+        key: 'acciones',
+        label: 'Acciones',
+        visible: true,
+        required: true,
+        sortable: false,
+        type: 'actions',
+        width: '120px'
+      }
+    ];
+
+    // Cargar configuración guardada
+    this.loadColumnVisibility();
+    this.updateVisibleColumns();
+  }
+
+  private loadColumnVisibility() {
+    if (this.columnManagerConfig.persistKey) {
+      const savedConfig = localStorage.getItem(this.columnManagerConfig.persistKey);
+      if (savedConfig) {
+        try {
+          const visibilityMap = JSON.parse(savedConfig);
+          this.tableColumns.forEach(column => {
+            if (visibilityMap.hasOwnProperty(column.key)) {
+              column.visible = visibilityMap[column.key];
+            }
+          });
+        } catch (error) {
+          console.warn('Error loading column visibility:', error);
+        }
+      }
+    }
+  }
+
+  private updateVisibleColumns() {
+    this.visibleColumns = this.tableColumns
+      .filter(col => col.visible)
+      .map(col => col.key);
+  }
+
+  onColumnManagerChange(event: ColumnChangeEvent) {
+    console.log('Columna cambiada:', event);
+    this.updateVisibleColumns();
+  }
+
+  onColumnsApply(columns: ColumnConfig[]) {
+    console.log('Aplicando configuración de columnas:', columns);
+    this.tableColumns = [...columns];
+    this.updateVisibleColumns();
+  }
+
+  onColumnsReset() {
+    console.log('Restaurando configuración de columnas');
+    this.initializeTableColumns();
+  }
+
+  isColumnVisible(columnKey: string): boolean {
+    return this.visibleColumns.includes(columnKey);
   }
 }

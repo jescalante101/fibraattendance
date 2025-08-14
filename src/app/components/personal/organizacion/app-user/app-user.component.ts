@@ -8,6 +8,11 @@ import { UserPermissionsModalComponent, UserPermissionsResult } from './user-per
 import { UpdateAppUser, CreateAppUser } from 'src/app/core/models/app-user.model';
 import { ColDef, GridOptions, ICellRendererParams } from 'ag-grid-community';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { ToastService } from '../../../../shared/services/toast.service';
+import * as XLSX from 'xlsx-js-style';
+import * as FileSaver from 'file-saver';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Interfaz para tipos de Toast
 interface ToastConfig {
@@ -46,6 +51,7 @@ export class AppUserComponent implements OnInit {
     private dialog: MatDialog,
     private modalService: ModalService,
     private authService: AuthService,
+    private toastService: ToastService
 
   ) { }
 
@@ -53,6 +59,124 @@ export class AppUserComponent implements OnInit {
     this.setupAgGrid();
     this.loadUsers();
     this.loadCurrentUser();
+  }
+
+  exportToExcel() {
+    if (!this.gridApi) {
+      this.toastService.error('Error', 'La tabla no está lista para exportar.');
+      return;
+    }
+
+    const dataToExport = this.getGridDataForExport();
+    if (dataToExport.length === 0) {
+      this.toastService.warning('Advertencia', 'No hay datos para exportar.');
+      return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    this.styleExcelSheet(worksheet);
+
+    const workbook = { Sheets: { 'Usuarios': worksheet }, SheetNames: ['Usuarios'] };
+    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    
+    this.saveAsExcelFile(excelBuffer, 'reporte_usuarios');
+  }
+
+  private getGridDataForExport(): any[] {
+    const data: any[] = [];
+    // We iterate through all nodes, including those not currently visible due to pagination
+    this.gridApi.forEachNodeAfterFilterAndSort((node: any) => {
+      data.push({
+        'Usuario': node.data.userName,
+        'Nombre': node.data.firstName,
+        'Apellido': node.data.lastName,
+        'Email': node.data.email,
+        'Estado': node.data.isActive ? 'Activo' : 'Inactivo',
+        'Creado': this.formatDate(node.data.createdAt),
+        'Actualizado': this.formatDate(node.data.updatedAt)
+      });
+    });
+    return data;
+  }
+
+  private styleExcelSheet(worksheet: XLSX.WorkSheet) {
+    const headerStyle = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: "0A6ED1" } }, // Fiori Primary
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    // Set column widths
+    const columnWidths = [
+      { wch: 20 }, // Usuario
+      { wch: 20 }, // Nombre
+      { wch: 20 }, // Apellido
+      { wch: 30 }, // Email
+      { wch: 10 }, // Estado
+      { wch: 18 }, // Creado
+      { wch: 18 }  // Actualizado
+    ];
+    worksheet['!cols'] = columnWidths;
+
+    // Apply style to header
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:G1');
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const address = XLSX.utils.encode_cell({ r: 0, c: C });
+      if (worksheet[address]) {
+        worksheet[address].s = headerStyle;
+      }
+    }
+  }
+
+  private saveAsExcelFile(buffer: any, fileName: string): void {
+    const data: Blob = new Blob([buffer], { type: 'application/octet-stream' });
+    FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + '.xlsx');
+    this.toastService.success('Éxito', 'El reporte de usuarios ha sido exportado a Excel.');
+  }
+
+  exportToPdf() {
+    if (!this.gridApi) {
+      this.toastService.error('Error', 'La tabla no está lista para exportar.');
+      return;
+    }
+
+    const dataToExport = this.getGridDataForExport();
+    if (dataToExport.length === 0) {
+      this.toastService.warning('Advertencia', 'No hay datos para exportar.');
+      return;
+    }
+
+    const doc = new jsPDF();
+    const head = [['Usuario', 'Nombre', 'Apellido', 'Email', 'Estado', 'Creado', 'Actualizado']];
+    const body = dataToExport.map(row => [
+      row.Usuario,
+      row.Nombre,
+      row.Apellido,
+      row.Email,
+      row.Estado,
+      row.Creado,
+      row.Actualizado
+    ]);
+
+    doc.setFontSize(18);
+    doc.setTextColor(40);
+    doc.text('Reporte de Usuarios', 14, 22);
+
+    autoTable(doc, {
+      head: head,
+      body: body,
+      styles: {
+        halign: 'center',
+        fontSize: 8
+      },
+      headStyles: {
+        fillColor: [10, 110, 209] // fiori-primary
+      },
+      startY: 30
+    });
+
+    doc.save('reporte_usuarios_' + new Date().getTime() + '.pdf');
+    this.toastService.success('Éxito', 'El reporte de usuarios ha sido exportado a PDF.');
   }
 
  // cargamos el usuario logueado
@@ -77,7 +201,7 @@ export class AppUserComponent implements OnInit {
         this.users = [];
         this.filteredUsers = [];
         this.loading = false;
-        this.showToast('error', 'Error al cargar', 'No se pudieron cargar los usuarios. Verifica tu conexión.');
+        this.toastService.error('error', 'No se pudieron cargar los usuarios. Verifica tu conexión.');
         console.error('Error loading users:', error);
       }
     });
@@ -128,14 +252,14 @@ export class AppUserComponent implements OnInit {
     this.appUserService.addUser(newUser).subscribe({
       next: (response) => {
         console.log('Respuesta del servidor:', response);
-        this.showToast('success', 'Usuario creado', `El usuario "${userData.userName}" ha sido registrado exitosamente.`);
+        this.toastService.success('success', `El usuario "${userData.userName}" ha sido registrado exitosamente.`);
         this.loadUsers();
       },
       error: (error) => {
         this.loading = false;
         console.error('Error creating user:', error);
         console.error('Error details:', error.error);
-        this.showToast('error', 'Error al crear', `Error: ${error.error?.message || error.message || 'No se pudo crear el usuario.'}`);
+        this.toastService.error('error', `Error: ${error.error?.message || error.message || 'No se pudo crear el usuario.'}`);
       }
     });
   }
@@ -161,12 +285,12 @@ export class AppUserComponent implements OnInit {
 
     this.appUserService.updateUser(updatedUser, userData.userId).subscribe({
       next: _ => {
-        this.showToast('success', 'Usuario actualizado', `El usuario "${userData.userName}" ha sido actualizado correctamente.`);
+        this.toastService.success('success',  `El usuario "${userData.userName}" ha sido actualizado correctamente.`);
         this.loadUsers();
       },
       error: (error) => {
         this.loading = false;
-        this.showToast('error', 'Error al actualizar', 'No se pudo actualizar el usuario. Inténtalo de nuevo.');
+        this.toastService.error('error', 'No se pudo actualizar el usuario. Inténtalo de nuevo.');
         console.error('Error updating user:', error);
       }
     });
@@ -212,11 +336,11 @@ export class AppUserComponent implements OnInit {
       if (result) {
         this.appUserService.deleteUser(user.userId).subscribe({
           next: _ => {
-            this.showToast('success', 'Usuario eliminado', `El usuario "${user.userName}" ha sido eliminado correctamente.`);
+            this.toastService.success('success', `El usuario "${user.userName}" ha sido eliminado correctamente.`);
             this.loadUsers();
           },
           error: (error) => {
-            this.showToast('error', 'Error al eliminar', 'No se pudo eliminar el usuario. Inténtalo de nuevo.');
+            this.toastService.error('error', 'No se pudo eliminar el usuario. Inténtalo de nuevo.');
             console.error('Error deleting user:', error);
           }
         });
@@ -238,11 +362,11 @@ export class AppUserComponent implements OnInit {
     }).then((result: UserPermissionsResult | null) => {
       if (result && result.action === 'close') {
         console.log('Modal de permisos cerrado');
-        this.showToast('info', 'Permisos gestionados', `Los permisos de "${user.userName}" han sido gestionados.`);
+        this.toastService.success('success', `Los permisos de "${user.userName}" han sido gestionados.`);
       }
     }).catch((error) => {
       console.error('Error en el modal de permisos:', error);
-      this.showToast('error', 'Error', 'Ocurrió un error al gestionar los permisos.');
+      this.toastService.error('error', 'Ocurrió un error al gestionar los permisos.');
     });
   }
 
@@ -381,76 +505,8 @@ export class AppUserComponent implements OnInit {
     return user.userId;
   }
 
-  // Método para mostrar Toast notifications
-  private showToast(type: ToastConfig['type'], title: string, message: string, duration: number = 5000) {
-    const toastId = `toast-${++this.toastCounter}`;
-    const toast: ToastConfig = { id: toastId, type, title, message, duration };
 
-    // Crear el elemento toast
-    const toastElement = this.createToastElement(toast);
-    const container = document.getElementById('toast-container');
 
-    if (container) {
-      container.appendChild(toastElement);
-
-      // Mostrar con animación
-      setTimeout(() => {
-        toastElement.classList.add('translate-x-0');
-        toastElement.classList.remove('translate-x-full');
-      }, 100);
-
-      // Auto-remove después del duration
-      setTimeout(() => {
-        this.removeToast(toastId);
-      }, duration);
-    }
-  }
-
-  private createToastElement(toast: ToastConfig): HTMLElement {
-    const toastDiv = document.createElement('div');
-    toastDiv.id = toast.id;
-    toastDiv.className = `flex items-center w-full max-w-xs p-4 mb-4 text-fiori-text bg-fiori-surface rounded-lg shadow-fioriHover transform translate-x-full transition-transform duration-300 ease-in-out border border-fiori-border`;
-
-    // Configurar colores según el tipo
-    const typeClasses = {
-      success: 'text-fiori-success',
-      error: 'text-fiori-error',
-      warning: 'text-fiori-warning',
-      info: 'text-fiori-info'
-    };
-
-    const iconNames = {
-      success: 'check-circle',
-      error: 'x-circle',
-      warning: 'alert-triangle',
-      info: 'info'
-    };
-
-    toastDiv.innerHTML = `
-      <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 ${typeClasses[toast.type]} rounded-lg">
-        <lucide-icon name="${iconNames[toast.type]}" class="w-5 h-5"></lucide-icon>
-      </div>
-      <div class="ml-3 text-sm font-normal">
-        <div class="font-semibold">${toast.title}</div>
-        <div class="text-fiori-subtext">${toast.message}</div>
-      </div>
-      <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-transparent text-fiori-subtext hover:text-fiori-text rounded-lg focus:ring-2 focus:ring-fiori-primary p-1.5 hover:bg-fiori-hover inline-flex h-8 w-8" onclick="document.getElementById('${toast.id}')?.remove()">
-        <lucide-icon name="x" class="w-4 h-4"></lucide-icon>
-      </button>
-    `;
-
-    return toastDiv;
-  }
-
-  private removeToast(toastId: string) {
-    const toast = document.getElementById(toastId);
-    if (toast) {
-      toast.classList.add('translate-x-full');
-      setTimeout(() => {
-        toast.remove();
-      }, 300);
-    }
-  }
 
   // Método para enfocar el input del formulario (ahora abre el modal)
   focusUserNameInput() {

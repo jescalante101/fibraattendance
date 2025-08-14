@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { AttendanceService } from 'src/app/core/services/attendance.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { ModalLoadingComponent } from 'src/app/shared/modal-loading/modal-loading.component';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-nuevo-descanso',
@@ -37,8 +38,8 @@ export class NuevoDescansoComponent implements OnInit {
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     private attendanceService: AttendanceService,
     private dialogLoading: MatDialog,
-    private authService: AuthService
-
+    private authService: AuthService,
+    private toastService: ToastService
   ) {
     
   }
@@ -79,7 +80,11 @@ export class NuevoDescansoComponent implements OnInit {
   }
 
   onConfirm() {
-
+    if (this.descansoForm.invalid) {
+      this.descansoForm.markAllAsTouched();
+      this.toastService.warning('Formulario incompleto', 'Por favor completa todos los campos requeridos');
+      return;
+    }
 
     if (this.descansoForm.valid) {
       // Mostrar el modal de carga
@@ -110,21 +115,26 @@ export class NuevoDescansoComponent implements OnInit {
 
         this.attendanceService.updateDescanso(formValue).subscribe({
          next: (response) => {
-         this.modalRef.closeModalFromChild(response);
+           this.toastService.success('Descanso actualizado', 'El descanso se actualizó correctamente');
+           this.modalRef.closeModalFromChild(response);
          },
          error: (error) => {
            console.error('Error al actualizar descanso:', error);
+           this.toastService.error('Error al actualizar', 'No se pudo actualizar el descanso. Verifica los datos e intenta nuevamente');
+           this.loading = false;
          }
         });
       }else{
         formValue.createdBy = this.userLogin;
          this.attendanceService.saveDescanso(formValue).subscribe({
         next: (response) => {
-         this.modalRef.closeModalFromChild(response);
+          this.toastService.success('Descanso creado', 'El nuevo descanso se creó correctamente');
+          this.modalRef.closeModalFromChild(response);
         },
         error: (error) => {
           console.error('Error al guardar descanso:', error);
-          // Aquí puedes manejar el error, mostrar un mensaje al usuario, etc.
+          this.toastService.error('Error al crear', 'No se pudo crear el descanso. Verifica los datos e intenta nuevamente');
+          this.loading = false;
         }
       });
       }
@@ -150,6 +160,7 @@ export class NuevoDescansoComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading descanso data:', error);
+        this.toastService.error('Error al cargar', 'No se pudieron cargar los datos del descanso para editar');
         this.loading = false;
       }
     });

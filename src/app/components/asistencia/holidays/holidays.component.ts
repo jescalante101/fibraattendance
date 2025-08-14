@@ -8,6 +8,10 @@ import { initFlowbite } from 'flowbite';
 import { HolidaysService } from 'src/app/core/services/holidays.service';
 import { HolidayYear, HolidayTableRow, SynchronizationResult, HolidayStats } from 'src/app/core/models/holiday.model';
 import { AG_GRID_LOCALE_ES } from 'src/app/ag-grid-locale.es';
+import * as XLSX from 'xlsx-js-style';
+import * as FileSaver from 'file-saver';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-holidays',
@@ -279,6 +283,110 @@ export class HolidaysComponent implements OnInit, OnDestroy, AfterViewInit {
         fileName: `feriados_${new Date().getFullYear()}.csv`
       });
     }
+  }
+
+  exportToExcel() {
+
+    const dataToExport = this.getGridDataForExport();
+    if (dataToExport.length === 0) {
+      this.errorMessage = 'No hay datos para exportar.';
+      this.clearMessagesAfterDelay();
+      return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    this.styleExcelSheet(worksheet);
+
+    const workbook = { Sheets: { 'Feriados': worksheet }, SheetNames: ['Feriados'] };
+    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    
+    this.saveAsExcelFile(excelBuffer, 'reporte_feriados');
+
+  }
+
+  private getGridDataForExport(): any[] {
+    return this.filteredRowData.map(row => ({
+      'Año': row.year,
+      'Fecha': new Date(row.holidayDate).toLocaleDateString('es-ES'),
+      'Día': row.dayName,
+      'Mes': row.monthName,
+      'Descripción': row.description,
+      'Duración (días)': row.duration
+    }));
+  }
+
+  private styleExcelSheet(worksheet: XLSX.WorkSheet) {
+    const headerStyle = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: "0A6ED1" } }, // Fiori Primary
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    const columnWidths = [
+      { wch: 10 }, // Año
+      { wch: 15 }, // Fecha
+      { wch: 15 }, // Día
+      { wch: 15 }, // Mes
+      { wch: 50 }, // Descripción
+      { wch: 15 }  // Duración
+    ];
+    worksheet['!cols'] = columnWidths;
+
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:F1');
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const address = XLSX.utils.encode_cell({ r: 0, c: C });
+      if (worksheet[address]) {
+        worksheet[address].s = headerStyle;
+      }
+    }
+  }
+
+  private saveAsExcelFile(buffer: any, fileName: string): void {
+    const data: Blob = new Blob([buffer], { type: 'application/octet-stream' });
+    FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + '.xlsx');
+    this.successMessage = 'El reporte ha sido exportado a Excel.';
+    this.clearMessagesAfterDelay();
+  }
+
+  exportToPdf() {
+    const dataToExport = this.getGridDataForExport();
+    if (dataToExport.length === 0) {
+      this.errorMessage = 'No hay datos para exportar.';
+      this.clearMessagesAfterDelay();
+      return;
+    }
+
+    const doc = new jsPDF();
+    const head = [['Año', 'Fecha', 'Día', 'Mes', 'Descripción', 'Duración (días)']];
+    const body = dataToExport.map(row => [
+      row.Año,
+      row.Fecha,
+      row.Día,
+      row.Mes,
+      row.Descripción,
+      row['Duración (días)']
+    ]);
+
+    doc.setFontSize(18);
+    doc.setTextColor(40);
+    doc.text('Reporte de Feriados', 14, 22);
+
+    autoTable(doc, {
+      head: head,
+      body: body,
+      styles: {
+        halign: 'center',
+        fontSize: 8
+      },
+      headStyles: {
+        fillColor: [10, 110, 209] // fiori-primary
+      },
+      startY: 30
+    });
+
+    doc.save('reporte_feriados_' + new Date().getTime() + '.pdf');
+    this.successMessage = 'El reporte ha sido exportado a PDF.';
+    this.clearMessagesAfterDelay();
   }
 
   private clearMessages(): void {

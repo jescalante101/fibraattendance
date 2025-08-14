@@ -1,0 +1,89 @@
+/* Estilos para el Column Manager Component */
+
+.rotate-90 {
+  transform: rotate(90deg);
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+/* Animaciones suaves para las transiciones */
+button, input[type="checkbox"] {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Estilos para el estado indeterminado del checkbox */
+input[type="checkbox"]:indeterminate {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M5.707 7.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4a1 1 0 0 0-1.414-1.414L7 8.586 5.707 7.293z'/%3e%3c/svg%3e");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Estilos personalizados para el popover */
+.column-manager-popover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Estilos para el scroll personalizado */
+.column-manager-popover::-webkit-scrollbar {
+  width: 4px;
+}
+
+.column-manager-popover::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.column-manager-popover::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.column-manager-popover::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Estados de hover mejorados */
+.group-header:hover {
+  background-color: #f8fafc;
+}
+
+.column-item:hover {
+  background-color: #f8fafc;
+}
+
+/* Estilo para elementos deshabilitados */
+.column-item.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.column-item.disabled input[type="checkbox"] {
+  cursor: not-allowed;
+}
+
+/* Animación para el colapso/expansión de grupos */
+.group-content {
+  transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out;
+  overflow: hidden;
+}
+
+.group-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+.group-content.expanded {
+  opacity: 1;
+}
+
+/* Estilos responsivos */
+@media (max-width: 640px) {
+  .column-manager-popover {
+    min-width: 280px;
+    max-width: 320px;
+  }
+}

@@ -29,189 +29,22 @@
     </div>
   </div>
 
-  <!-- Panel de filtros compacto -->
-  <div
-    class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border mb-3"
-  >
-    <div class="p-4">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-        <!-- Campo de búsqueda -->
-        <div>
-          <label class="block text-xs font-medium text-gray-600 mb-1"
-            >Buscar Empleado</label
-          >
-          <div class="relative">
-            <input
-              type="text"
-              [(ngModel)]="filtro"
-              placeholder="Nombre, documento..."
-              (keyup.enter)="buscarEmpleado()"
-              class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-            />
-            <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-3 h-3 text-gray-400"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607z"
-                />
-              </svg>
-            </div>
-            <button
-              (click)="buscarEmpleado()"
-              class="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-3 h-3"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607z"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <!-- Sede Autocomplete -->
-        <div class="relative">
-          <label class="block text-xs font-medium text-gray-600 mb-1"
-            >Sede</label
-          >
-          <div class="relative">
-            <input
-              type="text"
-              [(ngModel)]="sedeSearchTerm"
-              (input)="onSedeSearchChange($event)"
-              (focus)="showSedeDropdown = true"
-              (blur)="onSedeBlur()"
-              (keydown)="onSedeKeydown($event)"
-              placeholder="{{ selectedCategoriaAuxiliar ? '' : 'Buscar sede...' }}"
-              class="w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white"
-            />
-            <div class="absolute right-2 top-1/2 transform -translate-y-1/2">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-gray-400">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
-              </svg>
-            </div>
-          </div>
-          
-          <!-- Dropdown -->
-          <div *ngIf="showSedeDropdown && sedesFiltradas.length > 0" 
-               class="absolute z-[9999] w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-60 overflow-y-auto"
-               style="z-index: 9999 !important;">
-            <div *ngFor="let sede of sedesFiltradas; let i = index" 
-                 class="px-3 py-2 cursor-pointer hover:bg-blue-50 text-sm transition-colors"
-                 [class.bg-blue-100]="highlightedSedeIndex === i"
-                 (mousedown)="selectSede(sede)"
-                 (mouseenter)="highlightedSedeIndex = i">
-              <div class="font-medium text-gray-900">{{ sede.descripcion }}</div>
-              <div class="text-xs text-gray-500">ID: {{ sede.categoriaAuxiliarId }}</div>
-            </div>
-            <div *ngIf="sedesFiltradas.length === 0" class="px-3 py-2 text-sm text-gray-500">
-              No se encontraron sedes
-            </div>
-          </div>
-        </div>
-
-        <!-- Área Autocomplete -->
-        <div class="relative">
-          <label class="block text-xs font-medium text-gray-600 mb-1"
-            >Área</label
-          >
-          <div class="relative">
-            <input
-              type="text"
-              [(ngModel)]="areaSearchTerm"
-              (input)="onAreaSearchChange($event)"
-              (focus)="showAreaDropdown = true"
-              (blur)="onAreaBlur()"
-              (keydown)="onAreaKeydown($event)"
-              placeholder="{{ selectedRhArea ? '' : 'Buscar área...' }}"
-              class="w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white"
-            />
-            <div class="absolute right-2 top-1/2 transform -translate-y-1/2">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-gray-400">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
-              </svg>
-            </div>
-          </div>
-          
-          <!-- Dropdown -->
-          <div *ngIf="showAreaDropdown && areasFiltradas.length > 0" 
-               class="absolute z-[9999] w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-60 overflow-y-auto"
-               style="z-index: 9999 !important;">
-            <div *ngFor="let area of areasFiltradas; let i = index" 
-                 class="px-3 py-2 cursor-pointer hover:bg-blue-50 text-sm transition-colors"
-                 [class.bg-blue-100]="highlightedAreaIndex === i"
-                 (mousedown)="selectArea(area)"
-                 (mouseenter)="highlightedAreaIndex = i">
-              <div class="font-medium text-gray-900">{{ area.descripcion }}</div>
-              <div class="text-xs text-gray-500">ID: {{ area.areaId }}</div>
-            </div>
-            <div *ngIf="areasFiltradas.length === 0" class="px-3 py-2 text-sm text-gray-500">
-              No se encontraron áreas
-            </div>
-          </div>
-        </div>
-
-        <!-- Botones filtrar y limpiar -->
-        <div class="flex gap-2">
-          <button
-            (click)="buscarEmpleado()"
-            class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-4 h-4 mr-1"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"
-              />
-            </svg>
-            Filtrar
-          </button>
-          <button
-            (click)="limpiarFiltros()"
-            class="inline-flex items-center justify-center px-3 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
-            title="Limpiar todos los filtros"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-4 h-4"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-              />
-            </svg>
-          </button>
-        </div>
+  <!-- Panel de filtros -->
+  <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border mb-3 p-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+        </svg>
+        <h3 class="text-sm font-medium text-gray-700">Filtrar Empleados</h3>
       </div>
+      <app-generic-filter
+        [config]="filterConfig"
+        [initialValues]="currentFilters"
+        (filterChange)="onGenericFilterChange($event)"
+        (filtersApply)="onGenericFiltersApply($event)"
+        (filtersClear)="onGenericFiltersClear()"
+      ></app-generic-filter>
     </div>
   </div>
 
@@ -224,11 +57,23 @@
         <div class="text-lg font-semibold text-fiori-text">
           Lista de Empleados
         </div>
-        <div class="flex items-center space-x-2 text-sm text-fiori-subtext">
-          <span
-            >Mostrando {{ employees.length }} de
-            {{ totalCount }} empleados</span
-          >
+        <div class="flex items-center space-x-3">
+          <!-- Gestor de Columnas -->
+          <app-column-manager
+            [config]="columnManagerConfig"
+            [columns]="tableColumns"
+            [dataSource]="employees"
+            (columnChange)="onColumnManagerChange($event)"
+            (columnsApply)="onColumnsApply($event)"
+            (columnsReset)="onColumnsReset()"
+          ></app-column-manager>
+          
+          <div class="text-sm text-fiori-subtext">
+            <span
+              >Mostrando {{ employees.length }} de
+              {{ totalCount }} empleados</span
+            >
+          </div>
         </div>
       </div>
     </div>
@@ -250,9 +95,9 @@
       <table class="w-full" *ngIf="!loading">
         <thead class="bg-gray-50">
           <tr>
-            <!-- Checkbox select si mostrarBotonAsignar -->
+            <!-- Columnas dinámicas basadas en configuración -->
             <th
-              *ngIf="mostrarBotonAsignar"
+              *ngIf="isColumnVisible('select')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
               <input
@@ -262,34 +107,74 @@
                 class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
             </th>
-            <!-- ID solo si no mostrarBotonAsignar -->
             <th
-              *ngIf="!mostrarBotonAsignar"
+              *ngIf="isColumnVisible('personalId')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
               ID
             </th>
             <th
+              *ngIf="isColumnVisible('nroDoc')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
               Documento
             </th>
             <th
+              *ngIf="isColumnVisible('empleado')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
               Empleado
             </th>
             <th
+              *ngIf="isColumnVisible('categoriaAuxiliarDescripcion')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
               Sede
             </th>
             <th
+              *ngIf="isColumnVisible('areaDescripcion')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
               Área
             </th>
             <th
+              *ngIf="isColumnVisible('fechaIngreso')"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Fecha Ingreso
+            </th>
+            <th
+              *ngIf="isColumnVisible('fechaCese')"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Fecha Cese
+            </th>
+            <th
+              *ngIf="isColumnVisible('cargoDescripcion')"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Cargo
+            </th>
+            <th
+              *ngIf="isColumnVisible('ccostoDescripcion')"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Centro de Costo
+            </th>
+            <th
+              *ngIf="isColumnVisible('email')"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Correo Electrónico
+            </th>
+            <th
+              *ngIf="isColumnVisible('telefono')"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Teléfono
+            </th>
+            <th
+              *ngIf="isColumnVisible('acciones')"
               class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
               Acciones
@@ -301,17 +186,16 @@
             *ngFor="let emp of employees"
             class="hover:bg-gray-50 transition-colors"
           >
-            <!-- Checkbox select -->
-            <td *ngIf="mostrarBotonAsignar" class="px-6 py-4 whitespace-nowrap">
+            <!-- Columnas dinámicas basadas en configuración -->
+            <td *ngIf="isColumnVisible('select')" class="px-6 py-4 whitespace-nowrap">
               <input
                 type="checkbox"
                 [(ngModel)]="emp.selected"
                 class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
             </td>
-            <!-- ID -->
             <td
-              *ngIf="!mostrarBotonAsignar"
+              *ngIf="isColumnVisible('personalId')"
               class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
             >
               <div class="flex items-center">
@@ -324,12 +208,10 @@
                 </div>
               </div>
             </td>
-            <!-- Documento -->
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <td *ngIf="isColumnVisible('nroDoc')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
               {{ emp.nroDoc }}
             </td>
-            <!-- Empleado -->
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td *ngIf="isColumnVisible('empleado')" class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center">
                 <div
                   class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-3"
@@ -351,21 +233,41 @@
                 </div>
                 <div>
                   <div class="text-sm font-medium text-gray-900">
-                    {{ emp.apellidoPaterno }} {{ emp.apellidoMaterno }}, {{ emp.nombres }}
+                    {{ emp.nombres }}, {{ emp.apellidoPaterno }} {{ emp.apellidoMaterno }}
                   </div>
                 </div>
               </div>
             </td>
-            <!-- Sede -->
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <td *ngIf="isColumnVisible('categoriaAuxiliarDescripcion')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
               {{ emp.categoriaAuxiliarDescripcion || "-" }}
             </td>
-            <!-- Área -->
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <td *ngIf="isColumnVisible('areaDescripcion')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
               {{ emp.areaDescripcion || "-" }}
+            </td>
+            <td *ngIf="isColumnVisible('fechaIngreso')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ emp.fechaIngreso | date:'dd/MM/yyyy' }}
+            </td>
+            <td *ngIf="isColumnVisible('fechaCese')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ emp.fechaCese | date:'dd/MM/yyyy' }}
+            </td>
+            <td *ngIf="isColumnVisible('cargoDescripcion')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ emp.cargoDescripcion || "-" }}
+            </td>
+            <td *ngIf="isColumnVisible('ccostoDescripcion')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ emp.ccostoDescripcion || "-" }}
+            </td>
+            <td *ngIf="isColumnVisible('email')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <a *ngIf="emp.email" [href]="'mailto:' + emp.email" class="text-blue-600 hover:text-blue-800">
+                {{ emp.email }}
+              </a>
+              <span *ngIf="!emp.email" class="text-gray-400">-</span>
+            </td>
+            <td *ngIf="isColumnVisible('telefono')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ emp.telefono || "-" }}
             </td>
             <!-- Acciones -->
             <td
+              *ngIf="isColumnVisible('acciones')"
               class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
             >
               <div class="flex items-center justify-end space-x-2">

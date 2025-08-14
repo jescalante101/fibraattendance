@@ -1,5 +1,3 @@
-
-
 import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { ShiftsService, Shift } from 'src/app/core/services/shifts.service';
@@ -7,6 +5,11 @@ import { ModalService } from 'src/app/shared/modal/modal.service';
 import { ModalNuevoTurnoComponent } from './modal-nuevo-turno/modal-nuevo-turno.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
+import { ToastService } from 'src/app/shared/services/toast.service';
+import * as XLSX from 'xlsx-js-style';
+import * as FileSaver from 'file-saver';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-turno',
@@ -26,10 +29,113 @@ export class TurnoComponent implements OnInit {
   pageNumber: number = 1;
   datosSeleccionado: any[] = [];
 
-  constructor(private service: ShiftsService, private modalService: ModalService,  private dialog: MatDialog,) { }
+  constructor(
+    private service: ShiftsService, 
+    private modalService: ModalService,  
+    private dialog: MatDialog,
+    private toastService: ToastService
+  ) { }
 
   ngOnInit() {
     this.loadTurnosData();
+  }
+
+  exportToExcel() {
+    const dataToExport = this.getGridDataForExport();
+    if (dataToExport.length === 0) {
+      this.toastService.warning('Advertencia', 'No hay datos para exportar.');
+      return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    this.styleExcelSheet(worksheet);
+
+    const workbook = { Sheets: { 'Turnos': worksheet }, SheetNames: ['Turnos'] };
+    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    
+    this.saveAsExcelFile(excelBuffer, 'reporte_turnos');
+  }
+
+  private getGridDataForExport(): any[] {
+    return this.dataHorariosFiltrados.map(item => ({
+      'ID': item.id,
+      'Nombre': item.alias,
+      'Horarios': this.getAreas(item.horario),
+      'Tipo': item.cycleUnit === 1 ? 'Semanal' : 'Diario',
+      'Ciclo': `${item.shiftCycle} ${item.cycleUnit === 1 ? 'semanas' : 'días'}`,
+      'Estado': item.autoShift ? 'Automático' : 'Manual'
+    }));
+  }
+
+  private styleExcelSheet(worksheet: XLSX.WorkSheet) {
+    const headerStyle = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: "0A6ED1" } }, // Fiori Primary
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    const columnWidths = [
+      { wch: 10 }, // ID
+      { wch: 25 }, // Nombre
+      { wch: 40 }, // Horarios
+      { wch: 15 }, // Tipo
+      { wch: 20 }, // Ciclo
+      { wch: 15 }  // Estado
+    ];
+    worksheet['!cols'] = columnWidths;
+
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:F1');
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const address = XLSX.utils.encode_cell({ r: 0, c: C });
+      if (worksheet[address]) {
+        worksheet[address].s = headerStyle;
+      }
+    }
+  }
+
+  private saveAsExcelFile(buffer: any, fileName: string): void {
+    const data: Blob = new Blob([buffer], { type: 'application/octet-stream' });
+    FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + '.xlsx');
+    this.toastService.success('Éxito', 'El reporte ha sido exportado a Excel.');
+  }
+
+  exportToPdf() {
+    const dataToExport = this.getGridDataForExport();
+    if (dataToExport.length === 0) {
+      this.toastService.warning('Advertencia', 'No hay datos para exportar.');
+      return;
+    }
+
+    const doc = new jsPDF();
+    const head = [['ID', 'Nombre', 'Horarios', 'Tipo', 'Ciclo', 'Estado']];
+    const body = dataToExport.map(row => [
+      row.ID,
+      row.Nombre,
+      row.Horarios,
+      row.Tipo,
+      row.Ciclo,
+      row.Estado
+    ]);
+
+    doc.setFontSize(18);
+    doc.setTextColor(40);
+    doc.text('Reporte de Turnos', 14, 22);
+
+    autoTable(doc, {
+      head: head,
+      body: body,
+      styles: {
+        halign: 'center',
+        fontSize: 8
+      },
+      headStyles: {
+        fillColor: [10, 110, 209] // fiori-primary
+      },
+      startY: 30
+    });
+
+    doc.save('reporte_turnos_' + new Date().getTime() + '.pdf');
+    this.toastService.success('Éxito', 'El reporte ha sido exportado a PDF.');
   }
 
   updateThorarioSelect(select: any[]) {
@@ -52,6 +158,7 @@ export class TurnoComponent implements OnInit {
       (error) => {
         console.error('Error al cargar turnos:', error);
         this.errorMessage = 'No se pudieron cargar los turnos. Por favor, intente nuevamente.';
+        this.toastService.error('Error al cargar', 'No se pudieron cargar los turnos. Verifica tu conexión.');
         this.isLoading = false;
         this.dataHorarios = [];
         this.dataHorariosFiltrados = [];
@@ -122,7 +229,8 @@ export class TurnoComponent implements OnInit {
       width: '900px'
     }).then(result => {
       if (result) {
-        console.log('Turno creado:', result);
+        // console.log('Turno creado:', result);
+        // this.toastService.success('Turno creado', 'El nuevo turno ha sido creado exitosamente');
         this.loadTurnosData();
       }
     });
@@ -136,7 +244,8 @@ export class TurnoComponent implements OnInit {
       width: '900px'
     }).then(result => {
       if (result) {
-        console.log('Turno actualizado:', result);
+        // console.log('Turno actualizado:', result);
+        // this.toastService.success('Turno actualizado', `El turno "${turno.alias}" ha sido actualizado correctamente`);
         this.loadTurnosData();
       }
     });
@@ -177,12 +286,14 @@ export class TurnoComponent implements OnInit {
           this.service.deleteShift(turno.id).subscribe(
         (response) => {
           console.log('Turno eliminado exitosamente:', response);
+          this.toastService.success('Turno eliminado', `El turno "${turno.alias}" ha sido eliminado correctamente`);
           this.loadTurnosData();
           // Resetear el error message si existía
           this.errorMessage = '';
         },
         (error) => {
           console.error('Error al eliminar turno:', error);
+          this.toastService.error('Error al eliminar', `No se pudo eliminar el turno "${turno.alias}". Inténtalo nuevamente.`);
           this.errorMessage = `No se pudo eliminar el turno "${turno.alias}". Por favor, intente nuevamente.`;
         }
       );

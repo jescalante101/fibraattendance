@@ -15,6 +15,8 @@ export interface Employee {
   ccostoId?: string;
   ccostoDescripcion?: string;
   categoriaAuxiliarId?: string;
+  cargoDescripcion?: string;
+  cargoId?: string;
   categoriaAuxiliarDescripcion?: string;
   planillaId?: string;
   categoriaAuxiliar2Id?: string;

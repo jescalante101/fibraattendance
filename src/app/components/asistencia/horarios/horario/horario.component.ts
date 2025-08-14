@@ -8,6 +8,11 @@ import { NuevoHorarioComponent } from './nuevo-horario/nuevo-horario.component';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 import { FixedSizeVirtualScrollStrategy } from '@angular/cdk/scrolling';
 import { ModalService } from 'src/app/shared/modal/modal.service';
+import { ToastService } from 'src/app/shared/services/toast.service';
+import * as XLSX from 'xlsx-js-style';
+import * as FileSaver from 'file-saver';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-horario',
@@ -27,11 +32,116 @@ export class HorarioComponent implements OnInit {
   constructor(
     private service: AttendanceService,
     private dialog: MatDialog,
-    private modalService: ModalService
+    private modalService: ModalService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
     this.loadHoraiosData();
+  }
+
+  exportToExcel() {
+    const dataToExport = this.getGridDataForExport();
+    if (dataToExport.length === 0) {
+      this.toastService.warning('Advertencia', 'No hay datos para exportar.');
+      return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    this.styleExcelSheet(worksheet);
+
+    const workbook = { Sheets: { 'Horarios': worksheet }, SheetNames: ['Horarios'] };
+    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    
+    this.saveAsExcelFile(excelBuffer, 'reporte_horarios');
+  }
+
+  private getGridDataForExport(): any[] {
+    return this.dataHorariosFiltrados.map(item => ({
+      'ID': item.idHorio,
+      'Nombre': item.nombre,
+      'Tipo': item.tipo === 0 ? 'Estándar' : 'Flexible',
+      'Entrada': item.horaEntrada,
+      'Salida': item.horaSalida,
+      'Tiempo Trabajo (min)': item.tiempoTrabajo,
+      'Descanso (min)': item.descanso,
+      'Días Laborales': item.diasLaboral
+    }));
+  }
+
+  private styleExcelSheet(worksheet: XLSX.WorkSheet) {
+    const headerStyle = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: "0A6ED1" } }, // Fiori Primary
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    const columnWidths = [
+      { wch: 10 }, // ID
+      { wch: 25 }, // Nombre
+      { wch: 15 }, // Tipo
+      { wch: 15 }, // Entrada
+      { wch: 15 }, // Salida
+      { wch: 20 }, // Tiempo Trabajo (min)
+      { wch: 20 }, // Descanso (min)
+      { wch: 20 }  // Días Laborales
+    ];
+    worksheet['!cols'] = columnWidths;
+
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:H1');
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const address = XLSX.utils.encode_cell({ r: 0, c: C });
+      if (worksheet[address]) {
+        worksheet[address].s = headerStyle;
+      }
+    }
+  }
+
+  private saveAsExcelFile(buffer: any, fileName: string): void {
+    const data: Blob = new Blob([buffer], { type: 'application/octet-stream' });
+    FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + '.xlsx');
+    this.toastService.success('Éxito', 'El reporte ha sido exportado a Excel.');
+  }
+
+  exportToPdf() {
+    const dataToExport = this.getGridDataForExport();
+    if (dataToExport.length === 0) {
+      this.toastService.warning('Advertencia', 'No hay datos para exportar.');
+      return;
+    }
+
+    const doc = new jsPDF();
+    const head = [['ID', 'Nombre', 'Tipo', 'Entrada', 'Salida', 'Tiempo Trabajo (min)', 'Descanso (min)', 'Días Laborales']];
+    const body = dataToExport.map(row => [
+      row.ID,
+      row.Nombre,
+      row.Tipo,
+      row.Entrada,
+      row.Salida,
+      row['Tiempo Trabajo (min)'],
+      row['Descanso (min)'],
+      row['Días Laborales']
+    ]);
+
+    doc.setFontSize(18);
+    doc.setTextColor(40);
+    doc.text('Reporte de Horarios', 14, 22);
+
+    autoTable(doc, {
+      head: head,
+      body: body,
+      styles: {
+        halign: 'center',
+        fontSize: 8
+      },
+      headStyles: {
+        fillColor: [10, 110, 209] // fiori-primary
+      },
+      startY: 30
+    });
+
+    doc.save('reporte_horarios_' + new Date().getTime() + '.pdf');
+    this.toastService.success('Éxito', 'El reporte ha sido exportado a PDF.');
   }
 
   loadHoraiosData(){
@@ -45,9 +155,8 @@ export class HorarioComponent implements OnInit {
         loadinngRef.close();
       },
       (error)=>{
-        console.log(error);
-        
-        alert("Error al cargar los datos");
+        console.error('Error al cargar los horarios:', error);
+        this.toastService.error('Error al cargar', 'No se pudieron cargar los horarios. Verifica tu conexión.');
         loadinngRef.close();
       }
     )
@@ -78,14 +187,9 @@ export class HorarioComponent implements OnInit {
       componentType: NuevoHorarioComponent,
       componentData: { use_mode: mode },
     }).then(result => {
+      this.loadHoraiosData();
       if (result?.id) {
-        this.loadHoraiosData();
-        this.dialog.open(ModalConfirmComponent, {
-          data: {
-            tipo: 'success',
-            mensaje: 'El horario se guardó correctamente.'
-          }
-        });
+        this.toastService.success('Horario creado', 'El horario se guardó correctamente');
       }
     });
   }
@@ -102,18 +206,9 @@ export class HorarioComponent implements OnInit {
       if (result) {
         if(result.id){
           this.loadHoraiosData();
-          this.dialog.open(ModalConfirmComponent, {
-            width: '400px',
-            height: '200px',
-            hasBackdrop: true,
-            backdropClass: 'backdrop-modal',
-            data: {
-              tipo: 'success',
-              mensaje: 'El horario se guardó correctamente.'
-            }
-          });
+          this.toastService.success('Horario actualizado', 'El horario se actualizó correctamente');
         }
-        console.log('Horario Creado:', result);
+        console.log('Horario actualizado:', result);
       }
     });
   }
@@ -123,10 +218,12 @@ export class HorarioComponent implements OnInit {
     this.service.deleteHorario(idHorario).subscribe({
       next: (response) => {
         console.log('Horario eliminado:', response);
+        this.toastService.success('Horario eliminado', 'El horario ha sido eliminado correctamente');
         this.loadHoraiosData();
       },
       error: (error) => {
         console.error('Error al eliminar horario:', error);
+        this.toastService.error('Error al eliminar', 'No se pudo eliminar el horario. Inténtalo nuevamente');
       }
     });
   }

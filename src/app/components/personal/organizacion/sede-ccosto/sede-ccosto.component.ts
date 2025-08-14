@@ -4,7 +4,7 @@ import { SedeCcostoService } from 'src/app/core/services/sede-ccosto.service';
 import { SedeCcosto, SedeCcostoInsert, SedeCcostoUpdate } from 'src/app/core/models/sede-ccosto.model';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { CostCenterService, CostCenter } from 'src/app/core/services/cost-center.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from 'src/app/shared/services/toast.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 import { HeaderConfigService } from 'src/app/core/services/header-config.service';
@@ -12,6 +12,10 @@ import { Subject, takeUntil } from 'rxjs';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { SedeCcostoFormModalComponent, SedeCcostoFormResult, SedeCcostoData } from './sede-ccosto-form-modal/sede-ccosto-form-modal.component';
 import { AuthService } from '../../../../core/services/auth.service';
+import * as XLSX from 'xlsx-js-style';
+import * as FileSaver from 'file-saver';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Interfaces for tree data
 interface GroupedSite {
@@ -67,7 +71,7 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
     private sedeCcostoService: SedeCcostoService,
     private categoriaAuxiliarService: CategoriaAuxiliarService,
     private costCenterService: CostCenterService,
-    private snackBar: MatSnackBar,
+    private toastService: ToastService,
     private dialog: MatDialog,
     private headerConfigService: HeaderConfigService,
     private modalService: ModalService,
@@ -98,6 +102,104 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
       });    
 
     this.getUserCurrent();
+  }
+
+  exportToExcel() {
+    const dataToExport = this.getGridDataForExport();
+    if (dataToExport.length === 0) {
+      this.toastService.warning('Advertencia', 'No hay datos para exportar.');
+      return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    this.styleExcelSheet(worksheet);
+
+    const workbook = { Sheets: { 'SedeCcosto': worksheet }, SheetNames: ['SedeCcosto'] };
+    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    
+    this.saveAsExcelFile(excelBuffer, 'reporte_sede_ccosto');
+  }
+
+  private getGridDataForExport(): any[] {
+    return this.sedeCcostoList.map(item => ({
+      'Sede': item.siteName,
+      'Centro de Costo': item.costCenterName,
+      'Observación': item.observation,
+      'Estado': item.active === 'Y' ? 'Activo' : 'Inactivo',
+      'Creado por': item.createdBy,
+      'Fecha de Creación': new Date(item.createdAt).toLocaleDateString('es-ES')
+    }));
+  }
+
+  private styleExcelSheet(worksheet: XLSX.WorkSheet) {
+    const headerStyle = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: "0A6ED1" } }, // Fiori Primary
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    const columnWidths = [
+      { wch: 25 }, // Sede
+      { wch: 30 }, // Centro de Costo
+      { wch: 30 }, // Observación
+      { wch: 15 }, // Estado
+      { wch: 20 }, // Creado por
+      { wch: 20 }  // Fecha de Creación
+    ];
+    worksheet['!cols'] = columnWidths;
+
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:F1');
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const address = XLSX.utils.encode_cell({ r: 0, c: C });
+      if (worksheet[address]) {
+        worksheet[address].s = headerStyle;
+      }
+    }
+  }
+
+  private saveAsExcelFile(buffer: any, fileName: string): void {
+    const data: Blob = new Blob([buffer], { type: 'application/octet-stream' });
+    FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + '.xlsx');
+    this.toastService.success('Éxito', 'El reporte ha sido exportado a Excel.');
+  }
+
+  exportToPdf() {
+    const dataToExport = this.getGridDataForExport();
+    if (dataToExport.length === 0) {
+      this.toastService.warning('Advertencia', 'No hay datos para exportar.');
+      return;
+    }
+
+    const doc = new jsPDF();
+    const head = [['Sede', 'Centro de Costo', 'Observación', 'Estado', 'Creado por', 'Fecha de Creación']];
+    const body = dataToExport.map(row => [
+      row.Sede,
+      row['Centro de Costo'],
+      row.Observación,
+      row.Estado,
+      row['Creado por'],
+      row['Fecha de Creación']
+    ]);
+
+    doc.setFontSize(18);
+    doc.setTextColor(40);
+    doc.text('Reporte de Sede - C. Costo', 14, 22);
+
+    autoTable(doc, {
+      head: head,
+      body: body,
+      styles: {
+        halign: 'center',
+        fontSize: 8
+      },
+      headStyles: {
+        fillColor: [10, 110, 209] // fiori-primary
+      },
+      startY: 30
+    });
+
+    doc.save('reporte_sede_ccosto_' + new Date().getTime() + '.pdf');
+    this.toastService.success('Éxito', 'El reporte ha sido exportado a PDF.');
   }
 
   private getUserCurrent(){
@@ -206,20 +308,10 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
       if (confirmed) {
         this.sedeCcostoService.delete(item.siteId, item.costCenterId).subscribe({
           next: () => {
-            this.snackBar.open('Registro eliminado', 'Cerrar', { 
-              duration: 3000,
-              panelClass: 'snackbar-success',
-              horizontalPosition: 'end',
-              verticalPosition: 'top'
-            });
+            this.toastService.success('Registro eliminado', `La relación de ${item.siteName} - ${item.costCenterName} fue eliminada`);
             this.loadSedeCcosto();
           },
-          error: () => this.snackBar.open('Error al eliminar', 'Cerrar', { 
-            duration: 3000,
-            panelClass: 'snackbar-error',
-            horizontalPosition: 'end',
-            verticalPosition: 'top'
-          })
+          error: () => this.toastService.error('Error al eliminar', 'No se pudo eliminar la relación sede-ccosto')
         });
       }
     });
@@ -241,24 +333,13 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
       if (confirmed) {
         this.sedeCcostoService.update(item.siteId, item.costCenterId, updated).subscribe({
           next: () => {
-            this.snackBar.open(
+            this.toastService.success(
               item.active === 'Y' ? 'Registro desactivado' : 'Registro activado',
-              'Cerrar',
-              { 
-                duration: 3000,
-                panelClass: 'snackbar-success',
-                horizontalPosition: 'end',
-                verticalPosition: 'top'
-              }
+              `El estado de ${item.siteName} - ${item.costCenterName} fue ${item.active === 'Y' ? 'desactivado' : 'activado'}`
             );
             this.loadSedeCcosto();
           },
-          error: () => this.snackBar.open('Error al actualizar el estado', 'Cerrar', { 
-            duration: 3000,
-            panelClass: 'snackbar-error',
-            horizontalPosition: 'end',
-            verticalPosition: 'top'
-          })
+          error: () => this.toastService.error('Error al actualizar', 'No se pudo cambiar el estado de la relación')
         });
       }
     });
@@ -364,12 +445,12 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
 
     this.sedeCcostoService.create(sedeCcosto).subscribe({
       next: () => {
-        this.snackBar.open('Relación creada exitosamente', 'Cerrar', { duration: 3000 });
+        this.toastService.success('Relación creada', 'La relación sede-ccosto se creó correctamente');
         this.loadSedeCcosto();
       },
       error: () => {
         this.loading = false;
-        this.snackBar.open('Error al crear la relación', 'Cerrar', { duration: 3000 });
+        this.toastService.error('Error al crear', 'No se pudo crear la relación sede-ccosto');
       }
     });
   }
@@ -391,12 +472,12 @@ export class SedeCcostoComponent implements OnInit,OnDestroy {
 
     this.sedeCcostoService.update(originalItem.siteId, originalItem.costCenterId, sedeCcosto).subscribe({
       next: () => {
-        this.snackBar.open('Relación actualizada exitosamente', 'Cerrar', { duration: 3000 });
+        this.toastService.success('Relación actualizada', 'La relación sede-ccosto se actualizó correctamente');
         this.loadSedeCcosto();
       },
       error: () => {
         this.loading = false;
-        this.snackBar.open('Error al actualizar la relación', 'Cerrar', { duration: 3000 });
+        this.toastService.error('Error al actualizar', 'No se pudo actualizar la relación sede-ccosto');
       }
     });
   }

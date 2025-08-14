@@ -24,6 +24,7 @@ import { InvLecturaComponent } from './components/modal/inv-lectura/inv-lectura.
 
 import { ModalComponent } from './shared/modal/modal.component'; // Para selects
 import { SharedModule } from './shared/shared.module';
+import { ToastContainerComponent } from './shared/toast-container/toast-container.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
@@ -110,6 +111,7 @@ registerLocaleData(localeEs);
         FilterOrdenesPipe,
         InvLecturaComponent,
         ModalComponent,
+        ToastContainerComponent,
         // 🔥 Aquí ya NO pongas ModalAlertaComponent
         PersonalComponent,
         DepartamentoComponent,

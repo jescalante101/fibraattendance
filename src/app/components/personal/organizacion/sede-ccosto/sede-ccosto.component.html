@@ -208,7 +208,8 @@
               <!-- Fecha Creación -->
               <div class="col-span-2 flex items-center">
                 <div>
-                  <div class="text-xs text-fiori-text">{{ formatDate(item.createdAt) }}</div>
+                  <div class="text-xs text-fiori-text">{{ item.createdAt | date: 'short' }}</div>
+
                   <div class="text-xs text-fiori-subtext">por {{ item.createdBy }}</div>
                 </div>
               </div>

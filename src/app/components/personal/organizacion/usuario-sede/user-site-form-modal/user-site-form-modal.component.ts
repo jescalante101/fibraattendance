@@ -60,7 +60,7 @@ export class UserSiteFormModalComponent implements OnInit {
       siteId: ['', this.selectedSedesValidator.bind(this)],
       usuarioFilter: [''],
       sedeFilter: [''],
-      creationDate: [{ value: '', disabled: true }],
+      createdAt: [{ value: '', disabled: true }],
       observation: ['']
     });
   }
@@ -82,20 +82,29 @@ export class UserSiteFormModalComponent implements OnInit {
         const selectedUsuario = this.usuarios.find(u => u.userId === this.userSiteData!.userId);
         const selectedSede = this.sedes.find(s => s.categoriaAuxiliarId === this.userSiteData!.siteId);
 
+        // En modo edición, cargar fecha actual como fecha de modificación
+        const now = new Date();
+        const currentDateTime = now.toISOString().slice(0, 16);
+        
         this.form.patchValue({
           userId: this.userSiteData.userId,
           siteId: this.userSiteData.siteId,
           usuarioFilter: selectedUsuario?.userName || '',
           sedeFilter: selectedSede?.descripcion || '',
-          createdAt: this.userSiteData.createdAt || '',
+          createdAt: currentDateTime, // Fecha actual para modificación
           observation: this.userSiteData.observation || ''
         });
+        
+        // Si hay sede seleccionada en modo edición, agregarla a selectedSedes
+        if (selectedSede) {
+          this.selectedSedes = [selectedSede];
+        }
       } else {
-        // Modo nuevo: establecer fecha actual
+        // Modo nuevo: establecer fecha actual como fecha de creación
         const now = new Date();
         const currentDateTime = now.toISOString().slice(0, 16);
         this.form.patchValue({
-          creationDate: currentDateTime
+          createdAt: currentDateTime
         });
       }
     }
@@ -110,14 +119,12 @@ export class UserSiteFormModalComponent implements OnInit {
         userId: this.form.value.userId,
         siteId: sede.categoriaAuxiliarId,
         observation: this.form.value.observation,
-        creationDate: this.form.value.creationDate || new Date().toISOString(),
+        createdAt: this.form.value.createdAt || new Date().toISOString(),
+        
         active: 'Y'
       }));
 
-      console.log('🚀 Array de UserSiteData creado:', userSiteDataArray);
-      console.log('📍 Sedes seleccionadas:', this.selectedSedes.map(s => s.descripcion));
-      console.log('📊 Total registros a crear:', userSiteDataArray.length);
-
+ 
       // Simular delay de guardar
       setTimeout(() => {
         this.loading = false;

@@ -294,18 +294,7 @@ export class SedeAreaCostoComponent implements OnInit {
     });
   }
 
-  formatDate(dateString?: string): string {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return '-';
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
+ 
 
   trackByItem(index: number, item: DisplayItem): string {
     return item.isGroup ? item.siteId : `${item.siteId}-${item.areaId}-${item.costCenterId}`;

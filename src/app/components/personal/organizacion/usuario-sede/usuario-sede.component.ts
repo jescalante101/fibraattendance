@@ -164,7 +164,9 @@ export class UsuarioSedeComponent implements OnInit {
 
   // Actualizar asignación usuario-sede
   private updateUserSite(userSiteData: UserSiteData) {
-    if (!userSiteData.userSiteId) return;
+    console.log("a un paso",userSiteData);
+    if (!userSiteData.userId || !userSiteData.siteId) return;
+
     
     this.loading = true;
     const user = this.usuarios.find(u => u.userId === userSiteData.userId);
@@ -207,6 +209,7 @@ export class UsuarioSedeComponent implements OnInit {
           siteId: userSite.siteId,
           observation: userSite.observation,
           createdAt: userSite.createdAt,
+
           active: userSite.active
         },
         isEditMode: true,
@@ -218,6 +221,8 @@ export class UsuarioSedeComponent implements OnInit {
     }).then((result: UserSiteFormResult | null) => {
       if (result && result.action === 'save' && result.data) {
         // Ensure result.data is a single UserSiteData object before updating
+        console.log("Listo para editar",result.data);
+
         if (Array.isArray(result.data)) {
           this.updateUserSite(result.data[0]); // Take first item if array
         } else {

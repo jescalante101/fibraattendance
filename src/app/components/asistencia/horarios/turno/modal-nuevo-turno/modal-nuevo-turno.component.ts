@@ -54,11 +54,17 @@ export class ModalNuevoTurnoComponent implements OnInit {
   // Para Mes: array de filas, cada fila es un array de días, cada día es un array de horarios
   horariosMesPorFila: any[][][] = [];
 
+  // Usuario
+  usuario: string = '';
+
+
 
   constructor(
     private attendanceService: AttendanceService,
     private shiftsService: ShiftsService,
     private modalService: ModalService,
+    private authService: AuthService,
+
 
   ) {}
 
@@ -73,7 +79,15 @@ export class ModalNuevoTurnoComponent implements OnInit {
       this.modalMode = 'edit';
       // Los datos se cargarán en loadHorarios() después de obtener la lista de horarios
     }
+    this.getUsuario();
   }
+
+  // Obtener el usuario desde el servicio de autenticación
+  getUsuario() {
+    this.usuario = this.authService.getCurrentUser()?.username || '';
+
+  }
+
 
   loadHorarios() {
     this.attendanceService.getHorarios(this.pageNumber, this.pageSize).subscribe(
@@ -209,6 +223,9 @@ export class ModalNuevoTurnoComponent implements OnInit {
     if (this.modalMode === 'edit' && this.turnoId) {
       const shiftRegister: ShiftRegisterUpdate = this.buildShiftRegisterUpdate();
       // Actualizar turno existente
+      console.log("shiftRegister Update", shiftRegister);
+
+
       this.shiftsService.updateShift(shiftRegister, this.turnoId).subscribe(
         (response) => {
           console.log('Turno actualizado exitosamente:', response);
@@ -318,7 +335,7 @@ export class ModalNuevoTurnoComponent implements OnInit {
       dayOffType: 0,     // Valor por defecto
       autoShift: this.turnoAutomatico,
       detalles: detalles,
-      createdBy: '',
+      createdBy: this.usuario,
       createdAt: new Date().toISOString(),
 
 
@@ -351,7 +368,7 @@ export class ModalNuevoTurnoComponent implements OnInit {
       dayOffType: 0,     // Valor por defecto
       autoShift: this.turnoAutomatico,
       detalles: detalles,
-      updatedBy: '',
+      updatedBy: this.usuario,
       updatedAt: new Date().toISOString(),
 
 

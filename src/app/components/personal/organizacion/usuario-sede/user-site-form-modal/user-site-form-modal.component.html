@@ -134,17 +134,17 @@
       </p>
     </div>
 
-    <!-- Campo Fecha de creación -->
+    <!-- Campo Fecha dinámico -->
     <div>
-      <label for="creationDate" class="block text-sm font-medium text-fiori-text mb-2">
+      <label for="createdAt" class="block text-sm font-medium text-fiori-text mb-2">
         <lucide-icon name="calendar" class="w-4 h-4 inline mr-1"></lucide-icon>
-        Fecha de creación
+        {{ isEditMode ? 'Fecha de Modificación' : 'Fecha de Creación' }}
       </label>
       <div class="relative">
         <input 
           type="datetime-local" 
-          id="creationDate"
-          formControlName="creationDate"
+          id="createdAt"
+          formControlName="createdAt"
           readonly
           class="w-full pl-10 pr-4 py-3 border border-fiori-border rounded-lg bg-fiori-muted text-fiori-subtext cursor-not-allowed">
         <div class="absolute left-3 top-1/2 transform -translate-y-1/2">

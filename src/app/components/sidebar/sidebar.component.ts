@@ -85,8 +85,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
   menuSections: MenuSection[] = [
     // 👥 SECCIÓN PERSONAL
     {
-      key: 'personal',
-      label: 'Personal',
+      key: 'configuracion',
+      label: 'Configuración',
       items: [
         {
           key: 'organizacion',
@@ -101,6 +101,25 @@ export class SidebarComponent implements OnInit, OnDestroy {
             { label: 'Feriados', link: '/panel/personal/organizacion/holidays', permission: 'personal.holidays.view' }
           ]
         },
+        {
+          key: 'horarioturno',
+          label: 'Horario-Turno',
+          icon: 'clock',
+          permission: 'asistencia.horarios.view',
+          submenu: [
+            { label: 'Descanso', link: '/panel/asistencia/descansos', permission: 'asistencia.descansos.view' },
+            { label: 'Horario', link: '/panel/asistencia/horarios', permission: 'asistencia.horarios.manage' },
+            { label: 'Turno', link: '/panel/asistencia/turno', permission: 'asistencia.turnos.manage' }
+          ]
+        },
+
+        
+      ]
+    },
+    {
+      key: 'empleado',
+      label: 'Empleado',
+      items: [
         {
           key: 'empleado',
           label: 'Empleados',
@@ -119,17 +138,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       key: 'asistencia',
       label: 'Asistencia',
       items: [
-        {
-          key: 'horarioturno',
-          label: 'Horario-Turno',
-          icon: 'clock',
-          permission: 'asistencia.horarios.view',
-          submenu: [
-            { label: 'Descanso', link: '/panel/asistencia/descansos', permission: 'asistencia.descansos.view' },
-            { label: 'Horario', link: '/panel/asistencia/horarios', permission: 'asistencia.horarios.manage' },
-            { label: 'Turno', link: '/panel/asistencia/turno', permission: 'asistencia.turnos.manage' }
-          ]
-        },
+        
         {
           key: 'aprobaciones',
           label: 'Aprobaciones',

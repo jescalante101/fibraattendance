@@ -68,6 +68,23 @@
             <div class="text-fiori-subtext">Elige la planilla activa</div>
           </div>
           <ul class="py-2 font-semibold text-gray-900 text-xs uppercase tracking-wider" aria-labelledby="dropdownPlanillaButton">
+            <!-- Opción "Todos" -->
+            <li>
+              <a   
+                 (click)="selectPlanilla({planillaId: '', descripcion: 'Todos'})"
+                 class="block px-4 py-2 hover:bg-fiori-hover transition-colors hover:text-fiori-primary"
+                 [class.bg-fiori-primary]="selectedPlanilla?.planillaId === ''"
+                 [class.text-white]="selectedPlanilla?.planillaId === ''">
+                <div>
+                  Todos
+                </div>
+              </a>
+            </li>
+            <!-- Separador -->
+            <li *ngIf="planillas.length > 0">
+              <hr class="my-1 border-fiori-border">
+            </li>
+            <!-- Planillas específicas -->
             <li *ngFor="let planilla of planillas">
               <a   
                  (click)="selectPlanilla(planilla)"
@@ -285,6 +302,19 @@
           
           <div id="dropdownPlanillaMobile" class="z-10 hidden bg-fiori-surface divide-y divide-fiori-border rounded-lg shadow-xl w-full border border-fiori-border mt-1 max-h-60 overflow-y-auto">
             <ul class="py-2 text-sm text-fiori-text">
+              <!-- Opción "Todos" -->
+              <li>
+                <a   (click)="selectPlanilla({planillaId: '', descripcion: 'Todos'})" class="block px-4 py-2 hover:bg-fiori-hover"
+                   [class.bg-fiori-primary]="selectedPlanilla?.planillaId === ''"
+                   [class.text-white]="selectedPlanilla?.planillaId === ''">
+                  Todos
+                </a>
+              </li>
+              <!-- Separador -->
+              <li *ngIf="planillas.length > 0">
+                <hr class="my-1 border-fiori-border">
+              </li>
+              <!-- Planillas específicas -->
               <li *ngFor="let planilla of planillas">
                 <a   (click)="selectPlanilla(planilla)" class="block px-4 py-2 hover:bg-fiori-hover"
                    [class.bg-fiori-primary]="selectedPlanilla?.planillaId === planilla.planillaId"

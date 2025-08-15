@@ -4,28 +4,38 @@
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
         <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
-          <lucide-icon name="users" class="w-4 h-4 text-fiori-primary"></lucide-icon>
+          <lucide-icon name="arrow-right-left" class="w-4 h-4 text-fiori-primary"></lucide-icon>
         </div>
         <div>
           <div class="text-lg font-semibold text-fiori-text">
-            Gestión de Personal
+            Transferencias de Personal
           </div>
           <div class="text-xs text-fiori-subtext">
-            {{ totalCount }} Personal registrados
+            {{ totalCount }} transferencias registradas
           </div>
         </div>
       </div>
     </div>
     
-    <!-- Botón de acción compacto -->
+    <!-- Botones de acción compactos -->
     <div class="mt-3 pt-3 border-t border-fiori-border">
-      <button
-        (click)="abrirAsignarTurnoMasivo()"
-        class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors"
-      >
-        <lucide-icon name="clock" class="w-4 h-4 mr-1"></lucide-icon>
-        Asignar Turnos
-      </button>
+      <div class="flex items-center space-x-3">
+        <button
+          (click)="createTransfer()"
+          class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors"
+        >
+          <lucide-icon name="plus" class="w-4 h-4 mr-1"></lucide-icon>
+          Nueva Transferencia
+        </button>
+        
+        <button
+          (click)="createMassiveTransfer()"
+          class="inline-flex items-center px-3 py-1.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors"
+        >
+          <lucide-icon name="users" class="w-4 h-4 mr-1"></lucide-icon>
+          Transferencias Masivas
+        </button>
+      </div>
     </div>
   </div>
 
@@ -36,7 +46,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
         </svg>
-        <h3 class="text-sm font-medium text-gray-700">Filtrar Personal</h3>
+        <h3 class="text-sm font-medium text-gray-700">Filtrar Transferencias</h3>
       </div>
       <app-generic-filter
         [config]="filterConfig"
@@ -48,21 +58,21 @@
     </div>
   </div>
 
-  <!-- Tabla de empleados -->
+  <!-- Tabla de transferencias -->
   <div
     class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden"
   >
     <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
       <div class="flex items-center justify-between">
         <div class="text-lg font-semibold text-fiori-text">
-          Lista de Empleados
+          Lista de Transferencias
         </div>
         <div class="flex items-center space-x-3">
           <!-- Gestor de Columnas -->
           <app-column-manager
             [config]="columnManagerConfig"
             [columns]="tableColumns"
-            [dataSource]="employees"
+            [dataSource]="transfers"
             (columnChange)="onColumnManagerChange($event)"
             (columnsApply)="onColumnsApply($event)"
             (columnsReset)="onColumnsReset()"
@@ -70,8 +80,8 @@
           
           <div class="text-sm text-fiori-subtext">
             <span
-              >Mostrando {{ employees.length }} de
-              {{ totalCount }} empleados</span
+              >Mostrando {{ transfers.length }} de
+              {{ totalCount }} transferencias</span
             >
           </div>
         </div>
@@ -87,7 +97,7 @@
         <div
           class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"
         ></div>
-        <p class="text-sm text-gray-500">Cargando empleados...</p>
+        <p class="text-sm text-gray-500">Cargando transferencias...</p>
       </div>
     </div>
 
@@ -103,7 +113,7 @@
               <input
                 type="checkbox"
                 [(ngModel)]="allSelected"
-                (change)="toggleAllEmployees()"
+                (change)="toggleAllTransfers()"
                 class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
             </th>
@@ -111,67 +121,61 @@
               *ngIf="isColumnVisible('personalId')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              ID
+              ID Personal
             </th>
             <th
-              *ngIf="isColumnVisible('nroDoc')"
+              *ngIf="isColumnVisible('fullName')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Documento
+              Nombre Completo
             </th>
             <th
-              *ngIf="isColumnVisible('empleado')"
+              *ngIf="isColumnVisible('branchDescription')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Empleado
+              Sucursal
             </th>
             <th
-              *ngIf="isColumnVisible('categoriaAuxiliarDescripcion')"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Sede
-            </th>
-            <th
-              *ngIf="isColumnVisible('areaDescripcion')"
+              *ngIf="isColumnVisible('areaDescription')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
               Área
             </th>
             <th
-              *ngIf="isColumnVisible('fechaIngreso')"
+              *ngIf="isColumnVisible('costCenterDescription')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Fecha Ingreso
+              Centro de Costos
             </th>
             <th
-              *ngIf="isColumnVisible('fechaCese')"
+              *ngIf="isColumnVisible('startDate')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Fecha Cese
+              Fecha Inicio
             </th>
             <th
-              *ngIf="isColumnVisible('cargoDescripcion')"
+              *ngIf="isColumnVisible('endDate')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Cargo
+              Fecha Fin
             </th>
             <th
-              *ngIf="isColumnVisible('ccostoDescripcion')"
+              *ngIf="isColumnVisible('observation')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Centro de Costo
+              Observación
             </th>
             <th
-              *ngIf="isColumnVisible('email')"
+              *ngIf="isColumnVisible('createdBy')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Correo Electrónico
+              Creado Por
             </th>
             <th
-              *ngIf="isColumnVisible('telefono')"
+              *ngIf="isColumnVisible('createdAt')"
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Teléfono
+              Fecha Creación
             </th>
             <th
               *ngIf="isColumnVisible('acciones')"
@@ -183,14 +187,14 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr
-            *ngFor="let emp of employees"
+            *ngFor="let transfer of transfers"
             class="hover:bg-gray-50 transition-colors"
           >
             <!-- Columnas dinámicas basadas en configuración -->
             <td *ngIf="isColumnVisible('select')" class="px-6 py-4 whitespace-nowrap">
               <input
                 type="checkbox"
-                [(ngModel)]="emp.selected"
+                [(ngModel)]="transfer.selected"
                 class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
             </td>
@@ -203,67 +207,100 @@
                   class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3"
                 >
                   <span class="text-xs font-medium text-blue-600"
-                    >#{{ emp.personalId }}</span
+                    >#{{ transfer.personalId }}</span
                   >
                 </div>
               </div>
             </td>
-            <td *ngIf="isColumnVisible('nroDoc')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ emp.nroDoc }}
-            </td>
-            <td *ngIf="isColumnVisible('empleado')" class="px-6 py-4 whitespace-nowrap">
+            <td *ngIf="isColumnVisible('fullName')" class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center">
                 <div
                   class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-3"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-5 h-5 text-gray-500"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-                    />
-                  </svg>
+                  <lucide-icon name="user" class="w-5 h-5 text-gray-500"></lucide-icon>
                 </div>
                 <div>
                   <div class="text-sm font-medium text-gray-900">
-                    {{ emp.nombres }}, {{ emp.apellidoPaterno }} {{ emp.apellidoMaterno }}
+                    {{ transfer.fullName || '-' }}
                   </div>
                 </div>
               </div>
             </td>
-            <td *ngIf="isColumnVisible('categoriaAuxiliarDescripcion')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ emp.categoriaAuxiliarDescripcion || "-" }}
+            <td *ngIf="isColumnVisible('branchDescription')" class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div
+                  class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3"
+                >
+                  <lucide-icon name="building" class="w-4 h-4 text-green-600"></lucide-icon>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ transfer.branchDescription }}
+                  </div>
+                  <div class="text-sm text-gray-500">
+                    ID: {{ transfer.branchId }}
+                  </div>
+                </div>
+              </div>
             </td>
-            <td *ngIf="isColumnVisible('areaDescripcion')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ emp.areaDescripcion || "-" }}
+            <td *ngIf="isColumnVisible('areaDescription')" class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div
+                  class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3"
+                >
+                  <lucide-icon name="layers" class="w-4 h-4 text-purple-600"></lucide-icon>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ transfer.areaDescription }}
+                  </div>
+                  <div class="text-sm text-gray-500">
+                    ID: {{ transfer.areaId }}
+                  </div>
+                </div>
+              </div>
             </td>
-            <td *ngIf="isColumnVisible('fechaIngreso')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ emp.fechaIngreso | date:'dd/MM/yyyy' }}
+            <td *ngIf="isColumnVisible('costCenterDescription')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <div class="flex items-center">
+                <div
+                  class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mr-3"
+                >
+                  <lucide-icon name="target" class="w-4 h-4 text-orange-600"></lucide-icon>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ transfer.costCenterDescription || '-' }}
+                  </div>
+                  <div class="text-sm text-gray-500" *ngIf="transfer.costCenterId">
+                    ID: {{ transfer.costCenterId }}
+                  </div>
+                </div>
+              </div>
             </td>
-            <td *ngIf="isColumnVisible('fechaCese')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ emp.fechaCese | date:'dd/MM/yyyy' }}
+            <td *ngIf="isColumnVisible('startDate')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <div class="flex items-center">
+                <lucide-icon name="calendar-plus" class="w-4 h-4 text-green-600 mr-2"></lucide-icon>
+                {{ transfer.startDate | date:'dd/MM/yyyy' }}
+              </div>
             </td>
-            <td *ngIf="isColumnVisible('cargoDescripcion')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ emp.cargoDescripcion || "-" }}
+            <td *ngIf="isColumnVisible('endDate')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <div class="flex items-center" *ngIf="transfer.endDate">
+                <lucide-icon name="calendar-x" class="w-4 h-4 text-red-600 mr-2"></lucide-icon>
+                {{ transfer.endDate | date:'dd/MM/yyyy' }}
+              </div>
+              <span *ngIf="!transfer.endDate" class="text-gray-400 italic">Activa</span>
             </td>
-            <td *ngIf="isColumnVisible('ccostoDescripcion')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ emp.ccostoDescripcion || "-" }}
+            <td *ngIf="isColumnVisible('observation')" class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
+              {{ transfer.observation || '-' }}
             </td>
-            <td *ngIf="isColumnVisible('email')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              <a *ngIf="emp.email" [href]="'mailto:' + emp.email" class="text-blue-600 hover:text-blue-800">
-                {{ emp.email }}
-              </a>
-              <span *ngIf="!emp.email" class="text-gray-400">-</span>
+            <td *ngIf="isColumnVisible('createdBy')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <div class="flex items-center">
+                <lucide-icon name="user" class="w-4 h-4 text-gray-500 mr-2"></lucide-icon>
+                {{ transfer.createdBy }}
+              </div>
             </td>
-            <td *ngIf="isColumnVisible('telefono')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ emp.telefono || "-" }}
+            <td *ngIf="isColumnVisible('createdAt')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ transfer.createdAt | date:'dd/MM/yyyy HH:mm' }}
             </td>
             <!-- Acciones -->
             <td
@@ -271,34 +308,21 @@
               class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
             >
               <div class="flex items-center justify-end space-x-2">
-                <!-- Botón Asignar si mostrarBotonAsignar -->
+                <!-- Botón Editar -->
                 <button
-                  *ngIf="mostrarBotonAsignar"
-                  class="inline-flex items-center px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
-                >
-                  Asignar
-                </button>
-                <!-- Botón Ver marcaciones si NO mostrarBotonAsignar -->
-                <button
-                  *ngIf="!mostrarBotonAsignar"
-                  (click)="verMarcaciones(emp)"
+                  (click)="editTransfer(transfer)"
                   class="inline-flex items-center p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-                  title="Ver marcaciones"
+                  title="Editar transferencia"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-4 h-4"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
+                  <lucide-icon name="edit" class="w-4 h-4"></lucide-icon>
+                </button>
+                <!-- Botón Eliminar -->
+                <button
+                  (click)="deleteTransfer(transfer)"
+                  class="inline-flex items-center p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Eliminar transferencia"
+                >
+                  <lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon>
                 </button>
               </div>
             </td>
@@ -308,34 +332,30 @@
 
       <!-- Estado vacío -->
       <div
-        *ngIf="!employees || employees.length === 0"
+        *ngIf="!transfers || transfers.length === 0"
         class="text-center py-12"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-16 h-16 text-gray-400 mx-auto mb-4"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-          />
-        </svg>
-        <div class="text-lg font-medium text-gray-900 mb-2">
-          No hay empleados registrados
+        <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <lucide-icon name="arrow-right-left" class="w-8 h-8 text-gray-400"></lucide-icon>
         </div>
-        <p class="text-gray-500">
-          Los empleados aparecerán aquí cuando se registren
+        <div class="text-lg font-medium text-gray-900 mb-2">
+          No hay transferencias registradas
+        </div>
+        <p class="text-gray-500 mb-4">
+          Las transferencias de personal aparecerán aquí cuando se registren
         </p>
+        <button
+          (click)="createTransfer()"
+          class="inline-flex items-center px-4 py-2 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors"
+        >
+          <lucide-icon name="plus" class="w-4 h-4 mr-2"></lucide-icon>
+          Crear Primera Transferencia
+        </button>
       </div>
     </div>
 
    
-     <app-fiori-paginator
+    <app-fiori-paginator
       [totalRecords]="totalCount"
       [pageSize]="pageSize"
       [pageNumber]="page"
@@ -344,7 +364,6 @@
       [loading]="false"
       (pageChange)="onPageChangeCustom($event)">
     </app-fiori-paginator>
-
 
   </div>
 </div>

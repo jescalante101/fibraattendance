@@ -118,16 +118,17 @@ export class SidebarComponent implements OnInit, OnDestroy {
     },
     {
       key: 'empleado',
-      label: 'Empleado',
+      label: 'Personal',
       items: [
         {
           key: 'empleado',
-          label: 'Empleados',
+          label: 'Personal',
           icon: 'id-card',
           permission: 'personal.empleado.view',
           submenu: [
-            { label: 'Empleados', link: '/panel/personal/empleado/empleado', permission: 'personal.empleado.list' },
-            { label: 'Empleados con Turnos', link: '/panel/personal/empleado/asignar-horario', permission: 'personal.empleado.horarios' }
+            { label: 'Personal', link: '/panel/personal/empleado/empleado', permission: 'personal.empleado.list' },
+            { label: 'Personal con Turnos', link: '/panel/personal/empleado/asignar-horario', permission: 'personal.empleado.horarios' },
+            { label: 'Personal Traslado', link: '/panel/personal/empleado/traslado', permission: 'personal.empleado.tranfers'  }
           ]
         }
       ]

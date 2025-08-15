@@ -8,8 +8,8 @@
           <lucide-icon name="users" class="w-4 h-4 text-fiori-primary"></lucide-icon>
         </div>
         <div>
-          <div class="text-lg font-semibold text-fiori-text">Empleados con Turno</div>
-          <div class="text-xs text-fiori-subtext">{{ totalCount }} empleados registrados</div>
+          <div class="text-lg font-semibold text-fiori-text">Personal con Turno</div>
+          <div class="text-xs text-fiori-subtext">{{ totalCount }} Personal registrados</div>
         </div>
       </div>
     </div>
@@ -48,9 +48,9 @@
   <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden">
     <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
       <div class="flex items-center justify-between">
-        <div class="text-lg font-semibold text-fiori-text">Lista de Empleados</div>
+        <div class="text-lg font-semibold text-fiori-text">Lista de Personal</div>
         <div class="flex items-center space-x-2 text-sm text-fiori-subtext">
-          <span>Mostrando {{ employees.length }} de {{ totalCount }} empleados</span>
+          <span>Mostrando {{ employees.length }} de {{ totalCount }} Personal</span>
         </div>
       </div>
     </div>
@@ -59,7 +59,7 @@
     <div *ngIf="loading" class="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
       <div class="text-center p-4">
         <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
-        <p class="text-sm text-gray-500">Cargando empleados...</p>
+        <p class="text-sm text-gray-500">Cargando Personal...</p>
       </div>
     </div>
 

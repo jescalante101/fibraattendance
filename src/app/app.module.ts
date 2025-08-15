@@ -91,10 +91,13 @@ import { ReporteMarcacionesDetalleComponent } from './components/asistencia/marc
 import { ModalVerHorarioComponent } from './components/personal/empleado/asignar-horario-empleado/modal-ver-horario/modal-ver-horario.component';
 import { ModalEditarAsignacionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-editar-asignacion/modal-editar-asignacion.component';
 import { ModalRegistrarExcepcionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-registrar-excepcion/modal-registrar-excepcion.component';
-import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, ChevronUp, Layers, Menu, Info, FileSpreadsheet, Search, RefreshCw, Save, Plus, X, AlertCircle, UserPen, UserPlus, Table, Edit, Trash2, CheckCircle, XCircle, Eye, EyeOff, Play, Square, ArrowRight, Timer, Zap, Hand, BarChart3, Database, Download, Filter, CalendarRange, LogIn, LogOut as LogOutIcon, Columns, Globe, Coffee, Badge, Group, FileEdit, ClipboardList, Check, PlusCircle, Star, TrendingUp, SearchX, CalendarX, RefreshCcw, AlertTriangle, HelpCircle, RotateCw, ShieldX, Mail, Shield, UserCheck, Lock, UserCheck2, ShieldCheck, Folder, Building2 } from 'lucide-angular';
+import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, ChevronUp, Layers, Menu, Info, FileSpreadsheet, Search, RefreshCw, Save, Plus, X, AlertCircle, UserPen, UserPlus, Table, Edit, Trash2, CheckCircle, XCircle, Eye, EyeOff, Play, Square, ArrowRight, Timer, Zap, Hand, BarChart3, Database, Download, Filter, CalendarRange, LogIn, LogOut as LogOutIcon, Columns, Globe, Coffee, Badge, Group, FileEdit, ClipboardList, Check, PlusCircle, Star, TrendingUp, SearchX, CalendarX, RefreshCcw, AlertTriangle, HelpCircle, RotateCw, ShieldX, Mail, Shield, UserCheck, Lock, UserCheck2, ShieldCheck, Folder, Building2, ArrowRightLeft, Target, CalendarPlus, Send } from 'lucide-angular';
 import { ReporteAsistenciaComponent } from './components/asistencia/reportes/reporte-asistencia/reporte-asistencia.component';
 import { HolidaysComponent } from './components/asistencia/holidays/holidays.component';
 import { NoPermissionsComponent } from './components/no-permissions/no-permissions.component';
+import { PersonalTransferComponent } from './components/personal/transferencias/personal-transfer.component';
+import { TransferModalComponent } from './components/personal/transferencias/transfer-modal/transfer-modal.component';
+import { MassiveTransferModalComponent } from './components/personal/transferencias/massive-transfer-modal/massive-transfer-modal.component';
 import { AgGridModule } from 'ag-grid-angular';
 import { ModuleRegistry, AllCommunityModule, GridOptions } from 'ag-grid-community';
 import { AG_GRID_LOCALE_ES } from './ag-grid-locale.es';
@@ -158,6 +161,11 @@ registerLocaleData(localeEs);
         ReporteAsistenciaComponent,
         HolidaysComponent,
         NoPermissionsComponent,
+        PersonalTransferComponent,
+        TransferModalComponent,
+        MassiveTransferModalComponent,
+
+
     ],
     exports: [
         TerminalSyncComponent,
@@ -276,6 +284,10 @@ registerLocaleData(localeEs);
             ShieldCheck,
             Folder,
             Building2,
+            ArrowRightLeft,
+            Target,
+            CalendarPlus,
+            Send,
             
 
         })

@@ -1,0 +1,122 @@
+/* Estilos específicos para el componente de transferencias de personal */
+
+/* Estados de transferencia */
+.transfer-status {
+  @apply px-2 py-1 text-xs font-medium rounded-full;
+}
+
+.transfer-status.active {
+  @apply bg-green-100 text-green-800;
+}
+
+.transfer-status.inactive {
+  @apply bg-red-100 text-red-800;
+}
+
+.transfer-status.pending {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+/* Tabla responsive */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Animaciones para las filas */
+.table-row-hover {
+  @apply transition-colors duration-200 ease-in-out;
+}
+
+.table-row-hover:hover {
+  @apply bg-fiori-hover;
+}
+
+/* Iconos de estado */
+.status-icon {
+  @apply w-4 h-4 mr-2;
+}
+
+.status-icon.active {
+  @apply text-green-600;
+}
+
+.status-icon.inactive {
+  @apply text-red-600;
+}
+
+/* Botones de acción */
+.action-button {
+  @apply inline-flex items-center p-2 rounded-lg transition-colors duration-200 ease-in-out;
+}
+
+.action-button:hover {
+  @apply shadow-sm;
+}
+
+.action-button.edit {
+  @apply text-blue-600 hover:text-blue-800 hover:bg-blue-50;
+}
+
+.action-button.delete {
+  @apply text-red-600 hover:text-red-800 hover:bg-red-50;
+}
+
+.action-button.view {
+  @apply text-gray-600 hover:text-gray-800 hover:bg-gray-50;
+}
+
+/* Badges para información adicional */
+.info-badge {
+  @apply inline-flex items-center px-2 py-1 text-xs font-medium rounded-md;
+}
+
+.info-badge.branch {
+  @apply bg-green-100 text-green-800;
+}
+
+.info-badge.area {
+  @apply bg-purple-100 text-purple-800;
+}
+
+.info-badge.cost-center {
+  @apply bg-orange-100 text-orange-800;
+}
+
+/* Loading state */
+.loading-overlay {
+  @apply absolute inset-0 z-10 flex items-center justify-center bg-white/70;
+}
+
+.loading-spinner {
+  @apply inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-fiori-primary;
+}
+
+/* Empty state */
+.empty-state {
+  @apply text-center py-12;
+}
+
+.empty-state-icon {
+  @apply w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4;
+}
+
+/* Filtros activos */
+.filter-badge {
+  @apply inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .table-container {
+    @apply overflow-x-auto;
+  }
+  
+  .header-actions {
+    @apply flex-col space-y-2 space-x-0;
+  }
+  
+  .filter-panel {
+    @apply flex-col;
+  }
+}

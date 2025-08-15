@@ -57,7 +57,7 @@
             <div class="hidden sm:block">
               <div class="font-medium">Personal</div>
               <div class="text-xs text-fiori-subtext">
-                Seleccionar empleados
+                Seleccionar Personal 
               </div>
             </div>
           </span>
@@ -290,7 +290,7 @@
                 class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
               >
                 <div class="flex-1 max-w-md">
-                  <label for="search" class="sr-only">Buscar empleado</label>
+                  <label for="search" class="sr-only">Buscar Personal</label>
                   <div class="relative">
                     <div
                       class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
@@ -315,7 +315,7 @@
                   <div class="flex items-center space-x-2">
                     <div class="w-3 h-3 bg-fiori-primary rounded-full"></div>
                     <span class="text-fiori-subtext"
-                      >{{ personalFiltrado.length }} empleados</span
+                      >{{ personalFiltrado.length }} Personal</span
                     >
                   </div>
                   <div class="flex items-center space-x-2">
@@ -663,7 +663,7 @@
                     <div>
                       Personal:
                       <span class="font-medium"
-                        >{{ getSelectedCount() }} empleado(s)</span
+                        >{{ getSelectedCount() }} Personal(s)</span
                       >
                     </div>
                     <div *ngIf="turnoForm.get('turno')?.value">

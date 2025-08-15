@@ -31,6 +31,7 @@ import { ReporteMarcacionesDetalleComponent } from "./components/asistencia/marc
 import { ReporteAsistenciaComponent } from "./components/asistencia/reportes/reporte-asistencia/reporte-asistencia.component";
 import { HolidaysComponent } from "./components/asistencia/holidays/holidays.component";
 import { NoPermissionsComponent } from "./components/no-permissions/no-permissions.component";
+import { PersonalTransferComponent } from "./components/personal/transferencias/personal-transfer.component";
 
 
 
@@ -61,6 +62,7 @@ const appRoutes: Routes = [
         { path: 'personal/empleado/empleado', component: EmpleadoComponent },
         { path: 'personal/empleado/cese', component: CeseComponent },
         { path: 'personal/empleado/asignar-horario', component: AsignarHorarioEmpleadoComponent },
+        { path: 'personal/empleado/traslado', component: PersonalTransferComponent },
 
         // Device routes
         { path: 'dispositivo', component: DispositivoComponent },

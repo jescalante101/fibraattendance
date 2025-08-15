@@ -12,6 +12,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ToastService } from 'src/app/shared/services/toast.service';
 import { HeaderConfig, HeaderConfigService } from 'src/app/core/services/header-config.service';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-asignar-turno-masivo',
@@ -65,6 +66,8 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   
   // Math for template
   Math = Math;
+  idUser:number=0;
+  userLogin:string=''
 
   constructor(
     private fb: FormBuilder,
@@ -76,13 +79,24 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     private toastService: ToastService,
     private headerConfigService: HeaderConfigService,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
+    private authService: AuthService
     
   ) {}
 
   ngOnInit(): void {
+     this.loadUser();
     this.headerConfig = this.headerConfigService.loadHeaderConfig();
     this.inicializarFormularios();
     this.cargarDatosIniciales();
+   
+  }
+
+  private loadUser(){
+    const user=this.authService.getCurrentUser();
+    if(user){
+      this.userLogin=user.username;
+      this.idUser=user.id
+    }
   }
 
   private inicializarFormularios(): void {
@@ -107,7 +121,9 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     this.datosListos = false;
     
     // Usar el nuevo servicio para obtener sedes y áreas
-    this.appUserService.getSedesAreas(1).subscribe({
+    this.appUserService.getSedesAreas(
+      this.idUser
+    ).subscribe({
       next: (sedesAreas) => {
         this.sedesAreas = sedesAreas;
         

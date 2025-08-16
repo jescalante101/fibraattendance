@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { ColDef, GridReadyEvent, GridApi, GridOptions } from 'ag-grid-community';
-import { AG_GRID_LOCALE_ES } from '../../../../ag-grid-locale.es';
+import { themeFiori, createFioriGridOptions, multiSelectGridOptions, localeTextFiori } from '../../../../shared/ag-grid-theme-fiori';
 import { PersonalTransferDto, CreatePersonalTransferDto } from '../../../../core/models/personal-transfer.model';
 import { PersonalTransferService } from '../../../../core/services/personal-transfer.service';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from '../../../../core/services/categoria-auxiliar.service';
@@ -55,21 +55,15 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
     selectedBranches: [] as string[]
   };
 
-  // Empleados y selección
+  // Empleados y selección (se usan con ag-Grid ahora)
   allEmployees: SelectedEmployee[] = [];
-  filteredEmployees: SelectedEmployee[] = [];
   selectedEmployees: SelectedEmployee[] = [];
-  allSelected = false;
-
-  // Paginación de empleados
-  employeePage = 1;
-  employeePageSize = 50; // Tamaño de página para empleados
   employeeTotalCount = 0;
-  employeeTotalPages = 0;
 
   // Estados de UI
   loading = false;
   loadingEmployees = false;
+  private employeesLoaded = false; // Flag para evitar cargas duplicadas
 
   // Estados para autocompletes (simplificado)
   showToSedeDropdown = false;
@@ -104,81 +98,124 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
 
   // Configuración de ag-Grid
   gridApi!: GridApi;
-  localeText = AG_GRID_LOCALE_ES;
   
   columnDefs: ColDef[] = [
-    {
-      headerName: '',
-      field: 'selected',
-      checkboxSelection: true,
-      headerCheckboxSelection: false, // Quitamos el checkbox del header para evitar duplicado
-      width: 50,
-      pinned: 'left',
-      sortable: false,
-      filter: false,
-      suppressHeaderMenuButton: true
-    },
     {
       headerName: 'Colaborador',
       field: 'fullName',
       flex: 2,
       filter: 'agTextColumnFilter',
+      checkboxSelection: true,
+      headerCheckboxSelection: false,
       valueGetter: (params) => {
         const emp = params.data;
         return `${emp.nombres || ''} ${emp.apellidoPaterno || ''} ${emp.apellidoMaterno || ''}`.trim();
+      },
+      cellRenderer: (params: any) => {
+        const emp = params.data;
+        const fullName = `${emp.nombres || ''} ${emp.apellidoPaterno || ''} ${emp.apellidoMaterno || ''}`.trim();
+        return `
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+              <span class="text-blue-600 font-semibold text-xs">${emp.nombres?.charAt(0) || 'U'}</span>
+            </div>
+            <div>
+              <div class="font-medium text-gray-900">${fullName}</div>
+              <div class="text-xs text-gray-500">ID: ${emp.personalId}</div>
+            </div>
+          </div>
+        `;
       }
     },
     {
       headerName: 'Documento',
       field: 'nroDoc',
       flex: 1,
-      filter: 'agTextColumnFilter'
-    },
-    {
-      headerName: 'ID Personal',
-      field: 'personalId',
-      flex: 1,
-      filter: 'agTextColumnFilter'
+      filter: 'agTextColumnFilter',
+      cellRenderer: (params: any) => {
+        return `<div class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">${params.value || '-'}</div>`;
+      }
     },
     {
       headerName: 'Sede Actual',
       field: 'categoriaAuxiliarDescripcion',
       flex: 1.5,
       filter: 'agSetColumnFilter',
-      valueFormatter: (params) => params.value || '-'
+      valueFormatter: (params) => params.value || '-',
+      cellRenderer: (params: any) => {
+        return `
+          <div class="flex items-center">
+            <div class="w-2 h-2 bg-orange-500 rounded-full mr-2"></div>
+            <span>${params.value || '-'}</span>
+          </div>
+        `;
+      }
     },
     {
       headerName: 'Área Actual',
       field: 'areaDescripcion',
       flex: 1.5,
       filter: 'agSetColumnFilter',
-      valueFormatter: (params) => params.value || '-'
+      valueFormatter: (params) => params.value || '-',
+      cellRenderer: (params: any) => {
+        return `
+          <div class="flex items-center">
+            <div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+            <span>${params.value || '-'}</span>
+          </div>
+        `;
+      }
     }
   ];
 
 
-  // Configuración de ag-Grid
-  gridOptions: GridOptions = {
-    defaultColDef: {
-      sortable: true,
-      filter: true,
-      resizable: true,
-      minWidth: 100,
-      floatingFilter: true
+  // Configuración del tema Fiori
+  themeFiori = themeFiori;
+  
+  // Configuración de ag-Grid con tema Fiori y sidebar
+  gridOptions: GridOptions = createFioriGridOptions({
+    // Configuraciones específicas para transferencias masivas
+    sideBar: {
+      toolPanels: [
+        {
+          id: 'columns',
+          labelDefault: 'Columnas',
+          labelKey: 'columns',
+          iconKey: 'columns',
+          toolPanel: 'agColumnsToolPanel',
+          minWidth: 225,
+          maxWidth: 300,
+          width: 250
+        },
+        {
+          id: 'filters',
+          labelDefault: 'Filtros Avanzados',
+          labelKey: 'filters', 
+          iconKey: 'filter',
+          toolPanel: 'agFiltersToolPanel',
+          minWidth: 225,
+          maxWidth: 300,
+          width: 250
+        }
+      ],
+      position: 'right',
+      defaultToolPanel: 'filters',
+      hiddenByDefault: false
     },
-    localeText: this.localeText,
-    suppressHorizontalScroll: false,
+    
+    // Configuración de selección múltiple
     rowSelection: 'multiple',
-    pagination: true,
-    paginationPageSize: 50,
-    paginationPageSizeSelector: [25, 50, 100, 200],
-    suppressRowClickSelection: true,
-    enableRangeSelection: false,
-    animateRows: true,
-    enableCellTextSelection: true,
-    suppressMenuHide: true,
-    sideBar: false
-  };
+    rowMultiSelectWithClick: false,
+    suppressRowDeselection: false,
+    
+    // Performance y UX para listas grandes
+    rowBuffer: 20,
+    suppressRowVirtualisation: false,
+    suppressColumnVirtualisation: false,
+    
+    // Localización en español
+    localeText: localeTextFiori
+  });
   
   // Datos de empleados
   allEmployeesData: SelectedEmployee[] = [];
@@ -287,100 +324,7 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Carga inicial de empleados (solo se ejecuta una vez)
-   */
-  private loadEmployeesInitial(): void {
-    if (this.loadingEmployees) {
-      return;
-    }
-    
-    this.loadEmployees();
-  }
 
-  /**
-   * Cargar todos los empleados activos usando PersonService
-   */
-  private loadEmployees(): void {
-    if (!this.headerConfig?.selectedEmpresa) {
-      this.toastService.warning('Configuración Requerida', 'No hay empresa seleccionada');
-      return;
-    }
-
-    this.loadingEmployees = true;
-    
-    const employeeParams: EmployeesParameters = {
-      searchText: this.employeeFilters.searchTerm || '',
-      page: this.employeePage,
-      pagesize: this.employeePageSize,
-      areaId: this.employeeFilters.selectedAreas.length > 0 ? this.employeeFilters.selectedAreas[0] : null,
-      ccostoId: null, // No filtro específico por centro de costo por ahora
-      sede: null, // No filtrar por sede en origen
-      periodoId: this.headerConfig.selectedPeriodo?.periodoId || null,
-      planillaId: this.headerConfig.selectedPlanilla?.planillaId || null,
-      companiaId: this.headerConfig.selectedEmpresa.companiaId
-    };
-
-    this.personService.getPersonalActivo(employeeParams)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response) => {
-          this.loadingEmployees = false;
-          if (response.exito && response.data) {
-            // Mapear empleados activos y agregar propiedad 'selected'
-            const employees = response.data.items || [];
-            this.allEmployees = employees.map(emp => ({
-              ...emp,
-              selected: false
-            }));
-            
-            // Configurar paginación desde la respuesta del servidor
-            this.employeeTotalCount = response.data.totalCount || 0;
-            this.employeeTotalPages = Math.ceil(this.employeeTotalCount / this.employeePageSize);
-            
-            this.filteredEmployees = [...this.allEmployees];
-            this.updateSelectedEmployees();
-            
-            
-            // Toast de éxito si es la primera carga
-            if (this.employeePage === 1 && this.allEmployees.length > 0) {
-              this.toastService.success(
-                'Empleados Activos Cargados', 
-                `Se encontraron ${this.employeeTotalCount} empleados activos disponibles`
-              );
-            }
-          } else {
-            this.allEmployees = [];
-            this.employeeTotalCount = 0;
-            
-            this.toastService.warning(
-              'Sin Resultados',
-              response.mensaje || 'No se encontraron empleados activos'
-            );
-          }
-        },
-        error: (error) => {
-          this.loadingEmployees = false;
-          this.allEmployees = [];
-          this.filteredEmployees = [];
-          this.employeeTotalCount = 0;
-          
-          this.toastService.error(
-            'Error al Cargar Empleados',
-            'No se pudieron cargar los empleados activos. Intente nuevamente.'
-          );
-        }
-      });
-  }
-
-  /**
-   * Aplicar filtros locales a empleados (después de cargar del servidor)
-   */
-  private applyEmployeeFilters(): void {
-    // Los filtros ya se aplican en el servidor, solo mantenemos referencia
-    this.filteredEmployees = [...this.allEmployees];
-    this.updateSelectedEmployees();
-  }
 
   /**
    * Filtrar empleados por área
@@ -450,18 +394,11 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Actualizar lista de empleados seleccionados
+   * Actualizar lista de empleados seleccionados (ya no se usa, ag-Grid maneja la selección)
    */
   private updateSelectedEmployees(): void {
-    this.selectedEmployees = this.filteredEmployees.filter(emp => emp.selected);
-  }
-
-  /**
-   * Seleccionar/deseleccionar todos los empleados
-   */
-  toggleAllEmployees(): void {
-    this.filteredEmployees.forEach(emp => emp.selected = this.allSelected);
-    this.updateSelectedEmployees();
+    // Este método ya no es necesario con ag-Grid
+    // La selección se maneja en onSelectionChanged()
   }
 
   /**
@@ -478,6 +415,11 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
    * Cargar todos los empleados desde el servidor
    */
   private loadAllEmployees(): void {
+    // Evitar cargas duplicadas
+    if (this.employeesLoaded || this.loadingEmployees) {
+      return;
+    }
+    
     if (!this.headerConfig?.selectedEmpresa) {
       this.toastService.warning('Configuración Requerida', 'No hay empresa seleccionada');
       return;
@@ -502,6 +444,8 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           this.loadingEmployees = false;
+          this.employeesLoaded = true; // Marcar como cargado
+          
           if (response.exito && response.data) {
             const employees = response.data.items || [];
             this.allEmployeesData = employees.map(emp => ({
@@ -528,6 +472,7 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.loadingEmployees = false;
+          this.employeesLoaded = false; // Reset flag en caso de error
           this.allEmployeesData = [];
           this.employeeTotalCount = 0;
           
@@ -540,12 +485,11 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Cambio en selección de empleado individual
+   * Cambio en selección de empleado individual (ya no se usa, ag-Grid maneja la selección)
    */
   onEmployeeSelectionChange(): void {
-    this.updateSelectedEmployees();
-    this.allSelected = this.filteredEmployees.length > 0 && 
-                      this.filteredEmployees.every(emp => emp.selected);
+    // Este método ya no es necesario con ag-Grid
+    // La selección se maneja en onSelectionChanged()
   }
 
   /**
@@ -581,10 +525,6 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   selectAllFiltered(): void {
     if (this.gridApi) {
       this.gridApi.selectAll();
-    } else {
-      this.filteredEmployees.forEach(emp => emp.selected = true);
-      this.updateSelectedEmployees();
-      this.allSelected = true;
     }
   }
 
@@ -594,10 +534,6 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   deselectAll(): void {
     if (this.gridApi) {
       this.gridApi.deselectAll();
-    } else {
-      this.allEmployees.forEach(emp => emp.selected = false);
-      this.updateSelectedEmployees();
-      this.allSelected = false;
     }
   }
 
@@ -642,8 +578,8 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
       })),
       summary: {
         totalEmployees: this.selectedEmployees.length,
-        fromBranches: [...new Set(this.selectedEmployees.map(emp => emp.categoriaAuxiliarDescripcion).filter(Boolean))],
-        fromAreas: [...new Set(this.selectedEmployees.map(emp => emp.areaDescripcion).filter(Boolean))]
+        fromBranches: Array.from(new Set(this.selectedEmployees.map(emp => emp.categoriaAuxiliarDescripcion).filter(Boolean))),
+        fromAreas: Array.from(new Set(this.selectedEmployees.map(emp => emp.areaDescripcion).filter(Boolean)))
       }
     };
 

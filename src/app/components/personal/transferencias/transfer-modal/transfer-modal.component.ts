@@ -1,17 +1,21 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { PersonalTransferDto, CreatePersonalTransferDto, UpdatePersonalTransferDto } from '../../../../core/models/personal-transfer.model';
+import { PersonalTransferService } from '../../../../core/services/personal-transfer.service';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from '../../../../core/services/categoria-auxiliar.service';
 import { RhAreaService, RhArea } from '../../../../core/services/rh-area.service';
 import { CostCenterService, CostCenter } from '../../../../core/services/cost-center.service';
 import { HeaderConfigService, HeaderConfig } from '../../../../core/services/header-config.service';
 import { PersonService } from '../../../../core/services/person.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 import { Employee } from '../../empleado/empleado/model/employeeDto';
 
 export interface TransferModalData {
   employee?: Employee; // Empleado prellenado
   mode: 'create' | 'edit';
   transferData?: PersonalTransferDto; // Para modo edición
+  transferId?: number; // ID de la transferencia para cargar datos en modo edición
 }
 
 @Component({
@@ -78,23 +82,74 @@ export class TransferModalComponent implements OnInit, OnDestroy {
   // Configuración del header
   headerConfig: HeaderConfig | null = null;
 
+  // Usuario logueado
+  currentUser: any = null;
+
   constructor(
+    private personalTransferService: PersonalTransferService,
     private categoriaAuxiliarService: CategoriaAuxiliarService,
     private rhAreaService: RhAreaService,
     private costCenterService: CostCenterService,
     private headerConfigService: HeaderConfigService,
-    private personService: PersonService
+    private personService: PersonService,
+    private authService: AuthService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
     this.headerConfig = this.headerConfigService.loadHeaderConfig();
+    this.loadCurrentUser();
     this.loadAutocompleteData();
-    this.initializeForm();
+    this.initializeFormAndData();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /**
+   * Cargar usuario logueado
+   */
+  private loadCurrentUser(): void {
+    this.currentUser = this.authService.getCurrentUser();
+  }
+
+  /**
+   * Inicializar formulario y cargar datos si es necesario
+   */
+  private initializeFormAndData(): void {
+    if (this.data.mode === 'edit' && this.data.transferId) {
+      this.loadTransferForEdit(this.data.transferId);
+    } else {
+      this.initializeForm();
+    }
+  }
+
+  /**
+   * Cargar datos de transferencia para edición
+   */
+  private loadTransferForEdit(transferId: number): void {
+    this.loading = true;
+    
+    this.personalTransferService.getPersonalTransferById(transferId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.loading = false;
+          if (response.success && response.data) {
+            this.data.transferData = response.data;
+            this.initializeForm();
+          } else {
+            this.toastService.error('Error', 'No se pudo cargar la transferencia');
+          }
+        },
+        error: (error) => {
+          this.loading = false;
+          console.error('Error cargando transferencia:', error);
+          this.toastService.error('Error', 'Error al cargar los datos de la transferencia');
+        }
+      });
   }
 
   /**
@@ -115,13 +170,32 @@ export class TransferModalComponent implements OnInit, OnDestroy {
     // Si es modo edición, prellenar con datos de transferencia
     if (this.data.mode === 'edit' && this.data.transferData) {
       const transfer = this.data.transferData;
-      this.formData.newBranchId = transfer.branchId || '';
-      this.formData.newAreaId = transfer.areaId || '';
-      this.formData.newCostCenterId = transfer.costCenterId || '';
-      this.formData.startDate = transfer.startDate || '';
-      this.formData.endDate = transfer.endDate || '';
+      
+      // Cargar datos del empleado si están disponibles
+      if (!this.formData.selectedEmployee) {
+        this.loadEmployeeForTransfer(transfer.personalId);
+      }
+      
+      // Los datos de la transferencia van en "Ubicación Actual" porque es donde está ahora el empleado
+      this.formData.currentBranch = transfer.branchDescription || '';
+      this.formData.currentArea = transfer.areaDescription || '';
+      this.formData.currentCostCenter = transfer.costCenterDescription || '';
+      
+      // Las fechas y observaciones se prellenan para edición
+      this.formData.startDate = transfer.startDate ? transfer.startDate.split('T')[0] : '';
+      this.formData.endDate = transfer.endDate ? transfer.endDate.split('T')[0] : '';
       this.formData.isPermanent = !transfer.endDate;
       this.formData.observations = transfer.observation || '';
+      
+      // Los campos "Nueva Ubicación" quedan vacíos para que el usuario los llene
+      this.formData.newBranchId = '';
+      this.formData.newAreaId = '';
+      this.formData.newCostCenterId = '';
+      
+      // Limpiar términos de filtro para autocompletes (nueva ubicación debe estar vacía)
+      this.sedeFilterTerm = '';
+      this.areaFilterTerm = '';
+      this.costCenterFilterTerm = '';
     } else {
       // Valores por defecto para nueva transferencia
       const today = new Date().toISOString().split('T')[0];
@@ -129,6 +203,30 @@ export class TransferModalComponent implements OnInit, OnDestroy {
       this.formData.isPermanent = true;
     }
   }
+
+  /**
+   * Cargar datos del empleado para transferencia en modo edición
+   */
+  private loadEmployeeForTransfer(personalId: string): void {
+    // TODO: Implementar carga de empleado por personalId usando PersonService
+    // Por ahora simulamos con los datos de la transferencia
+    if (this.data.transferData) {
+      const transfer = this.data.transferData;
+      this.formData.selectedEmployee = {
+        personalId: transfer.personalId,
+        nombres: transfer.fullName.split(' ')[0] || '',
+        apellidoPaterno: transfer.fullName.split(' ')[1] || '',
+        apellidoMaterno: transfer.fullName.split(' ').slice(2).join(' ') || '',
+        nroDoc: '',
+        categoriaAuxiliarDescripcion: '',
+        areaDescripcion: '',
+        ccostoDescripcion: ''
+      } as Employee;
+      
+      this.formData.employeeSearchTerm = transfer.fullName;
+    }
+  }
+
 
   /**
    * Cargar datos para autocompletes
@@ -240,53 +338,116 @@ export class TransferModalComponent implements OnInit, OnDestroy {
     const selectedBranch = this.sedesList.find(s => s.categoriaAuxiliarId === this.formData.newBranchId);
     const selectedArea = this.areasList.find(a => a.areaId === this.formData.newAreaId);
     const selectedCostCenter = this.formData.newCostCenterId ? 
-      this.costCentersList.find(cc => cc.ccostoId === this.formData.newCostCenterId) : null;
+      this.costCentersList.find(cc => cc.ccostoId === this.formData.newCostCenterId) || null : null;
 
     if (this.data.mode === 'edit') {
-      // Modo edición - enviar solo campos modificados
-      const updateData: UpdatePersonalTransferDto = {
-        branchId: this.formData.newBranchId,
-        branchDescription: selectedBranch?.descripcion || '',
-        areaId: this.formData.newAreaId,
-        areaDescription: selectedArea?.descripcion || '',
-        costCenterId: this.formData.newCostCenterId || '',
-        costCenterDescription: selectedCostCenter?.descripcion || '',
-        startDate: this.formData.startDate,
-        endDate: this.formData.isPermanent ? null : this.formData.endDate,
-        observation: this.formData.observations || null,
-        updatedBy: 'Sistema' // TODO: Obtener usuario actual
-      };
-      // Cerrar modal con los datos
-      if (this.modalRef) {
-        this.modalRef.closeModalFromChild({
-          action: 'save',
-          data: updateData
-        });
-      }
+      // Modo edición - actualizar transferencia
+      this.updateTransfer(selectedBranch, selectedArea, selectedCostCenter);
     } else {
-      // Modo creación - enviar datos completos
-      const createData: CreatePersonalTransferDto = {
-        personalId: this.formData.selectedEmployee!.personalId,
-        fullName: `${this.formData.selectedEmployee!.nombres || ''} ${this.formData.selectedEmployee!.apellidoPaterno || ''} ${this.formData.selectedEmployee!.apellidoMaterno || ''}`.trim(),
-        branchId: this.formData.newBranchId,
-        branchDescription: selectedBranch?.descripcion || '',
-        areaId: this.formData.newAreaId,
-        areaDescription: selectedArea?.descripcion || '',
-        costCenterId: this.formData.newCostCenterId || '',
-        costCenterDescription: selectedCostCenter?.descripcion || '',
-        startDate: this.formData.startDate,
-        endDate: this.formData.isPermanent ? null : this.formData.endDate,
-        observation: this.formData.observations || null,
-        createdBy: 'Sistema' // TODO: Obtener usuario actual
-      };
-      // Cerrar modal con los datos
-    if (this.modalRef) {
-      this.modalRef.closeModalFromChild({
-        action: 'save',
-        data: createData
+      // Modo creación - crear nueva transferencia
+      this.createTransfer(selectedBranch, selectedArea, selectedCostCenter);
+    }
+  }
+
+  /**
+   * Actualizar transferencia existente
+   */
+  private updateTransfer(selectedBranch: CategoriaAuxiliar | undefined, selectedArea: RhArea | undefined, selectedCostCenter: CostCenter | null): void {
+    if (!this.data.transferData?.id) {
+      this.toastService.error('Error', 'No se pudo identificar la transferencia a actualizar');
+      return;
+    }
+
+    this.loading = true;
+    
+    const updateData: UpdatePersonalTransferDto = {
+      branchId: this.formData.newBranchId,
+      branchDescription: selectedBranch?.descripcion || '',
+      areaId: this.formData.newAreaId,
+      areaDescription: selectedArea?.descripcion || '',
+      costCenterId: this.formData.newCostCenterId || '',
+      costCenterDescription: selectedCostCenter?.descripcion || '',
+      startDate: this.formData.startDate,
+      endDate: this.formData.isPermanent ? null : this.formData.endDate,
+      observation: this.formData.observations || null,
+      updatedBy: this.currentUser?.username || 'Sistema'
+    };
+
+    this.personalTransferService.updatePersonalTransfer(this.data.transferData.id, updateData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.loading = false;
+          if (response.success) {
+            this.toastService.success('Éxito', 'Transferencia actualizada correctamente');
+            // Cerrar modal con resultado exitoso
+            if (this.modalRef) {
+              this.modalRef.closeModalFromChild({
+                action: 'save',
+                success: true,
+                data: response.data,
+                message: 'Transferencia actualizada correctamente'
+              });
+            }
+          } else {
+            this.toastService.error('Error', response.message || 'Error al actualizar la transferencia');
+          }
+        },
+        error: (error) => {
+          this.loading = false;
+          console.error('Error actualizando transferencia:', error);
+          this.toastService.error('Error', 'Error al actualizar la transferencia');
+        }
       });
-    }
-    }
+  }
+
+  /**
+   * Crear nueva transferencia
+   */
+  private createTransfer(selectedBranch: CategoriaAuxiliar | undefined, selectedArea: RhArea | undefined, selectedCostCenter: CostCenter | null): void {
+    this.loading = true;
+    
+    const createData: CreatePersonalTransferDto = {
+      personalId: this.formData.selectedEmployee!.personalId,
+      fullName: `${this.formData.selectedEmployee!.nombres || ''} ${this.formData.selectedEmployee!.apellidoPaterno || ''} ${this.formData.selectedEmployee!.apellidoMaterno || ''}`.trim(),
+      branchId: this.formData.newBranchId,
+      branchDescription: selectedBranch?.descripcion || '',
+      areaId: this.formData.newAreaId,
+      areaDescription: selectedArea?.descripcion || '',
+      costCenterId: this.formData.newCostCenterId || '',
+      costCenterDescription: selectedCostCenter?.descripcion || '',
+      startDate: this.formData.startDate,
+      endDate: this.formData.isPermanent ? null : this.formData.endDate,
+      observation: this.formData.observations || null,
+      createdBy: this.currentUser?.username || 'Sistema'
+    };
+
+    this.personalTransferService.createPersonalTransfer(createData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.loading = false;
+          if (response.success) {
+            this.toastService.success('Éxito', 'Transferencia creada correctamente');
+            // Cerrar modal con resultado exitoso
+            if (this.modalRef) {
+              this.modalRef.closeModalFromChild({
+                action: 'save',
+                success: true,
+                data: response.data,
+                message: 'Transferencia creada correctamente'
+              });
+            }
+          } else {
+            this.toastService.error('Error', response.message || 'Error al crear la transferencia');
+          }
+        },
+        error: (error) => {
+          this.loading = false;
+          console.error('Error creando transferencia:', error);
+          this.toastService.error('Error', 'Error al crear la transferencia');
+        }
+      });
   }
 
   /**

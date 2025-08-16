@@ -1,21 +1,35 @@
 <!-- Contenido del Modal de Transferencia Individual -->
 <div class="h-full flex flex-col bg-fiori-background">
   
+  <!-- Indicador de carga -->
+  <div *ngIf="loading" class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
+    <div class="flex flex-col items-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <p class="mt-2 text-gray-600">{{ data.mode === 'edit' ? 'Cargando datos...' : 'Procesando...' }}</p>
+    </div>
+  </div>
+  
   <!-- Contenido principal con scroll -->
   <div class="flex-1 overflow-y-auto p-6">
     
     <!-- Información del Empleado -->
     <div class="mb-6">
-      <div class="flex items-center space-x-2 mb-4">
-        <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
-          <lucide-icon name="user" class="w-4 h-4 text-blue-600"></lucide-icon>
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center space-x-2">
+          <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
+            <lucide-icon name="user" class="w-4 h-4 text-blue-600"></lucide-icon>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900">Información del Empleado</h3>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900">Información del Empleado</h3>
+        <div *ngIf="data.mode === 'edit'" class="flex items-center space-x-1 px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">
+          <lucide-icon name="edit-3" class="w-4 h-4"></lucide-icon>
+          <span>Modo Edición</span>
+        </div>
       </div>
       
       <div class="bg-gray-50 rounded-lg p-4">
-        <!-- Búsqueda de Empleado (solo si no hay empleado prellenado) -->
-        <div *ngIf="!data.employee" class="mb-4">
+        <!-- Búsqueda de Empleado (solo si no hay empleado prellenado y no está en modo edición) -->
+        <div *ngIf="!data.employee && data.mode !== 'edit'" class="mb-4">
           <label class="block text-sm font-medium text-gray-700 mb-2">Buscar Empleado</label>
           <div class="relative">
             <input
@@ -86,10 +100,19 @@
           <div class="w-6 h-6 bg-orange-100 rounded-lg flex items-center justify-center">
             <lucide-icon name="map-pin" class="w-4 h-4 text-orange-600"></lucide-icon>
           </div>
-          <h3 class="text-lg font-semibold text-gray-900">Ubicación Actual</h3>
+          <h3 class="text-lg font-semibold text-gray-900">
+            {{ data.mode === 'edit' ? 'Ubicación Actual (Transferencia Existente)' : 'Ubicación Actual (Empleado)' }}
+          </h3>
         </div>
         
         <div class="bg-orange-50 rounded-lg p-4 space-y-3">
+          <!-- Mensaje informativo para modo edición -->
+          <div *ngIf="data.mode === 'edit'" class="mb-3 p-2 bg-orange-100 rounded-lg border border-orange-200">
+            <div class="flex items-center space-x-2 text-orange-800">
+              <lucide-icon name="info" class="w-4 h-4"></lucide-icon>
+              <span class="text-sm font-medium">Esta es la ubicación donde está actualmente el empleado según la transferencia que está editando.</span>
+            </div>
+          </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Sede Actual</label>
             <div class="px-3 py-2 bg-white border border-orange-200 rounded-lg text-gray-600">

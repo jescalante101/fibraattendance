@@ -270,28 +270,7 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
       });
   }
   
-  /**
-   * Crear nueva transferencia individual
-   */
-  createTransfer(): void {
-    this.modalService.open({
-      title: 'Nueva Transferencia de Personal',
-      componentType: TransferModalComponent,
-      width: '90vw',
-      height: 'auto',
-      componentData: {
-        mode: 'create'
-      }
-    }).then(result => {
-      if (result && result.action === 'save') {
-        console.log('Nueva transferencia:', result.data);
-        // TODO: Llamar al servicio para crear la transferencia
-        this.loadTransfers();
-      }
-    }).catch(error => {
-      console.error('Error en modal de transferencia:', error);
-    });
-  }
+  
 
   /**
    * Crear transferencias masivas
@@ -327,16 +306,17 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
       height: 'auto',
       componentData: {
         mode: 'edit',
-        transferData: transfer
+        transferId: transfer.id, // Pasamos el ID para cargar los datos frescos
+        transferData: transfer  // También pasamos los datos como respaldo
       }
     }).then(result => {
-      if (result && result.action === 'save') {
-        console.log('Transferencia editada:', result.data);
-        // TODO: Llamar al servicio para actualizar la transferencia
-        this.loadTransfers();
+      if (result && result.action === 'save' && result.success) {
+        this.toastService.success('Éxito', result.message || 'Transferencia actualizada correctamente');
+        this.loadTransfers(); // Recargar la lista de transferencias
       }
     }).catch(error => {
       console.error('Error en modal de edición:', error);
+      //this.toastService.error('Error', 'Error al abrir el modal de edición');
     });
   }
   

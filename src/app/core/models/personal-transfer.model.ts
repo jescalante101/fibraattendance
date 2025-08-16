@@ -1,5 +1,6 @@
 
 export interface PersonalTransferDto {
+  id: number;
   personalId: string;
   fullName: string;
   branchId: string;

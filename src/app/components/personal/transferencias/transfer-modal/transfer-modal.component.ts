@@ -55,10 +55,25 @@ export class TransferModalComponent implements OnInit, OnDestroy {
   employeeSearchResults: Employee[] = [];
   loading = false;
 
+  // Estados para autocompletes
+  showSedeDropdown = false;
+  showAreaDropdown = false;
+  showCostCenterDropdown = false;
+
   // Listas para autocompletes
   sedesList: CategoriaAuxiliar[] = [];
   areasList: RhArea[] = [];
   costCentersList: CostCenter[] = [];
+
+  // Listas filtradas para autocompletes
+  filteredSedesList: CategoriaAuxiliar[] = [];
+  filteredAreasList: RhArea[] = [];
+  filteredCostCentersList: CostCenter[] = [];
+
+  // Términos de búsqueda para autocompletes
+  sedeFilterTerm = '';
+  areaFilterTerm = '';
+  costCenterFilterTerm = '';
   
   // Configuración del header
   headerConfig: HeaderConfig | null = null;
@@ -130,7 +145,10 @@ export class TransferModalComponent implements OnInit, OnDestroy {
     this.categoriaAuxiliarService.getCategoriasAuxiliar()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (sedes) => this.sedesList = sedes,
+        next: (sedes) => {
+          this.sedesList = sedes;
+          this.filteredSedesList = sedes;
+        },
         error: (error) => console.error('Error cargando sedes:', error)
       });
 
@@ -138,7 +156,10 @@ export class TransferModalComponent implements OnInit, OnDestroy {
     this.rhAreaService.getAreas(companiaId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (areas) => this.areasList = areas,
+        next: (areas) => {
+          this.areasList = areas;
+          this.filteredAreasList = areas;
+        },
         error: (error) => console.error('Error cargando áreas:', error)
       });
 
@@ -146,7 +167,10 @@ export class TransferModalComponent implements OnInit, OnDestroy {
     this.costCenterService.getAll(companiaId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (costCenters) => this.costCentersList = costCenters,
+        next: (costCenters) => {
+          this.costCentersList = costCenters;
+          this.filteredCostCentersList = costCenters;
+        },
         error: (error) => console.error('Error cargando centros de costo:', error)
       });
   }
@@ -295,5 +319,116 @@ export class TransferModalComponent implements OnInit, OnDestroy {
       return 'Actualizar Transferencia';
     }
     return 'Guardar Transferencia';
+  }
+
+  // ===============================
+  // AUTOCOMPLETE METHODS - SEDE
+  // ===============================
+
+  getSedeFilterText(): string {
+    if (this.formData.newBranchId) {
+      const selectedSede = this.sedesList.find(s => s.categoriaAuxiliarId === this.formData.newBranchId);
+      return selectedSede?.descripcion || '';
+    }
+    return this.sedeFilterTerm;
+  }
+
+  onSedeFilterChange(event: any): void {
+    const value = event.target?.value || '';
+    this.sedeFilterTerm = value;
+    this.filteredSedesList = this.sedesList.filter(sede => 
+      sede.descripcion.toLowerCase().includes(value.toLowerCase())
+    );
+    this.showSedeDropdown = this.filteredSedesList.length > 0;
+  }
+
+  onSedeSelected(sede: CategoriaAuxiliar): void {
+    this.formData.newBranchId = sede.categoriaAuxiliarId;
+    this.sedeFilterTerm = sede.descripcion;
+    this.showSedeDropdown = false;
+  }
+
+  onSedeBlur(): void {
+    setTimeout(() => {
+      this.showSedeDropdown = false;
+    }, 200);
+  }
+
+  trackBySedeId(index: number, sede: CategoriaAuxiliar): string {
+    return sede.categoriaAuxiliarId;
+  }
+
+  // ===============================
+  // AUTOCOMPLETE METHODS - AREA
+  // ===============================
+
+  getAreaFilterText(): string {
+    if (this.formData.newAreaId) {
+      const selectedArea = this.areasList.find(a => a.areaId === this.formData.newAreaId);
+      return selectedArea?.descripcion || '';
+    }
+    return this.areaFilterTerm;
+  }
+
+  onAreaFilterChange(event: any): void {
+    const value = event.target?.value || '';
+    this.areaFilterTerm = value;
+    this.filteredAreasList = this.areasList.filter(area => 
+      area.descripcion.toLowerCase().includes(value.toLowerCase())
+    );
+    this.showAreaDropdown = this.filteredAreasList.length > 0;
+  }
+
+  onAreaSelected(area: RhArea): void {
+    this.formData.newAreaId = area.areaId;
+    this.areaFilterTerm = area.descripcion;
+    this.showAreaDropdown = false;
+  }
+
+  onAreaBlur(): void {
+    setTimeout(() => {
+      this.showAreaDropdown = false;
+    }, 200);
+  }
+
+  trackByAreaId(index: number, area: RhArea): string {
+    return area.areaId;
+  }
+
+  // ===============================
+  // AUTOCOMPLETE METHODS - COST CENTER
+  // ===============================
+
+  getCostCenterFilterText(): string {
+    if (this.formData.newCostCenterId) {
+      const selectedCC = this.costCentersList.find(cc => cc.ccostoId === this.formData.newCostCenterId);
+      return selectedCC?.descripcion || '';
+    }
+    return this.costCenterFilterTerm;
+  }
+
+  onCostCenterFilterChange(event: any): void {
+    const value = event.target?.value || '';
+    this.costCenterFilterTerm = value;
+    this.filteredCostCentersList = this.costCentersList.filter(cc => 
+      cc.descripcion.toLowerCase().includes(value.toLowerCase())
+    );
+    this.showCostCenterDropdown = this.filteredCostCentersList.length > 0;
+  }
+
+  onCostCenterSelected(costCenter: CostCenter): void {
+    this.formData.newCostCenterId = costCenter.ccostoId;
+    this.costCenterFilterTerm = costCenter.descripcion;
+    this.showCostCenterDropdown = false;
+  }
+
+  onCostCenterBlur(): void {
+    setTimeout(() => {
+      this.showCostCenterDropdown = false;
+    }, 200);
+  }
+
+  trackByCostCenterId(index: number, costCenter: CostCenter): string {
+    return costCenter.ccostoId;
   }
 }

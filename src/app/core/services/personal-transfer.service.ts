@@ -164,8 +164,8 @@ export class PersonalTransferService {
   /**
    * Gets a personal Transfer record by ID
    */
-  getPersonalTransferById(personalId: string): Observable<ApiResponsePersonalTransfer<PersonalTransferDto>> {
-    return this.http.get<PersonalTransferDto>(`${this.baseUrl}/personal/${encodeURIComponent(personalId)}`, {
+  getPersonalTransferById(id: number): Observable<ApiResponsePersonalTransfer<PersonalTransferDto>> {
+    return this.http.get<PersonalTransferDto>(`${this.baseUrl}/personal/${encodeURIComponent(id)}`, {
       headers: this.getHttpHeaders()
     }).pipe(
       map(data => ({
@@ -215,14 +215,47 @@ export class PersonalTransferService {
     );
   }
 
+
+   /**
+   * Creates a new personal Transfer record massive
+   */
+  createPersonalTransferMassive(personalTransfer: CreatePersonalTransferDto[]): Observable<ApiResponsePersonalTransfer<PersonalTransferDto[]>> {
+    return this.http.post<PersonalTransferDto[]>(`${this.baseUrl}/personal/personal-transfers/massive`, personalTransfer, {
+
+      headers: this.getHttpHeaders()
+    }).pipe(
+      map(data => ({
+        success: true,
+        data,
+        message: 'Personal Transfer created successfully'
+      })),
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 409) {
+          return throwError(() => ({
+            success: false,
+            message: 'Personal Transfer with this ID already exists'
+          }));
+        }
+        if (error.status === 400) {
+          return throwError(() => ({
+            success: false,
+            message: 'Validation errors occurred',
+            errors: error.error?.errors || ['Bad request']
+          }));
+        }
+        return this.handleError(error);
+      })
+    );
+  }
+
   /**
    * Updates an existing personal Transfer record
    */
   updatePersonalTransfer(
-    personalId: string,
+    id: number,
     personalTransfer: UpdatePersonalTransferDto
   ): Observable<ApiResponsePersonalTransfer<PersonalTransferDto>> {
-    return this.http.put<PersonalTransferDto>(`${this.baseUrl}/personal/${encodeURIComponent(personalId)}`, personalTransfer, {
+    return this.http.put<PersonalTransferDto>(`${this.baseUrl}/personal/${encodeURIComponent(id)}`, personalTransfer, {
       headers: this.getHttpHeaders()
     }).pipe(
       map(data => ({
@@ -449,21 +482,21 @@ export class PersonalTransferService {
       }
     }
 
-    if ('createdBy' in personalTransfer) {
-      if (!personalTransfer.createdBy?.trim()) {
-        errors.push('Created by is required');
-      } else if (personalTransfer.createdBy.length > 30) {
-        errors.push('Created by cannot exceed 30 characters');
-      }
-    }
+    // if ('createdBy' in personalTransfer) {
+    //   if (!personalTransfer.createdBy?.trim()) {
+    //     errors.push('Created by is required');
+    //   } else if (personalTransfer.createdBy.length > 30) {
+    //     errors.push('Created by cannot exceed 30 characters');
+    //   }
+    // }
 
-    if ('updatedBy' in personalTransfer) {
-      if (!personalTransfer.updatedBy?.trim()) {
-        errors.push('Updated by is required');
-      } else if (personalTransfer.updatedBy.length > 30) {
-        errors.push('Updated by cannot exceed 30 characters');
-      }
-    }
+    // if ('updatedBy' in personalTransfer) {
+    //   if (!personalTransfer.updatedBy?.trim()) {
+    //     errors.push('Updated by is required');
+    //   } else if (personalTransfer.updatedBy.length > 30) {
+    //     errors.push('Updated by cannot exceed 30 characters');
+    //   }
+    // }
 
     return errors;
   }

@@ -1,285 +1,342 @@
-<!-- Modal Overlay -->
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-  <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+<!-- Contenido del Modal de Transferencia Individual -->
+<div class="h-full flex flex-col bg-fiori-background">
+  
+  <!-- Contenido principal con scroll -->
+  <div class="flex-1 overflow-y-auto p-6">
     
-    <!-- Header del Modal -->
-    <div class="bg-gradient-to-r from-fiori-primary to-fiori-secondary px-6 py-4 text-white">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-            <lucide-icon name="arrow-right-left" class="w-5 h-5"></lucide-icon>
-          </div>
-          <div>
-            <h2 class="text-xl font-semibold">{{ getModalTitle() }}</h2>
-            <p class="text-sm text-white/80">Complete la información para la transferencia</p>
-          </div>
+    <!-- Información del Empleado -->
+    <div class="mb-6">
+      <div class="flex items-center space-x-2 mb-4">
+        <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
+          <lucide-icon name="user" class="w-4 h-4 text-blue-600"></lucide-icon>
         </div>
-        <button 
-          (click)="onCancel()"
-          class="p-2 hover:bg-white/10 rounded-lg transition-colors"
-        >
-          <lucide-icon name="x" class="w-5 h-5"></lucide-icon>
-        </button>
+        <h3 class="text-lg font-semibold text-gray-900">Información del Empleado</h3>
       </div>
-    </div>
-
-    <!-- Contenido del Modal -->
-    <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
       
-      <!-- Información del Empleado -->
-      <div class="mb-6">
-        <div class="flex items-center space-x-2 mb-4">
-          <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
-            <lucide-icon name="user" class="w-4 h-4 text-blue-600"></lucide-icon>
+      <div class="bg-gray-50 rounded-lg p-4">
+        <!-- Búsqueda de Empleado (solo si no hay empleado prellenado) -->
+        <div *ngIf="!data.employee" class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Buscar Empleado</label>
+          <div class="relative">
+            <input
+              type="text"
+              [value]="formData.employeeSearchTerm"
+              (input)="onEmployeeSearch($event.target?.value || '')"
+              placeholder="Escriba el nombre, documento o código del empleado..."
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pl-10"
+            >
+            <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+              <lucide-icon name="search" class="w-5 h-5 text-gray-400"></lucide-icon>
+            </div>
           </div>
-          <h3 class="text-lg font-semibold text-gray-900">Información del Empleado</h3>
-        </div>
-        
-        <div class="bg-gray-50 rounded-lg p-4">
-          <!-- Búsqueda de Empleado (solo si no hay empleado prellenado) -->
-          <div *ngIf="!data.employee" class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Buscar Empleado</label>
-            <div class="relative">
-              <input
-                type="text"
-                [value]="formData.employeeSearchTerm"
-                (input)="onEmployeeSearch($event.target?.value || '')"
-                placeholder="Escriba el nombre, documento o código del empleado..."
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pl-10"
-              >
-              <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
-                <lucide-icon name="search" class="w-5 h-5 text-gray-400"></lucide-icon>
+          
+          <!-- Dropdown de resultados -->
+          <div 
+            *ngIf="showEmployeeDropdown"
+            class="absolute z-60 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-48 overflow-y-auto"
+          >
+            <div 
+              *ngFor="let employee of employeeSearchResults"
+              class="px-4 py-3 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
+              (click)="selectEmployee(employee)"
+            >
+              <div class="font-medium text-gray-900">
+                {{ employee.nombres }} {{ employee.apellidoPaterno }} {{ employee.apellidoMaterno }}
+              </div>
+              <div class="text-sm text-gray-500">
+                DNI: {{ employee.nroDoc }} | ID: {{ employee.personalId }}
               </div>
             </div>
             
-            <!-- Dropdown de resultados -->
-            <div 
-              *ngIf="showEmployeeDropdown"
-              class="absolute z-60 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-48 overflow-y-auto"
-            >
-              <div 
-                *ngFor="let employee of employeeSearchResults"
-                class="px-4 py-3 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
-                (click)="selectEmployee(employee)"
-              >
-                <div class="font-medium text-gray-900">
-                  {{ employee.nombres }} {{ employee.apellidoPaterno }} {{ employee.apellidoMaterno }}
-                </div>
-                <div class="text-sm text-gray-500">
-                  DNI: {{ employee.nroDoc }} | ID: {{ employee.personalId }}
-                </div>
-              </div>
-              
-              <div *ngIf="employeeSearchResults.length === 0" class="px-4 py-3 text-gray-500 text-center">
-                No se encontraron empleados
-              </div>
-            </div>
-          </div>
-
-          <!-- Empleado Seleccionado -->
-          <div *ngIf="formData.selectedEmployee" class="bg-white rounded-lg border border-gray-200 p-4">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <lucide-icon name="user" class="w-6 h-6 text-blue-600"></lucide-icon>
-              </div>
-              <div class="flex-1">
-                <div class="font-semibold text-gray-900">
-                  {{ formData.selectedEmployee.nombres }} {{ formData.selectedEmployee.apellidoPaterno }} {{ formData.selectedEmployee.apellidoMaterno }}
-                </div>
-                <div class="text-sm text-gray-500">
-                  DNI: {{ formData.selectedEmployee.nroDoc }} | ID: {{ formData.selectedEmployee.personalId }}
-                </div>
-              </div>
-              <div class="text-right">
-                <div class="text-xs text-gray-500">Empleado</div>
-                <div class="text-sm font-medium text-green-600">Seleccionado</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Información de Transferencia -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        <!-- Ubicación Actual (Desde) -->
-        <div>
-          <div class="flex items-center space-x-2 mb-4">
-            <div class="w-6 h-6 bg-orange-100 rounded-lg flex items-center justify-center">
-              <lucide-icon name="map-pin" class="w-4 h-4 text-orange-600"></lucide-icon>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-900">Ubicación Actual</h3>
-          </div>
-          
-          <div class="bg-orange-50 rounded-lg p-4 space-y-3">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Sede Actual</label>
-              <div class="px-3 py-2 bg-white border border-orange-200 rounded-lg text-gray-600">
-                {{ formData.currentBranch || 'No asignada' }}
-              </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Área Actual</label>
-              <div class="px-3 py-2 bg-white border border-orange-200 rounded-lg text-gray-600">
-                {{ formData.currentArea || 'No asignada' }}
-              </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Centro de Costo Actual</label>
-              <div class="px-3 py-2 bg-white border border-orange-200 rounded-lg text-gray-600">
-                {{ formData.currentCostCenter || 'No asignado' }}
-              </div>
+            <div *ngIf="employeeSearchResults.length === 0" class="px-4 py-3 text-gray-500 text-center">
+              No se encontraron empleados
             </div>
           </div>
         </div>
 
-        <!-- Nueva Ubicación (Hacia) -->
-        <div>
-          <div class="flex items-center space-x-2 mb-4">
-            <div class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
-              <lucide-icon name="target" class="w-4 h-4 text-green-600"></lucide-icon>
+        <!-- Empleado Seleccionado -->
+        <div *ngIf="formData.selectedEmployee" class="bg-white rounded-lg border border-gray-200 p-4">
+          <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <lucide-icon name="user" class="w-6 h-6 text-blue-600"></lucide-icon>
             </div>
-            <h3 class="text-lg font-semibold text-gray-900">Nueva Ubicación</h3>
-          </div>
-          
-          <div class="bg-green-50 rounded-lg p-4 space-y-3">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Nueva Sede *</label>
-              <select 
-                [(ngModel)]="formData.newBranchId"
-                class="w-full px-3 py-2 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                <option value="">Seleccionar sede...</option>
-                <option *ngFor="let sede of sedesList" [value]="sede.categoriaAuxiliarId">
-                  {{ sede.descripcion }}
-                </option>
-              </select>
+            <div class="flex-1">
+              <div class="font-semibold text-gray-900">
+                {{ formData.selectedEmployee.nombres }} {{ formData.selectedEmployee.apellidoPaterno }} {{ formData.selectedEmployee.apellidoMaterno }}
+              </div>
+              <div class="text-sm text-gray-500">
+                DNI: {{ formData.selectedEmployee.nroDoc }} | ID: {{ formData.selectedEmployee.personalId }}
+              </div>
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Nueva Área *</label>
-              <select 
-                [(ngModel)]="formData.newAreaId"
-                class="w-full px-3 py-2 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                <option value="">Seleccionar área...</option>
-                <option *ngFor="let area of areasList" [value]="area.areaId">
-                  {{ area.descripcion }}
-                </option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Nuevo Centro de Costo</label>
-              <select 
-                [(ngModel)]="formData.newCostCenterId"
-                class="w-full px-3 py-2 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                <option value="">Seleccionar centro de costo...</option>
-                <option *ngFor="let cc of costCentersList" [value]="cc.ccostoId">
-                  {{ cc.descripcion }}
-                </option>
-              </select>
+            <div class="text-right">
+              <div class="text-xs text-gray-500">Empleado</div>
+              <div class="text-sm font-medium text-green-600">Seleccionado</div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Fechas de Transferencia -->
-      <div class="mt-6">
-        <div class="flex items-center space-x-2 mb-4">
-          <div class="w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center">
-            <lucide-icon name="calendar" class="w-4 h-4 text-purple-600"></lucide-icon>
-          </div>
-          <h3 class="text-lg font-semibold text-gray-900">Fechas de Transferencia</h3>
-        </div>
-        
-        <div class="bg-purple-50 rounded-lg p-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Inicio *</label>
-              <input
-                type="date"
-                [(ngModel)]="formData.startDate"
-                class="w-full px-3 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              >
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Fin</label>
-              <input
-                type="date"
-                [(ngModel)]="formData.endDate"
-                [disabled]="formData.isPermanent"
-                class="w-full px-3 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500"
-              >
-            </div>
-          </div>
-          
-          <div class="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="isPermanent"
-              [(ngModel)]="formData.isPermanent"
-              (change)="onPermanentChange()"
-              class="w-4 h-4 text-purple-600 border-purple-300 rounded focus:ring-purple-500"
-            >
-            <label for="isPermanent" class="text-sm font-medium text-gray-700">
-              Transferencia permanente (sin fecha de fin)
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Observaciones -->
-      <div class="mt-6">
-        <div class="flex items-center space-x-2 mb-4">
-          <div class="w-6 h-6 bg-gray-100 rounded-lg flex items-center justify-center">
-            <lucide-icon name="file-text" class="w-4 h-4 text-gray-600"></lucide-icon>
-          </div>
-          <h3 class="text-lg font-semibold text-gray-900">Observaciones</h3>
-        </div>
-        
-        <div class="bg-gray-50 rounded-lg p-4">
-          <textarea
-            [(ngModel)]="formData.observations"
-            placeholder="Ingrese observaciones sobre la transferencia (opcional)..."
-            rows="3"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-          ></textarea>
         </div>
       </div>
     </div>
 
-    <!-- Footer del Modal -->
-    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
-      <div class="flex items-center justify-between">
-        <!-- Información de validación -->
-        <div class="flex items-center space-x-2">
-          <div *ngIf="!isFormValid()" class="flex items-center space-x-1 text-orange-600">
-            <lucide-icon name="alert-circle" class="w-4 h-4"></lucide-icon>
-            <span class="text-sm">Complete los campos obligatorios (*)</span>
+    <!-- Información de Transferencia -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      
+      <!-- Ubicación Actual (Desde) -->
+      <div>
+        <div class="flex items-center space-x-2 mb-4">
+          <div class="w-6 h-6 bg-orange-100 rounded-lg flex items-center justify-center">
+            <lucide-icon name="map-pin" class="w-4 h-4 text-orange-600"></lucide-icon>
           </div>
-          <div *ngIf="isFormValid()" class="flex items-center space-x-1 text-green-600">
-            <lucide-icon name="check-circle" class="w-4 h-4"></lucide-icon>
-            <span class="text-sm">Formulario completo</span>
+          <h3 class="text-lg font-semibold text-gray-900">Ubicación Actual</h3>
+        </div>
+        
+        <div class="bg-orange-50 rounded-lg p-4 space-y-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Sede Actual</label>
+            <div class="px-3 py-2 bg-white border border-orange-200 rounded-lg text-gray-600">
+              {{ formData.currentBranch || 'No asignada' }}
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Área Actual</label>
+            <div class="px-3 py-2 bg-white border border-orange-200 rounded-lg text-gray-600">
+              {{ formData.currentArea || 'No asignada' }}
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Centro de Costo Actual</label>
+            <div class="px-3 py-2 bg-white border border-orange-200 rounded-lg text-gray-600">
+              {{ formData.currentCostCenter || 'No asignado' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nueva Ubicación (Hacia) -->
+      <div>
+        <div class="flex items-center space-x-2 mb-4">
+          <div class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
+            <lucide-icon name="target" class="w-4 h-4 text-green-600"></lucide-icon>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900">Nueva Ubicación</h3>
+        </div>
+        
+        <div class="bg-green-50 rounded-lg p-4 space-y-3">
+          <!-- Campo Nueva Sede with Autocomplete -->
+          <div class="relative">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <lucide-icon name="map-pin" class="w-4 h-4 inline mr-1"></lucide-icon>
+              Nueva Sede <span class="text-fiori-error">*</span>
+            </label>
+            <div class="relative">
+              <input 
+                type="text" 
+                [value]="getSedeFilterText()"
+                (input)="onSedeFilterChange($event); formData.newBranchId = ''"
+                (focus)="showSedeDropdown = true"
+                (blur)="onSedeBlur()"
+                placeholder="Buscar sede..."
+                class="w-full pl-10 pr-4 py-3 border border-green-300 rounded-lg bg-fiori-surface text-fiori-text focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                [class.border-fiori-error]="!formData.newBranchId">
+              <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                <lucide-icon name="map-pin" class="w-4 h-4 text-green-600"></lucide-icon>
+              </div>
+              
+              <!-- Dropdown de sedes -->
+              <div *ngIf="showSedeDropdown && filteredSedesList && filteredSedesList.length > 0" 
+                   class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover max-h-60 overflow-y-auto">
+                <div *ngFor="let sede of filteredSedesList; trackBy: trackBySedeId" 
+                     (mousedown)="onSedeSelected(sede)"
+                     class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border last:border-b-0 transition-colors">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
+                      <lucide-icon name="map-pin" class="w-3 h-3 text-green-600"></lucide-icon>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-fiori-text">{{ sede.descripcion }}</div>
+                      <div class="text-xs text-fiori-subtext">ID: {{ sede.categoriaAuxiliarId }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Campo Nueva Área with Autocomplete -->
+          <div class="relative">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <lucide-icon name="layers" class="w-4 h-4 inline mr-1"></lucide-icon>
+              Nueva Área <span class="text-fiori-error">*</span>
+            </label>
+            <div class="relative">
+              <input 
+                type="text" 
+                [value]="getAreaFilterText()"
+                (input)="onAreaFilterChange($event); formData.newAreaId = ''"
+                (focus)="showAreaDropdown = true"
+                (blur)="onAreaBlur()"
+                placeholder="Buscar área..."
+                class="w-full pl-10 pr-4 py-3 border border-green-300 rounded-lg bg-fiori-surface text-fiori-text focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                [class.border-fiori-error]="!formData.newAreaId">
+              <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                <lucide-icon name="layers" class="w-4 h-4 text-green-600"></lucide-icon>
+              </div>
+              
+              <!-- Dropdown de áreas -->
+              <div *ngIf="showAreaDropdown && filteredAreasList && filteredAreasList.length > 0" 
+                   class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover max-h-60 overflow-y-auto">
+                <div *ngFor="let area of filteredAreasList; trackBy: trackByAreaId" 
+                     (mousedown)="onAreaSelected(area)"
+                     class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border last:border-b-0 transition-colors">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-6 h-6 bg-fiori-accent/10 rounded-lg flex items-center justify-center">
+                      <lucide-icon name="layers" class="w-3 h-3 text-fiori-accent"></lucide-icon>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-fiori-text">{{ area.descripcion }}</div>
+                      <div class="text-xs text-fiori-subtext">ID: {{ area.areaId }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Campo Nuevo Centro de Costo with Autocomplete -->
+          <div class="relative">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <lucide-icon name="target" class="w-4 h-4 inline mr-1"></lucide-icon>
+              Nuevo Centro de Costo
+            </label>
+            <div class="relative">
+              <input 
+                type="text" 
+                [value]="getCostCenterFilterText()"
+                (input)="onCostCenterFilterChange($event); formData.newCostCenterId = ''"
+                (focus)="showCostCenterDropdown = true"
+                (blur)="onCostCenterBlur()"
+                placeholder="Buscar centro de costo..."
+                class="w-full pl-10 pr-4 py-3 border border-green-300 rounded-lg bg-fiori-surface text-fiori-text focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
+              <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                <lucide-icon name="target" class="w-4 h-4 text-green-600"></lucide-icon>
+              </div>
+              
+              <!-- Dropdown de centros de costo -->
+              <div *ngIf="showCostCenterDropdown && filteredCostCentersList && filteredCostCentersList.length > 0" 
+                   class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover max-h-60 overflow-y-auto">
+                <div *ngFor="let cc of filteredCostCentersList; trackBy: trackByCostCenterId" 
+                     (mousedown)="onCostCenterSelected(cc)"
+                     class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border last:border-b-0 transition-colors">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-6 h-6 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <lucide-icon name="target" class="w-3 h-3 text-orange-600"></lucide-icon>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-fiori-text">{{ cc.descripcion }}</div>
+                      <div class="text-xs text-fiori-subtext">ID: {{ cc.ccostoId }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fechas de Transferencia -->
+    <div class="mt-6">
+      <div class="flex items-center space-x-2 mb-4">
+        <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
+          <lucide-icon name="calendar" class="w-4 h-4 text-blue-600"></lucide-icon>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900">Fechas de Transferencia</h3>
+      </div>
+      
+      <div class="bg-blue-50 rounded-lg p-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Inicio *</label>
+            <input
+              type="date"
+              [(ngModel)]="formData.startDate"
+              class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Fin</label>
+            <input
+              type="date"
+              [(ngModel)]="formData.endDate"
+              [disabled]="formData.isPermanent"
+              class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500"
+            >
           </div>
         </div>
         
-        <!-- Botones de acción -->
-        <div class="flex items-center space-x-3">
-          <button
-            (click)="onCancel()"
-            class="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        <div class="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="isPermanent"
+            [(ngModel)]="formData.isPermanent"
+            (change)="onPermanentChange()"
+            class="w-4 h-4 text-blue-600 border-blue-300 rounded focus:ring-blue-500"
           >
-            Cancelar
-          </button>
-          <button
-            (click)="onSave()"
-            [disabled]="!isFormValid()"
-            class="px-6 py-2 bg-fiori-primary text-white rounded-lg hover:bg-fiori-secondary transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-2"
-          >
-            <lucide-icon name="save" class="w-4 h-4"></lucide-icon>
-            <span>{{ getSaveButtonText() }}</span>
-          </button>
+          <label for="isPermanent" class="text-sm font-medium text-gray-700">
+            Transferencia permanente (sin fecha de fin)
+          </label>
         </div>
+      </div>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="mt-6">
+      <div class="flex items-center space-x-2 mb-4">
+        <div class="w-6 h-6 bg-gray-100 rounded-lg flex items-center justify-center">
+          <lucide-icon name="file-text" class="w-4 h-4 text-gray-600"></lucide-icon>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900">Observaciones</h3>
+      </div>
+      
+      <div class="bg-gray-50 rounded-lg p-4">
+        <textarea
+          [(ngModel)]="formData.observations"
+          placeholder="Ingrese observaciones sobre la transferencia (opcional)..."
+          rows="3"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+        ></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer fijo del Modal -->
+  <div class="bg-white px-6 py-4 border-t border-gray-200 flex-shrink-0">
+    <div class="flex items-center justify-between">
+      <!-- Información de validación -->
+      <div class="flex items-center space-x-2">
+        <div *ngIf="!isFormValid()" class="flex items-center space-x-1 text-orange-600">
+          <lucide-icon name="alert-circle" class="w-4 h-4"></lucide-icon>
+          <span class="text-sm">Complete los campos obligatorios (*)</span>
+        </div>
+        <div *ngIf="isFormValid()" class="flex items-center space-x-1 text-green-600">
+          <lucide-icon name="check-circle" class="w-4 h-4"></lucide-icon>
+          <span class="text-sm">Formulario completo</span>
+        </div>
+      </div>
+      
+      <!-- Botones de acción -->
+      <div class="flex items-center space-x-3">
+        <button
+          (click)="onCancel()"
+          class="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          (click)="onSave()"
+          [disabled]="!isFormValid()"
+          class="px-6 py-2 bg-fiori-primary text-white rounded-lg hover:bg-fiori-secondary transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-2"
+        >
+          <lucide-icon name="save" class="w-4 h-4"></lucide-icon>
+          <span>{{ getSaveButtonText() }}</span>
+        </button>
       </div>
     </div>
   </div>

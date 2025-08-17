@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { PersonalTransferDto, CreatePersonalTransferDto, UpdatePersonalTransferDto } from '../../../../core/models/personal-transfer.model';
 import { PersonalTransferService } from '../../../../core/services/personal-transfer.service';
@@ -10,6 +11,7 @@ import { PersonService } from '../../../../core/services/person.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { Employee } from '../../empleado/empleado/model/employeeDto';
+import { DateRange } from '../../../../shared/components/date-range-picker/date-range-picker.component';
 
 export interface TransferModalData {
   employee?: Employee; // Empleado prellenado
@@ -45,7 +47,7 @@ export class TransferModalComponent implements OnInit, OnDestroy {
     newAreaId: '',
     newCostCenterId: '',
     
-    // Fechas
+    // Fechas (simplified - handled by DateRangePicker)
     startDate: '',
     endDate: '',
     isPermanent: false,
@@ -53,6 +55,9 @@ export class TransferModalComponent implements OnInit, OnDestroy {
     // Observaciones
     observations: ''
   };
+
+  // FormControl for date range picker
+  dateRangeControl = new FormControl<DateRange | null>(null, Validators.required);
 
   // Estados de UI
   showEmployeeDropdown = false;
@@ -310,20 +315,65 @@ export class TransferModalComponent implements OnInit, OnDestroy {
   onPermanentChange(): void {
     if (this.formData.isPermanent) {
       this.formData.endDate = '';
+      // Reset date range control if permanent
+      this.dateRangeControl.setValue(null);
     }
+  }
+
+  /**
+   * Handle date range selection from reusable component
+   */
+  onDateRangeSelected(dateRange: DateRange): void {
+    console.log('📅 Date range selected:', dateRange);
+    
+    this.formData.startDate = dateRange.start;
+    this.formData.endDate = dateRange.end;
+    
+    // If end date is selected, uncheck permanent
+    if (dateRange.end) {
+      this.formData.isPermanent = false;
+    }
+    
+    console.log('✅ Transfer form updated:');
+    console.log('   Start:', this.formData.startDate);
+    console.log('   End:', this.formData.endDate);
+    console.log('   Permanent:', this.formData.isPermanent);
+  }
+
+  /**
+   * Handle raw date objects from reusable component (optional)
+   */
+  onDatesSelected(dates: Date[]): void {
+    console.log('📅 Raw dates selected:', dates);
+    // Additional logic if needed with raw Date objects
   }
 
   /**
    * Validar formulario
    */
   isFormValid(): boolean {
-    return !!(
+    const dateValid = this.formData.isPermanent || (this.dateRangeControl.valid && this.dateRangeControl.value);
+    
+    const isValid = !!(
       this.formData.selectedEmployee &&
       this.formData.newBranchId &&
       this.formData.newAreaId &&
       this.formData.startDate &&
-      (this.formData.isPermanent || this.formData.endDate)
+      dateValid
     );
+
+    console.log('🔍 Form Validation:', {
+      selectedEmployee: !!this.formData.selectedEmployee,
+      newBranchId: !!this.formData.newBranchId,
+      newAreaId: !!this.formData.newAreaId,
+      startDate: !!this.formData.startDate,
+      isPermanent: this.formData.isPermanent,
+      dateRangeValid: this.dateRangeControl.valid,
+      dateValid,
+      isValid
+    });
+
+    return isValid;
   }
 
   /**

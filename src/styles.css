@@ -11,3 +11,6 @@
 
 /* El tema que quieras usar, por ejemplo, Quartz */
 @import "@ag-grid-community/styles/ag-theme-quartz.css";
+
+/* Flatpickr Theme */
+@import "flatpickr/dist/flatpickr.css";

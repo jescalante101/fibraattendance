@@ -1,0 +1,14 @@
+/* Estilos para el componente de transferencias masivas */
+
+/* Custom error styling for date range picker */
+::ng-deep .custom-error input {
+  @apply border-red-500 ring-red-500 ring-opacity-50;
+}
+
+::ng-deep .custom-error input:focus {
+  @apply border-red-500 ring-red-500;
+}
+
+::ng-deep .custom-error .error-indicator {
+  @apply opacity-100;
+}

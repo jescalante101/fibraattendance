@@ -1,0 +1,50 @@
+<!-- Date Range Picker Component -->
+<div class="relative">
+  <!-- Input with Flatpickr -->
+  <input 
+    type="text" 
+    mwlFlatpickr
+    [options]="flatpickrDefaults"
+    (flatpickrChange)="handleDateChange($event)"
+    (flatpickrClose)="handleDateChange($event)"
+    (flatpickrOpen)="pickerOpen.emit()"
+    [(ngModel)]="selectedDateRange"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [class]="getInputClasses()"
+    [class.pl-7]="showIcon && size === 'sm'"
+    [class.pl-10]="showIcon && size === 'md'"
+    [class.pl-12]="showIcon && size === 'lg'"
+  />
+  
+  <!-- Icon -->
+  <div 
+    *ngIf="showIcon" 
+    class="absolute left-2 top-1/2 transform -translate-y-1/2 pointer-events-none"
+    [class.mt-px]="size === 'sm'"
+  >
+    <lucide-icon 
+      [name]="iconName" 
+      [class]="getIconSize() + ' text-gray-400'"
+    ></lucide-icon>
+  </div>
+  
+  <!-- Error state indicator (optional) -->
+  <div 
+    *ngIf="hasError()" 
+    class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none"
+  >
+    <lucide-icon 
+      name="alert-circle" 
+      [class]="getIconSize() + ' text-red-500'"
+    ></lucide-icon>
+  </div>
+</div>
+
+<!-- Debug info (remove in production) -->
+<div *ngIf="false" class="mt-2 text-xs text-gray-500">
+  <div>Start: {{ currentValue.start }}</div>
+  <div>End: {{ currentValue.end }}</div>
+  <div>Valid: {{ isValid() }}</div>
+  <div>Has Error: {{ hasError() }}</div>
+</div>

@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { ColDef, GridReadyEvent, GridApi, GridOptions } from 'ag-grid-community';
 import {  createFioriGridOptions,  localeTextFiori } from '../../../../shared/ag-grid-theme-fiori';
@@ -12,6 +13,7 @@ import { PersonService, EmployeesParameters } from '../../../../core/services/pe
 import { ToastService } from '../../../../shared/services/toast.service';
 import { Employee } from '../../empleado/empleado/model/employeeDto';
 import { AuthService } from '../../../../core/services/auth.service';
+import { DateRange } from '../../../../shared/components/date-range-picker/date-range-picker.component';
 
 
 export interface MassiveTransferModalData {
@@ -47,6 +49,9 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
     // Observaciones
     observations: ''
   };
+
+  // Date range (con FormControl para validación)
+  dateRangeControl = new FormControl<DateRange | null>(null, Validators.required);
 
   // Filtros de empleados
   employeeFilters = {
@@ -207,15 +212,18 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
     private headerConfigService: HeaderConfigService,
     private personService: PersonService,
     private toastService: ToastService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    console.log('🚀 MassiveTransferModal: Initializing...');
     this.headerConfig = this.headerConfigService.loadHeaderConfig();
     this.initializeForm();
     this.loadAutocompleteData();
     this.loadUserData();
     this.loadAllEmployees();
+    console.log('✅ MassiveTransferModal: Initialized successfully');
   }
 
   
@@ -242,6 +250,7 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   private initializeForm(): void {
     const today = new Date().toISOString().split('T')[0];
     this.transferConfig.startDate = today;
+    this.transferConfig.endDate = today;
   }
 
   /**
@@ -514,6 +523,29 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Handle date range selection from reusable component
+   */
+  onDateRangeSelected(dateRange: DateRange): void {
+    console.log('📅 Date range selected:', dateRange);
+    
+    this.transferConfig.startDate = dateRange.start;
+    this.transferConfig.endDate = dateRange.end;
+    
+    console.log('✅ Transfer config updated:');
+    console.log('   Start:', this.transferConfig.startDate);
+    console.log('   End:', this.transferConfig.endDate);
+    console.log('   Form valid:', this.isConfigValid());
+  }
+
+  /**
+   * Handle raw date objects from reusable component (optional)
+   */
+  onDatesSelected(dates: Date[]): void {
+    console.log('📅 Raw dates selected:', dates);
+    // Additional logic if needed with raw Date objects
+  }
+
+  /**
    * Cambio en configuración de transferencia permanente
    */
 
@@ -578,12 +610,25 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
    * Validar configuración
    */
   isConfigValid(): boolean {
-    return !!(
+    const dateRangeValid = this.dateRangeControl.valid && this.dateRangeControl.value;
+    const isValid = !!(
       this.transferConfig.toBranchId &&
       this.transferConfig.toAreaId &&
-      this.transferConfig.startDate &&
-      this.transferConfig.endDate
+      dateRangeValid
     );
+    
+    // Debug para encontrar el problema
+    console.log('🔍 Config Validation:', {
+      toBranchId: !!this.transferConfig.toBranchId,
+      toAreaId: !!this.transferConfig.toAreaId,
+      dateRangeValid: dateRangeValid,
+      dateRangeValue: this.dateRangeControl.value,
+      startDate: this.transferConfig.startDate,
+      endDate: this.transferConfig.endDate,
+      isValid
+    });
+    
+    return isValid;
   }
 
   /**
@@ -619,7 +664,7 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
       costCenterId: this.transferConfig.toCostCenterId || '',
       costCenterDescription: selectedCostCenter?.descripcion || '',
       startDate: this.transferConfig.startDate,
-      endDate: this.transferConfig.endDate || null,
+      endDate: this.transferConfig.endDate,
       observation: this.transferConfig.observations || null,
       createdBy: this.userLogin
     }));

@@ -1,0 +1,87 @@
+/* Date Range Picker Component Styles */
+
+/* Flatpickr theme customizations */
+:host ::ng-deep .flatpickr-calendar {
+  @apply shadow-lg border-gray-200;
+}
+
+:host ::ng-deep .flatpickr-day {
+  @apply text-gray-700;
+}
+
+:host ::ng-deep .flatpickr-day.selected,
+:host ::ng-deep .flatpickr-day.startRange,
+:host ::ng-deep .flatpickr-day.endRange {
+  @apply bg-blue-500 text-white;
+}
+
+:host ::ng-deep .flatpickr-day.inRange {
+  @apply bg-blue-100 text-blue-800;
+}
+
+:host ::ng-deep .flatpickr-day:hover {
+  @apply bg-gray-100;
+}
+
+:host ::ng-deep .flatpickr-months .flatpickr-month {
+  @apply text-gray-700;
+}
+
+:host ::ng-deep .flatpickr-weekday {
+  @apply text-gray-600 font-medium;
+}
+
+/* Fiori theme variant */
+:host.fiori ::ng-deep .flatpickr-day.selected,
+:host.fiori ::ng-deep .flatpickr-day.startRange,
+:host.fiori ::ng-deep .flatpickr-day.endRange {
+  @apply bg-fiori-primary text-white;
+}
+
+:host.fiori ::ng-deep .flatpickr-day.inRange {
+  @apply bg-fiori-accent/20 text-fiori-primary;
+}
+
+/* Disabled state */
+:host ::ng-deep input[disabled] {
+  @apply bg-gray-100 cursor-not-allowed opacity-60;
+}
+
+/* Focus states */
+:host ::ng-deep input:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-opacity-50;
+}
+
+:host.fiori ::ng-deep input:focus {
+  @apply ring-fiori-primary;
+}
+
+/* Error state */
+:host ::ng-deep input.border-red-500 {
+  @apply ring-red-500 ring-opacity-50;
+}
+
+/* Size variants */
+.size-sm {
+  /* Small size styles already defined in component */
+}
+
+.size-md {
+  /* Medium size styles already defined in component */
+}
+
+.size-lg {
+  /* Large size styles already defined in component */
+}
+
+/* Animation for error indicator */
+.error-indicator {
+  @apply transition-opacity duration-200;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  :host ::ng-deep .flatpickr-calendar {
+    @apply w-full;
+  }
+}

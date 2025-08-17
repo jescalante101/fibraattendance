@@ -3,6 +3,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import { FlatpickrModule } from 'angularx-flatpickr';
+import { CommonModule } from '@angular/common';
 
 
 import { AppRoutingModule } from './app-routing.module';
@@ -178,6 +180,8 @@ registerLocaleData(localeEs);
         CustomHeaderComponent
     ],
     bootstrap: [AppComponent], imports: [
+        FlatpickrModule.forRoot(),
+        CommonModule,
         MatDatepickerModule,
         MatBadgeModule,
         ScrollingModule,

@@ -2,156 +2,121 @@
 <div class="h-full flex flex-col">
   
   <!-- Configuración de Transferencia -->
-  <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex-shrink-0">
+  <div class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex-shrink-0">
     <div class="flex items-center space-x-2 mb-3">
       <div class="w-5 h-5 bg-fiori-accent/10 rounded-lg flex items-center justify-center">
         <lucide-icon name="settings" class="w-3 h-3 text-fiori-accent"></lucide-icon>
       </div>
-      <h3 class="text-lg font-semibold text-gray-900">Configuración de Transferencia</h3>
+      <h3 class="text-base font-semibold text-gray-900">Configuración de Transferencia</h3>
     </div>
     
     <!-- Configuración Compacta en Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
       
-      <!-- Nueva Ubicación -->
-      <div class="bg-green-50 rounded-lg p-4">
-        <h4 class="text-sm font-semibold text-green-800 mb-3 flex items-center">
-          <lucide-icon name="target" class="w-4 h-4 mr-1"></lucide-icon>
-          Nueva Ubicación para Transferencia *
-        </h4>
-        <div class="space-y-3">
-          <!-- Autocomplete To Sede -->
-          <div class="relative">
-            <label class="block text-xs text-green-700 mb-1">Sede Destino *</label>
-            <input 
-              type="text" 
-              [value]="getToSedeFilterText()"
-              (input)="onToSedeFilterChange($event); transferConfig.toBranchId = ''"
-              (focus)="showToSedeDropdown = true"
-              (blur)="onToSedeBlur()"
-              placeholder="Buscar sede destino..."
-              class="w-full pl-8 pr-3 py-2 text-sm border border-green-300 rounded-lg bg-fiori-surface text-fiori-text focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
-              [class.border-fiori-error]="!transferConfig.toBranchId">
-            <div class="absolute left-2 top-8 transform -translate-y-1/2">
-              <lucide-icon name="map-pin" class="w-3 h-3 text-green-600"></lucide-icon>
-            </div>
-            
-            <!-- Dropdown de sedes destino -->
-            <div *ngIf="showToSedeDropdown && filteredToSedesList && filteredToSedesList.length > 0" 
-                 class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover max-h-40 overflow-y-auto">
-              <div *ngFor="let sede of filteredToSedesList; trackBy: trackBySedeId" 
-                   (mousedown)="onToSedeSelected(sede)"
-                   class="px-3 py-2 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border last:border-b-0 transition-colors">
-                <div class="text-sm font-medium text-fiori-text">{{ sede.descripcion }}</div>
-                <div class="text-xs text-fiori-subtext">ID: {{ sede.categoriaAuxiliarId }}</div>
-              </div>
+      <!-- Columna 1: Sede y Área -->
+      <div class="space-y-2">
+        <!-- Sede Destino -->
+        <div class="relative">
+          <label class="block text-xs text-gray-600 mb-1">Sede Destino *</label>
+          <input 
+            type="text" 
+            [value]="getToSedeFilterText()"
+            (input)="onToSedeFilterChange($event); transferConfig.toBranchId = ''"
+            (focus)="showToSedeDropdown = true"
+            (blur)="onToSedeBlur()"
+            placeholder="Buscar sede..."
+            class="w-full pl-7 pr-2 py-1.5 text-sm border border-gray-300 rounded-md bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="!transferConfig.toBranchId">
+          <div class="absolute left-2 top-1/2 transform -translate-y-1/2 mt-px">
+            <lucide-icon name="map-pin" class="w-3.5 h-3.5 text-gray-400"></lucide-icon>
+          </div>
+          <div *ngIf="showToSedeDropdown && filteredToSedesList?.length > 0" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto">
+            <div *ngFor="let sede of filteredToSedesList; trackBy: trackBySedeId" (mousedown)="onToSedeSelected(sede)" class="px-3 py-1.5 hover:bg-gray-100 cursor-pointer text-sm">
+              {{ sede.descripcion }}
             </div>
           </div>
-          
-          <!-- Autocomplete To Area -->
-          <div class="relative">
-            <label class="block text-xs text-green-700 mb-1">Área Destino *</label>
-            <input 
-              type="text" 
-              [value]="getToAreaFilterText()"
-              (input)="onToAreaFilterChange($event); transferConfig.toAreaId = ''"
-              (focus)="showToAreaDropdown = true"
-              (blur)="onToAreaBlur()"
-              placeholder="Buscar área destino..."
-              class="w-full pl-8 pr-3 py-2 text-sm border border-green-300 rounded-lg bg-fiori-surface text-fiori-text focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
-              [class.border-fiori-error]="!transferConfig.toAreaId">
-            <div class="absolute left-2 top-8 transform -translate-y-1/2">
-              <lucide-icon name="layers" class="w-3 h-3 text-green-600"></lucide-icon>
-            </div>
-            
-            <!-- Dropdown de áreas destino -->
-            <div *ngIf="showToAreaDropdown && filteredToAreasList && filteredToAreasList.length > 0" 
-                 class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover max-h-40 overflow-y-auto">
-              <div *ngFor="let area of filteredToAreasList; trackBy: trackByAreaId" 
-                   (mousedown)="onToAreaSelected(area)"
-                   class="px-3 py-2 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border last:border-b-0 transition-colors">
-                <div class="text-sm font-medium text-fiori-text">{{ area.descripcion }}</div>
-                <div class="text-xs text-fiori-subtext">ID: {{ area.areaId }}</div>
-              </div>
-            </div>
+        </div>
+        
+        <!-- Área Destino -->
+        <div class="relative">
+          <label class="block text-xs text-gray-600 mb-1">Área Destino *</label>
+          <input 
+            type="text" 
+            [value]="getToAreaFilterText()"
+            (input)="onToAreaFilterChange($event); transferConfig.toAreaId = ''"
+            (focus)="showToAreaDropdown = true"
+            (blur)="onToAreaBlur()"
+            placeholder="Buscar área..."
+            class="w-full pl-7 pr-2 py-1.5 text-sm border border-gray-300 rounded-md bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="!transferConfig.toAreaId">
+          <div class="absolute left-2 top-1/2 transform -translate-y-1/2 mt-px">
+            <lucide-icon name="layers" class="w-3.5 h-3.5 text-gray-400"></lucide-icon>
           </div>
-          
-          <!-- Autocomplete To Cost Center -->
-          <div class="relative">
-            <label class="block text-xs text-green-700 mb-1">Centro de Costo (Opcional)</label>
-            <input 
-              type="text" 
-              [value]="getToCostCenterFilterText()"
-              (input)="onToCostCenterFilterChange($event); transferConfig.toCostCenterId = ''"
-              (focus)="showToCostCenterDropdown = true"
-              (blur)="onToCostCenterBlur()"
-              placeholder="Buscar centro de costo..."
-              class="w-full pl-8 pr-3 py-2 text-sm border border-green-300 rounded-lg bg-fiori-surface text-fiori-text focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
-            <div class="absolute left-2 top-8 transform -translate-y-1/2">
-              <lucide-icon name="target" class="w-3 h-3 text-green-600"></lucide-icon>
-            </div>
-            
-            <!-- Dropdown de centros de costo destino -->
-            <div *ngIf="showToCostCenterDropdown && filteredToCostCentersList && filteredToCostCentersList.length > 0" 
-                 class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover max-h-40 overflow-y-auto">
-              <div *ngFor="let cc of filteredToCostCentersList; trackBy: trackByCostCenterId" 
-                   (mousedown)="onToCostCenterSelected(cc)"
-                   class="px-3 py-2 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border last:border-b-0 transition-colors">
-                <div class="text-sm font-medium text-fiori-text">{{ cc.descripcion }}</div>
-                <div class="text-xs text-fiori-subtext">ID: {{ cc.ccostoId }}</div>
-              </div>
+          <div *ngIf="showToAreaDropdown && filteredToAreasList?.length > 0" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto">
+            <div *ngFor="let area of filteredToAreasList; trackBy: trackByAreaId" (mousedown)="onToAreaSelected(area)" class="px-3 py-1.5 hover:bg-gray-100 cursor-pointer text-sm">
+              {{ area.descripcion }}
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Configuración de Transferencia -->
-      <div class="bg-blue-50 rounded-lg p-4">
-        <h4 class="text-sm font-semibold text-blue-800 mb-3 flex items-center">
-          <lucide-icon name="settings" class="w-4 h-4 mr-1"></lucide-icon>
-          Configuración de Transferencia
-        </h4>
-        
-        <!-- Fechas -->
-        <div class="mb-4">
-          <div class="grid grid-cols-2 gap-3 mb-3">
-            <div>
-              <label class="block text-xs text-blue-700 mb-1">Fecha Inicio *</label>
-              <input
-                type="date"
-                [(ngModel)]="transferConfig.startDate"
-                class="w-full px-2 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                [class.border-fiori-error]="!transferConfig.startDate">
-            </div>
-            <div>
-              <label class="block text-xs text-blue-700 mb-1">Fecha Fin</label>
-              <input
-                type="date"
-                [(ngModel)]="transferConfig.endDate"
-                [disabled]="transferConfig.isPermanent"
-                class="w-full px-2 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500">
+      <!-- Columna 2: Centro de Costo y Fechas -->
+      <div class="space-y-2">
+        <!-- Centro de Costo -->
+        <div class="relative">
+          <label class="block text-xs text-gray-600 mb-1">Centro de Costo (Opcional)</label>
+          <input 
+            type="text" 
+            [value]="getToCostCenterFilterText()"
+            (input)="onToCostCenterFilterChange($event); transferConfig.toCostCenterId = ''"
+            (focus)="showToCostCenterDropdown = true"
+            (blur)="onToCostCenterBlur()"
+            placeholder="Buscar C.Costo..."
+            class="w-full pl-7 pr-2 py-1.5 text-sm border border-gray-300 rounded-md bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+          <div class="absolute left-2 top-1/2 transform -translate-y-1/2 mt-px">
+            <lucide-icon name="target" class="w-3.5 h-3.5 text-gray-400"></lucide-icon>
+          </div>
+          <div *ngIf="showToCostCenterDropdown && filteredToCostCentersList?.length > 0" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto">
+            <div *ngFor="let cc of filteredToCostCentersList; trackBy: trackByCostCenterId" (mousedown)="onToCostCenterSelected(cc)" class="px-3 py-1.5 hover:bg-gray-100 cursor-pointer text-sm">
+              {{ cc.descripcion }}
             </div>
           </div>
-          <label class="flex items-center text-sm text-blue-700">
+        </div>
+        
+        <!-- Fechas -->
+        <div class="flex space-x-2">
+          <div>
+            <label class="block text-xs text-gray-600 mb-1">Fecha Inicio *</label>
             <input
-              type="checkbox"
-              [(ngModel)]="transferConfig.isPermanent"
-              (change)="onPermanentChange()"
-              class="mr-2 text-blue-600 border-blue-300 rounded focus:ring-blue-500">
-            Transferencia permanente (sin fecha de fin)
-          </label>
+              type="date"
+              [(ngModel)]="transferConfig.startDate"
+              class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-500]="!transferConfig.startDate">
+          </div>
+          <div>
+            <label class="block text-xs text-gray-600 mb-1">Fecha Fin</label>
+            <input
+              type="date"
+              [(ngModel)]="transferConfig.endDate"
+              class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100">
+          </div>
         </div>
+      </div>
 
-        <!-- Observaciones -->
-        <div>
-          <label class="block text-xs text-blue-700 mb-1">Observaciones</label>
-          <textarea
-            [(ngModel)]="transferConfig.observations"
-            placeholder="Motivo de la transferencia o comentarios adicionales..."
-            rows="3"
-            class="w-full px-2 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-          ></textarea>
-        </div>
+      <!-- Columna 3: Observaciones -->
+      <div class="lg:col-span-1">
+        <label class="block text-xs text-gray-600 mb-1">Observaciones</label>
+        <textarea
+          [(ngModel)]="transferConfig.observations"
+          placeholder="Motivo de la transferencia..."
+          rows="3"
+          class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none"
+        ></textarea>
+      </div>
+      
+      <!-- Columna 4: Checkbox Permanente -->
+      <div class="flex items-center justify-start lg:justify-center">
+
       </div>
     </div>
   </div>
@@ -256,9 +221,9 @@
       </div>
 
       <!-- ag-Grid de Empleados -->
-      <div class="flex-1 ag-grid-fiori-container">
+      <div class="flex-1 ag-theme-quartz p-4">
         <ag-grid-angular
-          [theme]="themeFiori"
+         #agGrid
           [columnDefs]="columnDefs"
           [rowData]="allEmployees"
           [gridOptions]="gridOptions"

@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { ColDef, GridReadyEvent, GridApi, GridOptions } from 'ag-grid-community';
-import { themeFiori, createFioriGridOptions, multiSelectGridOptions, localeTextFiori } from '../../../../shared/ag-grid-theme-fiori';
-import { PersonalTransferDto, CreatePersonalTransferDto } from '../../../../core/models/personal-transfer.model';
+import {  createFioriGridOptions,  localeTextFiori } from '../../../../shared/ag-grid-theme-fiori';
+import {  CreatePersonalTransferDto } from '../../../../core/models/personal-transfer.model';
 import { PersonalTransferService } from '../../../../core/services/personal-transfer.service';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from '../../../../core/services/categoria-auxiliar.service';
 import { RhAreaService, RhArea } from '../../../../core/services/rh-area.service';
@@ -12,6 +12,7 @@ import { PersonService, EmployeesParameters } from '../../../../core/services/pe
 import { ToastService } from '../../../../shared/services/toast.service';
 import { Employee } from '../../empleado/empleado/model/employeeDto';
 import { AuthService } from '../../../../core/services/auth.service';
+
 
 export interface MassiveTransferModalData {
   mode: 'massive';
@@ -42,7 +43,6 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
     // Fechas
     startDate: '',
     endDate: '',
-    isPermanent: true,
     
     // Observaciones
     observations: ''
@@ -102,75 +102,47 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   columnDefs: ColDef[] = [
     {
       headerName: 'Colaborador',
-      field: 'fullName',
       flex: 2,
       filter: 'agTextColumnFilter',
       checkboxSelection: true,
-      headerCheckboxSelection: false,
+      headerCheckboxSelection: true, // Recomendado para seleccionar/deseleccionar todos
+      headerCheckboxSelectionFilteredOnly: true,
       valueGetter: (params) => {
         const emp = params.data;
-        return `${emp.nombres || ''} ${emp.apellidoPaterno || ''} ${emp.apellidoMaterno || ''}`.trim();
+        const apellidos = `${emp.apellidoPaterno || ''} ${emp.apellidoMaterno || ''}`.trim();
+        return `${apellidos}, ${emp.nombres || ''}`;
       },
-      cellRenderer: (params: any) => {
-        const emp = params.data;
-        const fullName = `${emp.nombres || ''} ${emp.apellidoPaterno || ''} ${emp.apellidoMaterno || ''}`.trim();
-        return `
-          <div class="flex items-center">
-            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-              <span class="text-blue-600 font-semibold text-xs">${emp.nombres?.charAt(0) || 'U'}</span>
-            </div>
-            <div>
-              <div class="font-medium text-gray-900">${fullName}</div>
-              <div class="text-xs text-gray-500">ID: ${emp.personalId}</div>
-            </div>
-          </div>
-        `;
-      }
+      // Se elimina el cellRenderer para mantener una sola línea y evitar el "aplastamiento"
+    },
+    {
+      headerName: 'ID',
+      field: 'personalId',
+      flex: 1,
+      filter: 'agTextColumnFilter',
     },
     {
       headerName: 'Documento',
       field: 'nroDoc',
       flex: 1,
       filter: 'agTextColumnFilter',
-      cellRenderer: (params: any) => {
-        return `<div class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">${params.value || '-'}</div>`;
-      }
     },
     {
       headerName: 'Sede Actual',
       field: 'categoriaAuxiliarDescripcion',
       flex: 1.5,
-      filter: 'agSetColumnFilter',
+      filter: 'agTextColumnFilter',
       valueFormatter: (params) => params.value || '-',
-      cellRenderer: (params: any) => {
-        return `
-          <div class="flex items-center">
-            <div class="w-2 h-2 bg-orange-500 rounded-full mr-2"></div>
-            <span>${params.value || '-'}</span>
-          </div>
-        `;
-      }
     },
     {
       headerName: 'Área Actual',
       field: 'areaDescripcion',
       flex: 1.5,
-      filter: 'agSetColumnFilter',
+      filter: 'agTextColumnFilter',
       valueFormatter: (params) => params.value || '-',
-      cellRenderer: (params: any) => {
-        return `
-          <div class="flex items-center">
-            <div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-            <span>${params.value || '-'}</span>
-          </div>
-        `;
-      }
     }
   ];
 
 
-  // Configuración del tema Fiori
-  themeFiori = themeFiori;
   
   // Configuración de ag-Grid con tema Fiori y sidebar
   gridOptions: GridOptions = createFioriGridOptions({
@@ -202,14 +174,19 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
       defaultToolPanel: 'filters',
       hiddenByDefault: false
     },
-    
+    defaultColDef: {
+        sortable: true,
+        filter: true,
+        resizable: true,
+        minWidth: 100
+      },
+    theme: 'legacy',
     // Configuración de selección múltiple
     rowSelection: 'multiple',
     rowMultiSelectWithClick: false,
     suppressRowDeselection: false,
     
     // Performance y UX para listas grandes
-    rowBuffer: 20,
     suppressRowVirtualisation: false,
     suppressColumnVirtualisation: false,
     
@@ -265,7 +242,6 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   private initializeForm(): void {
     const today = new Date().toISOString().split('T')[0];
     this.transferConfig.startDate = today;
-    this.transferConfig.isPermanent = true;
   }
 
   /**
@@ -540,11 +516,7 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   /**
    * Cambio en configuración de transferencia permanente
    */
-  onPermanentChange(): void {
-    if (this.transferConfig.isPermanent) {
-      this.transferConfig.endDate = '';
-    }
-  }
+
 
   /**
    * Vista previa de transferencias
@@ -566,7 +538,7 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
         toArea: selectedArea?.descripcion || 'No seleccionada',
         toCostCenter: selectedCostCenter?.descripcion || 'No seleccionado',
         startDate: this.transferConfig.startDate,
-        endDate: this.transferConfig.isPermanent ? 'Permanente' : this.transferConfig.endDate,
+        endDate:  this.transferConfig.endDate,
         observations: this.transferConfig.observations || 'Sin observaciones'
       },
       employees: this.selectedEmployees.map(emp => ({
@@ -610,7 +582,7 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
       this.transferConfig.toBranchId &&
       this.transferConfig.toAreaId &&
       this.transferConfig.startDate &&
-      (this.transferConfig.isPermanent || this.transferConfig.endDate)
+      this.transferConfig.endDate
     );
   }
 
@@ -647,7 +619,7 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
       costCenterId: this.transferConfig.toCostCenterId || '',
       costCenterDescription: selectedCostCenter?.descripcion || '',
       startDate: this.transferConfig.startDate,
-      endDate: this.transferConfig.isPermanent ? null : this.transferConfig.endDate,
+      endDate: this.transferConfig.endDate || null,
       observation: this.transferConfig.observations || null,
       createdBy: this.userLogin
     }));

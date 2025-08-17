@@ -13,6 +13,7 @@ import * as XLSX from 'xlsx-js-style';
 import * as FileSaver from 'file-saver';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { localeTextFiori } from 'src/app/shared/ag-grid-theme-fiori';
 
 // Interfaz para tipos de Toast
 interface ToastConfig {
@@ -33,7 +34,6 @@ export class AppUserComponent implements OnInit {
   filteredUsers: User[] = [];
   loading = false;
   searchTerm = '';
-  private toastCounter = 0;
   
   // AG-Grid Configuration
   columnDefs: ColDef[] = [];
@@ -444,6 +444,7 @@ export class AppUserComponent implements OnInit {
       paginationPageSizeSelector: [10, 25, 50, 100],
       animateRows: true,
       suppressHorizontalScroll: false,
+      localeText:localeTextFiori,
       onCellClicked: (event) => this.onCellClicked(event),
       onGridReady: (params) => {
         this.gridApi = params.api;

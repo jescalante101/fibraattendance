@@ -6,6 +6,8 @@
 @plugin  "flowbite/plugin";
 
 /* AG-Grid Themes */
-@import 'ag-grid-community/styles/ag-grid.css';
-@import 'ag-grid-community/styles/ag-theme-alpine.css';
-@import './ag-grid-fiori.css'; /* Estilos Fiori para AG-Grid */
+/* Estilos estructurales básicos, siempre necesarios */
+@import "@ag-grid-community/styles/ag-grid.css";
+
+/* El tema que quieras usar, por ejemplo, Quartz */
+@import "@ag-grid-community/styles/ag-theme-quartz.css";

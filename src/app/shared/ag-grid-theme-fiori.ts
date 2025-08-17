@@ -1,103 +1,76 @@
-// ag-grid-theme-fiori.ts - Tema SAP Fiori personalizado para ag-Grid v34
-
-import { themeQuartz } from 'ag-grid-community';
+// ag-grid-theme-fiori.ts - Tema SAP Fiori profesional y personalizado para ag-Grid
+import { ColDef, GridOptions, SideBarDef, themeQuartz } from 'ag-grid-community';
 
 /**
- * Tema SAP Fiori basado en themeQuartz
- * Configuración completa con colores y espaciado oficial de SAP
+ * =================================================================================
+ * THEME FIORI PARAMS
+ * Basado en themeQuartz y alineado con tailwind.config.js
+ * Documentación de variables: https://www.ag-grid.com/angular-data-grid/theming-parameters/
+ * =================================================================================
  */
 export const themeFiori = themeQuartz.withParams({
-  // Paleta de colores SAP Fiori
-  backgroundColor: '#ffffff',
-  foregroundColor: '#32363a',
-  borderColor: '#d9d9d9',
+  // Paleta de colores principal (de tailwind.config.js)
+  backgroundColor: 'var(--ag-fiori-background-color, #f9f9f9)',
+  foregroundColor: 'var(--ag-fiori-text-color, #32363a)',
+  borderColor: 'var(--ag-fiori-border-color, #d1d1d1)',
   
-  // Colores primarios
-  accentColor: '#0070f2',
+  // Colores de acento y selección
+  accentColor: 'var(--ag-fiori-primary-color, #0a6ed1)',
+  rowHoverColor: 'var(--ag-fiori-hover-color, #f5f5f5)',
+  selectedRowBackgroundColor: 'var(--ag-fiori-active-color, #e3f2fd)',
   
-  // Header styling
-  headerBackgroundColor: '#f7f7f7',
+  // Cabeceras
+  headerBackgroundColor: 'var(--ag-fiori-muted-color, #f8f9fa)', // Color gris sutil para separar la cabecera
   
-  // Espaciado y tipografía
-  spacing: 8,
-  fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', Arial, sans-serif",
-  fontSize: 14,
+  // Tipografía (de tailwind.config.js)
+  fontFamily: '"72", "Segoe UI", Arial, sans-serif',
+  fontSize: '14px', // 0.875rem (base)
   
-  // Bordes y escalado
-  borderRadius: 6,
-  cellHorizontalPaddingScale: 1.2,
-  rowVerticalPaddingScale: 1.1,
+  // Espaciado y tamaño
+  spacing: 10, // Aumentamos el espaciado para dar más "aire"
+  borderRadius: 4, // 0.25rem
+  headerHeight: 56, // Aumentamos la altura de la cabecera
+  rowHeight: 52,    // Aumentamos la altura de las filas
   
-  // Colores de interacción
-  rowHoverColor: '#f1f5fe',
-  selectedRowBackgroundColor: '#e7f3ff'
-} as any); // Usar 'as any' para evitar errores de tipos temporalmente
+  // Iconos
+  iconSize: 18,
+  
+  // Otros
+  oddRowBackgroundColor: 'var(--ag-fiori-muted-color, #f8f9fa)',
+  rangeSelectionBackgroundColor: 'rgba(10, 110, 209, 0.1)', // De fiori.primary con alpha
+});
 
 /**
- * Configuración del sidebar para ag-Grid
- * Define los paneles disponibles y su configuración
+ * =================================================================================
+ * GRID OPTIONS POR DEFECTO
+ * Configuraciones recomendadas para una experiencia Fiori consistente.
+ * =================================================================================
  */
-export const sideBarConfig = {
-  toolPanels: [
-    {
-      id: 'columns',
-      labelDefault: 'Columnas',
-      labelKey: 'columns',
-      iconKey: 'columns',
-      toolPanel: 'agColumnsToolPanel',
-      minWidth: 225,
-      maxWidth: 300,
-      width: 250
-    },
-    {
-      id: 'filters',
-      labelDefault: 'Filtros',
-      labelKey: 'filters', 
-      iconKey: 'filter',
-      toolPanel: 'agFiltersToolPanel',
-      minWidth: 225,
-      maxWidth: 300,
-      width: 250
-    }
-  ],
-  position: 'right',
-  defaultToolPanel: 'columns',
-  hiddenByDefault: false
-};
 
-/**
- * Configuración por defecto para columnas
- * Configuración estándar que se aplica a todas las columnas
- */
-export const defaultColDefFiori = {
+// Definiciones de columna por defecto
+export const defaultColDefFiori: ColDef = {
   sortable: true,
   filter: true,
   resizable: true,
-  floatingFilter: true,
-  minWidth: 100,
+  floatingFilter: true, // Filtros flotantes para una UX más rápida
+  minWidth: 120,
   flex: 1,
+  suppressHeaderMenuButton: false,
   cellStyle: {
     display: 'flex',
     alignItems: 'center',
-    padding: '12px 16px'
+    padding: '0 16px', // Padding horizontal
   },
-  headerStyle: {
-    fontWeight: '600',
-    fontSize: '12px',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px'
-  }
+  headerClass: 'fiori-header', // Clase CSS personalizada para cabeceras
 };
 
-/**
- * Configuración de Grid Options optimizada para SAP Fiori
- */
-export const gridOptionsFiori = {
-  // Configuración base
+// Opciones del Grid
+export const gridOptionsFiori: GridOptions = {
   defaultColDef: defaultColDefFiori,
   
-  // Sidebar
-  sideBar: sideBarConfig,
+  // Tema y Estilo
+  // theme: themeFiori, // El tema se aplica a través de la clase del contenedor
+  domLayout: 'normal',
   
   // Paginación
   pagination: true,
@@ -107,50 +80,48 @@ export const gridOptionsFiori = {
   // Selección
   rowSelection: 'multiple',
   suppressRowClickSelection: true,
+  rowDragManaged: true,
   
-  // Animaciones y UX
+  // UX y Animaciones
   animateRows: true,
   enableCellTextSelection: true,
-  suppressMenuHide: false,
   
-  // Comportamiento de filtros
+  // Rendimiento
   suppressColumnVirtualisation: false,
-  enableRangeSelection: false,
-  
-  // Headers
-  suppressHeaderKeyboardEvent: false,
-  suppressHeaderMenuButton: false,
-  
-  // Performance
-  rowBuffer: 10,
   suppressRowVirtualisation: false,
   
-  // Drag & Drop
-  rowDragManaged: false,
-  suppressMoveWhenRowDragging: true,
+  // Menús y Paneles
+  sideBar: {
+    toolPanels: [
+      {
+        id: 'columns',
+        labelDefault: 'Columnas',
+        labelKey: 'columns',
+        iconKey: 'columns',
+        toolPanel: 'agColumnsToolPanel',
+      },
+      {
+        id: 'filters',
+        labelDefault: 'Filtros',
+        labelKey: 'filters',
+        iconKey: 'filter',
+        toolPanel: 'agFiltersToolPanel',
+      }
+    ],
+    position: 'right',
+    defaultToolPanel: 'columns',
+  } as SideBarDef,
   
-  // Resize
-  suppressAutoSize: false,
-  skipHeaderOnAutoSize: false,
-  
-  // Context menu
-  allowContextMenuWithControlKey: true,
-  preventDefaultOnContextMenu: false,
-  
-  // Accessibility
+  // Accesibilidad
   ensureDomOrder: true,
   suppressRowHoverHighlight: false,
-  
-  // Tool panels configuration
-  toolPanelSizeChanged: () => {
-    // Auto-resize columns when tool panel size changes
-    // This will be called when sidebar is opened/closed
-  }
 };
 
 /**
- * Configuración de localización en español para ag-Grid
- * Textos de interfaz traducidos al español
+ * =================================================================================
+ * LOCALIZACIÓN EN ESPAÑOL
+ * Textos de la interfaz para una experiencia localizada.
+ * =================================================================================
  */
 export const localeTextFiori = {
   // Paginación
@@ -242,53 +213,15 @@ export const localeTextFiori = {
 };
 
 /**
- * Función utilitaria para aplicar configuración completa Fiori a ag-Grid
- * @param customGridOptions Opciones personalizadas adicionales
- * @returns Configuración completa de gridOptions
+ * =================================================================================
+ * FUNCIÓN UTILITARIA
+ * Combina las opciones base, la localización y cualquier personalización adicional.
+ * =================================================================================
  */
-export function createFioriGridOptions(customGridOptions: any = {}) {
+export function createFioriGridOptions(customGridOptions: GridOptions = {}): GridOptions {
   return {
     ...gridOptionsFiori,
     localeText: localeTextFiori,
-    ...customGridOptions
+    ...customGridOptions,
   };
 }
-
-/**
- * Configuración específica para componentes con selección múltiple
- */
-export const multiSelectGridOptions = {
-  ...gridOptionsFiori,
-  checkboxSelection: true,
-  headerCheckboxSelection: false, // Evitar doble checkbox
-  rowMultiSelectWithClick: false,
-  suppressRowDeselection: false
-};
-
-/**
- * Configuración para grids de solo lectura (sin edición)
- */
-export const readOnlyGridOptions = {
-  ...gridOptionsFiori,
-  editable: false,
-  suppressClickEdit: true,
-  rowSelection: 'single'
-};
-
-/**
- * Configuración para grids con grouping habilitado
- */
-export const groupingGridOptions = {
-  ...gridOptionsFiori,
-  autoGroupColumnDef: {
-    headerName: 'Grupo',
-    minWidth: 200,
-    cellRendererParams: {
-      suppressCount: false,
-      checkbox: true
-    }
-  },
-  groupSelectsChildren: true,
-  groupSelectsFiltered: true,
-  suppressRowGroupHidesColumns: true
-};

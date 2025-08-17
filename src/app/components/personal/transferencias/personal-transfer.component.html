@@ -66,6 +66,7 @@
         <div class="flex items-center space-x-3">
           <!-- Gestor de Columnas -->
           <app-column-manager
+            *ngIf="tableColumns.length > 0"
             [config]="columnManagerConfig"
             [columns]="tableColumns"
             [dataSource]="transfers"

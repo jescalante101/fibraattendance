@@ -17,6 +17,8 @@ import { EmployeesParameters } from '../../../../core/services/person.service';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
 import { GenericFilterConfig, FilterState, FilterChangeEvent } from 'src/app/shared/generic-filter/filter-config.interface';
 import { ColumnManagerConfig, ColumnConfig, ColumnChangeEvent } from 'src/app/shared/column-manager/column-config.interface';
+import { ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
+import { createFioriGridOptions } from 'src/app/shared/ag-grid-theme-fiori';
 
 @Component({
   selector: 'app-empleado',
@@ -45,7 +47,7 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
   allSelected = false;
   totalCount = 0;
   page = 1;
-  pageSize = 10;
+  pageSize = 50;
   filtro = '';
 
   categoriaAuxiliarList: CategoriaAuxiliar[] = [];
@@ -137,6 +139,18 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
 
   tableColumns: ColumnConfig[] = [];
   visibleColumns: string[] = [];
+  
+  // ag-Grid configuration
+  columnDefs: ColDef[] = [];
+  gridOptions: GridOptions = {
+    ...createFioriGridOptions(),
+    // Centrar verticalmente el contenido de todas las celdas
+    defaultColDef: {
+      ...createFioriGridOptions().defaultColDef,
+      cellClass: 'ag-cell-vertical-center'
+    }
+  };
+  gridApi: any;
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -156,6 +170,7 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
     
     this.setDisplayedColumns();
     this.initializeTableColumns();
+    this.setupAgGrid();
     this.getCategoriasAuxiliar();
     this.setupGenericFilter();
   }
@@ -213,14 +228,29 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
             this.totalCount = res.data.totalCount;
             this.page = res.data.pageNumber;
             this.pageSize = res.data.pageSize;
+            
+            // Update ag-Grid data
+            if (this.gridApi) {
+              this.gridApi.setRowData(this.employees);
+            }
           } else {
             this.employees = [];
             this.totalCount = 0;
+            
+            // Clear ag-Grid data
+            if (this.gridApi) {
+              this.gridApi.setRowData([]);
+            }
           }
         },
         error: _ => {
           this.employees = [];
           this.totalCount = 0;
+          
+          // Clear ag-Grid data on error
+          if (this.gridApi) {
+            this.gridApi.setRowData([]);
+          }
         }
       });
   }
@@ -707,21 +737,328 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
 
   onColumnManagerChange(event: ColumnChangeEvent) {
     console.log('Columna cambiada:', event);
+    
+    // Obtener la clave y visibilidad de la columna
+    const columnKey = event.column.key;
+    const visible = event.column.visible;
+    
+    // Actualizar el estado local primero
+    const column = this.tableColumns.find(col => col.key === columnKey);
+    if (column) {
+      column.visible = visible;
+    }
+    
     this.updateVisibleColumns();
+    
+    // Aplicar cambios inmediatamente a ag-Grid
+    if (this.gridApi) {
+      this.gridApi.setColumnsVisible([columnKey], visible);
+      
+      // Trigger re-render of cells to update responsive content
+      setTimeout(() => {
+        this.gridApi.refreshCells({ force: true });
+      }, 100);
+    }
   }
 
   onColumnsApply(columns: ColumnConfig[]) {
     console.log('Aplicando configuración de columnas:', columns);
     this.tableColumns = [...columns];
     this.updateVisibleColumns();
+    
+    // Aplicar todas las visibilidades a ag-Grid
+    if (this.gridApi) {
+      columns.forEach(col => {
+        this.gridApi.setColumnsVisible([col.key], col.visible);
+      });
+      
+      // Trigger refresh and resize after column visibility changes
+      setTimeout(() => {
+        this.gridApi.refreshCells({ force: true });
+        this.gridApi.sizeColumnsToFit();
+      }, 100);
+    }
   }
 
   onColumnsReset() {
     console.log('Restaurando configuración de columnas');
     this.initializeTableColumns();
+    
+    // Aplicar reset a ag-Grid
+    if (this.gridApi) {
+      this.tableColumns.forEach(col => {
+        this.gridApi.setColumnsVisible([col.key], col.visible);
+      });
+      
+      // Trigger refresh and resize after reset
+      setTimeout(() => {
+        this.gridApi.refreshCells({ force: true });
+        this.gridApi.sizeColumnsToFit();
+      }, 100);
+    }
   }
 
   isColumnVisible(columnKey: string): boolean {
     return this.visibleColumns.includes(columnKey);
+  }
+  
+  // === AG-GRID CONFIGURATION ===
+  
+  private setupAgGrid(): void {
+    this.columnDefs = [
+      {
+        field: 'select',
+        headerName: '',
+        minWidth: 50,
+        maxWidth: 60,
+        checkboxSelection: true,
+        headerCheckboxSelection: true,
+        pinned: 'left',
+        lockPosition: true,
+        cellClass: 'ag-cell-checkbox',
+        resizable: false,
+        hide: !this.mostrarBotonAsignar
+      },
+      {
+        field: 'personalId',
+        headerName: 'ID Personal',
+        width: 100,
+        pinned: 'left',
+        hide: this.mostrarBotonAsignar,
+        cellRenderer: (params: any) => {
+          return `<div class="flex items-center py-1">
+            <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center mr-2">
+              <span class="text-xs font-medium text-fiori-primary">#${params.value}</span>
+            </div>
+          </div>`;
+        }
+      },
+      {
+        field: 'nroDoc',
+        headerName: 'Documento',
+        width: 120,
+        pinned: 'left',
+        cellRenderer: (params: any) => {
+          return `<div class="flex items-center text-sm">
+            <svg class="w-4 h-4 text-fiori-info mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span class="font-mono">${params.value}</span>
+          </div>`;
+        }
+      },
+      {
+        field: 'empleado',
+        headerName: 'Personal',
+        width: 280,
+        pinned: 'left',
+       
+        cellRenderer: (params: any) => {
+          const emp = params.data;
+          const fullName = `${emp.apellidoPaterno} ${emp.apellidoMaterno}, ${emp.nombres}`;
+          return `<div class="flex items-center py-1">
+            <div class="w-8 h-8 bg-fiori-muted rounded-full flex items-center justify-center mr-3">
+              <svg class="w-4 h-4 text-fiori-subtext" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-fiori-text" title="${fullName}">${fullName}</div>
+            </div>
+          </div>`;
+        }
+      },
+      {
+        field: 'categoriaAuxiliarDescripcion',
+        headerName: 'Sede',
+      
+        cellRenderer: (params: any) => {
+          if (!params.value) return '<span class="text-fiori-subtext">-</span>';
+          return `<div class="flex items-center text-sm">
+            <svg class="w-4 h-4 text-fiori-success mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+            <span>${params.value}</span>
+          </div>`;
+        }
+      },
+      {
+        field: 'areaDescripcion',
+        headerName: 'Área',
+        
+        cellRenderer: (params: any) => {
+          if (!params.value) return '<span class="text-fiori-subtext">-</span>';
+          return `<div class="flex items-center text-sm">
+            <svg class="w-4 h-4 text-fiori-accent mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+            <span>${params.value}</span>
+          </div>`;
+        }
+      },
+      {
+        field: 'fechaIngreso',
+        headerName: 'Fecha Ingreso',
+        minWidth: 120,
+        maxWidth: 150,
+        hide: true,
+        cellRenderer: (params: any) => {
+          if (!params.value) return '-';
+          const date = new Date(params.value);
+          const formattedDate = date.toLocaleDateString('es-ES');
+          return `<div class="flex items-center text-sm">
+            <svg class="w-4 h-4 text-fiori-success mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <span class="font-medium">${formattedDate}</span>
+          </div>`;
+        }
+      },
+      {
+        field: 'fechaCese',
+        headerName: 'Fecha Cese',
+        minWidth: 120,
+        maxWidth: 150,
+        hide: true,
+        cellRenderer: (params: any) => {
+          if (!params.value) {
+            return `<span class="text-fiori-info font-medium">Activo</span>`;
+          }
+          const date = new Date(params.value);
+          const formattedDate = date.toLocaleDateString('es-ES');
+          return `<div class="flex items-center text-sm">
+            <svg class="w-4 h-4 text-fiori-error mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <span class="font-medium">${formattedDate}</span>
+          </div>`;
+        }
+      },
+      {
+        field: 'cargoDescripcion',
+        headerName: 'Cargo',
+        minWidth: 150,
+        maxWidth: 200,
+        hide: true,
+        cellRenderer: (params: any) => {
+          if (!params.value) return '<span class="text-fiori-subtext">-</span>';
+          return `<span class="text-sm">${params.value}</span>`;
+        }
+      },
+      {
+        field: 'ccostoDescripcion',
+        headerName: 'Centro de Costo',
+        minWidth: 150,
+        maxWidth: 200,
+        hide: true,
+        cellRenderer: (params: any) => {
+          if (!params.value) return '<span class="text-fiori-subtext">-</span>';
+          return `<span class="text-sm">${params.value}</span>`;
+        }
+      },
+      {
+        field: 'email',
+        headerName: 'Correo Electrónico',
+        minWidth: 180,
+        maxWidth: 250,
+        hide: true,
+        cellRenderer: (params: any) => {
+          if (!params.value) return '<span class="text-fiori-subtext">-</span>';
+          return `<div class="flex items-center text-sm">
+            <svg class="w-4 h-4 text-fiori-info mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+            <a href="mailto:${params.value}" class="text-fiori-primary hover:text-fiori-secondary truncate" title="${params.value}">${params.value}</a>
+          </div>`;
+        }
+      },
+      {
+        field: 'telefono',
+        headerName: 'Teléfono',
+        minWidth: 120,
+        maxWidth: 150,
+        hide: true,
+        cellRenderer: (params: any) => {
+          if (!params.value) return '<span class="text-fiori-subtext">-</span>';
+          return `<div class="flex items-center text-sm">
+            <svg class="w-4 h-4 text-fiori-success mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+            </svg>
+            <span class="font-mono">${params.value}</span>
+          </div>`;
+        }
+      },
+      {
+        field: 'acciones',
+        headerName: 'Acciones',
+        width: 90,
+        pinned: 'right',
+        lockPosition: true,
+        resizable: false,
+        cellRenderer: (params: any) => {
+          if (this.mostrarBotonAsignar) {
+            return `<div class="flex items-center justify-center h-full">
+              <button class="assign-btn inline-flex items-center px-3 py-1 text-xs bg-fiori-primary text-white rounded-lg hover:bg-fiori-secondary transition-colors">
+                Asignar
+              </button>
+            </div>`;
+          } else {
+            return `<div class="flex items-center justify-center space-x-1 h-full">
+              <button class="view-btn p-2 text-fiori-primary hover:bg-fiori-primary/10 rounded transition-colors" title="Ver marcaciones">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </button>
+            </div>`;
+          }
+        }
+      }
+    ];
+  }
+  
+  onGridReady(params: GridReadyEvent): void {
+    this.gridApi = params.api;
+    
+    // Apply initial column visibility from tableColumns configuration
+    this.tableColumns.forEach(col => {
+      params.api.setColumnsVisible([col.key], col.visible);
+    });
+    
+    params.api.sizeColumnsToFit();
+    
+    // Set up action button click handlers
+    this.setupActionHandlers();
+  }
+  
+  private setupActionHandlers(): void {
+    // Use event delegation to handle action button clicks
+    const gridElement = document.querySelector('.ag-theme-quartz');
+    if (gridElement) {
+      gridElement.addEventListener('click', (event: Event) => {
+        const target = event.target as HTMLElement;
+        const button = target.closest('button');
+        
+        if (button && button.classList.contains('view-btn')) {
+          const cell = button.closest('.ag-cell');
+          if (cell) {
+            const rowIndex = parseInt(cell.closest('.ag-row')?.getAttribute('row-index') || '0');
+            const rowData = this.gridApi.getDisplayedRowAtIndex(rowIndex)?.data;
+            if (rowData) {
+              this.verMarcaciones(rowData);
+            }
+          }
+        } else if (button && button.classList.contains('assign-btn')) {
+          const cell = button.closest('.ag-cell');
+          if (cell) {
+            const rowIndex = parseInt(cell.closest('.ag-row')?.getAttribute('row-index') || '0');
+            const rowData = this.gridApi.getDisplayedRowAtIndex(rowIndex)?.data;
+            if (rowData) {
+              // TODO: Implementar lógica de asignación
+              console.log('Asignar turno a:', rowData);
+            }
+          }
+        }
+      });
+    }
   }
 }

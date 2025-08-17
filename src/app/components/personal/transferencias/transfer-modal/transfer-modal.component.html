@@ -314,12 +314,7 @@
       
       <!-- Botones compactos -->
       <div class="flex items-center space-x-2">
-        <button
-          (click)="onCancel()"
-          class="px-4 py-1.5 text-sm text-fiori-text bg-fiori-surface border border-fiori-border rounded hover:bg-fiori-hover transition-all"
-        >
-          Cancelar
-        </button>
+        
         <button
           (click)="onSave()"
           [disabled]="!isFormValid()"
@@ -327,6 +322,13 @@
         >
           <lucide-icon name="save" class="w-3 h-3"></lucide-icon>
           <span>{{ getSaveButtonText() }}</span>
+        </button>
+
+        <button
+          (click)="onCancel()"
+          class="px-4 py-1.5 text-sm text-fiori-text bg-fiori-surface border border-fiori-border rounded hover:bg-fiori-hover transition-all"
+        >
+          Cancelar
         </button>
       </div>
     </div>

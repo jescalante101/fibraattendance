@@ -13,3 +13,42 @@
     opacity: 0.5;
   }
 }
+
+/* ========================================
+   AG-GRID VERTICAL CENTERING
+   ======================================== */
+
+/* Centrar verticalmente el contenido de las celdas */
+:host ::ng-deep .ag-cell-vertical-center {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  height: 100% !important;
+}
+
+/* Para celdas con checkboxes */
+:host ::ng-deep .ag-cell-checkbox {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+}
+
+/* Para la columna de acciones */
+:host ::ng-deep .ag-cell[col-id="acciones"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+}
+
+/* ========================================
+   COLUMN MANAGER Z-INDEX FIX
+   ======================================== */
+
+/* Solo el dropdown/modal del column manager necesita z-index alto */
+:host ::ng-deep app-column-manager .column-manager-dropdown,
+:host ::ng-deep app-column-manager .dropdown-content,
+:host ::ng-deep app-column-manager .popover-content {
+  z-index: 1050 !important;
+}

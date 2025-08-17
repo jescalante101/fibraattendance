@@ -289,20 +289,6 @@
       <!-- Botones de acción -->
       <div class="flex items-center space-x-3">
         <button
-          (click)="onCancel()"
-          class="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          Cancelar
-        </button>
-        <button
-          (click)="showPreview()"
-          [disabled]="!isFormValid()"
-          class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-2"
-        >
-          <lucide-icon name="eye" class="w-4 h-4"></lucide-icon>
-          <span>Vista Previa</span>
-        </button>
-        <button
           (click)="onExecuteTransfers()"
           [disabled]="!isFormValid()"
           class="px-6 py-2 bg-fiori-secondary text-white rounded-lg hover:bg-fiori-primary transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-2"
@@ -310,6 +296,14 @@
           <lucide-icon name="send" class="w-4 h-4"></lucide-icon>
           <span>Ejecutar Transferencias</span>
         </button>
+
+         <button
+          (click)="onCancel()"
+          class="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          Cancelar
+        </button>
+
       </div>
     </div>
   </div>

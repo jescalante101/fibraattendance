@@ -51,7 +51,17 @@
     <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
       <div class="flex items-center justify-between">
         <div class="text-lg font-semibold text-fiori-text">Lista de Descansos</div>
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-3">
+          <!-- Gestor de Columnas -->
+          <app-column-manager
+            [config]="columnManagerConfig"
+            [columns]="tableColumns"
+            [dataSource]="filteredDescansos"
+            (columnChange)="onColumnManagerChange($event)"
+            (columnsApply)="onColumnsApply($event)"
+            (columnsReset)="onColumnsReset()"
+          ></app-column-manager>
+          
           <div class="relative">
             <input 
               type="text" 
@@ -63,107 +73,51 @@
               <lucide-icon name="search" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
             </div>
           </div>
-          <div class="flex items-center space-x-2 text-sm text-fiori-subtext">
+          
+          <div class="text-sm text-fiori-subtext">
             <span>{{ filteredDescansos.length }} de {{ dataDescansos.length }} descansos</span>
           </div>
         </div>
       </div>
     </div>
-    
-    <div class="overflow-x-auto">
-      <table class="w-full">
-        <thead class="bg-fiori-muted">
-          <tr>
-            <th class="px-4 py-3 text-left text-xs font-medium text-fiori-subtext uppercase tracking-wider">
-              <input type="checkbox" class="rounded border-fiori-border text-fiori-primary focus:ring-fiori-primary">
-            </th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-fiori-subtext uppercase tracking-wider">Nombre</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-fiori-subtext uppercase tracking-wider">Horario</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-fiori-subtext uppercase tracking-wider">Duración</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-fiori-subtext uppercase tracking-wider">Tipo de Cálculo</th>
-            <th class="px-4 py-3 text-right text-xs font-medium text-fiori-subtext uppercase tracking-wider">Acciones</th>
-          </tr>
-        </thead>
-        <tbody class="bg-fiori-surface divide-y divide-fiori-border">
-          <tr *ngFor="let item of filteredDescansos; trackBy: trackByDescansoId" class="hover:bg-fiori-hover transition-colors">
-            <td class="px-4 py-3 whitespace-nowrap">
-              <input type="checkbox" class="rounded border-fiori-border text-fiori-primary focus:ring-fiori-primary">
-            </td>
-            <td class="px-4 py-3 whitespace-nowrap">
-              <div class="flex items-center">
-                <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center mr-3">
-                  <lucide-icon name="clock" class="w-4 h-4 text-fiori-primary"></lucide-icon>
-                </div>
-                <div>
-                  <div class="text-sm font-medium text-fiori-text">{{ item.alias }}</div>
-                  <div class="text-xs text-fiori-subtext">ID: {{ item.id }}</div>
-                </div>
-              </div>
-            </td>
-            <td class="px-4 py-3 whitespace-nowrap">
-              <div class="flex items-center space-x-2">
-                <div class="flex items-center space-x-1">
-                  <lucide-icon name="play" class="w-3 h-3 text-fiori-success"></lucide-icon>
-                  <span class="text-sm text-fiori-text">{{ item.periodStart | date : 'HH:mm' }}</span>
-                </div>
-                <lucide-icon name="arrow-right" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
-                <div class="flex items-center space-x-1">
-                  <lucide-icon name="square" class="w-3 h-3 text-fiori-error"></lucide-icon>
-                  <span class="text-sm text-fiori-text">{{ calcularHoraFin(extraerHora(item.periodStart), item.duration) }}</span>
-                </div>
-              </div>
-            </td>
-            <td class="px-4 py-3 whitespace-nowrap">
-              <div class="flex items-center space-x-2">
-                <lucide-icon name="timer" class="w-4 h-4 text-fiori-info"></lucide-icon>
-                <span class="text-sm font-medium text-fiori-text">{{ item.duration }} min</span>
-              </div>
-            </td>
-            <td class="px-4 py-3 whitespace-nowrap">
-              <span *ngIf="item.calcType == 0; else manualTemplate" 
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-fiori-success/10 text-fiori-success border border-fiori-success/20">
-                <lucide-icon name="zap" class="w-3 h-3 mr-1"></lucide-icon>
-                Auto Deducir
-              </span>
-              <ng-template #manualTemplate>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-fiori-warning/10 text-fiori-warning border border-fiori-warning/20">
-                  <lucide-icon name="hand" class="w-3 h-3 mr-1"></lucide-icon>
-                  Manual
-                </span>
-              </ng-template>
-            </td>
-            <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-              <div class="flex items-center justify-end space-x-2">
-                <button 
-                  (click)="openModalEditarDescanso2(item.id)" 
-                  class="inline-flex items-center p-1.5 text-fiori-primary hover:text-fiori-secondary hover:bg-fiori-primary/5 rounded-lg transition-colors" 
-                  title="Editar descanso">
-                  <lucide-icon name="edit" class="w-4 h-4"></lucide-icon>
-                </button>
-                <button 
-                  (click)="openConfirmationDialog(item.id)" 
-                  class="inline-flex items-center p-1.5 text-fiori-error hover:text-red-800 hover:bg-fiori-error/5 rounded-lg transition-colors" 
-                  title="Eliminar descanso">
-                  <lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
 
-    <!-- Estado vacío compacto -->
-    <div *ngIf="filteredDescansos.length === 0" class="text-center py-12">
-      <lucide-icon name="clock" class="w-16 h-16 text-fiori-subtext mx-auto mb-4"></lucide-icon>
-      <div class="text-lg font-medium text-fiori-text mb-2">No hay descansos registrados</div>
-      <p class="text-fiori-subtext mb-4">Los descansos que registres aparecerán aquí</p>
-      <button 
-        (click)="openModalNuevoDescanso2()" 
-        class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors">
-        <lucide-icon name="plus" class="w-4 h-4 mr-1"></lucide-icon>
-        Agregar Descanso
-      </button>
+    <!-- ag-Grid Container -->
+    <div class="relative h-[50vh]">
+      <!-- ag-Grid -->
+      <div class="ag-theme-quartz w-full h-full">
+        <ag-grid-angular
+          #agGrid
+          [columnDefs]="columnDefs"
+          [rowData]="filteredDescansos"
+          class="w-full h-full"
+          [gridOptions]="gridOptions"
+          (gridReady)="onGridReady($event)"
+        ></ag-grid-angular>
+      </div>
+
+      <!-- Estado vacío -->
+      <div
+        *ngIf="(!filteredDescansos || filteredDescansos.length === 0)"
+        class="absolute inset-0 flex items-center justify-center bg-fiori-surface"
+      >
+        <div class="text-center p-8">
+          <div class="w-16 h-16 bg-fiori-background rounded-xl flex items-center justify-center mx-auto mb-4">
+            <lucide-icon name="clock" class="w-8 h-8 text-fiori-subtext"></lucide-icon>
+          </div>
+          <div class="text-lg font-semibold text-fiori-text mb-2">
+            No hay descansos registrados
+          </div>
+          <p class="text-fiori-subtext mb-4 max-w-sm">
+            Los descansos que registres aparecerán aquí
+          </p>
+          <button 
+            (click)="openModalNuevoDescanso2()" 
+            class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors">
+            <lucide-icon name="plus" class="w-4 h-4 mr-1"></lucide-icon>
+            Agregar Descanso
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 

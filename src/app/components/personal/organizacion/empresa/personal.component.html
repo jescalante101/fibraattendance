@@ -1,64 +1,124 @@
-<div class="border-b px-4 mb-5">
-  <!-- Cabecera en card-fiori -->
-  <div class="card-fiori flex justify-between items-center mb-4">
-    <span class="text-title">Empresas</span>
-    <div class="flex gap-2">
-      <button class="" mat-stroked-button>
-        <small>Nuevo</small>
-      </button>
-      <button class="" mat-stroked-button>
-        <small>Borrar</small>
-      </button>
+<div class="w-full mx-auto p-6 bg-fiori-background min-h-screen">
+  <!-- Header compacto -->
+  <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border p-3 mb-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+          <lucide-icon name="building" class="w-4 h-4 text-fiori-primary"></lucide-icon>
+        </div>
+        <div>
+          <div class="text-lg font-semibold text-fiori-text">
+            Gestión de Empresas
+          </div>
+          <div class="text-xs text-fiori-subtext">
+            {{ dataCompany.length }} empresa{{ dataCompany.length !== 1 ? 's' : '' }} registrada{{ dataCompany.length !== 1 ? 's' : '' }}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Botones de acción compactos -->
+    <div class="mt-3 pt-3 border-t border-fiori-border">
+      <div class="flex items-center space-x-3">
+        <button
+          (click)="newCompany()"
+          class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors"
+        >
+          <lucide-icon name="plus" class="w-4 h-4 mr-1"></lucide-icon>
+          Nueva Empresa
+        </button>
+        
+        <button
+          (click)="deleteSelected()"
+          class="inline-flex items-center px-3 py-1.5 bg-fiori-error text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+        >
+          <lucide-icon name="trash-2" class="w-4 h-4 mr-1"></lucide-icon>
+          Eliminar Seleccionadas
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Tabla -->
-  <div class="card-fiori overflow-auto">
-    <table class="min-w-full text-xs text-left text-fiori-text bg-fiori-surface">
-      <thead class="bg-fiori-muted text-[11px] uppercase text-fiori-subtext">
-        <tr>
-          <th class="px-3 py-2 whitespace-nowrap">RUC</th>
-          <th class="px-3 py-2 whitespace-nowrap">Nombre</th>
-          <th class="px-3 py-2 whitespace-nowrap">País</th>
-          <th class="px-3 py-2 whitespace-nowrap">Ciudad</th>
-          <th class="px-3 py-2 whitespace-nowrap">Fax</th>
-          <th class="px-3 py-2 whitespace-nowrap">Provincia</th>
-          <th class="px-3 py-2 whitespace-nowrap">Correo Electrónico</th>
-          <th class="px-3 py-2 whitespace-nowrap">Teléfono</th>
-          <th class="px-3 py-2 whitespace-nowrap">Código Postal</th>
-          <th class="px-3 py-2 whitespace-nowrap"># Departamentos</th>
-          <th class="px-3 py-2 whitespace-nowrap">Dirección</th>
-          <th class="px-3 py-2"></th>
-        </tr>
-      </thead>
-      <tbody *ngIf="dataCompany.length > 0; else noData" class="divide-y divide-fiori-border">
-        <tr *ngFor="let item of dataCompany" class="hover:bg-fiori-hover transition">
-          <td class="px-3 py-2 font-medium">{{ item.companyCode }}</td>
-          <td class="px-3 py-2">{{ item.companyName }}</td>
-          <td class="px-3 py-2">{{ item.country }}</td>
-          <td class="px-3 py-2">{{ item.city }}</td>
-          <td class="px-3 py-2">{{ item.fax }}</td>
-          <td class="px-3 py-2">{{ item.state }}</td>
-          <td class="px-3 py-2">{{ item.email }}</td>
-          <td class="px-3 py-2">{{ item.phone }}</td>
-          <td class="px-3 py-2">{{ item.postalCode }}</td>
-          <td class="px-3 py-2">{{ item.cantidadDepartamentos }}</td>
-          <td class="px-3 py-2">{{ item.address }}</td>
-          <td class="px-3 py-2 flex gap-1">
-            <button mat-icon-button class="text-fiori-primary hover:bg-fiori-hover rounded-fiori" aria-label="Editar">
-              <mat-icon fontIcon="edit"></mat-icon>
-            </button>
-            <button mat-icon-button class="text-fiori-error hover:bg-fiori-hover rounded-fiori" aria-label="Eliminar">
-              <mat-icon fontIcon="delete"></mat-icon>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-      <ng-template #noData>
-        <tr>
-          <td colspan="13" class="text-center py-4 text-fiori-subtext">No se encontraron datos.</td>
-        </tr>
-      </ng-template>
-    </table>
+  <!-- ag-Grid de empresas -->
+  <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden">
+    <!-- Header con información y controles -->
+    <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <lucide-icon name="table" class="w-5 h-5 text-fiori-primary"></lucide-icon>
+          <div>
+            <div class="text-lg font-semibold text-fiori-text">Lista de Empresas</div>
+            <div class="text-xs text-fiori-subtext">Gestión profesional con ag-Grid</div>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <!-- Gestor de Columnas -->
+          <app-column-manager
+            *ngIf="tableColumns.length > 0"
+            [config]="columnManagerConfig"
+            [columns]="tableColumns"
+            [dataSource]="dataCompany"
+            (columnChange)="onColumnManagerChange($event)"
+            (columnsApply)="onColumnsApply($event)"
+            (columnsReset)="onColumnsReset()"
+          ></app-column-manager>
+          
+          <div class="text-sm text-fiori-subtext">
+            Mostrando {{ dataCompany.length }} empresas
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ag-Grid Container -->
+    <div class="relative h-96">
+      <!-- Loading Overlay -->
+      <div
+        *ngIf="loading"
+        class="absolute inset-0 z-10 bg-white/80 backdrop-blur-sm flex items-center justify-center"
+      >
+        <div class="flex flex-col items-center">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-fiori-primary mb-2"></div>
+          <p class="text-sm text-fiori-text font-medium">Cargando empresas...</p>
+        </div>
+      </div>
+
+      <!-- ag-Grid -->
+      <div class="ag-theme-quartz w-full h-full">
+        <ag-grid-angular
+          #agGrid
+          [columnDefs]="columnDefs"
+          [rowData]="dataCompany"
+          class="w-full h-full"
+          [gridOptions]="gridOptions"
+          (gridReady)="onGridReady($event)"
+        ></ag-grid-angular>
+      </div>
+
+      <!-- Estado vacío -->
+      <div
+        *ngIf="!loading && (!dataCompany || dataCompany.length === 0)"
+        class="absolute inset-0 flex items-center justify-center bg-fiori-surface"
+      >
+        <div class="text-center p-8">
+          <div class="w-16 h-16 bg-fiori-background rounded-xl flex items-center justify-center mx-auto mb-4">
+            <lucide-icon name="building" class="w-8 h-8 text-fiori-subtext"></lucide-icon>
+          </div>
+          <div class="text-lg font-semibold text-fiori-text mb-2">
+            No hay empresas registradas
+          </div>
+          <p class="text-fiori-subtext mb-4 max-w-sm">
+            Las empresas registradas en el sistema aparecerán aquí
+          </p>
+          <button
+            (click)="newCompany()"
+            class="inline-flex items-center px-4 py-2 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors shadow-fioriSm"
+          >
+            <lucide-icon name="plus" class="w-4 h-4 mr-2"></lucide-icon>
+            Registrar Primera Empresa
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

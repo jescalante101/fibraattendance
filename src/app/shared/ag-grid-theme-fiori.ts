@@ -1,13 +1,5 @@
 // ag-grid-theme-fiori.ts - Tema SAP Fiori profesional y personalizado para ag-Grid
-import { ColDef, GridOptions, SideBarDef, themeBalham, themeQuartz, GridApi, GridReadyEvent, FirstDataRenderedEvent, GridSizeChangedEvent, RowHeightParams, Column } from 'ag-grid-community';
-
-/**
- * =================================================================================
- * THEME FIORI PARAMS
- * Basado en themeQuartz y alineado con tailwind.config.js
- * Documentación de variables: https://www.ag-grid.com/angular-data-grid/theming-parameters/
- * =================================================================================
- */
+import { ColDef, GridOptions,    GridApi, GridReadyEvent, FirstDataRenderedEvent, GridSizeChangedEvent, RowHeightParams, Column } from 'ag-grid-community';
 
 /**
  * =================================================================================

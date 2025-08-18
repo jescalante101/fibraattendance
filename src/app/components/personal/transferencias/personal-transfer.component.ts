@@ -499,7 +499,7 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
         maxWidth: 200,
         cellRenderer: (params: any) => {
           return `<div class="flex items-center">
-            <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center mr-2">
+            <div class=" h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center mr-2">
               <span class="text-xs font-medium text-fiori-primary">#${params.value}</span>
             </div>
           </div>`;
@@ -577,8 +577,7 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
       {
         field: 'endDate',
         headerName: 'Fecha Fin',
-        minWidth: 120,
-        maxWidth: 150,
+       
         cellRenderer: (params: any) => {
           if (!params.value) {
             return `<span class="text-fiori-info font-medium">Permanente</span>`;

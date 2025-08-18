@@ -10,6 +10,7 @@ import { WeeklyAttendanceReportData } from 'src/app/core/models/report/weekly-at
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 import { AG_GRID_LOCALE_ES } from 'src/app/ag-grid-locale.es';
+import { createFioriGridOptions, localeTextFiori } from 'src/app/shared/ag-grid-theme-fiori';
 
 
 @Component({
@@ -28,17 +29,12 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
   columnDefs: ColDef[] = [];
   rowData: any[] = [];
   gridOptions: GridOptions = {
-    theme: 'legacy', // Usar temas CSS legacy (ag-grid.css, ag-theme-alpine.css)
-    defaultColDef: {
-      sortable: true,
-      filter: true,
-      resizable: true,
-      minWidth: 50
-    },
-    localeText: AG_GRID_LOCALE_ES,
+    ...createFioriGridOptions(),
+    // Configuraciones específicas para el reporte mensual
     suppressHorizontalScroll: false,
-    // enableRangeSelection: true, // Comentado: requiere AG-Grid Enterprise
-    rowSelection: 'multiple'
+    rowSelection: 'multiple',
+    rowHeight: 40,
+    headerHeight: 50
   };
   
   // Datos del reporte 
@@ -269,7 +265,7 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
     weeklyData.content.weekGroups.forEach(weekGroup => {
       // Crear grupo de columnas para cada semana
       const weekColumnGroup: ColGroupDef = {
-        headerName: `SEMANA N° ${weekGroup.weekNumber}`,
+        headerName: `SEM ${weekGroup.weekNumber} (${this.getWeekDateRange(weekGroup)})`,
         headerClass: 'week-header',
         children: [
           // Columna TURNO para cada semana
@@ -404,34 +400,72 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
       dateColumns.push(weekColumnGroup);
     });
     
-    // Columna de totales globales
-    dateColumns.push({
-      headerName: 'TOTALES<br>H.TRAB | H.EXTRA',
-      field: 'globalTotals',
-      width: 120,
-      pinned: 'right',
-      headerClass: 'totals-header',
-      cellStyle: { 
-        textAlign: 'center', 
-        fontSize: '11px', 
-        fontWeight: 'bold',
-        backgroundColor: '#f0fdf4',
-        borderLeft: '2px solid #10b981'
-      },
-      cellRenderer: (params: any) => {
-        const totals = params.data.globalTotals;
-        if (totals) {
-          const formatHours = (hours: number) => {
-            if (!hours) return '0:00';
-            const h = Math.floor(hours);
-            const m = Math.round((hours - h) * 60);
-            return `${h}:${m.toString().padStart(2, '0')}`;
-          };
-          return `${formatHours(totals.totalHoras)} | ${formatHours(totals.totalExtras)}`;
-        }
-        return '0:00 | 0:00';
-      }
-    });
+    // Grupo de totales generales separado en dos columnas
+    const totalGeneralesGroup: ColGroupDef = {
+      headerName: 'TOTALES GENERALES',
+      headerClass: 'general-totals-header',
+      children: [
+        {
+          field: 'totalHoras',
+          headerName: 'H. Trabajo',
+          width: 100,
+          pinned: 'right',
+          cellStyle: { 
+            textAlign: 'center', 
+            fontSize: '11px', 
+            fontWeight: 'bold',
+            backgroundColor: '#ecfdf5',
+            color: '#16a34a'
+          },
+          cellRenderer: (params: any) => {
+            const totals = params.data.globalTotals;
+            const hours = totals?.totalHoras || 0;
+            const formatHours = (h: number) => {
+              if (!h) return '0:00';
+              const hInt = Math.floor(h);
+              const m = Math.round((h - hInt) * 60);
+              return `${hInt}:${m.toString().padStart(2, '0')}`;
+            };
+            return `<div class="flex items-center justify-center gap-1">
+              <svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>${formatHours(hours)}</span>
+            </div>`;
+          }
+        } as ColDef,
+        {
+          field: 'totalExtras',
+          headerName: 'H. Extras',
+          width: 100,
+          pinned: 'right',
+          cellStyle: { 
+            textAlign: 'center', 
+            fontSize: '11px', 
+            fontWeight: 'bold',
+            backgroundColor: '#fff7ed',
+            color: '#ea580c'
+          },
+          cellRenderer: (params: any) => {
+            const totals = params.data.globalTotals;
+            const hours = totals?.totalExtras || 0;
+            const formatHours = (h: number) => {
+              if (!h) return '0:00';
+              const hInt = Math.floor(h);
+              const m = Math.round((h - hInt) * 60);
+              return `${hInt}:${m.toString().padStart(2, '0')}`;
+            };
+            return `<div class="flex items-center justify-center gap-1">
+              <svg class="w-3 h-3 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>${formatHours(hours)}</span>
+            </div>`;
+          }
+        } as ColDef
+      ]
+    };
+    dateColumns.push(totalGeneralesGroup);
     return dateColumns;
   }
 
@@ -469,6 +503,11 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
 
       // Agregar totales globales
       row.globalTotals = employee.globalTotals;
+      
+      // Agregar campos separados para las nuevas columnas de totales
+      row.totalHoras = employee.globalTotals?.totalHoras || 0;
+      row.totalExtras = employee.globalTotals?.totalExtras || 0;
+      
       return row;
 
     });
@@ -635,6 +674,22 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.showSedeDropdown = false;
     }, 150);
+  }
+
+  // Helper method para obtener el rango de fechas de una semana
+  getWeekDateRange(weekGroup: any): string {
+    if (!weekGroup.dates || weekGroup.dates.length === 0) {
+      return '';
+    }
+    
+    const firstDate = new Date(weekGroup.dates[0]);
+    const lastDate = new Date(weekGroup.dates[weekGroup.dates.length - 1]);
+    
+    const formatDate = (date: Date) => {
+      return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+    };
+    
+    return `${formatDate(firstDate)} - ${formatDate(lastDate)}`;
   }
 
 }

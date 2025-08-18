@@ -3,11 +3,47 @@
 }
 
 /* ========================================
-   SAP FIORI ELEGANT STYLING FOR AG-GRID
+   SAP FIORI STYLING FOR AG-GRID QUARTZ
    ======================================== */
 
-::ng-deep .ag-theme-alpine {
-  /* Variables Fiori personalizadas */
+/* Vertical centering for ag-Grid cells */
+:host ::ng-deep .ag-cell-vertical-center {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  height: 100% !important;
+}
+
+/* Center content for specific columns */
+:host ::ng-deep .ag-cell[col-id="nroDoc"],
+:host ::ng-deep .ag-cell[col-id="sede"],
+:host ::ng-deep .ag-cell[col-id="totalHoras"],
+:host ::ng-deep .ag-cell[col-id="horasExtras"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Left align for name columns */
+:host ::ng-deep .ag-cell[col-id="colaborador"],
+:host ::ng-deep .ag-cell[col-id="area"],
+:host ::ng-deep .ag-cell[col-id="cargo"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+/* Center all time and data cells */
+:host ::ng-deep .ag-cell[col-id^="entrada_"],
+:host ::ng-deep .ag-cell[col-id^="salida_"],
+:host ::ng-deep .ag-cell[col-id^="week_"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+::ng-deep .ag-theme-quartz {
+  /* Variables Fiori personalizadas para Quartz */
   --ag-background-color: #ffffff;
   --ag-foreground-color: #32363a;
   --ag-border-color: #d9d9d9;
@@ -17,7 +53,7 @@
   --ag-row-hover-color: #e3f2fd;
   --ag-selected-row-background-color: #bbdefb;
   --ag-font-size: 13px;
-  --ag-font-family: 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  --ag-font-family: 'Segoe UI', '72', -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* Fuente y tamaño refinado */
   font-family: var(--ag-font-family);

@@ -1,7 +1,41 @@
-/* Estilos para AG-Grid con temática Fiori (Naranja) */
-:host ::ng-deep .ag-theme-alpine {
-    --ag-header-height: 42px;
-    --ag-header-group-height: 48px; 
+/* Vertical centering for ag-Grid cells */
+:host ::ng-deep .ag-cell-vertical-center {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  height: 100% !important;
+}
+
+/* Center content for specific columns */
+:host ::ng-deep .ag-cell[col-id="itemNumber"],
+:host ::ng-deep .ag-cell[col-id="planilla"],
+:host ::ng-deep .ag-cell[col-id="nroDoc"],
+:host ::ng-deep .ag-cell[col-id="fechaIngreso"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Left align for name columns */
+:host ::ng-deep .ag-cell[col-id="colaborador"],
+:host ::ng-deep .ag-cell[col-id="area"],
+:host ::ng-deep .ag-cell[col-id="cargo"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+/* Center all time and data cells */
+:host ::ng-deep .ag-cell[col-id^="week_"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Estilos para AG-Grid con temática Fiori Quartz (Centro de Costos - Naranja) */
+:host ::ng-deep .ag-theme-quartz {
+    --ag-header-height: 50px;
+    --ag-header-group-height: 55px; 
     --ag-header-background-color: #f9f9f9;
     --ag-header-foreground-color: #32363a;
     --ag-border-color: #d1d1d1;
@@ -27,14 +61,14 @@
     color: #0854a0; /* Azul Fiori secundario para contraste */
 }
 
-/* Estilo para los encabezados de semana (Naranja) */
+/* Estilo para los encabezados de semana (Naranja SAP Fiori) */
 :host ::ng-deep .week-header {
-    background-color: #fff7ed; /* Naranja muy claro */
-    border-bottom: 2px solid #ea580c; /* Naranja principal */
+    background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%) !important;
+    border-bottom: 2px solid #ea580c !important; /* Naranja SAP Fiori */
 }
 :host ::ng-deep .week-header .ag-header-group-cell-label {
     font-weight: 700;
-    color: #ea580c; /* Naranja principal */
+    color: #ea580c !important; /* Naranja SAP Fiori */
     font-size: 0.875rem;
     justify-content: center;
 }

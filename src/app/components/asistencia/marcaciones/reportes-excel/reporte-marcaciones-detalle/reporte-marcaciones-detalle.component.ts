@@ -10,6 +10,7 @@ import { MarkingsReportData } from 'src/app/core/models/report/markings-report.m
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 import { AG_GRID_LOCALE_ES } from 'src/app/ag-grid-locale.es';
+import { createFioriGridOptions, localeTextFiori } from 'src/app/shared/ag-grid-theme-fiori';
 
 @Component({
   selector: 'app-reporte-marcaciones-detalle',
@@ -27,17 +28,12 @@ export class ReporteMarcacionesDetalleComponent implements OnInit, OnDestroy {
   columnDefs: (ColDef | ColGroupDef)[] = [];
   rowData: any[] = [];
   gridOptions: GridOptions = {
-    theme: 'legacy', // Usar temas CSS legacy (ag-grid.css, ag-theme-alpine.css)
-    defaultColDef: {
-      sortable: true,
-      filter: true,
-      resizable: true,
-      minWidth: 50
-    },
-    localeText: AG_GRID_LOCALE_ES,
+    ...createFioriGridOptions(),
+    // Configuraciones específicas para el reporte marcaciones detalle
     suppressHorizontalScroll: false,
-    // enableRangeSelection: true, // Comentado: requiere AG-Grid Enterprise
-    rowSelection: 'multiple'
+    rowSelection: 'multiple',
+    rowHeight: 40,
+    headerHeight: 50
   };
 
   // Datos del reporte

@@ -11,6 +11,7 @@ import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, ColGroupDef, GridOptions, GridReadyEvent, GridApi } from 'ag-grid-community';
 import { AG_GRID_LOCALE_ES } from 'src/app/ag-grid-locale.es';
+import { createFioriGridOptions, localeTextFiori } from 'src/app/shared/ag-grid-theme-fiori';
 
 // Usamos las interfaces del backend con extensiones para funcionalidades adicionales
 export interface EmployeePivotData extends BackendEmployeePivotData {
@@ -745,20 +746,10 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
   }
 
   private setupGridOptions(): void {
+    // Usar createFioriGridOptions como base y sobrescribir configuraciones específicas
     this.gridOptions = {
-      defaultColDef: {
-        sortable: true,
-        filter: true,
-        resizable: true,
-        minWidth: 80,
-        // Auto-size columns to content
-        suppressSizeToFit: false
-      },
-      localeText: AG_GRID_LOCALE_ES,
-      rowSelection: 'multiple',
-      // enableRangeSelection: true, // Comentado: requiere AG-Grid Enterprise
-      suppressMenuHide: true,
-      animateRows: true,
+      ...createFioriGridOptions(),
+      // Configuraciones específicas para el reporte de asistencia
       rowHeight: 50,
       headerHeight: 60,
       suppressHorizontalScroll: false,
@@ -849,7 +840,7 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
 
         // Grupo de totales semanales
         const weekTotalsGroup: ColGroupDef = {
-          headerName: `Semana ${week.weekKey.split('-W')[1]}`,
+          headerName: `Sem ${week.weekKey.split('-W')[1]} (${this.getWeekLabel(week)})`,
           headerClass: 'week-totals-header',
           children: [
             {

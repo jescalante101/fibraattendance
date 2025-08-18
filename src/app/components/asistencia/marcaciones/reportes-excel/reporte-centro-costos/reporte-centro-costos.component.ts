@@ -10,6 +10,7 @@ import { CostCenterReportData } from 'src/app/core/models/report/cost-center-rep
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 import { AG_GRID_LOCALE_ES } from 'src/app/ag-grid-locale.es';
+import { createFioriGridOptions, localeTextFiori } from 'src/app/shared/ag-grid-theme-fiori';
 
 
 @Component({
@@ -28,17 +29,12 @@ export class ReporteCentroCostosComponent implements OnInit, OnDestroy {
   columnDefs: (ColDef | ColGroupDef)[] = [];
   rowData: any[] = [];
   gridOptions: GridOptions = {
-    theme: 'legacy', // Usar temas CSS legacy (ag-grid.css, ag-theme-alpine.css)
-    defaultColDef: {
-      sortable: true,
-      filter: true,
-      resizable: true,
-      minWidth: 50
-    },
-    localeText: AG_GRID_LOCALE_ES,
+    ...createFioriGridOptions(),
+    // Configuraciones específicas para el reporte centro de costos
     suppressHorizontalScroll: false,
-    // enableRangeSelection: true, // Comentado: requiere AG-Grid Enterprise
-    rowSelection: 'multiple'
+    rowSelection: 'multiple',
+    rowHeight: 40,
+    headerHeight: 50
   };
 
   // Datos del reporte
@@ -262,7 +258,7 @@ export class ReporteCentroCostosComponent implements OnInit, OnDestroy {
       {
         headerName: 'CARGO',
         field: 'cargo',
-        width: 120,
+        width: 210,
         headerClass: 'fiori-header'
       },
       {
@@ -293,7 +289,7 @@ export class ReporteCentroCostosComponent implements OnInit, OnDestroy {
     
     this.reportData.content.weekGroups.forEach(weekGroup => {
       const weekColumnGroup: ColGroupDef = {
-        headerName: `SEMANA N° ${weekGroup.weekNumber}`,
+        headerName: `SEM ${weekGroup.weekNumber} (${this.getWeekDateRange(weekGroup)})`,
         headerClass: 'week-header',
         children: [
           {
@@ -449,6 +445,22 @@ export class ReporteCentroCostosComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.showSedeDropdown = false;
     }, 150);
+  }
+
+  // Helper method para obtener el rango de fechas de una semana
+  getWeekDateRange(weekGroup: any): string {
+    if (!weekGroup.dates || weekGroup.dates.length === 0) {
+      return '';
+    }
+    
+    const firstDate = new Date(weekGroup.dates[0]);
+    const lastDate = new Date(weekGroup.dates[weekGroup.dates.length - 1]);
+    
+    const formatDate = (date: Date) => {
+      return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+    };
+    
+    return `${formatDate(firstDate)} - ${formatDate(lastDate)}`;
   }
 
 }

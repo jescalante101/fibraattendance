@@ -1,0 +1,74 @@
+/* Vertical centering for ag-Grid cells */
+:host ::ng-deep .ag-cell {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  height: 100% !important;
+}
+
+/* Center content for specific columns */
+:host ::ng-deep .ag-cell[col-id="punchState"],
+:host ::ng-deep .ag-cell[col-id="actions"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Left align for text columns */
+:host ::ng-deep .ag-cell[col-id="nroDoc"],
+:host ::ng-deep .ag-cell[col-id="fullName"],
+:host ::ng-deep .ag-cell[col-id="punchDate"],
+:host ::ng-deep .ag-cell[col-id="punchHour"],
+:host ::ng-deep .ag-cell[col-id="applyReason"],
+:host ::ng-deep .ag-cell[col-id="applyTime"],
+:host ::ng-deep .ag-cell[col-id="auditTime"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+/* Estilos para AG-Grid con tem�tica Fiori Quartz (Marcaci�n Manual - Azul) */
+:host ::ng-deep .ag-theme-quartz {
+    --ag-header-height: 50px;
+    --ag-header-background-color: #f9f9f9;
+    --ag-header-foreground-color: #32363a;
+    --ag-border-color: #d1d1d1;
+    --ag-font-family: "72", "Segoe UI", Arial, sans-serif;
+    --ag-font-size: 0.875rem;
+    --ag-row-height: 50px;
+}
+
+/* Centrado vertical y padding para todas las etiquetas de encabezado */
+:host ::ng-deep .ag-header-cell-label {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    color: #0854a0; /* Azul Fiori secundario */
+}
+
+/* Hover effects for rows */
+:host ::ng-deep .ag-row:hover {
+    background-color: #f8fafc !important;
+}
+
+/* Button styling within ag-Grid */
+:host ::ng-deep .ag-btn-edit,
+:host ::ng-deep .ag-btn-delete {
+    cursor: pointer;
+    z-index: 1;
+}
+
+:host ::ng-deep .ag-btn-edit:hover {
+    background-color: #f0f9ff !important;
+    border-color: #0070f2 !important;
+}
+
+:host ::ng-deep .ag-btn-delete:hover {
+    background-color: #fef2f2 !important;
+    border-color: #dc2626 !important;
+}

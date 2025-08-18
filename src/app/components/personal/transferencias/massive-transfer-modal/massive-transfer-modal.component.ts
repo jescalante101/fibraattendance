@@ -14,6 +14,9 @@ import { ToastService } from '../../../../shared/services/toast.service';
 import { Employee } from '../../empleado/empleado/model/employeeDto';
 import { AuthService } from '../../../../core/services/auth.service';
 import { DateRange } from '../../../../shared/components/date-range-picker/date-range-picker.component';
+import { AppUserService, SedeArea, Area, CostCenter as OriginCostCenter } from '../../../../core/services/app-user.services';
+import { SedeAreaCostoService } from '../../../../core/services/sede-area-costo.service';
+import { SedeAreaCosto } from '../../../../models/site-area-ccost.model';
 
 
 export interface MassiveTransferModalData {
@@ -35,9 +38,14 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   data: MassiveTransferModalData = { mode: 'massive' }; // Datos pasados desde el modal service
   modalRef: any; // Referencia al modal padre
 
-  // Configuración de transferencia (simplificada)
+  // Configuración de transferencia (con origen y destino)
   transferConfig = {
-    // Ubicación destino
+    // ORIGEN
+    fromBranchId: '',
+    fromAreaId: '',
+    fromCostCenterId: '',
+    
+    // DESTINO
     toBranchId: '',
     toAreaId: '',
     toCostCenterId: '',
@@ -70,22 +78,40 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   loadingEmployees = false;
   private employeesLoaded = false; // Flag para evitar cargas duplicadas
 
-  // Estados para autocompletes (simplificado)
+  // Estados para autocompletes ORIGEN
+  showFromSedeDropdown = false;
+  showFromAreaDropdown = false;
+  showFromCostCenterDropdown = false;
+  
+  // Estados para autocompletes DESTINO
   showToSedeDropdown = false;
   showToAreaDropdown = false;
   showToCostCenterDropdown = false;
 
-  // Listas para autocompletes
+  // Listas para ORIGEN (desde AppUserService)
+  originSedesAreas: SedeArea[] = [];
+  filteredOriginAreas: Area[] = [];
+  selectedOriginCostCenters: OriginCostCenter[] = [];
+  
+  // Listas para DESTINO (desde SedeAreaCostoService)
+  destinationSedesAreas: SedeAreaCosto[] = [];
+  filteredDestinationAreas: SedeAreaCosto[] = [];
+  filteredDestinationCostCenters: SedeAreaCosto[] = [];
+
+  // Listas para autocompletes (legacy - se mantendrán por compatibilidad)
   sedesList: CategoriaAuxiliar[] = [];
   areasList: RhArea[] = [];
   costCentersList: CostCenter[] = [];
 
-  // Listas filtradas para autocompletes (simplificado)
+  // Listas filtradas para autocompletes DESTINO
   filteredToSedesList: CategoriaAuxiliar[] = [];
   filteredToAreasList: RhArea[] = [];
   filteredToCostCentersList: CostCenter[] = [];
 
-  // Términos de búsqueda para autocompletes (simplificado)
+  // Términos de búsqueda para autocompletes
+  fromSedeFilterTerm = '';
+  fromAreaFilterTerm = '';
+  fromCostCenterFilterTerm = '';
   toSedeFilterTerm = '';
   toAreaFilterTerm = '';
   toCostCenterFilterTerm = '';
@@ -213,16 +239,19 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
     private personService: PersonService,
     private toastService: ToastService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private appUserService: AppUserService,
+    private sedeAreaCostoService: SedeAreaCostoService
   ) {}
 
   ngOnInit(): void {
     console.log('🚀 MassiveTransferModal: Initializing...');
     this.headerConfig = this.headerConfigService.loadHeaderConfig();
     this.initializeForm();
-    this.loadAutocompleteData();
     this.loadUserData();
-    this.loadAllEmployees();
+    this.loadOriginData();
+    this.loadDestinationData();
+    this.loadAutocompleteData(); // Legacy data for compatibility
     console.log('✅ MassiveTransferModal: Initialized successfully');
   }
 
@@ -240,8 +269,50 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
     const user=this.authService.getCurrentUser();
     if(user){
       this.userLogin=user.username;
-
     }
+  }
+
+  /**
+   * Cargar datos de ORIGEN (sedes/áreas del usuario)
+   */
+  private loadOriginData(): void {
+    const user = this.authService.getCurrentUser();
+    if (!user) {
+      console.warn('No user logged in');
+      return;
+    }
+
+    this.appUserService.getSedesAreas(user.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (sedesAreas) => {
+          this.originSedesAreas = sedesAreas;
+          console.log('✅ Origin data loaded:', sedesAreas);
+        },
+        error: (error) => {
+          console.error('Error loading origin data:', error);
+          this.toastService.error('Error de Datos', 'No se pudieron cargar las ubicaciones de origen disponibles');
+        }
+      });
+  }
+
+  /**
+   * Cargar datos de DESTINO (todas las sedes/áreas activas)
+   */
+  private loadDestinationData(): void {
+    this.sedeAreaCostoService.getAll()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (sedesAreasCosto) => {
+          // Filtrar solo los activos
+          this.destinationSedesAreas = sedesAreasCosto.filter(item => item.active === 'Y');
+          console.log('✅ Destination data loaded:', this.destinationSedesAreas);
+        },
+        error: (error) => {
+          console.error('Error loading destination data:', error);
+          this.toastService.error('Error de Datos', 'No se pudieron cargar las ubicaciones de destino disponibles');
+        }
+      });
   }
 
   /**
@@ -491,17 +562,13 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Filtrar áreas por término de búsqueda
+   * Filtrar áreas del origen por término de búsqueda
    */
   onAreaSearchChange(): void {
-    if (!this.areaSearchTerm.trim()) {
-      this.filteredAreas = [...this.filterAreas];
-    } else {
-      const searchTerm = this.areaSearchTerm.toLowerCase();
-      this.filteredAreas = this.filterAreas.filter(area =>
-        area.descripcion.toLowerCase().includes(searchTerm)
-      );
-    }
+    // Este método ya no es necesario porque el filtro de áreas ahora se maneja
+    // directamente a través del origen seleccionado en filteredOriginAreas
+    // Mantenemos el método para evitar errores pero no hace nada
+    console.log('Area search changed:', this.areaSearchTerm);
   }
 
   /**
@@ -879,5 +946,196 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
 
   trackByCostCenterId(index: number, costCenter: CostCenter): string {
     return costCenter.ccostoId;
+  }
+
+  // ===============================
+  // ORIGIN METHODS - SEDE
+  // ===============================
+
+  onOriginSedeChange(sedeId: string): void {
+    console.log('Origin sede changed:', sedeId);
+    
+    this.transferConfig.fromBranchId = sedeId;
+    this.transferConfig.fromAreaId = '';
+    this.transferConfig.fromCostCenterId = '';
+    
+    // Filtrar áreas para la sede seleccionada
+    const selectedSede = this.originSedesAreas.find(s => s.siteId === sedeId);
+    if (selectedSede) {
+      this.filteredOriginAreas = selectedSede.areas;
+      this.selectedOriginCostCenters = selectedSede.costCenters;
+    } else {
+      this.filteredOriginAreas = [];
+      this.selectedOriginCostCenters = [];
+    }
+    
+    // Cargar empleados del origen seleccionado
+    this.loadEmployeesFromOrigin();
+  }
+
+  onOriginAreaChange(areaId: string): void {
+    console.log('Origin area changed:', areaId);
+    this.transferConfig.fromAreaId = areaId;
+    this.transferConfig.fromCostCenterId = '';
+    
+    // Cargar empleados del área específica
+    this.loadEmployeesFromOrigin();
+  }
+
+  onOriginCostCenterChange(costCenterId: string): void {
+    console.log('Origin cost center changed:', costCenterId);
+    this.transferConfig.fromCostCenterId = costCenterId;
+    
+    // Opcional: recargar empleados si es necesario
+    this.loadEmployeesFromOrigin();
+  }
+
+  // ===============================
+  // DESTINATION METHODS - SEDE/AREA
+  // ===============================
+
+  onDestinationSedeChange(sedeId: string): void {
+    console.log('Destination sede changed:', sedeId);
+    
+    this.transferConfig.toBranchId = sedeId;
+    this.transferConfig.toAreaId = '';
+    this.transferConfig.toCostCenterId = '';
+    
+    // Filtrar áreas para la sede de destino seleccionada
+    this.filteredDestinationAreas = this.destinationSedesAreas
+      .filter(item => item.siteId === sedeId);
+    
+    this.filteredDestinationCostCenters = [];
+  }
+
+  onDestinationAreaChange(areaId: string): void {
+    console.log('Destination area changed:', areaId);
+    this.transferConfig.toAreaId = areaId;
+    this.transferConfig.toCostCenterId = '';
+    
+    // Filtrar centros de costo para la sede/área de destino
+    this.filteredDestinationCostCenters = this.destinationSedesAreas
+      .filter(item => item.siteId === this.transferConfig.toBranchId && item.areaId === areaId);
+  }
+
+  onDestinationCostCenterChange(costCenterId: string): void {
+    console.log('Destination cost center changed:', costCenterId);
+    this.transferConfig.toCostCenterId = costCenterId;
+  }
+
+  // ===============================
+  // EMPLOYEE LOADING BASED ON ORIGIN
+  // ===============================
+
+  /**
+   * Cargar empleados basado en la selección de origen
+   */
+  private loadEmployeesFromOrigin(): void {
+    if (!this.transferConfig.fromBranchId) {
+      console.warn('No origin branch selected');
+      return;
+    }
+
+    if (!this.headerConfig?.selectedEmpresa) {
+      this.toastService.warning('Configuración Requerida', 'No hay empresa seleccionada');
+      return;
+    }
+
+    this.loadingEmployees = true;
+    this.employeesLoaded = false;
+    
+    const employeeParams: EmployeesParameters = {
+      searchText: this.employeeFilters.searchTerm || '',
+      page: 1,
+      pagesize: 1000,
+      areaId: this.transferConfig.fromAreaId || null,
+      ccostoId: this.transferConfig.fromCostCenterId || null,
+      sede: this.transferConfig.fromBranchId,
+      periodoId: this.headerConfig.selectedPeriodo?.periodoId || null,
+      planillaId: this.headerConfig.selectedPlanilla?.planillaId || null,
+      companiaId: this.headerConfig.selectedEmpresa.companiaId
+    };
+
+    console.log('Loading employees with params:', employeeParams);
+
+    this.personService.getPersonalActivo(employeeParams)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.loadingEmployees = false;
+          this.employeesLoaded = true;
+          
+          if (response.exito && response.data) {
+            const employees = response.data.items || [];
+            this.allEmployeesData = employees.map(emp => ({
+              ...emp,
+              selected: false
+            }));
+            
+            this.employeeTotalCount = response.data.totalCount || 0;
+            this.applyFiltersToGrid();
+            
+            console.log(`✅ Loaded ${this.employeeTotalCount} employees from origin`);
+            
+            this.toastService.success(
+              'Empleados Cargados', 
+              `Se encontraron ${this.employeeTotalCount} empleados en la ubicación seleccionada`
+            );
+          } else {
+            this.allEmployeesData = [];
+            this.employeeTotalCount = 0;
+            this.applyFiltersToGrid();
+            
+            this.toastService.warning(
+              'Sin Resultados',
+              'No se encontraron empleados en la ubicación seleccionada'
+            );
+          }
+        },
+        error: (error) => {
+          this.loadingEmployees = false;
+          this.employeesLoaded = false;
+          this.allEmployeesData = [];
+          this.employeeTotalCount = 0;
+          this.applyFiltersToGrid();
+          
+          this.toastService.error(
+            'Error al Cargar Empleados',
+            'No se pudieron cargar los empleados del origen seleccionado'
+          );
+        }
+      });
+  }
+
+  // ===============================
+  // HELPER METHODS
+  // ===============================
+
+  getOriginSedeName(): string {
+    if (!this.transferConfig.fromBranchId) return 'Seleccionar sede origen';
+    const sede = this.originSedesAreas.find(s => s.siteId === this.transferConfig.fromBranchId);
+    return sede?.siteName || 'Sede no encontrada';
+  }
+
+  getOriginAreaName(): string {
+    if (!this.transferConfig.fromAreaId) return 'Seleccionar área origen';
+    const area = this.filteredOriginAreas.find(a => a.areaId === this.transferConfig.fromAreaId);
+    return area?.areaName || 'Área no encontrada';
+  }
+
+  getDestinationSedeOptions(): {siteId: string, siteName: string}[] {
+    const uniqueSedes = new Map<string, string>();
+    this.destinationSedesAreas.forEach(item => {
+      uniqueSedes.set(item.siteId, item.siteName);
+    });
+    return Array.from(uniqueSedes.entries()).map(([siteId, siteName]) => ({siteId, siteName}));
+  }
+
+  getUniqueSedes(sedesAreas: SedeAreaCosto[]): {siteId: string, siteName: string}[] {
+    const uniqueSedes = new Map<string, string>();
+    sedesAreas.forEach(item => {
+      uniqueSedes.set(item.siteId, item.siteName);
+    });
+    return Array.from(uniqueSedes.entries()).map(([siteId, siteName]) => ({siteId, siteName}));
   }
 }

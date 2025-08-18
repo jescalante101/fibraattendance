@@ -27,6 +27,22 @@ export interface SelectedEmployee extends Employee {
   selected: boolean;
 }
 
+// Interfaces simplificadas para autocompletes
+export interface SimpleSedeAutocomplete {
+  categoriaAuxiliarId: string;
+  descripcion: string;
+}
+
+export interface SimpleAreaAutocomplete {
+  areaId: string;
+  descripcion: string;
+}
+
+export interface SimpleCostCenterAutocomplete {
+  ccostoId: string;
+  descripcion: string;
+}
+
 @Component({
   selector: 'app-massive-transfer-modal',
   templateUrl: './massive-transfer-modal.component.html',
@@ -104,9 +120,9 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   costCentersList: CostCenter[] = [];
 
   // Listas filtradas para autocompletes DESTINO
-  filteredToSedesList: CategoriaAuxiliar[] = [];
-  filteredToAreasList: RhArea[] = [];
-  filteredToCostCentersList: CostCenter[] = [];
+  filteredToSedesList: SimpleSedeAutocomplete[] = [];
+  filteredToAreasList: SimpleAreaAutocomplete[] = [];
+  filteredToCostCentersList: SimpleCostCenterAutocomplete[] = [];
 
   // Términos de búsqueda para autocompletes
   fromSedeFilterTerm = '';
@@ -306,6 +322,10 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
         next: (sedesAreasCosto) => {
           // Filtrar solo los activos
           this.destinationSedesAreas = sedesAreasCosto.filter(item => item.active === 'Y');
+          
+          // Inicializar las listas filtradas para autocomplete
+          this.initializeDestinationAutocompleteLists();
+          
           console.log('✅ Destination data loaded:', this.destinationSedesAreas);
         },
         error: (error) => {
@@ -313,6 +333,22 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
           this.toastService.error('Error de Datos', 'No se pudieron cargar las ubicaciones de destino disponibles');
         }
       });
+  }
+
+  /**
+   * Inicializar las listas de autocomplete para destino
+   */
+  private initializeDestinationAutocompleteLists(): void {
+    // Inicializar lista de sedes para autocomplete
+    const uniqueSedes = this.getUniqueSedes(this.destinationSedesAreas);
+    this.filteredToSedesList = uniqueSedes.map(sede => ({
+      categoriaAuxiliarId: sede.siteId,
+      descripcion: sede.siteName
+    }));
+
+    // Limpiar áreas y centros de costo (se llenarán cuando se seleccione una sede)
+    this.filteredToAreasList = [];
+    this.filteredToCostCentersList = [];
   }
 
   /**
@@ -341,7 +377,10 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (sedes) => {
           this.sedesList = sedes;
-          this.filteredToSedesList = sedes;
+          this.filteredToSedesList = sedes.map(sede => ({
+            categoriaAuxiliarId: sede.categoriaAuxiliarId,
+            descripcion: sede.descripcion
+          }));
         },
         error: (error) => {
           console.error('Error cargando sedes:', error);
@@ -839,8 +878,9 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
 
   getToSedeFilterText(): string {
     if (this.transferConfig.toBranchId) {
-      const selectedSede = this.sedesList.find(s => s.categoriaAuxiliarId === this.transferConfig.toBranchId);
-      return selectedSede?.descripcion || '';
+      const uniqueSedes = this.getUniqueSedes(this.destinationSedesAreas);
+      const selectedSede = uniqueSedes.find(s => s.siteId === this.transferConfig.toBranchId);
+      return selectedSede?.siteName || '';
     }
     return this.toSedeFilterTerm;
   }
@@ -848,16 +888,25 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   onToSedeFilterChange(event: any): void {
     const value = event.target?.value || '';
     this.toSedeFilterTerm = value;
-    this.filteredToSedesList = this.sedesList.filter(sede => 
-      sede.descripcion.toLowerCase().includes(value.toLowerCase())
-    );
+    const uniqueSedes = this.getUniqueSedes(this.destinationSedesAreas);
+    this.filteredToSedesList = uniqueSedes
+      .map(sede => ({
+        categoriaAuxiliarId: sede.siteId,
+        descripcion: sede.siteName
+      }))
+      .filter(sede => 
+        sede.descripcion.toLowerCase().includes(value.toLowerCase())
+      );
     this.showToSedeDropdown = this.filteredToSedesList.length > 0;
   }
 
-  onToSedeSelected(sede: CategoriaAuxiliar): void {
+  onToSedeSelected(sede: SimpleSedeAutocomplete): void {
     this.transferConfig.toBranchId = sede.categoriaAuxiliarId;
     this.toSedeFilterTerm = sede.descripcion;
     this.showToSedeDropdown = false;
+    
+    // Llamar al método de cambio de sede para activar el filtrado jerárquico
+    this.onDestinationSedeChange(sede.categoriaAuxiliarId);
   }
 
   onToSedeBlur(): void {
@@ -872,8 +921,8 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
 
   getToAreaFilterText(): string {
     if (this.transferConfig.toAreaId) {
-      const selectedArea = this.areasList.find(a => a.areaId === this.transferConfig.toAreaId);
-      return selectedArea?.descripcion || '';
+      const selectedArea = this.filteredDestinationAreas.find(a => a.areaId === this.transferConfig.toAreaId);
+      return selectedArea?.areaName || '';
     }
     return this.toAreaFilterTerm;
   }
@@ -881,16 +930,26 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   onToAreaFilterChange(event: any): void {
     const value = event.target?.value || '';
     this.toAreaFilterTerm = value;
-    this.filteredToAreasList = this.areasList.filter(area => 
-      area.descripcion.toLowerCase().includes(value.toLowerCase())
-    );
+    
+    // Filtrar solo las áreas de la sede seleccionada que coincidan con el término de búsqueda
+    this.filteredToAreasList = this.filteredDestinationAreas
+      .map(area => ({
+        areaId: area.areaId,
+        descripcion: area.areaName
+      }))
+      .filter(area => 
+        area.descripcion.toLowerCase().includes(value.toLowerCase())
+      );
     this.showToAreaDropdown = this.filteredToAreasList.length > 0;
   }
 
-  onToAreaSelected(area: RhArea): void {
+  onToAreaSelected(area: SimpleAreaAutocomplete): void {
     this.transferConfig.toAreaId = area.areaId;
     this.toAreaFilterTerm = area.descripcion;
     this.showToAreaDropdown = false;
+    
+    // Llamar al método de cambio de área para activar el filtrado jerárquico
+    this.onDestinationAreaChange(area.areaId);
   }
 
   onToAreaBlur(): void {
@@ -905,8 +964,8 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
 
   getToCostCenterFilterText(): string {
     if (this.transferConfig.toCostCenterId) {
-      const selectedCC = this.costCentersList.find(cc => cc.ccostoId === this.transferConfig.toCostCenterId);
-      return selectedCC?.descripcion || '';
+      const selectedCC = this.filteredDestinationCostCenters.find(cc => cc.costCenterId === this.transferConfig.toCostCenterId);
+      return selectedCC?.costCenterName || '';
     }
     return this.toCostCenterFilterTerm;
   }
@@ -914,16 +973,26 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   onToCostCenterFilterChange(event: any): void {
     const value = event.target?.value || '';
     this.toCostCenterFilterTerm = value;
-    this.filteredToCostCentersList = this.costCentersList.filter(cc => 
-      cc.descripcion.toLowerCase().includes(value.toLowerCase())
-    );
+    
+    // Filtrar solo los centros de costo de la sede/área seleccionada que coincidan con el término de búsqueda
+    this.filteredToCostCentersList = this.filteredDestinationCostCenters
+      .map(cc => ({
+        ccostoId: cc.costCenterId,
+        descripcion: cc.costCenterName
+      }))
+      .filter(cc => 
+        cc.descripcion.toLowerCase().includes(value.toLowerCase())
+      );
     this.showToCostCenterDropdown = this.filteredToCostCentersList.length > 0;
   }
 
-  onToCostCenterSelected(costCenter: CostCenter): void {
+  onToCostCenterSelected(costCenter: SimpleCostCenterAutocomplete): void {
     this.transferConfig.toCostCenterId = costCenter.ccostoId;
     this.toCostCenterFilterTerm = costCenter.descripcion;
     this.showToCostCenterDropdown = false;
+    
+    // Llamar al método de cambio de centro de costo para completar el flujo
+    this.onDestinationCostCenterChange(costCenter.ccostoId);
   }
 
   onToCostCenterBlur(): void {
@@ -1006,6 +1075,18 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
       .filter(item => item.siteId === sedeId);
     
     this.filteredDestinationCostCenters = [];
+    
+    // Actualizar listas de autocomplete
+    this.filteredToAreasList = this.filteredDestinationAreas.map(area => ({
+      areaId: area.areaId,
+      descripcion: area.areaName
+    }));
+    
+    this.filteredToCostCentersList = [];
+    
+    // Limpiar términos de búsqueda
+    this.toAreaFilterTerm = '';
+    this.toCostCenterFilterTerm = '';
   }
 
   onDestinationAreaChange(areaId: string): void {
@@ -1016,6 +1097,15 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
     // Filtrar centros de costo para la sede/área de destino
     this.filteredDestinationCostCenters = this.destinationSedesAreas
       .filter(item => item.siteId === this.transferConfig.toBranchId && item.areaId === areaId);
+    
+    // Actualizar lista de autocomplete para centros de costo
+    this.filteredToCostCentersList = this.filteredDestinationCostCenters.map(cc => ({
+      ccostoId: cc.costCenterId,
+      descripcion: cc.costCenterName
+    }));
+    
+    // Limpiar término de búsqueda
+    this.toCostCenterFilterTerm = '';
   }
 
   onDestinationCostCenterChange(costCenterId: string): void {

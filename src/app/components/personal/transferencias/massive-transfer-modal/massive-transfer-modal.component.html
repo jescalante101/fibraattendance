@@ -23,7 +23,7 @@
     </div>
     
     <!-- Configuración en Cards -->
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
       
       <!-- Card 1: Ubicación de Origen -->
       <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
@@ -94,66 +94,86 @@
         </div>
         
         <div class="space-y-3">
-          <!-- Sede Destino -->
+          <!-- Sede Destino con Autocomplete -->
           <div class="relative">
             <label class="block text-xs font-medium text-slate-600 mb-1.5">Sede Destino *</label>
-            <select 
-              [(ngModel)]="transferConfig.toBranchId"
-              (change)="onDestinationSedeChange($any($event.target).value)"
-              class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            <input 
+              type="text" 
+              [value]="getToSedeFilterText()"
+              (input)="onToSedeFilterChange($event); transferConfig.toBranchId = ''"
+              (focus)="showToSedeDropdown = true"
+              (blur)="onToSedeBlur()"
+              placeholder="Seleccionar sede..."
+              class="w-full pl-8 pr-3 py-2 text-sm border border-slate-300 rounded-lg bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               [class.border-red-300]="!transferConfig.toBranchId"
               [class.bg-red-50]="!transferConfig.toBranchId">
-              <option value="">Seleccionar sede...</option>
-              <option *ngFor="let sede of getUniqueSedes(destinationSedesAreas)" [value]="sede.siteId">
-                {{ sede.siteName }}
-              </option>
-            </select>
+            <div class="absolute left-2.5 top-1/2 transform -translate-y-1/2 mt-px">
+              <lucide-icon name="building" class="w-4 h-4 text-slate-400"></lucide-icon>
+            </div>
+            <div *ngIf="showToSedeDropdown && filteredToSedesList?.length > 0" class="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-40 overflow-y-auto">
+              <div *ngFor="let sede of filteredToSedesList; trackBy: trackBySedeId" (mousedown)="onToSedeSelected(sede)" class="px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm border-b border-slate-100 last:border-b-0">
+                <div class="font-medium text-slate-700">{{ sede.descripcion }}</div>
+              </div>
+            </div>
           </div>
           
-          <!-- Área Destino -->
+          <!-- Área Destino con Autocomplete -->
           <div class="relative">
             <label class="block text-xs font-medium text-slate-600 mb-1.5">Área Destino *</label>
-            <select 
-              [(ngModel)]="transferConfig.toAreaId"
-              (change)="onDestinationAreaChange($any($event.target).value)"
-              [disabled]="!transferConfig.toBranchId"
-              class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
+            <input 
+              type="text" 
+              [value]="getToAreaFilterText()"
+              (input)="onToAreaFilterChange($event); transferConfig.toAreaId = ''"
+              (focus)="showToAreaDropdown = true"
+              (blur)="onToAreaBlur()"
+              placeholder="Seleccionar área..."
+              class="w-full pl-8 pr-3 py-2 text-sm border border-slate-300 rounded-lg bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               [class.border-red-300]="!transferConfig.toAreaId"
               [class.bg-red-50]="!transferConfig.toAreaId">
-              <option value="">Seleccionar área...</option>
-              <option *ngFor="let area of filteredDestinationAreas" [value]="area.areaId">
-                {{ area.areaName }}
-              </option>
-            </select>
+            <div class="absolute left-2.5 top-1/2 transform -translate-y-1/2 mt-px">
+              <lucide-icon name="layers" class="w-4 h-4 text-slate-400"></lucide-icon>
+            </div>
+            <div *ngIf="showToAreaDropdown && filteredToAreasList?.length > 0" class="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-40 overflow-y-auto">
+              <div *ngFor="let area of filteredToAreasList; trackBy: trackByAreaId" (mousedown)="onToAreaSelected(area)" class="px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm border-b border-slate-100 last:border-b-0">
+                <div class="font-medium text-slate-700">{{ area.descripcion }}</div>
+              </div>
+            </div>
           </div>
-
-          <!-- Centro de Costo Destino -->
+          
+          <!-- Centro de Costo Destino con Autocomplete -->
           <div class="relative">
             <label class="block text-xs font-medium text-slate-600 mb-1.5">Centro de Costo Destino</label>
-            <select 
-              [(ngModel)]="transferConfig.toCostCenterId"
-              [disabled]="!transferConfig.toAreaId"
-              class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:cursor-not-allowed">
-              <option value="">Opcional...</option>
-              <option *ngFor="let cc of filteredDestinationCostCenters" [value]="cc.costCenterId">
-                {{ cc.costCenterName }}
-              </option>
-            </select>
+            <input 
+              type="text" 
+              [value]="getToCostCenterFilterText()"
+              (input)="onToCostCenterFilterChange($event); transferConfig.toCostCenterId = ''"
+              (focus)="showToCostCenterDropdown = true"
+              (blur)="onToCostCenterBlur()"
+              placeholder="Opcional..."
+              class="w-full pl-8 pr-3 py-2 text-sm border border-slate-300 rounded-lg bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+            <div class="absolute left-2.5 top-1/2 transform -translate-y-1/2 mt-px">
+              <lucide-icon name="target" class="w-4 h-4 text-slate-400"></lucide-icon>
+            </div>
+            <div *ngIf="showToCostCenterDropdown && filteredToCostCentersList?.length > 0" class="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-40 overflow-y-auto">
+              <div *ngFor="let cc of filteredToCostCentersList; trackBy: trackByCostCenterId" (mousedown)="onToCostCenterSelected(cc)" class="px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm border-b border-slate-100 last:border-b-0">
+                <div class="font-medium text-slate-700">{{ cc.descripcion }}</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Card 3: Configuración de Período -->
+      <!-- Card 3: Período y Observaciones -->
       <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
-        <div class="flex items-center space-x-2 mb-3">
+        <div class="flex items-center space-x-2 mb-4">
           <div class="w-6 h-6 bg-amber-100 rounded-lg flex items-center justify-center">
             <lucide-icon name="calendar" class="w-3.5 h-3.5 text-amber-600"></lucide-icon>
           </div>
-          <span class="text-sm font-medium text-slate-700">Período de Transferencia</span>
+          <span class="text-sm font-medium text-slate-700">Período y Detalles</span>
         </div>
         
-        <div class="space-y-3">
-          <!-- Fechas con componente reutilizable -->
+        <div class="space-y-4">
+          <!-- Fechas -->
           <div>
             <label class="block text-xs font-medium text-slate-600 mb-1.5">Rango de Fechas *</label>
             <app-date-range-picker
@@ -166,27 +186,21 @@
               (dateSelected)="onDatesSelected($event)"
             ></app-date-range-picker>
           </div>
-        </div>
-      </div>
-
-      <!-- Card 4: Observaciones -->
-      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
-        <div class="flex items-center space-x-2 mb-3">
-          <div class="w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center">
-            <lucide-icon name="file-text" class="w-3.5 h-3.5 text-purple-600"></lucide-icon>
-          </div>
-          <span class="text-sm font-medium text-slate-700">Observaciones</span>
-        </div>
-        
-        <div class="relative">
-          <textarea
-            [(ngModel)]="transferConfig.observations"
-            placeholder="Ingrese el motivo o detalles de la transferencia..."
-            rows="4"
-            class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none placeholder:text-slate-400"
-          ></textarea>
-          <div class="absolute bottom-2 right-2 text-xs text-slate-400">
-            {{ transferConfig.observations?.length || 0 }}/150
+          
+          <!-- Observaciones -->
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1.5">Observaciones</label>
+            <div class="relative">
+              <textarea
+                [(ngModel)]="transferConfig.observations"
+                placeholder="Ingrese el motivo o detalles de la transferencia..."
+                rows="3"
+                class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none placeholder:text-slate-400"
+              ></textarea>
+              <div class="absolute bottom-2 right-2 text-xs text-slate-400">
+                {{ transferConfig.observations?.length || 0 }}/150
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -395,40 +395,76 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   }
 
   private syncFormArray() {
+    console.log('🔄 SYNC FORM ARRAY:');
+    console.log('  - Antes de limpiar FormArray length:', this.empleados.length);
+    
     const arr = this.empleados;
     arr.clear();
+    
+    console.log('  - Después de limpiar FormArray length:', arr.length);
+    console.log('  - Personal filtrado total:', this.personalFiltrado.length);
+    console.log('  - Seleccionados en Set:', this.seleccionados.size);
+    
+    let agregados = 0;
     this.personalFiltrado.forEach(emp => {
       if (this.seleccionados.has(emp.personalId)) {
         arr.push(this.fb.control(emp.personalId));
+        agregados++;
+        console.log(`    + Agregado al FormArray: ${emp.nombres} ${emp.apellidoPaterno} (${emp.personalId})`);
       }
     });
+    
+    console.log('  - Empleados agregados al FormArray:', agregados);
+    console.log('  - FormArray final length:', arr.length);
+    console.log('  - FormArray values:', arr.value);
+    
     arr.markAsDirty();
     arr.markAsTouched();
+    console.log('====================');
   }
 
   guardarAsignacion() {
+    console.log('=== INICIO GUARDAR ASIGNACIÓN ===');
+    
     const filtro = this.filtroForm.value;
     const empleados = this.personalForm.value.empleados;
     const turno = this.turnoForm.value;
+    
+    console.log('📄 DATOS DE FORMULARIOS:');
+    console.log('  - filtroForm.value:', JSON.stringify(filtro, null, 2));
+    console.log('  - personalForm.value:', JSON.stringify(this.personalForm.value, null, 2));
+    console.log('  - turnoForm.value:', JSON.stringify(turno, null, 2));
+    
+    console.log('👥 EMPLEADOS SELECCIONADOS:');
+    console.log('  - empleados array:', empleados);
+    console.log('  - empleados length:', empleados?.length || 0);
+    console.log('  - tipo de empleados:', typeof empleados);
+    console.log('  - es array?:', Array.isArray(empleados));
+    
+    console.log('📋 ESTADO DE SELECCIÓN:');
+    console.log('  - this.seleccionados (Set):', Array.from(this.seleccionados));
+    console.log('  - this.seleccionados.size:', this.seleccionados.size);
+    console.log('  - FormArray empleados:', this.empleados.value);
+    console.log('  - FormArray length:', this.empleados.length);
     // Buscar datos de la sede y área seleccionada
     const sede = this.sedes.find(s => s.categoriaAuxiliarId === filtro.sede);
     const area = this.areasFiltradas.find(a => a.areaId === filtro.area);
     const turnoSeleccionado = this.turnos.find(t => t.id === turno.turno);
     const now = new Date().toISOString();
-    // Aquí deberías obtener el usuario logueado, por ahora lo dejamos como 'admin'
-    const createdBy = 'huali';
+  
     // Armar los registros para cada empleado seleccionado
     const registros: EmployeeScheduleAssignmentInsert[] = empleados.map((employeeId: string) => {
       // Buscar datos del empleado en la lista filtrada
       const empleado = this.personalFiltrado.find(e => e.personalId === employeeId);
       return {
+        assignmentId: 0, // Se agrega para cumplir con la interfaz
         employeeId: employeeId,
         shiftId: turnoSeleccionado ? turnoSeleccionado.id : 0,
         startDate: filtro.fechaInicio, // Ahora desde filtroForm
-        endDate: filtro.fechaFin,      // Ahora desde filtroForm
+        endDate: filtro.fechaFin || null,      // Ahora desde filtroForm
         remarks: turno.observaciones || '',
         createdAt: now,
-        crearteBY: createdBy,
+        createdBy: this.userLogin, // Corregido el typo crearteBY
         fullNameEmployee: empleado ? `${empleado.apellidoPaterno} ${empleado.apellidoMaterno}, ${empleado.nombres}` : '',
         shiftDescription: turnoSeleccionado ? turnoSeleccionado.alias : '',
         nroDoc: empleado ? empleado.nroDoc : '',
@@ -438,16 +474,21 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         locationName: sede ? sede.descripcion : ''
       };
     });
-    console.log('Empleados seleccionados:', empleados);
-    console.log('Personal filtrado:', this.personalFiltrado);
-    console.log('Turno seleccionado:', turnoSeleccionado);
-    console.log('Sede:', sede);
-    console.log('Area:', area);
-    console.log('Fecha inicio:', filtro.fechaInicio);
-    console.log('Fecha fin:', filtro.fechaFin);
-    console.log('Observaciones:', turno.observaciones);
-    // Enviar el array de registros en una sola petición
-    console.log('Registros:', registros);
+    
+    if (registros.length > 0) {
+      console.log('    * employeeId:', registros[0].employeeId, '(tipo:', typeof registros[0].employeeId, ')');
+      console.log('    * shiftId:', registros[0].shiftId, '(tipo:', typeof registros[0].shiftId, ')');
+      console.log('    * startDate:', registros[0].startDate, '(tipo:', typeof registros[0].startDate, ')');
+      console.log('    * endDate:', registros[0].endDate, '(tipo:', typeof registros[0].endDate, ')');
+      console.log('    * fullNameEmployee:', registros[0].fullNameEmployee);
+      console.log('    * shiftDescription:', registros[0].shiftDescription);
+      console.log('    * locationName:', registros[0].locationName);
+      console.log('    * areaDescription:', registros[0].areaDescription);
+      console.log('  - Estructura completa del primer registro:', JSON.stringify(registros[0], null, 4));
+    }
+    console.log('  - Array completo a enviar:', JSON.stringify(registros, null, 2));
+    console.log('=======================================');
+    
     this.employeeScheduleAssignmentService.insertEmployeeScheduleAssignment(registros).subscribe({
       next: (response) => {
         console.log('Response:', response);
@@ -470,8 +511,6 @@ export class AsignarTurnoMasivoComponent implements OnInit {
       }
     });
   }
-
-  // Agregar estos métodos a tu componente
 
   // Método para filtrar áreas cuando se selecciona una sede
   onSedeSeleccionada(sedeId: string ): void {

@@ -302,8 +302,8 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
     this.modalService.open({
       title: 'Transferencias Masivas de Personal',
       componentType: MassiveTransferModalComponent,
-      width: '95vw',
-      height: '90vh',
+      width: '85vw',
+      height: '100vh',
       componentData: {
         mode: 'massive'
       }
@@ -507,7 +507,7 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
       },
       {
         field: 'fullName',
-        headerName: 'Empleado',
+        headerName: 'Personal',
         minWidth: 300,
         maxWidth: 300,
         cellRenderer: (params: any) => {

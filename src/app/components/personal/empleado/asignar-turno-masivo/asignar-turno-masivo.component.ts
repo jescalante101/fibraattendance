@@ -2,7 +2,7 @@ import { Component, Inject, Input, OnInit, Optional } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { RhArea } from 'src/app/core/services/rh-area.service';
-import { EmployeesParameters, PersonService } from 'src/app/core/services/person.service';
+import { EmployeesParameters, EmployeesWithoutShift, PersonService } from 'src/app/core/services/person.service';
 import { AppUserService, SedeArea } from 'src/app/core/services/app-user.services';
 import { ShiftsService, Shift } from 'src/app/core/services/shifts.service';
 import { PageEvent } from '@angular/material/paginator';
@@ -100,19 +100,21 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   }
 
   private inicializarFormularios(): void {
+    // Mover fechas al filtroForm (Paso 1)
     this.filtroForm = this.fb.group({
       sede: [null, Validators.required],
-      area: [null, Validators.required]
+      area: [null, Validators.required],
+      fechaInicio: [null, Validators.required],
+      fechaFin: [null] // Opcional
     });
 
     this.personalForm = this.fb.group({
       empleados: this.fb.array([], Validators.required)
     });
 
+    // Remover fechas del turnoForm (ya están en filtroForm)
     this.turnoForm = this.fb.group({
       turno: [null, Validators.required],
-      fechaInicio: [null, Validators.required],
-      fechaFin: [null, Validators.required],
       observaciones: ['']
     });
   }
@@ -218,32 +220,97 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   cargarPersonal() {
     this.loadingPersonal = true;
 
-    // Obtner otros valores de localStorage o del headerConfig
+    // Primero obtenemos las fechas del filtroForm
+    const fechaInicio = this.filtroForm.value.fechaInicio;
+    const fechaFin = this.filtroForm.value.fechaFin;
+    
+    if (!fechaInicio) {
+      this.toastService.error('Error', 'Debe seleccionar una fecha de inicio para continuar');
+      this.loadingPersonal = false;
+      return;
+    }
+
+    console.log('Obteniendo empleados por rango de fechas:', { fechaInicio, fechaFin });
+    
+    // 1. Primero obtenemos los IDs de empleados que ya tienen asignación en el rango de fechas
+    this.employeeScheduleAssignmentService.getEmployeeIdsByDateRange(fechaInicio, fechaFin || fechaInicio).subscribe({
+      next: (employeeIds) => {
+        console.log('IDs con asignación:', employeeIds);
+        
+        // 2. Ahora buscamos personal sin horario usando los IDs obtenidos
+        this.buscarPersonalSinHorario(employeeIds || []);
+      },
+      error: (error) => {
+        console.error('Error obteniendo IDs por fechas:', error);
+        // En caso de error, continuamos con array vacío para no bloquear el flujo
+        this.buscarPersonalSinHorario([]);
+      }
+    });
+  }
+  
+  /**
+   * Busca personal sin horario usando el nuevo servicio
+   */
+  private buscarPersonalSinHorario(personalIdsExcluir: string[]) {
+    // Obtener otros valores de localStorage o del headerConfig
     const companiaId = this.headerConfig?.selectedEmpresa?.companiaId || '01';
     const periodoId = this.headerConfig?.selectedPeriodo?.periodoId || null;
     const planillaId = this.headerConfig?.selectedPlanilla?.planillaId || null;
 
     const categoriaAuxiliarId = this.filtroForm.value.sede;
     const rhAreaId = this.filtroForm.value.area;
-    console.log("Cargando personal con filtros:", { categoriaAuxiliarId, rhAreaId });
+    console.log("Cargando personal sin horario con filtros:", { categoriaAuxiliarId, rhAreaId, personalIdsExcluir });
+    
     const ccosto = null; // Filtro adicional de centro de costo
     const filtro = this.searchTermPersonal.trim();
-    const employeeParams: EmployeesParameters = {
+    
+    const employeeParams: EmployeesWithoutShift = {
       searchText: filtro,
       page: this.paginaActual,
       pagesize: this.pageSize,
       areaId: rhAreaId || null,
       ccostoId: ccosto || null,
       sede: categoriaAuxiliarId || null,
-      periodoId: periodoId, // Puedes ajustar esto según tu lógica
-      planillaId: planillaId, // Puedes ajustar esto según tu lógica
-      companiaId: companiaId // Valor por defecto
+      periodoId: periodoId,
+      planillaId: planillaId,
+      companiaId: companiaId,
+      personalIds: personalIdsExcluir // IDs a excluir (los que ya tienen asignación)
     };
-    console.log("Params:", employeeParams);
     
-    this.personService.getPersonalActivo(employeeParams).subscribe({
+    console.log('=== PARÁMETROS ENVIADOS AL PERSON SERVICE ===');
+    console.log('🔍 Método:', 'getPersonalWithoutShift');
+    console.log('📋 Parámetros completos:', JSON.stringify(employeeParams, null, 2));
+    console.log('📊 Detalle de parámetros:');
+    console.log('  - searchText:', employeeParams.searchText);
+    console.log('  - page:', employeeParams.page);
+    console.log('  - pagesize:', employeeParams.pagesize);
+    console.log('  - areaId:', employeeParams.areaId);
+    console.log('  - ccostoId:', employeeParams.ccostoId);
+    console.log('  - sede:', employeeParams.sede);
+    console.log('  - periodoId:', employeeParams.periodoId);
+    console.log('  - planillaId:', employeeParams.planillaId);
+    console.log('  - companiaId:', employeeParams.companiaId);
+    console.log('  - personalIds (IDs a excluir):', employeeParams.personalIds);
+    console.log('  - personalIds length:', employeeParams.personalIds?.length || 0);
+    console.log('==============================================');
+    
+    this.personService.getPersonalWithoutShift(employeeParams).subscribe({
       next: res => {
-        console.log("Response:", res);
+        console.log('=== RESPUESTA DEL PERSON SERVICE ===');
+        console.log('✅ Respuesta completa:', JSON.stringify(res, null, 2));
+        console.log('📊 Detalle de respuesta:');
+        console.log('  - exito:', res.exito);
+        console.log('  - mensaje:', res.mensaje);
+        console.log('  - data existe:', !!res.data);
+        if (res.data) {
+          console.log('  - items length:', res.data.items?.length || 0);
+          console.log('  - totalCount:', res.data.totalCount);
+          console.log('  - pageNumber:', res.data.pageNumber);
+          console.log('  - pageSize:', res.data.pageSize);
+          console.log('  - primer empleado (muestra):', res.data.items?.[0] || 'N/A');
+        }
+        console.log('====================================');
+        
         if (res.exito && res.data && res.data.items) {
           this.personalTotal = res.data.items;
           this.personalFiltrado = [...this.personalTotal];
@@ -260,7 +327,15 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         this.loadingPersonal = false;
       },
       error: (error) => {
-        console.error('Error al cargar personal:', error);
+        console.log('=== ERROR EN PERSON SERVICE ===');
+        console.error('❌ Error completo:', error);
+        console.error('📊 Detalles del error:');
+        console.error('  - status:', error.status);
+        console.error('  - statusText:', error.statusText);
+        console.error('  - message:', error.message);
+        console.error('  - error body:', error.error);
+        console.log('===============================');
+        
         this.toastService.error('Error al cargar', 'No se pudo cargar el personal. Verifica los filtros seleccionados');
         this.personalFiltrado = [];
         this.totalCount = 0;
@@ -349,8 +424,8 @@ export class AsignarTurnoMasivoComponent implements OnInit {
       return {
         employeeId: employeeId,
         shiftId: turnoSeleccionado ? turnoSeleccionado.id : 0,
-        startDate: turno.fechaInicio,
-        endDate: turno.fechaFin,
+        startDate: filtro.fechaInicio, // Ahora desde filtroForm
+        endDate: filtro.fechaFin,      // Ahora desde filtroForm
         remarks: turno.observaciones || '',
         createdAt: now,
         crearteBY: createdBy,
@@ -368,8 +443,8 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     console.log('Turno seleccionado:', turnoSeleccionado);
     console.log('Sede:', sede);
     console.log('Area:', area);
-    console.log('Fecha inicio:', turno.fechaInicio);
-    console.log('Fecha fin:', turno.fechaFin);
+    console.log('Fecha inicio:', filtro.fechaInicio);
+    console.log('Fecha fin:', filtro.fechaFin);
     console.log('Observaciones:', turno.observaciones);
     // Enviar el array de registros en una sola petición
     console.log('Registros:', registros);

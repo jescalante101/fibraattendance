@@ -6,6 +6,8 @@ import { PersonalTransferService } from '../../../../core/services/personal-tran
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from '../../../../core/services/categoria-auxiliar.service';
 import { RhAreaService, RhArea } from '../../../../core/services/rh-area.service';
 import { CostCenterService, CostCenter } from '../../../../core/services/cost-center.service';
+import { SedeAreaCostoService } from '../../../../core/services/sede-area-costo.service';
+import { SedeAreaCosto } from '../../../../models/site-area-ccost.model';
 import { HeaderConfigService, HeaderConfig } from '../../../../core/services/header-config.service';
 import { PersonService } from '../../../../core/services/person.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -73,11 +75,24 @@ export class TransferModalComponent implements OnInit, OnDestroy {
   sedesList: CategoriaAuxiliar[] = [];
   areasList: RhArea[] = [];
   costCentersList: CostCenter[] = [];
+  
+  // Nueva lista unificada desde sede-area-costo.service
+  sedeAreaCostoList: SedeAreaCosto[] = [];
+  
+  // Listas derivadas para autocompletes
+  destinationSedesList: { siteId: string; siteName: string }[] = [];
+  destinationAreasList: { areaId: string; areaName: string; siteId: string }[] = [];
+  destinationCostCentersList: { costCenterId: string; costCenterName: string; siteId: string; areaId: string }[] = [];
 
   // Listas filtradas para autocompletes
   filteredSedesList: CategoriaAuxiliar[] = [];
   filteredAreasList: RhArea[] = [];
   filteredCostCentersList: CostCenter[] = [];
+  
+  // Listas filtradas para destination
+  filteredDestinationSedesList: { siteId: string; siteName: string }[] = [];
+  filteredDestinationAreasList: { areaId: string; areaName: string; siteId: string }[] = [];
+  filteredDestinationCostCentersList: { costCenterId: string; costCenterName: string; siteId: string; areaId: string }[] = [];
 
   // Términos de búsqueda para autocompletes
   sedeFilterTerm = '';
@@ -95,6 +110,7 @@ export class TransferModalComponent implements OnInit, OnDestroy {
     private categoriaAuxiliarService: CategoriaAuxiliarService,
     private rhAreaService: RhAreaService,
     private costCenterService: CostCenterService,
+    private sedeAreaCostoService: SedeAreaCostoService,
     private headerConfigService: HeaderConfigService,
     private personService: PersonService,
     private authService: AuthService,
@@ -244,7 +260,7 @@ export class TransferModalComponent implements OnInit, OnDestroy {
 
     const companiaId = this.headerConfig.selectedEmpresa.companiaId;
 
-    // Cargar sedes
+    // Cargar sedes (para origen)
     this.categoriaAuxiliarService.getCategoriasAuxiliar()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -255,7 +271,7 @@ export class TransferModalComponent implements OnInit, OnDestroy {
         error: (error) => console.error('Error cargando sedes:', error)
       });
 
-    // Cargar áreas
+    // Cargar áreas (para origen)
     this.rhAreaService.getAreas(companiaId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -266,7 +282,7 @@ export class TransferModalComponent implements OnInit, OnDestroy {
         error: (error) => console.error('Error cargando áreas:', error)
       });
 
-    // Cargar centros de costo
+    // Cargar centros de costo (para origen)
     this.costCenterService.getAll(companiaId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -276,6 +292,75 @@ export class TransferModalComponent implements OnInit, OnDestroy {
         },
         error: (error) => console.error('Error cargando centros de costo:', error)
       });
+    
+    // Cargar datos unificados de sede-area-costo para destino
+    this.loadDestinationData();
+  }
+  
+  /**
+   * Cargar datos de destino desde sede-area-costo.service
+   */
+  private loadDestinationData(): void {
+    this.sedeAreaCostoService.getAll()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (sedeAreaCostoData) => {
+          this.sedeAreaCostoList = sedeAreaCostoData;
+          this.prepareDestinationLists();
+        },
+        error: (error) => console.error('Error cargando datos de sede-area-costo:', error)
+      });
+  }
+  
+  /**
+   * Preparar listas derivadas para autocompletes de destino
+   */
+  private prepareDestinationLists(): void {
+    // Obtener sedes únicas
+    const sedesMap = new Map();
+    this.sedeAreaCostoList.forEach(item => {
+      if (!sedesMap.has(item.siteId)) {
+        sedesMap.set(item.siteId, {
+          siteId: item.siteId,
+          siteName: item.siteName
+        });
+      }
+    });
+    this.destinationSedesList = Array.from(sedesMap.values());
+    this.filteredDestinationSedesList = [...this.destinationSedesList];
+    
+    // Obtener áreas únicas
+    const areasMap = new Map();
+    this.sedeAreaCostoList.forEach(item => {
+      const key = `${item.siteId}-${item.areaId}`;
+      if (!areasMap.has(key)) {
+        areasMap.set(key, {
+          areaId: item.areaId,
+          areaName: item.areaName,
+          siteId: item.siteId
+        });
+      }
+    });
+    this.destinationAreasList = Array.from(areasMap.values());
+    this.filteredDestinationAreasList = [...this.destinationAreasList];
+    
+    // Obtener centros de costo únicos
+    const costCentersMap = new Map();
+    this.sedeAreaCostoList.forEach(item => {
+      if (item.costCenterId) {
+        const key = `${item.siteId}-${item.areaId}-${item.costCenterId}`;
+        if (!costCentersMap.has(key)) {
+          costCentersMap.set(key, {
+            costCenterId: item.costCenterId,
+            costCenterName: item.costCenterName,
+            siteId: item.siteId,
+            areaId: item.areaId
+          });
+        }
+      }
+    });
+    this.destinationCostCentersList = Array.from(costCentersMap.values());
+    this.filteredDestinationCostCentersList = [...this.destinationCostCentersList];
   }
 
   /**
@@ -384,11 +469,11 @@ export class TransferModalComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Obtener descripciones de los servicios
-    const selectedBranch = this.sedesList.find(s => s.categoriaAuxiliarId === this.formData.newBranchId);
-    const selectedArea = this.areasList.find(a => a.areaId === this.formData.newAreaId);
+    // Obtener descripciones de los servicios unificados
+    const selectedBranch = this.destinationSedesList.find(s => s.siteId === this.formData.newBranchId);
+    const selectedArea = this.filteredDestinationAreasList.find(a => a.areaId === this.formData.newAreaId);
     const selectedCostCenter = this.formData.newCostCenterId ? 
-      this.costCentersList.find(cc => cc.ccostoId === this.formData.newCostCenterId) || null : null;
+      this.filteredDestinationCostCentersList.find(cc => cc.costCenterId === this.formData.newCostCenterId) || null : null;
 
     if (this.data.mode === 'edit') {
       // Modo edición - actualizar transferencia
@@ -402,7 +487,7 @@ export class TransferModalComponent implements OnInit, OnDestroy {
   /**
    * Actualizar transferencia existente
    */
-  private updateTransfer(selectedBranch: CategoriaAuxiliar | undefined, selectedArea: RhArea | undefined, selectedCostCenter: CostCenter | null): void {
+  private updateTransfer(selectedBranch: { siteId: string; siteName: string } | undefined, selectedArea: { areaId: string; areaName: string; siteId: string } | undefined, selectedCostCenter: { costCenterId: string; costCenterName: string; siteId: string; areaId: string } | null): void {
     if (!this.data.transferData?.id) {
       this.toastService.error('Error', 'No se pudo identificar la transferencia a actualizar');
       return;
@@ -412,11 +497,11 @@ export class TransferModalComponent implements OnInit, OnDestroy {
     
     const updateData: UpdatePersonalTransferDto = {
       branchId: this.formData.newBranchId,
-      branchDescription: selectedBranch?.descripcion || '',
+      branchDescription: selectedBranch?.siteName || '',
       areaId: this.formData.newAreaId,
-      areaDescription: selectedArea?.descripcion || '',
+      areaDescription: selectedArea?.areaName || '',
       costCenterId: this.formData.newCostCenterId || '',
-      costCenterDescription: selectedCostCenter?.descripcion || '',
+      costCenterDescription: selectedCostCenter?.costCenterName || '',
       startDate: this.formData.startDate,
       endDate: this.formData.isPermanent ? null : this.formData.endDate,
       observation: this.formData.observations || null,
@@ -454,18 +539,18 @@ export class TransferModalComponent implements OnInit, OnDestroy {
   /**
    * Crear nueva transferencia
    */
-  private createTransfer(selectedBranch: CategoriaAuxiliar | undefined, selectedArea: RhArea | undefined, selectedCostCenter: CostCenter | null): void {
+  private createTransfer(selectedBranch: { siteId: string; siteName: string } | undefined, selectedArea: { areaId: string; areaName: string; siteId: string } | undefined, selectedCostCenter: { costCenterId: string; costCenterName: string; siteId: string; areaId: string } | null): void {
     this.loading = true;
     
     const createData: CreatePersonalTransferDto = {
       personalId: this.formData.selectedEmployee!.personalId,
       fullName: `${this.formData.selectedEmployee!.nombres || ''} ${this.formData.selectedEmployee!.apellidoPaterno || ''} ${this.formData.selectedEmployee!.apellidoMaterno || ''}`.trim(),
       branchId: this.formData.newBranchId,
-      branchDescription: selectedBranch?.descripcion || '',
+      branchDescription: selectedBranch?.siteName || '',
       areaId: this.formData.newAreaId,
-      areaDescription: selectedArea?.descripcion || '',
+      areaDescription: selectedArea?.areaName || '',
       costCenterId: this.formData.newCostCenterId || '',
-      costCenterDescription: selectedCostCenter?.descripcion || '',
+      costCenterDescription: selectedCostCenter?.costCenterName || '',
       startDate: this.formData.startDate,
       endDate: this.formData.isPermanent ? null : this.formData.endDate,
       observation: this.formData.observations || null,
@@ -533,13 +618,13 @@ export class TransferModalComponent implements OnInit, OnDestroy {
   }
 
   // ===============================
-  // AUTOCOMPLETE METHODS - SEDE
+  // AUTOCOMPLETE METHODS - SEDE (DESTINO)
   // ===============================
 
   getSedeFilterText(): string {
     if (this.formData.newBranchId) {
-      const selectedSede = this.sedesList.find(s => s.categoriaAuxiliarId === this.formData.newBranchId);
-      return selectedSede?.descripcion || '';
+      const selectedSede = this.destinationSedesList.find(s => s.siteId === this.formData.newBranchId);
+      return selectedSede?.siteName || '';
     }
     return this.sedeFilterTerm;
   }
@@ -547,16 +632,39 @@ export class TransferModalComponent implements OnInit, OnDestroy {
   onSedeFilterChange(event: any): void {
     const value = event.target?.value || '';
     this.sedeFilterTerm = value;
-    this.filteredSedesList = this.sedesList.filter(sede => 
-      sede.descripcion.toLowerCase().includes(value.toLowerCase())
+    this.filteredDestinationSedesList = this.destinationSedesList.filter(sede => 
+      sede.siteName.toLowerCase().includes(value.toLowerCase())
     );
-    this.showSedeDropdown = this.filteredSedesList.length > 0;
+    this.showSedeDropdown = this.filteredDestinationSedesList.length > 0;
+    
+    // Reset dependent fields when sede changes
+    this.formData.newAreaId = '';
+    this.formData.newCostCenterId = '';
+    this.areaFilterTerm = '';
+    this.costCenterFilterTerm = '';
+    this.updateDependentAreasList();
+  }
+  
+  onSedeFocus(): void {
+    if (this.filteredDestinationSedesList.length === 0) {
+      this.filteredDestinationSedesList = [...this.destinationSedesList];
+    }
+    this.showSedeDropdown = this.filteredDestinationSedesList.length > 0;
   }
 
-  onSedeSelected(sede: CategoriaAuxiliar): void {
-    this.formData.newBranchId = sede.categoriaAuxiliarId;
-    this.sedeFilterTerm = sede.descripcion;
+  onSedeSelected(sede: { siteId: string; siteName: string }): void {
+    this.formData.newBranchId = sede.siteId;
+    this.sedeFilterTerm = sede.siteName;
     this.showSedeDropdown = false;
+    
+    // Reset dependent fields
+    this.formData.newAreaId = '';
+    this.formData.newCostCenterId = '';
+    this.areaFilterTerm = '';
+    this.costCenterFilterTerm = '';
+    
+    // Update dependent lists
+    this.updateDependentAreasList();
   }
 
   onSedeBlur(): void {
@@ -565,18 +673,32 @@ export class TransferModalComponent implements OnInit, OnDestroy {
     }, 200);
   }
 
-  trackBySedeId(index: number, sede: CategoriaAuxiliar): string {
-    return sede.categoriaAuxiliarId;
+  trackBySedeId(index: number, sede: { siteId: string; siteName: string }): string {
+    return sede.siteId;
+  }
+  
+  /**
+   * Actualizar lista de áreas basada en la sede seleccionada
+   */
+  private updateDependentAreasList(): void {
+    if (this.formData.newBranchId) {
+      this.filteredDestinationAreasList = this.destinationAreasList.filter(area => 
+        area.siteId === this.formData.newBranchId
+      );
+    } else {
+      this.filteredDestinationAreasList = [...this.destinationAreasList];
+    }
+    this.updateDependentCostCentersList();
   }
 
   // ===============================
-  // AUTOCOMPLETE METHODS - AREA
+  // AUTOCOMPLETE METHODS - AREA (DESTINO)
   // ===============================
 
   getAreaFilterText(): string {
     if (this.formData.newAreaId) {
-      const selectedArea = this.areasList.find(a => a.areaId === this.formData.newAreaId);
-      return selectedArea?.descripcion || '';
+      const selectedArea = this.filteredDestinationAreasList.find(a => a.areaId === this.formData.newAreaId);
+      return selectedArea?.areaName || '';
     }
     return this.areaFilterTerm;
   }
@@ -584,16 +706,39 @@ export class TransferModalComponent implements OnInit, OnDestroy {
   onAreaFilterChange(event: any): void {
     const value = event.target?.value || '';
     this.areaFilterTerm = value;
-    this.filteredAreasList = this.areasList.filter(area => 
-      area.descripcion.toLowerCase().includes(value.toLowerCase())
+    
+    let availableAreas = this.destinationAreasList;
+    if (this.formData.newBranchId) {
+      availableAreas = this.destinationAreasList.filter(area => area.siteId === this.formData.newBranchId);
+    }
+    
+    this.filteredDestinationAreasList = availableAreas.filter(area => 
+      area.areaName.toLowerCase().includes(value.toLowerCase())
     );
-    this.showAreaDropdown = this.filteredAreasList.length > 0;
+    this.showAreaDropdown = this.filteredDestinationAreasList.length > 0;
+    
+    // Reset dependent fields when area changes
+    this.formData.newCostCenterId = '';
+    this.costCenterFilterTerm = '';
+    this.updateDependentCostCentersList();
+  }
+  
+  onAreaFocus(): void {
+    this.updateDependentAreasList();
+    this.showAreaDropdown = this.filteredDestinationAreasList.length > 0;
   }
 
-  onAreaSelected(area: RhArea): void {
+  onAreaSelected(area: { areaId: string; areaName: string; siteId: string }): void {
     this.formData.newAreaId = area.areaId;
-    this.areaFilterTerm = area.descripcion;
+    this.areaFilterTerm = area.areaName;
     this.showAreaDropdown = false;
+    
+    // Reset dependent fields
+    this.formData.newCostCenterId = '';
+    this.costCenterFilterTerm = '';
+    
+    // Update dependent lists
+    this.updateDependentCostCentersList();
   }
 
   onAreaBlur(): void {
@@ -602,18 +747,35 @@ export class TransferModalComponent implements OnInit, OnDestroy {
     }, 200);
   }
 
-  trackByAreaId(index: number, area: RhArea): string {
+  trackByAreaId(index: number, area: { areaId: string; areaName: string; siteId: string }): string {
     return area.areaId;
+  }
+  
+  /**
+   * Actualizar lista de centros de costo basada en sede y área seleccionadas
+   */
+  private updateDependentCostCentersList(): void {
+    if (this.formData.newBranchId && this.formData.newAreaId) {
+      this.filteredDestinationCostCentersList = this.destinationCostCentersList.filter(cc => 
+        cc.siteId === this.formData.newBranchId && cc.areaId === this.formData.newAreaId
+      );
+    } else if (this.formData.newBranchId) {
+      this.filteredDestinationCostCentersList = this.destinationCostCentersList.filter(cc => 
+        cc.siteId === this.formData.newBranchId
+      );
+    } else {
+      this.filteredDestinationCostCentersList = [...this.destinationCostCentersList];
+    }
   }
 
   // ===============================
-  // AUTOCOMPLETE METHODS - COST CENTER
+  // AUTOCOMPLETE METHODS - COST CENTER (DESTINO)
   // ===============================
 
   getCostCenterFilterText(): string {
     if (this.formData.newCostCenterId) {
-      const selectedCC = this.costCentersList.find(cc => cc.ccostoId === this.formData.newCostCenterId);
-      return selectedCC?.descripcion || '';
+      const selectedCC = this.filteredDestinationCostCentersList.find(cc => cc.costCenterId === this.formData.newCostCenterId);
+      return selectedCC?.costCenterName || '';
     }
     return this.costCenterFilterTerm;
   }
@@ -621,15 +783,32 @@ export class TransferModalComponent implements OnInit, OnDestroy {
   onCostCenterFilterChange(event: any): void {
     const value = event.target?.value || '';
     this.costCenterFilterTerm = value;
-    this.filteredCostCentersList = this.costCentersList.filter(cc => 
-      cc.descripcion.toLowerCase().includes(value.toLowerCase())
+    
+    let availableCostCenters = this.destinationCostCentersList;
+    if (this.formData.newBranchId && this.formData.newAreaId) {
+      availableCostCenters = this.destinationCostCentersList.filter(cc => 
+        cc.siteId === this.formData.newBranchId && cc.areaId === this.formData.newAreaId
+      );
+    } else if (this.formData.newBranchId) {
+      availableCostCenters = this.destinationCostCentersList.filter(cc => 
+        cc.siteId === this.formData.newBranchId
+      );
+    }
+    
+    this.filteredDestinationCostCentersList = availableCostCenters.filter(cc => 
+      cc.costCenterName.toLowerCase().includes(value.toLowerCase())
     );
-    this.showCostCenterDropdown = this.filteredCostCentersList.length > 0;
+    this.showCostCenterDropdown = this.filteredDestinationCostCentersList.length > 0;
+  }
+  
+  onCostCenterFocus(): void {
+    this.updateDependentCostCentersList();
+    this.showCostCenterDropdown = this.filteredDestinationCostCentersList.length > 0;
   }
 
-  onCostCenterSelected(costCenter: CostCenter): void {
-    this.formData.newCostCenterId = costCenter.ccostoId;
-    this.costCenterFilterTerm = costCenter.descripcion;
+  onCostCenterSelected(costCenter: { costCenterId: string; costCenterName: string; siteId: string; areaId: string }): void {
+    this.formData.newCostCenterId = costCenter.costCenterId;
+    this.costCenterFilterTerm = costCenter.costCenterName;
     this.showCostCenterDropdown = false;
   }
 
@@ -639,7 +818,7 @@ export class TransferModalComponent implements OnInit, OnDestroy {
     }, 200);
   }
 
-  trackByCostCenterId(index: number, costCenter: CostCenter): string {
-    return costCenter.ccostoId;
+  trackByCostCenterId(index: number, costCenter: { costCenterId: string; costCenterName: string; siteId: string; areaId: string }): string {
+    return costCenter.costCenterId;
   }
 }

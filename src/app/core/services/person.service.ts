@@ -43,6 +43,17 @@ getPersonalActivo(employeeParams:EmployeesParameters): Observable<ApiResponse<Em
   return this.http.post<ApiResponse<Employee>>(`${this.apiUrlScire}api/Personal/search`,employeeParams);
 }
 
+/**
+ * buscar personal sin horario por metodo POST en el body ira EmployeesWithoutShift
+ * /api/Personal/searchNoHorario
+ */
+getPersonalWithoutShift(employeeParams:EmployeesWithoutShift): Observable<ApiResponse<Employee>> {
+  return this.http.post<ApiResponse<Employee>>(`${this.apiUrlScire}api/Personal/searchNoHorario`,employeeParams);
+}
+
+
+
+
   
 
 }
@@ -57,5 +68,20 @@ export interface EmployeesParameters {
     periodoId:  string | null;
     planillaId: string | null;
     companiaId: string | null;
+}
+
+// personal sin turno
+export interface EmployeesWithoutShift {
+    searchText: string;
+    page:       number | 1;
+    pagesize:   number | 15;
+    areaId:     string | null;
+    ccostoId:   string | null;
+    sede:       string | null;
+    periodoId:  string | null;
+    planillaId: string | null;
+    companiaId: string | null;
+    //ids de los empleados
+    personalIds:        string[];
 }
 

@@ -11,7 +11,7 @@ export interface Area {
 }
 
 export interface CostCenter {
-  costCenterId: number;
+  costCenterId: string;
   costCenterName: string;
 }
 

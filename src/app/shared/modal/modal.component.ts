@@ -108,8 +108,9 @@ export class ModalComponent implements OnInit, OnDestroy {
   }
 
   onOverlayClick(event: Event) {
-    if (event.target === event.currentTarget) {
-      this.closeModal();
-    }
+    // Modal no se cierra al hacer click fuera - solo desde el componente interno
+    // if (event.target === event.currentTarget) {
+    //   this.closeModal();
+    // }
   }
 }

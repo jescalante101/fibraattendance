@@ -8,10 +8,10 @@
         </div>
         <div>
           <div class="text-lg font-semibold text-fiori-text">
-            Transferencias de Personal
+            Traslado de Personal
           </div>
           <div class="text-xs text-fiori-subtext">
-            {{ totalCount }} transferencias registradas
+            {{ totalCount }} Traslados registradas
           </div>
         </div>
       </div>
@@ -26,7 +26,7 @@
           class="inline-flex items-center px-3 py-1.5 bg-fiori-secondary text-white text-sm font-medium rounded-lg hover:bg-fiori-primary transition-colors"
         >
           <lucide-icon name="users" class="w-4 h-4 mr-1"></lucide-icon>
-          Transferencias Masivas
+          Traslados Masivas
         </button>
       </div>
     </div>
@@ -39,7 +39,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
         </svg>
-        <h3 class="text-sm font-medium text-gray-700">Filtrar Transferencias</h3>
+        <h3 class="text-sm font-medium text-gray-700">Filtrar Traslados</h3>
       </div>
       <app-generic-filter
         [config]="filterConfig"
@@ -59,8 +59,7 @@
         <div class="flex items-center space-x-3">
           <lucide-icon name="table" class="w-5 h-5 text-fiori-primary"></lucide-icon>
           <div>
-            <div class="text-lg font-semibold text-fiori-text">Lista de Transferencias</div>
-            <div class="text-xs text-fiori-subtext">Gestión profesional con ag-Grid</div>
+            <div class="text-lg font-semibold text-fiori-text">Lista de Traslados</div>
           </div>
         </div>
         <div class="flex items-center space-x-3">
@@ -76,7 +75,7 @@
           ></app-column-manager>
           
           <div class="text-sm text-fiori-subtext">
-            Mostrando {{ transfers.length }} de {{ totalCount }} transferencias
+            Mostrando {{ transfers.length }} de {{ totalCount }} Traslados
           </div>
         </div>
       </div>
@@ -91,7 +90,7 @@
       >
         <div class="flex flex-col items-center">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-fiori-primary mb-2"></div>
-          <p class="text-sm text-fiori-text font-medium">Cargando transferencias...</p>
+          <p class="text-sm text-fiori-text font-medium">Cargando Traslados...</p>
         </div>
       </div>
 
@@ -118,17 +117,17 @@
             <lucide-icon name="arrow-right-left" class="w-8 h-8 text-fiori-subtext"></lucide-icon>
           </div>
           <div class="text-lg font-semibold text-fiori-text mb-2">
-            No hay transferencias registradas
+            No hay Traslados registrados
           </div>
           <p class="text-fiori-subtext mb-4 max-w-sm">
-            Las transferencias de personal aparecerán aquí cuando se registren
+            Los Traslados de personal aparecerán aquí cuando se registren
           </p>
           <button
             (click)="createMassiveTransfer()"
             class="inline-flex items-center px-4 py-2 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors shadow-fioriSm"
           >
             <lucide-icon name="plus" class="w-4 h-4 mr-2"></lucide-icon>
-            Crear Primera Transferencia
+            Crear Primer Traslado
           </button>
         </div>
       </div>

@@ -119,6 +119,11 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   areasList: RhArea[] = [];
   costCentersList: CostCenter[] = [];
 
+  // Listas filtradas para autocompletes ORIGEN
+  filteredFromSedesList: SimpleSedeAutocomplete[] = [];
+  filteredFromAreasList: SimpleAreaAutocomplete[] = [];
+  filteredFromCostCentersList: SimpleCostCenterAutocomplete[] = [];
+
   // Listas filtradas para autocompletes DESTINO
   filteredToSedesList: SimpleSedeAutocomplete[] = [];
   filteredToAreasList: SimpleAreaAutocomplete[] = [];
@@ -244,7 +249,22 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   // Datos de empleados
   allEmployeesData: SelectedEmployee[] = [];
 
-
+  // === NUEVAS PROPIEDADES PARA DUAL AG-GRID ===
+  
+  // APIs de los grids separados
+  availableGridApi!: GridApi;
+  selectedGridApi!: GridApi;
+  
+  // Configuraciones de columnas para cada grid
+  availableEmployeesColumnDefs: ColDef[] = [];
+  selectedEmployeesColumnDefs: ColDef[] = [];
+  
+  // Configuraciones de grid para cada panel
+  availableEmployeesGridOptions: GridOptions = {};
+  selectedEmployeesGridOptions: GridOptions = {};
+  
+  // Tema Fiori para los grids
+  themeFiori = 'ag-theme-quartz';
 
   constructor(
     private personalTransferService: PersonalTransferService,
@@ -261,14 +281,14 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log('🚀 MassiveTransferModal: Initializing...');
     this.headerConfig = this.headerConfigService.loadHeaderConfig();
     this.initializeForm();
+    this.setupDualGrids(); // Configurar los dos ag-grids
     this.loadUserData();
     this.loadOriginData();
     this.loadDestinationData();
     this.loadAutocompleteData(); // Legacy data for compatibility
-    console.log('✅ MassiveTransferModal: Initialized successfully');
+    this.loadAllEmployees(); // Cargar empleados para el grid izquierdo
   }
 
   
@@ -276,6 +296,288 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  // === MÉTODOS PARA LA NUEVA ESTRUCTURA DE DUAL AG-GRID ===
+
+  /**
+   * Configurar los dos ag-grids
+   */
+  private setupDualGrids(): void {
+    this.setupAvailableEmployeesGrid();
+    this.setupSelectedEmployeesGrid();
+  }
+
+  /**
+   * Configurar ag-Grid de empleados disponibles
+   */
+  private setupAvailableEmployeesGrid(): void {
+    this.availableEmployeesColumnDefs = [
+      {
+        headerName: '',
+        field: 'select',
+        minWidth: 50,
+        maxWidth: 50,
+        checkboxSelection: true,
+        headerCheckboxSelection: true,
+        pinned: 'left',
+        lockPosition: true,
+        cellClass: 'ag-cell-checkbox',
+        resizable: false
+      },
+      {
+        headerName: 'ID Personal',
+        field: 'personalId',
+        minWidth: 100,
+        maxWidth: 150,
+        cellRenderer: (params: any) => {
+          return `<div class="flex items-center">
+            <div class="px-2 py-1 bg-blue-100 rounded text-xs font-medium text-blue-700">
+              #${params.value}
+            </div>
+          </div>`;
+        }
+      },
+      {
+        headerName: 'Empleado',
+        field: 'nombres',
+        minWidth: 200,
+        flex: 1,
+        cellRenderer: (params: any) => {
+          const fullName = `${params.data.nombres || ''} ${params.data.apellidoPaterno || ''} ${params.data.apellidoMaterno || ''}`.trim();
+          return `<div class="flex items-center py-1">
+            <div class="text-sm font-medium text-slate-700">${fullName}</div>
+          </div>`;
+        }
+      },
+      {
+        headerName: 'Documento',
+        field: 'nroDoc',
+        minWidth: 120,
+        maxWidth: 150,
+        cellRenderer: (params: any) => {
+          return `<div class="text-sm text-slate-600">${params.value || '-'}</div>`;
+        }
+      },
+      {
+        headerName: 'Área Actual',
+        field: 'areaDescripcion',
+        minWidth: 150,
+        flex: 1,
+        cellRenderer: (params: any) => {
+          return `<div class="text-sm text-slate-600">${params.value || '-'}</div>`;
+        }
+      }
+    ];
+
+    this.availableEmployeesGridOptions = createFioriGridOptions({
+      rowSelection: 'multiple',
+      suppressRowClickSelection: true,
+      onSelectionChanged: () => this.onAvailableSelectionChanged()
+    });
+  }
+
+  /**
+   * Configurar ag-Grid de empleados seleccionados
+   */
+  private setupSelectedEmployeesGrid(): void {
+    this.selectedEmployeesColumnDefs = [
+      {
+        headerName: 'ID Personal',
+        field: 'personalId',
+        minWidth: 100,
+        maxWidth: 150,
+        cellRenderer: (params: any) => {
+          return `<div class="flex items-center">
+            <div class="px-2 py-1 bg-emerald-100 rounded text-xs font-medium text-emerald-700">
+              #${params.value}
+            </div>
+          </div>`;
+        }
+      },
+      {
+        headerName: 'Empleado',
+        field: 'nombres',
+        minWidth: 200,
+        flex: 1,
+        cellRenderer: (params: any) => {
+          const fullName = `${params.data.nombres || ''} ${params.data.apellidoPaterno || ''} ${params.data.apellidoMaterno || ''}`.trim();
+          return `<div class="flex items-center py-1">
+            <div class="text-sm font-medium text-slate-700">${fullName}</div>
+          </div>`;
+        }
+      },
+      {
+        headerName: 'Área Origen',
+        field: 'areaDescripcion',
+        minWidth: 150,
+        flex: 1,
+        cellRenderer: (params: any) => {
+          return `<div class="text-sm text-slate-600">${params.value || '-'}</div>`;
+        }
+      },
+      {
+        headerName: 'Acción',
+        field: 'action',
+        minWidth: 110,
+        maxWidth: 130,
+        pinned: 'right',
+        lockPosition: true,
+        resizable: false,
+        cellRenderer: (params: any) => {
+          const button = document.createElement('button');
+          button.className = 'px-2 py-1.5 text-red-600 hover:bg-red-100 rounded-lg transition-colors text-sm font-medium w-full h-full';
+          button.title = 'Quitar empleado';
+          button.innerHTML = `
+            <svg class="w-4 h-4 mr-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+            Quitar
+          `;
+          button.addEventListener('click', () => {
+            this.removeEmployee(params.data);
+          });
+          return button;
+        }
+      }
+    ];
+
+    this.selectedEmployeesGridOptions = createFioriGridOptions({
+      suppressRowClickSelection: true
+    });
+  }
+
+  // === EVENT HANDLERS PARA LOS GRIDS ===
+
+  /**
+   * Evento cuando el grid de disponibles está listo
+   */
+  onAvailableGridReady(params: GridReadyEvent): void {
+    this.availableGridApi = params.api;
+    params.api.sizeColumnsToFit();
+  }
+
+  /**
+   * Evento cuando el grid de seleccionados está listo
+   */
+  onSelectedGridReady(params: GridReadyEvent): void {
+    this.selectedGridApi = params.api;
+    params.api.sizeColumnsToFit();
+  }
+
+
+  /**
+   * Evento cuando cambia la selección en el grid de disponibles
+   */
+  onAvailableSelectionChanged(): void {
+    // Este método se ejecuta cuando cambian las selecciones en el grid izquierdo
+    // El conteo se actualiza automáticamente con getSelectedAvailableCount()
+  }
+
+  // === MÉTODOS PARA MANEJO DE EMPLEADOS ===
+
+  /**
+   * Búsqueda de empleados
+   */
+  onEmployeeSearchChange(): void {
+    this.searchEmployeesDebounced();
+  }
+
+  /**
+   * Limpiar búsqueda de empleados
+   */
+  clearEmployeeSearch(): void {
+    this.employeeFilters.searchTerm = '';
+    this.applyFiltersToGrid();
+  }
+
+  /**
+   * Obtener cantidad de empleados seleccionados en el grid disponible
+   */
+  getSelectedAvailableCount(): number {
+    if (!this.availableGridApi) return 0;
+    return this.availableGridApi.getSelectedRows().length;
+  }
+
+  /**
+   * Agregar empleados seleccionados del grid izquierdo al derecho
+   */
+  addSelectedEmployees(): void {
+    if (!this.availableGridApi) return;
+    
+    const selectedRows = this.availableGridApi.getSelectedRows();
+    if (selectedRows.length === 0) return;
+
+    // Agregar empleados seleccionados a la lista
+    selectedRows.forEach(employee => {
+      // Verificar que no esté ya seleccionado
+      const alreadySelected = this.selectedEmployees.find(emp => emp.personalId === employee.personalId);
+      if (!alreadySelected) {
+        this.selectedEmployees.push({
+          ...employee,
+          selected: true
+        });
+      }
+    });
+
+    // Actualizar grid derecho
+    if (this.selectedGridApi) {
+      this.selectedGridApi.setGridOption('rowData', this.selectedEmployees);
+    }
+
+    // Deseleccionar en el grid izquierdo
+    this.availableGridApi.deselectAll();
+    
+    this.toastService.success('Empleados Agregados', `Se agregaron ${selectedRows.length} empleados a la lista de transferencia`);
+  }
+
+  /**
+   * Quitar un empleado específico de la lista de seleccionados
+   */
+  removeEmployee(employee: SelectedEmployee): void {
+    this.selectedEmployees = this.selectedEmployees.filter(emp => emp.personalId !== employee.personalId);
+    
+    // Actualizar grid derecho
+    if (this.selectedGridApi) {
+      this.selectedGridApi.setGridOption('rowData', this.selectedEmployees);
+    }
+    
+    this.toastService.info('Empleado Removido', `${employee.nombres} ${employee.apellidoPaterno} fue removido de la lista`);
+  }
+
+  /**
+   * Quitar todos los empleados de la lista de seleccionados
+   */
+  removeAllEmployees(): void {
+    const count = this.selectedEmployees.length;
+    this.selectedEmployees = [];
+    
+    // Actualizar grid derecho
+    if (this.selectedGridApi) {
+      this.selectedGridApi.setGridOption('rowData', this.selectedEmployees);
+    }
+    
+    this.toastService.info('Lista Limpiada', `Se removieron ${count} empleados de la lista`);
+  }
+
+  // === MÉTODOS DE INFORMACIÓN ===
+
+  /**
+   * Obtener nombre del área de origen
+   */
+  getOriginAreaName(): string {
+    if (!this.transferConfig.fromAreaId) return '';
+    const area = this.filteredOriginAreas.find(a => a.areaId === this.transferConfig.fromAreaId);
+    return area?.areaName || '';
+  }
+
+  /**
+   * Obtener nombre del área de destino  
+   */
+  getToAreaName(): string {
+    if (!this.transferConfig.toAreaId) return '';
+    const area = this.areasList.find(a => a.areaId === this.transferConfig.toAreaId);
+    return area?.descripcion || '';
   }
 
   /**
@@ -304,6 +606,8 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
         next: (sedesAreas) => {
           this.originSedesAreas = sedesAreas;
           console.log('✅ Origin data loaded:', sedesAreas);
+          // Inicializar listas de autocomplete para origen
+          this.initializeOriginAutocompleteLists();
         },
         error: (error) => {
           console.error('Error loading origin data:', error);
@@ -333,6 +637,22 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
           this.toastService.error('Error de Datos', 'No se pudieron cargar las ubicaciones de destino disponibles');
         }
       });
+  }
+
+  /**
+   * Inicializar las listas de autocomplete para origen
+   */
+  private initializeOriginAutocompleteLists(): void {
+    // Inicializar lista de sedes para autocomplete
+    const uniqueSedes = this.getUniqueOriginSedes(this.originSedesAreas);
+    this.filteredFromSedesList = uniqueSedes.map(sede => ({
+      categoriaAuxiliarId: sede.siteId,
+      descripcion: sede.siteName
+    }));
+
+    // Limpiar áreas y centros de costo (se llenarán cuando se seleccione una sede)
+    this.filteredFromAreasList = [];
+    this.filteredFromCostCentersList = [];
   }
 
   /**
@@ -454,7 +774,7 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Aplicar filtros al grid
+   * Aplicar filtros al grid de empleados disponibles
    */
   private applyFiltersToGrid(): void {
     let filteredData = [...this.allEmployeesData];
@@ -478,7 +798,13 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
       );
     }
     
+    // Actualizar la lista filtrada
     this.allEmployees = filteredData;
+    
+    // Actualizar el grid de empleados disponibles si existe
+    if (this.availableGridApi) {
+      this.availableGridApi.setGridOption('rowData', filteredData);
+    }
   }
 
   /**
@@ -1018,6 +1344,160 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   }
 
   // ===============================
+  // ORIGIN AUTOCOMPLETE METHODS
+  // ===============================
+
+  // Métodos para Sede Origen
+  getFromSedeFilterText(): string {
+    if (this.transferConfig.fromBranchId) {
+      const uniqueSedes = this.getUniqueOriginSedes(this.originSedesAreas);
+      const selectedSede = uniqueSedes.find(s => s.siteId === this.transferConfig.fromBranchId);
+      return selectedSede?.siteName || '';
+    }
+    return this.fromSedeFilterTerm;
+  }
+
+  onFromSedeFilterChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const value = target.value;
+    this.fromSedeFilterTerm = value;
+    
+    const uniqueSedes = this.getUniqueOriginSedes(this.originSedesAreas);
+    this.filteredFromSedesList = uniqueSedes
+      .map(sede => ({
+        categoriaAuxiliarId: sede.siteId,
+        descripcion: sede.siteName
+      }))
+      .filter(sede => 
+        sede.descripcion.toLowerCase().includes(value.toLowerCase())
+      );
+    this.showFromSedeDropdown = this.filteredFromSedesList.length > 0;
+  }
+
+  onFromSedeFocus(): void {
+    if (this.originSedesAreas.length > 0) {
+      const uniqueSedes = this.getUniqueOriginSedes(this.originSedesAreas);
+      this.filteredFromSedesList = uniqueSedes.map(sede => ({
+        categoriaAuxiliarId: sede.siteId,
+        descripcion: sede.siteName
+      }));
+      this.showFromSedeDropdown = this.filteredFromSedesList.length > 0;
+    }
+  }
+
+  onFromSedeSelected(sede: SimpleSedeAutocomplete): void {
+    this.transferConfig.fromBranchId = sede.categoriaAuxiliarId;
+    this.fromSedeFilterTerm = sede.descripcion;
+    this.showFromSedeDropdown = false;
+    
+    // Trigger change event
+    this.onOriginSedeChange(sede.categoriaAuxiliarId);
+  }
+
+  onFromSedeBlur(): void {
+    setTimeout(() => {
+      this.showFromSedeDropdown = false;
+    }, 200);
+  }
+
+  // Métodos para Área Origen
+  getFromAreaFilterText(): string {
+    if (this.transferConfig.fromAreaId) {
+      const selectedArea = this.filteredOriginAreas.find(a => a.areaId === this.transferConfig.fromAreaId);
+      return selectedArea?.areaName || '';
+    }
+    return this.fromAreaFilterTerm;
+  }
+
+  onFromAreaFilterChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const value = target.value;
+    this.fromAreaFilterTerm = value;
+    
+    this.filteredFromAreasList = this.filteredOriginAreas
+      .map(area => ({
+        areaId: area.areaId,
+        descripcion: area.areaName
+      }))
+      .filter(area => 
+        area.descripcion.toLowerCase().includes(value.toLowerCase())
+      );
+    this.showFromAreaDropdown = this.filteredFromAreasList.length > 0;
+  }
+
+  onFromAreaFocus(): void {
+    if (this.transferConfig.fromBranchId && this.filteredOriginAreas.length > 0) {
+      this.filteredFromAreasList = this.filteredOriginAreas.map(area => ({
+        areaId: area.areaId,
+        descripcion: area.areaName
+      }));
+      this.showFromAreaDropdown = this.filteredFromAreasList.length > 0;
+    }
+  }
+
+  onFromAreaSelected(area: SimpleAreaAutocomplete): void {
+    this.transferConfig.fromAreaId = area.areaId;
+    this.fromAreaFilterTerm = area.descripcion;
+    this.showFromAreaDropdown = false;
+    
+    // Trigger change event
+    this.onOriginAreaChange(area.areaId);
+  }
+
+  onFromAreaBlur(): void {
+    setTimeout(() => {
+      this.showFromAreaDropdown = false;
+    }, 200);
+  }
+
+  // Métodos para Centro de Costo Origen
+  getFromCostCenterFilterText(): string {
+    if (this.transferConfig.fromCostCenterId) {
+      const selectedCC = this.selectedOriginCostCenters.find(cc => cc.costCenterId === this.transferConfig.fromCostCenterId);
+      return selectedCC?.costCenterName || '';
+    }
+    return this.fromCostCenterFilterTerm;
+  }
+
+  onFromCostCenterFilterChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const value = target.value;
+    this.fromCostCenterFilterTerm = value;
+    
+    this.filteredFromCostCentersList = this.selectedOriginCostCenters
+      .map(cc => ({
+        ccostoId: cc.costCenterId,
+        descripcion: cc.costCenterName
+      }))
+      .filter(cc => 
+        cc.descripcion.toLowerCase().includes(value.toLowerCase())
+      );
+    this.showFromCostCenterDropdown = this.filteredFromCostCentersList.length > 0;
+  }
+
+  onFromCostCenterFocus(): void {
+    if (this.transferConfig.fromAreaId && this.selectedOriginCostCenters.length > 0) {
+      this.filteredFromCostCentersList = this.selectedOriginCostCenters.map(cc => ({
+        ccostoId: cc.costCenterId,
+        descripcion: cc.costCenterName
+      }));
+      this.showFromCostCenterDropdown = this.filteredFromCostCentersList.length > 0;
+    }
+  }
+
+  onFromCostCenterSelected(costCenter: SimpleCostCenterAutocomplete): void {
+    this.transferConfig.fromCostCenterId = costCenter.ccostoId;
+    this.fromCostCenterFilterTerm = costCenter.descripcion;
+    this.showFromCostCenterDropdown = false;
+  }
+
+  onFromCostCenterBlur(): void {
+    setTimeout(() => {
+      this.showFromCostCenterDropdown = false;
+    }, 200);
+  }
+
+  // ===============================
   // ORIGIN METHODS - SEDE
   // ===============================
 
@@ -1207,11 +1687,6 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
     return sede?.siteName || 'Sede no encontrada';
   }
 
-  getOriginAreaName(): string {
-    if (!this.transferConfig.fromAreaId) return 'Seleccionar área origen';
-    const area = this.filteredOriginAreas.find(a => a.areaId === this.transferConfig.fromAreaId);
-    return area?.areaName || 'Área no encontrada';
-  }
 
   getDestinationSedeOptions(): {siteId: string, siteName: string}[] {
     const uniqueSedes = new Map<string, string>();
@@ -1222,6 +1697,14 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
   }
 
   getUniqueSedes(sedesAreas: SedeAreaCosto[]): {siteId: string, siteName: string}[] {
+    const uniqueSedes = new Map<string, string>();
+    sedesAreas.forEach(item => {
+      uniqueSedes.set(item.siteId, item.siteName);
+    });
+    return Array.from(uniqueSedes.entries()).map(([siteId, siteName]) => ({siteId, siteName}));
+  }
+
+  getUniqueOriginSedes(sedesAreas: SedeArea[]): {siteId: string, siteName: string}[] {
     const uniqueSedes = new Map<string, string>();
     sedesAreas.forEach(item => {
       uniqueSedes.set(item.siteId, item.siteName);

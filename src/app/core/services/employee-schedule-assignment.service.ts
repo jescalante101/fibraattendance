@@ -145,5 +145,23 @@ export class EmployeeScheduleAssignmentService {
     );
   }
 
+  /**
+   * Obtener el id de los empleados por rango de fechas
+   * /api/employee-schedule-assignment/idsPorRangoDeFechas?startDate=2025-08-11&endDate=2025-08-17
+   * @param startDate 
+   * @param endDate 
+   * @returns  ["1234567890","0987654321"]
+   */
+  getEmployeeIdsByDateRange(startDate: string, endDate: string): Observable<string[]> {
+    const params = new HttpParams()
+      .set('startDate', startDate)
+      .set('endDate', endDate);
+    return this.http.get<string[]>(
+      `${this.apiUrl}api/employee-schedule-assignment/idsPorRangoDeFechas`,
+      { params }
+    );
+  }
+
+
 
 } 

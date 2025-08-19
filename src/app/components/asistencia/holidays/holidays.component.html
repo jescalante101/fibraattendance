@@ -176,13 +176,13 @@
   </div>
 
   <!-- AG-Grid Container sin paginación -->
-  <div class="ag-theme-alpine" style="height: 600px; width: 100%;">
+  <div class="ag-theme-quartz w-full h-[calc(100vh-20rem)]" >
     <ag-grid-angular
       #agGrid
       [columnDefs]="columnDefs"
       [rowData]="paginatedData"
       [gridOptions]="gridOptions"
-      style="height: 100%; width: 100%;">
+      class="w-full h-full">
     </ag-grid-angular>
   </div>
 

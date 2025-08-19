@@ -128,7 +128,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
           submenu: [
             { label: 'Personal', link: '/panel/personal/empleado/empleado', permission: 'personal.empleado.list' },
             { label: 'Personal con Turnos', link: '/panel/personal/empleado/asignar-horario', permission: 'personal.empleado.horarios' },
-            { label: 'Personal Traslado', link: '/panel/personal/empleado/traslado', permission: 'personal.empleado.tranfers'  }
+            { label: 'Solicitud de Traslado', link: '/panel/personal/empleado/traslado', permission: 'personal.empleado.tranfers'  }
           ]
         }
       ]

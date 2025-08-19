@@ -1,241 +1,211 @@
-<!-- Contenido del Modal de Transferencia Individual -->
-<div class="h-full flex flex-col">
+<!-- Modal de Transferencia Individual con Layout Compacto -->
+<div class="h-full flex flex-col min-h-0 bg-gray-50">
   
   <!-- Indicador de carga -->
-  <div *ngIf="loading" class="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+  <div *ngIf="loading" class="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-50">
     <div class="flex flex-col items-center">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-fiori-primary"></div>
-      <p class="mt-2 text-sm text-fiori-text font-medium">{{ data.mode === 'edit' ? 'Cargando...' : 'Procesando...' }}</p>
+      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-fiori-primary"></div>
+      <p class="mt-3 text-sm text-fiori-text font-medium">{{ data.mode === 'edit' ? 'Cargando transferencia...' : 'Guardando transferencia...' }}</p>
     </div>
   </div>
   
-  <!-- Contenido principal con scroll -->
-  <div class="flex-1 overflow-y-auto p-4 space-y-4">
-    
-    <!-- Información del Empleado -->
-    <div class="card-fiori">
-      <div class="flex items-center space-x-2 mb-3">
-        <lucide-icon name="user" class="w-4 h-4 text-fiori-primary"></lucide-icon>
-        <h3 class="text-sm font-semibold text-fiori-text">Empleado</h3>
+  <!-- Header con información del empleado destacada -->
+  <div class="bg-white border-b border-gray-200 px-4 py-3 flex-shrink-0">
+    <!-- Empleado Seleccionado -->
+    <div *ngIf="formData.selectedEmployee" class="flex items-center space-x-3">
+      <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-sm">
+        <lucide-icon name="user" class="w-5 h-5 text-white"></lucide-icon>
       </div>
-      <!-- Búsqueda de Empleado (solo si no hay empleado prellenado y no está en modo edición) -->
-      <div *ngIf="!data.employee && data.mode !== 'edit'" class="mb-4">
-        <div class="relative">
-          <input
-            type="text"
-            [value]="formData.employeeSearchTerm"
-            (input)="onEmployeeSearch($event.target?.value || '')"
-            placeholder="Escriba el nombre, documento o código del empleado..."
-            class="w-full px-4 py-3 pl-12 pr-4 bg-fiori-surface border border-fiori-border rounded-fiori text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all"
-          >
-          <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
-            <lucide-icon name="search" class="w-5 h-5 text-fiori-subtext"></lucide-icon>
+      <div class="flex-1">
+        <div class="font-semibold text-gray-900 text-sm">
+          {{ formData.selectedEmployee.nombres }} {{ formData.selectedEmployee.apellidoPaterno }} {{ formData.selectedEmployee.apellidoMaterno }}
+        </div>
+        <div class="text-xs text-gray-500">
+          DNI: {{ formData.selectedEmployee.nroDoc }} | ID: {{ formData.selectedEmployee.personalId }}
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="px-2 py-1 bg-green-50 border border-green-200 rounded-full">
+          <span class="text-xs font-medium text-green-700">✓ Seleccionado</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Búsqueda de Empleado (solo si no hay empleado prellenado y no está en modo edición) -->
+    <div *ngIf="!data.employee && data.mode !== 'edit'" class="mb-2">
+      <div class="relative">
+        <input
+          type="text"
+          [value]="formData.employeeSearchTerm"
+          (input)="onEmployeeSearch($event.target?.value || '')"
+          placeholder="Buscar empleado por nombre, documento o código..."
+          class="w-full px-3 py-2 pl-10 pr-4 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+        >
+        <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+          <lucide-icon name="search" class="w-4 h-4 text-gray-400"></lucide-icon>
+        </div>
+      </div>
+      
+      <!-- Dropdown de resultados -->
+      <div 
+        *ngIf="showEmployeeDropdown"
+        class="absolute z-60 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"
+      >
+        <div 
+          *ngFor="let employee of employeeSearchResults"
+          class="px-3 py-2 cursor-pointer hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors"
+          (click)="selectEmployee(employee)"
+        >
+          <div class="font-medium text-gray-900 text-sm">
+            {{ employee.nombres }} {{ employee.apellidoPaterno }} {{ employee.apellidoMaterno }}
+          </div>
+          <div class="text-xs text-gray-500">
+            DNI: {{ employee.nroDoc }} | ID: {{ employee.personalId }}
           </div>
         </div>
         
-        <!-- Dropdown de resultados -->
-        <div 
-          *ngIf="showEmployeeDropdown"
-          class="absolute z-60 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-fiori shadow-fioriHover max-h-48 overflow-y-auto"
-        >
-          <div 
-            *ngFor="let employee of employeeSearchResults"
-            class="px-4 py-3 cursor-pointer hover:bg-fiori-hover border-b border-fiori-border last:border-b-0 transition-colors"
-            (click)="selectEmployee(employee)"
-          >
-            <div class="font-medium text-fiori-text">
-              {{ employee.nombres }} {{ employee.apellidoPaterno }} {{ employee.apellidoMaterno }}
-            </div>
-            <div class="text-sm text-fiori-subtext">
-              DNI: {{ employee.nroDoc }} | ID: {{ employee.personalId }}
-            </div>
+        <div *ngIf="employeeSearchResults.length === 0" class="px-3 py-2 text-gray-500 text-center text-xs">
+          No se encontraron empleados
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Contenido principal con 2 columnas -->
+  <div class="flex-1 overflow-y-auto p-4 min-h-0" style="min-height: 400px;">
+    
+    <!-- Sección de Ubicaciones: Origen vs Destino -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+      
+      <!-- ORIGEN: Ubicación Actual -->
+      <div>
+        <h4 class="text-sm font-medium text-gray-700 mb-2">Sede Actual</h4>
+        <div class="bg-gray-100 border border-gray-300 rounded-lg px-3 py-2.5">
+          <div class="text-sm font-medium text-gray-900">
+            {{ formData.currentBranch || 'SEDE CHILCA 02' }}
+          </div>
+        </div>
+        
+        <h4 class="text-sm font-medium text-gray-700 mb-2 mt-3">Área Actual</h4>
+        <div class="bg-gray-100 border border-gray-300 rounded-lg px-3 py-2.5">
+          <div class="text-sm font-medium text-gray-900">
+            {{ formData.currentArea || 'CONTABILIDAD' }}
+          </div>
+        </div>
+        
+        <h4 class="text-sm font-medium text-gray-700 mb-2 mt-3">Centro de Costo Actual</h4>
+        <div class="bg-gray-100 border border-gray-300 rounded-lg px-3 py-2.5">
+          <div class="text-sm font-medium text-gray-900">
+            {{ formData.currentCostCenter || 'ALMACÉN LURIN' }}
+          </div>
+        </div>
+      </div>
+      
+      <!-- DESTINO: Nueva Ubicación con Autocomplete -->
+      <div>
+        <h4 class="text-sm font-medium text-gray-700 mb-2">
+          Nueva Sede <span class="text-red-500">*</span>
+        </h4>
+        <div class="relative">
+          <input 
+            type="text" 
+            [value]="getSedeFilterText()"
+            (input)="onSedeFilterChange($event); formData.newBranchId = ''"
+            (focus)="onSedeFocus()"
+            (blur)="onSedeBlur()"
+            placeholder="Seleccionar sede..."
+            class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+            [class.border-red-300]="!formData.newBranchId"
+            [class.bg-red-50]="!formData.newBranchId">
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+            <lucide-icon name="building" class="w-4 h-4 text-gray-400"></lucide-icon>
           </div>
           
-          <div *ngIf="employeeSearchResults.length === 0" class="px-4 py-3 text-fiori-subtext text-center">
-            No se encontraron empleados
-          </div>
-        </div>
-      </div>
-
-      <!-- Empleado Seleccionado -->
-      <div *ngIf="formData.selectedEmployee" class="bg-fiori-hover rounded-fiori border border-fiori-border p-4">
-        <div class="flex items-center space-x-4">
-          <div class="w-12 h-12 bg-gradient-to-br from-fiori-success to-fiori-info rounded-full flex items-center justify-center shadow-fioriSm">
-            <lucide-icon name="user-check" class="w-6 h-6 text-white"></lucide-icon>
-          </div>
-          <div class="flex-1">
-            <div class="font-semibold text-fiori-text">
-              {{ formData.selectedEmployee.nombres }} {{ formData.selectedEmployee.apellidoPaterno }} {{ formData.selectedEmployee.apellidoMaterno }}
-            </div>
-            <div class="text-sm text-fiori-subtext">
-              DNI: {{ formData.selectedEmployee.nroDoc }} | ID: {{ formData.selectedEmployee.personalId }}
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="px-3 py-1 bg-fiori-success/10 border border-fiori-success/20 rounded-full">
-              <span class="text-xs font-medium text-fiori-success">✓ Seleccionado</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Información de Transferencia -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      
-      <!-- Ubicación Actual (Desde) -->
-      <div class="card-fiori">
-        <div class="flex items-center space-x-2 mb-3">
-          <lucide-icon name="map-pin" class="w-4 h-4 text-fiori-warning"></lucide-icon>
-          <h3 class="text-sm font-semibold text-fiori-text">Ubicación Actual</h3>
-        </div>
-        <!-- Mensaje informativo para modo edición -->
-        <div *ngIf="data.mode === 'edit'" class="mb-3 p-2 bg-fiori-warning/10 rounded text-xs text-fiori-warning">
-          <lucide-icon name="info" class="w-3 h-3 inline mr-1"></lucide-icon>
-          Según transferencia existente
-        </div>
-        
-        <div class="space-y-3">
-          <div>
-            <label class="text-xs font-medium text-fiori-subtext mb-1 block">Sede</label>
-            <div class="px-3 py-2 bg-fiori-background border border-fiori-border rounded text-sm text-fiori-text">
-              {{ formData.currentBranch || 'No asignada' }}
-            </div>
-          </div>
-          <div>
-            <label class="text-xs font-medium text-fiori-subtext mb-1 block">Área</label>
-            <div class="px-3 py-2 bg-fiori-background border border-fiori-border rounded text-sm text-fiori-text">
-              {{ formData.currentArea || 'No asignada' }}
-            </div>
-          </div>
-          <div>
-            <label class="text-xs font-medium text-fiori-subtext mb-1 block">Centro de Costo</label>
-            <div class="px-3 py-2 bg-fiori-background border border-fiori-border rounded text-sm text-fiori-text">
-              {{ formData.currentCostCenter || 'No asignado' }}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Nueva Ubicación (Hacia) -->
-      <div class="card-fiori">
-        <div class="flex items-center space-x-2 mb-3">
-          <lucide-icon name="target" class="w-4 h-4 text-fiori-success"></lucide-icon>
-          <h3 class="text-sm font-semibold text-fiori-text">Nueva Ubicación</h3>
-        </div>
-        
-        <div class="space-y-3">
-          <!-- Campo Nueva Sede with Autocomplete -->
-          <div class="relative">
-            <label class="text-xs font-medium text-fiori-subtext mb-1 block">
-              Sede <span class="text-fiori-error">*</span>
-            </label>
-            <div class="relative">
-              <input 
-                type="text" 
-                [value]="getSedeFilterText()"
-                (input)="onSedeFilterChange($event); formData.newBranchId = ''"
-                (focus)="showSedeDropdown = true"
-                (blur)="onSedeBlur()"
-                placeholder="Seleccionar sede..."
-                class="w-full pl-8 pr-3 py-2 text-sm border border-fiori-border rounded bg-fiori-surface text-fiori-text focus:ring-1 focus:ring-fiori-primary focus:border-fiori-primary transition-all"
-                [class.border-fiori-error]="!formData.newBranchId"
-                [class.bg-red-50]="!formData.newBranchId">
-              <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
-                <lucide-icon name="building" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
-              </div>
-              
-              <!-- Dropdown de sedes -->
-              <div *ngIf="showSedeDropdown && filteredSedesList && filteredSedesList.length > 0" 
-                   class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover max-h-60 overflow-y-auto">
-                <div *ngFor="let sede of filteredSedesList; trackBy: trackBySedeId" 
-                     (mousedown)="onSedeSelected(sede)"
-                     class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border last:border-b-0 transition-colors">
-                  <div class="flex items-center space-x-3">
-                    <div class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
-                      <lucide-icon name="map-pin" class="w-3 h-3 text-green-600"></lucide-icon>
-                    </div>
-                    <div>
-                      <div class="text-sm font-medium text-fiori-text">{{ sede.descripcion }}</div>
-                      <div class="text-xs text-fiori-subtext">ID: {{ sede.categoriaAuxiliarId }}</div>
-                    </div>
-                  </div>
+          <!-- Dropdown de sedes -->
+          <div *ngIf="showSedeDropdown && filteredDestinationSedesList && filteredDestinationSedesList.length > 0" 
+               class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+            <div *ngFor="let sede of filteredDestinationSedesList; trackBy: trackBySedeId" 
+                 (mousedown)="onSedeSelected(sede)"
+                 class="px-3 py-2.5 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors">
+              <div class="flex items-center space-x-2">
+                <div class="w-5 h-5 bg-green-100 rounded flex items-center justify-center">
+                  <lucide-icon name="map-pin" class="w-3 h-3 text-green-600"></lucide-icon>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">{{ sede.siteName }}</div>
+                  <div class="text-xs text-gray-500">ID: {{ sede.siteId }}</div>
                 </div>
               </div>
             </div>
           </div>
-          <!-- Campo Nueva Área with Autocomplete -->
-          <div class="relative">
-            <label class="text-xs font-medium text-fiori-subtext mb-1 block">
-              Área <span class="text-fiori-error">*</span>
-            </label>
-            <div class="relative">
-              <input 
-                type="text" 
-                [value]="getAreaFilterText()"
-                (input)="onAreaFilterChange($event); formData.newAreaId = ''"
-                (focus)="showAreaDropdown = true"
-                (blur)="onAreaBlur()"
-                placeholder="Seleccionar área..."
-                class="w-full pl-8 pr-3 py-2 text-sm border border-fiori-border rounded bg-fiori-surface text-fiori-text focus:ring-1 focus:ring-fiori-primary focus:border-fiori-primary transition-all"
-                [class.border-fiori-error]="!formData.newAreaId"
-                [class.bg-red-50]="!formData.newAreaId">
-              <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
-                <lucide-icon name="layers" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
-              </div>
-              
-              <!-- Dropdown de áreas -->
-              <div *ngIf="showAreaDropdown && filteredAreasList && filteredAreasList.length > 0" 
-                   class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover max-h-60 overflow-y-auto">
-                <div *ngFor="let area of filteredAreasList; trackBy: trackByAreaId" 
-                     (mousedown)="onAreaSelected(area)"
-                     class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border last:border-b-0 transition-colors">
-                  <div class="flex items-center space-x-3">
-                    <div class="w-6 h-6 bg-fiori-accent/10 rounded-lg flex items-center justify-center">
-                      <lucide-icon name="layers" class="w-3 h-3 text-fiori-accent"></lucide-icon>
-                    </div>
-                    <div>
-                      <div class="text-sm font-medium text-fiori-text">{{ area.descripcion }}</div>
-                      <div class="text-xs text-fiori-subtext">ID: {{ area.areaId }}</div>
-                    </div>
-                  </div>
+        </div>
+        
+        <h4 class="text-sm font-medium text-gray-700 mb-2 mt-3">
+          Nueva Área <span class="text-red-500">*</span>
+        </h4>
+        <div class="relative">
+          <input 
+            type="text" 
+            [value]="getAreaFilterText()"
+            (input)="onAreaFilterChange($event); formData.newAreaId = ''"
+            (focus)="onAreaFocus()"
+            (blur)="onAreaBlur()"
+            [disabled]="!formData.newBranchId"
+            placeholder="Seleccionar área..."
+            class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
+            [class.border-red-300]="!formData.newAreaId"
+            [class.bg-red-50]="!formData.newAreaId && formData.newBranchId">
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+            <lucide-icon name="layers" class="w-4 h-4 text-gray-400"></lucide-icon>
+          </div>
+          
+          <!-- Dropdown de áreas -->
+          <div *ngIf="showAreaDropdown && filteredDestinationAreasList && filteredDestinationAreasList.length > 0" 
+               class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+            <div *ngFor="let area of filteredDestinationAreasList; trackBy: trackByAreaId" 
+                 (mousedown)="onAreaSelected(area)"
+                 class="px-3 py-2.5 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors">
+              <div class="flex items-center space-x-2">
+                <div class="w-5 h-5 bg-blue-100 rounded flex items-center justify-center">
+                  <lucide-icon name="layers" class="w-3 h-3 text-blue-600"></lucide-icon>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">{{ area.areaName }}</div>
+                  <div class="text-xs text-gray-500">ID: {{ area.areaId }}</div>
                 </div>
               </div>
             </div>
           </div>
-          <!-- Campo Nuevo Centro de Costo with Autocomplete -->
-          <div class="relative">
-            <label class="text-xs font-medium text-fiori-subtext mb-1 block">
-              Centro de Costo
-            </label>
-            <div class="relative">
-              <input 
-                type="text" 
-                [value]="getCostCenterFilterText()"
-                (input)="onCostCenterFilterChange($event); formData.newCostCenterId = ''"
-                (focus)="showCostCenterDropdown = true"
-                (blur)="onCostCenterBlur()"
-                placeholder="Opcional..."
-                class="w-full pl-8 pr-3 py-2 text-sm border border-fiori-border rounded bg-fiori-surface text-fiori-text focus:ring-1 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
-              <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
-                <lucide-icon name="target" class="w-3 h-3 text-fiori-subtext"></lucide-icon>
-              </div>
-              
-              <!-- Dropdown de centros de costo -->
-              <div *ngIf="showCostCenterDropdown && filteredCostCentersList && filteredCostCentersList.length > 0" 
-                   class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-fioriHover max-h-60 overflow-y-auto">
-                <div *ngFor="let cc of filteredCostCentersList; trackBy: trackByCostCenterId" 
-                     (mousedown)="onCostCenterSelected(cc)"
-                     class="px-4 py-3 hover:bg-fiori-hover cursor-pointer border-b border-fiori-border last:border-b-0 transition-colors">
-                  <div class="flex items-center space-x-3">
-                    <div class="w-6 h-6 bg-fiori-warning/10 rounded-lg flex items-center justify-center">
-                      <lucide-icon name="target" class="w-3 h-3 text-fiori-warning"></lucide-icon>
-                    </div>
-                    <div>
-                      <div class="text-sm font-medium text-fiori-text">{{ cc.descripcion }}</div>
-                      <div class="text-xs text-fiori-subtext">ID: {{ cc.ccostoId }}</div>
-                    </div>
-                  </div>
+        </div>
+        
+        <h4 class="text-sm font-medium text-gray-700 mb-2 mt-3">Nuevo Centro de Costo</h4>
+        <div class="relative">
+          <input 
+            type="text" 
+            [value]="getCostCenterFilterText()"
+            (input)="onCostCenterFilterChange($event); formData.newCostCenterId = ''"
+            (focus)="onCostCenterFocus()"
+            (blur)="onCostCenterBlur()"
+            [disabled]="!formData.newAreaId"
+            placeholder="Opcional..."
+            class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:bg-gray-100 disabled:cursor-not-allowed">
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+            <lucide-icon name="target" class="w-4 h-4 text-gray-400"></lucide-icon>
+          </div>
+          
+          <!-- Dropdown de centros de costo -->
+          <div *ngIf="showCostCenterDropdown && filteredDestinationCostCentersList && filteredDestinationCostCentersList.length > 0" 
+               class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+            <div *ngFor="let cc of filteredDestinationCostCentersList; trackBy: trackByCostCenterId" 
+                 (mousedown)="onCostCenterSelected(cc)"
+                 class="px-3 py-2.5 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors">
+              <div class="flex items-center space-x-2">
+                <div class="w-5 h-5 bg-amber-100 rounded flex items-center justify-center">
+                  <lucide-icon name="target" class="w-3 h-3 text-amber-600"></lucide-icon>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">{{ cc.costCenterName }}</div>
+                  <div class="text-xs text-gray-500">ID: {{ cc.costCenterId }}</div>
                 </div>
               </div>
             </div>
@@ -243,82 +213,79 @@
         </div>
       </div>
     </div>
-
-    <!-- Fechas de Transferencia -->
-    <div class="card-fiori">
+    
+    <!-- Sección de Fechas -->
+    <div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
       <div class="flex items-center space-x-2 mb-3">
-        <lucide-icon name="calendar" class="w-4 h-4 text-fiori-accent"></lucide-icon>
-        <h3 class="text-sm font-semibold text-fiori-text">Período de Transferencia</h3>
+        <lucide-icon name="calendar" class="w-4 h-4 text-gray-600"></lucide-icon>
+        <h3 class="text-sm font-semibold text-gray-700">Período de Transferencia</h3>
       </div>
       
-      <div class="space-y-3">
-        <!-- Reusable Date Range Picker -->
-        <div>
-          <app-date-range-picker
-            placeholder="Seleccionar período..."
-            [formControl]="dateRangeControl"
-            size="sm"
-            theme="default"
-            iconName="calendar-range"
-            (dateRangeChange)="onDateRangeSelected($event)"
-            (dateSelected)="onDatesSelected($event)"
-          ></app-date-range-picker>
-        </div>
-        
-        <!-- Checkbox para transferencia permanente -->
-        <div class="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="isPermanent"
-            [(ngModel)]="formData.isPermanent"
-            (change)="onPermanentChange()"
-            class="w-4 h-4 text-fiori-primary border-fiori-border rounded focus:ring-fiori-primary"
-          >
-          <label for="isPermanent" class="text-xs text-fiori-text cursor-pointer">
-            Transferencia permanente
-          </label>
-        </div>
+      <!-- Date Range Picker -->
+      <div class="mb-3">
+        <app-date-range-picker
+          placeholder="Seleccionar período..."
+          [formControl]="dateRangeControl"
+          size="sm"
+          theme="default"
+          iconName="calendar-range"
+          (dateRangeChange)="onDateRangeSelected($event)"
+          (dateSelected)="onDatesSelected($event)"
+        ></app-date-range-picker>
+      </div>
+      
+      <!-- Checkbox permanente -->
+      <div class="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          id="isPermanent"
+          [(ngModel)]="formData.isPermanent"
+          (change)="onPermanentChange()"
+          class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+        >
+        <label for="isPermanent" class="text-sm text-gray-700 cursor-pointer">
+          Transferencia permanente
+        </label>
       </div>
     </div>
-
-    <!-- Observaciones -->
-    <div class="card-fiori">
+    
+    <!-- Sección de Observaciones -->
+    <div class="bg-white rounded-lg border border-gray-200 p-4">
       <div class="flex items-center space-x-2 mb-3">
-        <lucide-icon name="file-text" class="w-4 h-4 text-fiori-info"></lucide-icon>
-        <h3 class="text-sm font-semibold text-fiori-text">Observaciones</h3>
+        <lucide-icon name="file-text" class="w-4 h-4 text-gray-600"></lucide-icon>
+        <h3 class="text-sm font-semibold text-gray-700">Observaciones</h3>
       </div>
       
       <div class="relative">
         <textarea
           [(ngModel)]="formData.observations"
-          placeholder="Detalles adicionales (opcional)..."
-          rows="2"
+          placeholder="mod"
+          rows="4"
           maxlength="200"
-          class="w-full px-3 py-2 text-sm border border-fiori-border rounded bg-fiori-surface text-fiori-text focus:ring-1 focus:ring-fiori-primary focus:border-fiori-primary transition-all resize-none placeholder:text-fiori-subtext"
+          class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none placeholder:text-gray-400"
         ></textarea>
-        <div class="absolute bottom-1 right-2 text-xs text-fiori-subtext">
+        <div class="absolute bottom-2 right-3 text-xs text-gray-400">
           {{ formData.observations?.length || 0 }}/200
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Footer del Modal -->
-  <div class="px-4 py-3 border-t border-fiori-border flex-shrink-0">
+  <!-- Footer compacto -->
+  <div class="bg-white border-t border-gray-200 px-4 py-3 flex-shrink-0">
     <div class="flex items-center justify-between">
-      <!-- Estado de validación compacto -->
-      <div class="text-xs" [class.text-fiori-warning]="!isFormValid()" [class.text-fiori-success]="isFormValid()">
-        <lucide-icon [name]="isFormValid() ? 'check-circle' : 'alert-circle'" class="w-3 h-3 inline mr-1"></lucide-icon>
-        {{ isFormValid() ? 'Listo para guardar' : 'Complete campos requeridos' }}
+      <!-- Estado de validación -->
+      <div class="text-xs flex items-center space-x-1" [class.text-amber-600]="!isFormValid()" [class.text-green-600]="isFormValid()">
+        <lucide-icon [name]="isFormValid() ? 'check-circle' : 'alert-circle'" class="w-3 h-3"></lucide-icon>
+        <span>{{ isFormValid() ? 'Listo para guardar' : 'Complete campos requeridos' }}</span>
       </div>
       
-      <!-- Botones compactos -->
+      <!-- Botones -->
       <div class="flex items-center space-x-2">
-        
         <button
           (click)="onSave()"
           [disabled]="!isFormValid()"
-          class="px-4 py-1.5 text-sm bg-fiori-primary text-white rounded hover:bg-fiori-secondary transition-all disabled:bg-fiori-subtext disabled:cursor-not-allowed flex items-center space-x-1"
+          class="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center space-x-1"
         >
           <lucide-icon name="save" class="w-3 h-3"></lucide-icon>
           <span>{{ getSaveButtonText() }}</span>
@@ -326,7 +293,7 @@
 
         <button
           (click)="onCancel()"
-          class="px-4 py-1.5 text-sm text-fiori-text bg-fiori-surface border border-fiori-border rounded hover:bg-fiori-hover transition-all"
+          class="px-3 py-1.5 text-xs text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-all"
         >
           Cancelar
         </button>

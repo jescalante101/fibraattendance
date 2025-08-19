@@ -393,6 +393,7 @@ export class TurnoComponent implements OnInit {
         field: 'checkbox',
         headerName: '',
         width: 50,
+        maxWidth: 50,
         pinned: 'left',
         checkboxSelection: true,
         headerCheckboxSelection: true,
@@ -404,6 +405,7 @@ export class TurnoComponent implements OnInit {
         field: 'id',
         headerName: 'ID',
         width: 80,
+        maxWidth: 80,
         pinned: 'left',
         cellRenderer: (params: any) => {
           return `<div class="flex items-center justify-center py-1">
@@ -416,7 +418,8 @@ export class TurnoComponent implements OnInit {
       {
         field: 'alias',
         headerName: 'Nombre',
-        width: 280,
+        width: 450,
+        maxWidth: 450,
         pinned: 'left',
         cellRenderer: (params: any) => {
           return `<div class="flex items-center py-1">
@@ -434,7 +437,9 @@ export class TurnoComponent implements OnInit {
       {
         field: 'horario',
         headerName: 'Horarios',
-        width: 400,
+        width: 500,
+        maxWidth: 500,
+
         cellRenderer: (params: any) => {
           const horarios = this.getAreas(params.value);
           return `<div class="flex items-center text-sm">
@@ -470,7 +475,6 @@ export class TurnoComponent implements OnInit {
       {
         field: 'shiftCycle',
         headerName: 'Ciclo',
-        width: 120,
         cellRenderer: (params: any) => {
           const unit = params.data.cycleUnit === 1 ? 'semanas' : 'días';
           return `<div class="flex items-center justify-center">
@@ -483,7 +487,6 @@ export class TurnoComponent implements OnInit {
       {
         field: 'autoShift',
         headerName: 'Estado',
-        width: 140,
         cellRenderer: (params: any) => {
           if (params.value) {
             return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-fiori-success/10 text-fiori-success border border-fiori-success/20">

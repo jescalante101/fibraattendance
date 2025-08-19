@@ -364,7 +364,8 @@ export class HorarioComponent implements OnInit {
       {
         field: 'checkbox',
         headerName: '',
-        width: 50,
+        width: 30,
+        maxWidth: 30,
         pinned: 'left',
         checkboxSelection: true,
         headerCheckboxSelection: true,
@@ -375,7 +376,8 @@ export class HorarioComponent implements OnInit {
       {
         field: 'idHorio',
         headerName: 'ID',
-        width: 80,
+        maxWidth: 75,
+        width: 50,
         pinned: 'left',
         cellRenderer: (params: any) => {
           return `<div class="flex items-center justify-center py-1">
@@ -388,7 +390,8 @@ export class HorarioComponent implements OnInit {
       {
         field: 'nombre',
         headerName: 'Nombre',
-        width: 280,
+        width: 350,
+        maxWidth: 350,
         pinned: 'left',
         cellRenderer: (params: any) => {
           return `<div class="flex items-center py-1">
@@ -427,6 +430,8 @@ export class HorarioComponent implements OnInit {
       {
         field: 'horario',
         headerName: 'Horario',
+        maxWidth: 300,
+        width:300,
         cellRenderer: (params: any) => {
           return `<div class="flex items-center space-x-2">
             <div class="flex items-center space-x-1">
@@ -449,7 +454,7 @@ export class HorarioComponent implements OnInit {
       },
       {
         field: 'tiempoTrabajo',
-        headerName: 'Tiempo Trabajo',
+        headerName: 'T. Trabajo',
         cellRenderer: (params: any) => {
           return `<div class="flex items-center justify-center space-x-2">
             <svg class="w-4 h-4 text-fiori-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">

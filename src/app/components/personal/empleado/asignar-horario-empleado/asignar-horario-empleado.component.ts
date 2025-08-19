@@ -388,7 +388,8 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       {
         field: 'fullNameEmployee',
         headerName: 'Personal',
-        width: 280,
+        width: 400,
+        maxWidth: 400,
         pinned: 'left',
         cellRenderer: (params: any) => {
           return `<div class="flex items-center py-1">
@@ -431,6 +432,8 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       {
         field: 'areaName',
         headerName: 'Área',
+        width: 400,
+        maxWidth: 400,
         cellRenderer: (params: any) => {
           if (!params.value) return '<span class="text-fiori-subtext">-</span>';
           return `<div class="flex items-center text-sm">
@@ -486,7 +489,7 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
               <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              Horario
+              
             </button>
             <button class="edit-btn p-2 text-fiori-primary hover:bg-fiori-primary/10 rounded transition-colors" title="Editar">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -118,132 +118,207 @@
           </div>
 
           <!-- Content -->
-          <div
-            *ngIf="datosListos"
-            class="grid grid-cols-1 lg:grid-cols-2 gap-8"
-          >
-            <!-- Sede Card -->
-            <div
-              class="bg-white border border-fiori-border rounded-xl p-6 shadow-fioriSm"
-            >
-              <div class="flex items-center space-x-3 mb-4">
-                <div
-                  class="w-10 h-10 bg-fiori-primary/10 rounded-lg flex items-center justify-center"
-                >
-                  <mat-icon class="text-fiori-primary">business</mat-icon>
+          <div *ngIf="datosListos" class="space-y-8">
+            <!-- Sede y Área -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <!-- Sede Card -->
+              <div
+                class="bg-white border border-fiori-border rounded-xl p-6 shadow-fioriSm"
+              >
+                <div class="flex items-center space-x-3 mb-4">
+                  <div
+                    class="w-10 h-10 bg-fiori-primary/10 rounded-lg flex items-center justify-center"
+                  >
+                    <mat-icon class="text-fiori-primary">business</mat-icon>
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-fiori-text">Sede</h3>
+                    <p class="text-sm text-fiori-subtext">Selecciona una sede</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 class="font-semibold text-fiori-text">Sede</h3>
-                  <p class="text-sm text-fiori-subtext">Selecciona una sede</p>
-                </div>
-              </div>
 
-              <div class="relative">
-                <select
-                  formControlName="sede"
-                  (change)="onSedeSeleccionada(filtroForm.get('sede')?.value)"
-                  class="bg-fiori-surface border border-fiori-border text-fiori-text text-sm rounded-lg focus:ring-fiori-primary focus:border-fiori-primary block w-full p-3"
-                  [class.border-fiori-error]="
+                <div class="relative">
+                  <select
+                    formControlName="sede"
+                    (change)="onSedeSeleccionada(filtroForm.get('sede')?.value)"
+                    class="bg-fiori-surface border border-fiori-border text-fiori-text text-sm rounded-lg focus:ring-fiori-primary focus:border-fiori-primary block w-full p-3"
+                    [class.border-fiori-error]="
+                      filtroForm.get('sede')?.hasError('required') &&
+                      filtroForm.get('sede')?.touched
+                    "
+                  >
+                    <option value="" disabled>Seleccionar sede...</option>
+                    <option
+                      *ngFor="let sede of sedes"
+                      [value]="sede.categoriaAuxiliarId"
+                    >
+                      {{ sede.descripcion }}
+                    </option>
+                  </select>
+                </div>
+
+                <div
+                  *ngIf="
                     filtroForm.get('sede')?.hasError('required') &&
                     filtroForm.get('sede')?.touched
                   "
+                  class="mt-2 text-sm text-fiori-error flex items-center"
                 >
-                  <option value="" disabled>Seleccionar sede...</option>
-                  <option
-                    *ngFor="let sede of sedes"
-                    [value]="sede.categoriaAuxiliarId"
-                  >
-                    {{ sede.descripcion }}
-                  </option>
-                </select>
+                  <mat-icon class="w-4 h-4 mr-1">error</mat-icon>
+                  Sede es requerida
+                </div>
               </div>
 
+              <!-- Area Card -->
               <div
-                *ngIf="
-                  filtroForm.get('sede')?.hasError('required') &&
-                  filtroForm.get('sede')?.touched
-                "
-                class="mt-2 text-sm text-fiori-error flex items-center"
+                class="bg-white border border-fiori-border rounded-xl p-6 shadow-fioriSm"
               >
-                <mat-icon class="w-4 h-4 mr-1">error</mat-icon>
-                Sede es requerida
-              </div>
-            </div>
-
-            <!-- Area Card -->
-            <div
-              class="bg-white border border-fiori-border rounded-xl p-6 shadow-fioriSm"
-            >
-              <div class="flex items-center space-x-3 mb-4">
-                <div
-                  class="w-10 h-10 bg-fiori-accent/10 rounded-lg flex items-center justify-center"
-                >
-                  <mat-icon class="text-fiori-accent">domain</mat-icon>
-                </div>
-                <div>
-                  <h3 class="font-semibold text-fiori-text">Área</h3>
-                  <p class="text-sm text-fiori-subtext">
-                    Selecciona un área específica
-                  </p>
-                </div>
-              </div>
-
-              <div
-                class="max-h-80 overflow-y-auto border border-fiori-border rounded-lg"
-              >
-                <div
-                  *ngIf="areasFiltradas.length === 0"
-                  class="p-8 text-center text-fiori-subtext"
-                >
-                  <mat-icon class="w-12 h-12 mx-auto mb-2 text-fiori-muted"
-                    >domain_disabled</mat-icon
+                <div class="flex items-center space-x-3 mb-4">
+                  <div
+                    class="w-10 h-10 bg-fiori-accent/10 rounded-lg flex items-center justify-center"
                   >
-                  <p>No hay áreas disponibles</p>
-                  <p class="text-sm">Selecciona una sede primero</p>
+                    <mat-icon class="text-fiori-accent">domain</mat-icon>
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-fiori-text">Área</h3>
+                    <p class="text-sm text-fiori-subtext">
+                      Selecciona un área específica
+                    </p>
+                  </div>
                 </div>
 
                 <div
-                  *ngFor="let area of areasFiltradas"
-                  class="p-4 border-b border-fiori-border last:border-b-0 hover:bg-fiori-hover cursor-pointer transition-colors"
-                  [class.bg-blue-50]="
-                    filtroForm.get('area')?.value === area.areaId
-                  "
-                  [class.border-l-4]="
-                    filtroForm.get('area')?.value === area.areaId
-                  "
-                  [class.border-l-fiori-primary]="
-                    filtroForm.get('area')?.value === area.areaId
-                  "
-                  (click)="onAreaSeleccionada(area)"
+                  class="max-h-80 overflow-y-auto border border-fiori-border rounded-lg"
                 >
-                  <div class="flex items-center space-x-3">
-                    <input
-                      type="radio"
-                      name="areaRadio"
-                      [checked]="filtroForm.get('area')?.value === area.areaId"
-                      class="w-4 h-4 text-fiori-primary bg-fiori-surface border-fiori-border focus:ring-fiori-primary focus:ring-2"
-                    />
-                    <div class="flex-1">
-                      <div class="font-medium text-fiori-text">
-                        {{ area.descripcion }}
-                      </div>
-                      <div class="text-sm text-fiori-subtext">
-                        ID: {{ area.areaId }}
+                  <div
+                    *ngIf="areasFiltradas.length === 0"
+                    class="p-8 text-center text-fiori-subtext"
+                  >
+                    <mat-icon class="w-12 h-12 mx-auto mb-2 text-fiori-muted"
+                      >domain_disabled</mat-icon
+                    >
+                    <p>No hay áreas disponibles</p>
+                    <p class="text-sm">Selecciona una sede primero</p>
+                  </div>
+
+                  <div
+                    *ngFor="let area of areasFiltradas"
+                    class="p-4 border-b border-fiori-border last:border-b-0 hover:bg-fiori-hover cursor-pointer transition-colors"
+                    [class.bg-blue-50]="
+                      filtroForm.get('area')?.value === area.areaId
+                    "
+                    [class.border-l-4]="
+                      filtroForm.get('area')?.value === area.areaId
+                    "
+                    [class.border-l-fiori-primary]="
+                      filtroForm.get('area')?.value === area.areaId
+                    "
+                    (click)="onAreaSeleccionada(area)"
+                  >
+                    <div class="flex items-center space-x-3">
+                      <input
+                        type="radio"
+                        name="areaRadio"
+                        [checked]="filtroForm.get('area')?.value === area.areaId"
+                        class="w-4 h-4 text-fiori-primary bg-fiori-surface border-fiori-border focus:ring-fiori-primary focus:ring-2"
+                      />
+                      <div class="flex-1">
+                        <div class="font-medium text-fiori-text">
+                          {{ area.descripcion }}
+                        </div>
+                        <div class="text-sm text-fiori-subtext">
+                          ID: {{ area.areaId }}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div
-                *ngIf="
-                  filtroForm.get('area')?.hasError('required') &&
-                  filtroForm.get('area')?.touched
-                "
-                class="mt-2 text-sm text-fiori-error flex items-center"
-              >
-                <mat-icon class="w-4 h-4 mr-1">error</mat-icon>
-                Área es requerida
+                <div
+                  *ngIf="
+                    filtroForm.get('area')?.hasError('required') &&
+                    filtroForm.get('area')?.touched
+                  "
+                  class="mt-2 text-sm text-fiori-error flex items-center"
+                >
+                  <mat-icon class="w-4 h-4 mr-1">error</mat-icon>
+                  Área es requerida
+                </div>
+              </div>
+            </div>
+            
+            <!-- Rango de Fechas -->
+            <div class="bg-white border border-fiori-border rounded-xl p-6 shadow-fioriSm">
+              <div class="flex items-center space-x-3 mb-6">
+                <div
+                  class="w-10 h-10 bg-fiori-info/10 rounded-lg flex items-center justify-center"
+                >
+                  <mat-icon class="text-fiori-info">date_range</mat-icon>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-fiori-text">Rango de Fechas</h3>
+                  <p class="text-sm text-fiori-subtext">
+                    Define el período de aplicación de la asignación
+                  </p>
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    for="fechaInicio"
+                    class="block text-sm font-medium text-fiori-text mb-2"
+                  >
+                    Fecha de Inicio <span class="text-fiori-error">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    id="fechaInicio"
+                    formControlName="fechaInicio"
+                    class="block w-full px-3 py-3 border border-fiori-border rounded-lg focus:ring-fiori-primary focus:border-fiori-primary text-sm bg-fiori-surface"
+                    [class.border-fiori-error]="
+                      filtroForm.get('fechaInicio')?.hasError('required') &&
+                      filtroForm.get('fechaInicio')?.touched
+                    "
+                  />
+                  <div
+                    *ngIf="
+                      filtroForm.get('fechaInicio')?.hasError('required') &&
+                      filtroForm.get('fechaInicio')?.touched
+                    "
+                    class="mt-1 text-sm text-fiori-error flex items-center"
+                  >
+                    <mat-icon class="w-4 h-4 mr-1">error</mat-icon>
+                    Fecha de inicio requerida
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    for="fechaFin"
+                    class="block text-sm font-medium text-fiori-text mb-2"
+                  >
+                    Fecha de Fin
+                    <span class="text-fiori-subtext">(opcional)</span>
+                  </label>
+                  <input
+                    type="date"
+                    id="fechaFin"
+                    formControlName="fechaFin"
+                    class="block w-full px-3 py-3 border border-fiori-border rounded-lg focus:ring-fiori-primary focus:border-fiori-primary text-sm bg-fiori-surface"
+                  />
+                </div>
+              </div>
+              
+              <!-- Info sobre fechas -->
+              <div class="mt-4 p-3 bg-fiori-background rounded-lg border border-fiori-border">
+                <div class="flex items-start space-x-2 text-xs text-fiori-subtext">
+                  <mat-icon class="w-4 h-4 text-fiori-info mt-0.5">info</mat-icon>
+                  <div class="space-y-1">
+                    <p>• La fecha de inicio determina cuándo comenzará la asignación de turnos</p>
+                    <p>• Sin fecha de fin, la asignación será indefinida</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -675,51 +750,23 @@
                   </div>
                 </div>
 
-                <!-- Date Inputs -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      for="fechaInicio"
-                      class="block text-sm font-medium text-fiori-text mb-2"
-                    >
-                      Fecha de Inicio <span class="text-fiori-error">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      id="fechaInicio"
-                      formControlName="fechaInicio"
-                      class="block w-full px-3 py-3 border border-fiori-border rounded-lg focus:ring-fiori-primary focus:border-fiori-primary text-sm bg-fiori-surface"
-                      [class.border-fiori-error]="
-                        turnoForm.get('fechaInicio')?.hasError('required') &&
-                        turnoForm.get('fechaInicio')?.touched
-                      "
-                    />
-                    <div
-                      *ngIf="
-                        turnoForm.get('fechaInicio')?.hasError('required') &&
-                        turnoForm.get('fechaInicio')?.touched
-                      "
-                      class="mt-1 text-sm text-fiori-error flex items-center"
-                    >
-                      <mat-icon class="w-4 h-4 mr-1">error</mat-icon>
-                      Fecha de inicio requerida
-                    </div>
+                <!-- Las fechas ahora están en el Paso 1 -->
+                <div class="p-4 bg-fiori-primary/5 border border-fiori-primary/20 rounded-lg">
+                  <div class="text-sm font-medium text-fiori-primary mb-2">
+                    Fechas de Asignación
                   </div>
-
-                  <div>
-                    <label
-                      for="fechaFin"
-                      class="block text-sm font-medium text-fiori-text mb-2"
-                    >
-                      Fecha de Fin
-                      <span class="text-fiori-subtext">(opcional)</span>
-                    </label>
-                    <input
-                      type="date"
-                      id="fechaFin"
-                      formControlName="fechaFin"
-                      class="block w-full px-3 py-3 border border-fiori-border rounded-lg focus:ring-fiori-primary focus:border-fiori-primary text-sm bg-fiori-surface"
-                    />
+                  <div class="space-y-1 text-sm text-fiori-text">
+                    <div *ngIf="filtroForm.get('fechaInicio')?.value">
+                      Inicio:
+                      <span class="font-medium">{{ filtroForm.get('fechaInicio')?.value | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                    <div *ngIf="filtroForm.get('fechaFin')?.value">
+                      Fin:
+                      <span class="font-medium">{{ filtroForm.get('fechaFin')?.value | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                    <div *ngIf="!filtroForm.get('fechaFin')?.value">
+                      <span class="text-fiori-accent font-medium">Asignación indefinida</span>
+                    </div>
                   </div>
                 </div>
 

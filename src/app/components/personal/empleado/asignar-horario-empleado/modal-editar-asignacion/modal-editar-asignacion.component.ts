@@ -238,7 +238,10 @@ export class ModalEditarAsignacionComponent implements OnInit {
       locationId: this.datat.locationId || 0,
       locationName: this.datat.locationName || '',
       updatedAt: new Date().toISOString(),
-      updatedBy: this.userLogin || ''
+      updatedBy: this.userLogin || '',
+      companiaId:  '', // DEL FILTRO GLOBAL
+      ccostId: '',
+      ccostDescription: ''
     }));
 
     console.log('Datos a enviar al API:', updateDataArray);

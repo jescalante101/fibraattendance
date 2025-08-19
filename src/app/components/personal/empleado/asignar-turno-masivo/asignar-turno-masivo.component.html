@@ -1,105 +1,64 @@
-<div class="bg-fiori-background pb-8 ">
-  <div class=" mx-auto">
-    <!-- Flowbite Steps Navigation -->
-    <div
-      class="bg-fiori-surface border border-fiori-border rounded-xl shadow-fiori p-3 mb-4"
-    >
-      <ol
-        class="flex items-center w-full text-sm font-medium text-center text-fiori-subtext sm:text-base"
-      >
-        <li
-          class="flex md:w-full items-center"
-          [class]="
-            currentStep >= 1 ? 'text-fiori-primary' : 'text-fiori-subtext'
-          "
-        >
-          <span
-            class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-fiori-border"
-          >
-            <span
-              class="flex items-center justify-center w-8 h-8 rounded-full shrink-0 mr-3"
-              [class]="
-                currentStep >= 1
-                  ? 'bg-fiori-primary text-white'
-                  : 'bg-fiori-muted text-fiori-subtext'
-              "
-            >
-              <mat-icon class="w-4 h-4">filter_alt</mat-icon>
-            </span>
-            <div class="hidden sm:block">
-              <div class="font-medium">Filtrar</div>
-              <div class="text-xs text-fiori-subtext">Sede y Área</div>
-            </div>
-          </span>
-        </li>
-
-        <li
-          class="flex md:w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-fiori-border after:border-4 after:inline-block"
-          [class]="
-            currentStep >= 2
-              ? 'text-fiori-primary after:border-fiori-primary'
-              : 'text-fiori-subtext after:border-fiori-border'
-          "
-        >
-          <span
-            class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-fiori-border"
-          >
-            <span
-              class="flex items-center justify-center w-8 h-8 rounded-full shrink-0 mr-3"
-              [class]="
-                currentStep >= 2
-                  ? 'bg-fiori-primary text-white'
-                  : 'bg-fiori-muted text-fiori-subtext'
-              "
-            >
-              <mat-icon class="w-4 h-4">people</mat-icon>
-            </span>
-            <div class="hidden sm:block">
-              <div class="font-medium">Personal</div>
-              <div class="text-xs text-fiori-subtext">
-                Seleccionar Personal 
-              </div>
-            </div>
-          </span>
-        </li>
-
-        <li
-          class="flex items-center"
-          [class]="
-            currentStep >= 3 ? 'text-fiori-primary' : 'text-fiori-subtext'
-          "
-        >
-          <span
-            class="flex items-center justify-center w-8 h-8 rounded-full shrink-0 mr-3"
-            [class]="
-              currentStep >= 3
-                ? 'bg-fiori-primary text-white'
-                : 'bg-fiori-muted text-fiori-subtext'
-            "
-          >
-            <mat-icon class="w-4 h-4">schedule</mat-icon>
-          </span>
-          <div class="hidden sm:block">
-            <div class="font-medium">Turno</div>
-            <div class="text-xs text-fiori-subtext">Asignar y confirmar</div>
+<!-- Layout tipo modal con header fijo, contenido scrolleable y footer fijo -->
+<div class="h-full flex flex-col">
+  
+  <!-- Header fijo - Steps Navigation compacto -->
+  <div class="flex-shrink-0 bg-gray-100 border-b border-gray-200 px-4 py-2">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-6">
+        <!-- Paso 1: Filtrar -->
+        <div class="flex items-center space-x-2"
+             [class]="currentStep >= 1 ? 'text-blue-600' : 'text-gray-400'">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium"
+               [class]="currentStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'">
+            <mat-icon class="w-3 h-3">filter_alt</mat-icon>
           </div>
-        </li>
-      </ol>
-    </div>
+          <span class="text-sm font-medium">Filtrar</span>
+          <span class="text-xs text-gray-500">Sede y Área</span>
+        </div>
 
+        <!-- Separador -->
+        <div class="w-8 h-px bg-gray-300"></div>
+
+        <!-- Paso 2: Personal -->
+        <div class="flex items-center space-x-2"
+             [class]="currentStep >= 2 ? 'text-blue-600' : 'text-gray-400'">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium"
+               [class]="currentStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'">
+            <mat-icon class="w-3 h-3">people</mat-icon>
+          </div>
+          <span class="text-sm font-medium">Personal</span>
+          <span class="text-xs text-gray-500">Seleccionar Personal</span>
+        </div>
+
+        <!-- Separador -->
+        <div class="w-8 h-px bg-gray-300"></div>
+
+        <!-- Paso 3: Turno -->
+        <div class="flex items-center space-x-2"
+             [class]="currentStep >= 3 ? 'text-blue-600' : 'text-gray-400'">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium"
+               [class]="currentStep >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'">
+            <mat-icon class="w-3 h-3">schedule</mat-icon>
+          </div>
+          <span class="text-sm font-medium">Turno</span>
+          <span class="text-xs text-gray-500">Asignar y confirmar</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal con scroll -->
+  <div class="flex-1 overflow-y-auto">
     <!-- Step Content -->
-    <div
-      class="bg-fiori-surface border border-fiori-border rounded-xl shadow-fiori overflow-hidden"
-    >
       <!-- Paso 1: Filtros -->
-      <div *ngIf="currentStep === 1" class="p-8">
+      <div *ngIf="currentStep === 1" class="p-4">
         <form [formGroup]="filtroForm">
           <!-- Progress Header -->
-          <div class="mb-8">
-            <h2 class="text-xl font-semibold text-fiori-text mb-2">
-              Selecciona Sede y Área
+          <div class="mb-4">
+            <h2 class="text-lg font-semibold text-fiori-text mb-1">
+              Selecciona Sede, Centro de Costo y Área
             </h2>
-            <p class="text-fiori-subtext">
+            <p class="text-sm text-fiori-subtext">
               Primero define la ubicación para filtrar el personal disponible
             </p>
           </div>
@@ -117,224 +76,158 @@
             </div>
           </div>
 
-          <!-- Content -->
-          <div *ngIf="datosListos" class="space-y-8">
-            <!-- Sede y Área -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <!-- Sede Card -->
-              <div
-                class="bg-white border border-fiori-border rounded-xl p-6 shadow-fioriSm"
-              >
-                <div class="flex items-center space-x-3 mb-4">
-                  <div
-                    class="w-10 h-10 bg-fiori-primary/10 rounded-lg flex items-center justify-center"
-                  >
-                    <mat-icon class="text-fiori-primary">business</mat-icon>
+          <!-- Content - Layout compacto como el mock -->
+          <div *ngIf="datosListos" class="space-y-4">
+            <!-- Layout horizontal compacto: Sede y Centro de Costo arriba, Área a la derecha -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <!-- Columna izquierda: Sede y Centro de Costo -->
+              <div class="lg:col-span-2 space-y-4">
+                <!-- Sede -->
+                <div class="space-y-2">
+                  <div class="flex items-center space-x-2">
+                    <mat-icon class="text-gray-600 w-5 h-5">business</mat-icon>
+                    <label class="text-sm font-medium text-gray-700">Sede</label>
                   </div>
-                  <div>
-                    <h3 class="font-semibold text-fiori-text">Sede</h3>
-                    <p class="text-sm text-fiori-subtext">Selecciona una sede</p>
-                  </div>
-                </div>
-
-                <div class="relative">
                   <select
                     formControlName="sede"
                     (change)="onSedeSeleccionada(filtroForm.get('sede')?.value)"
-                    class="bg-fiori-surface border border-fiori-border text-fiori-text text-sm rounded-lg focus:ring-fiori-primary focus:border-fiori-primary block w-full p-3"
-                    [class.border-fiori-error]="
-                      filtroForm.get('sede')?.hasError('required') &&
-                      filtroForm.get('sede')?.touched
-                    "
-                  >
+                    class="w-full p-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-500]="filtroForm.get('sede')?.hasError('required') && filtroForm.get('sede')?.touched">
                     <option value="" disabled>Seleccionar sede...</option>
-                    <option
-                      *ngFor="let sede of sedes"
-                      [value]="sede.categoriaAuxiliarId"
-                    >
+                    <option *ngFor="let sede of sedes" [value]="sede.categoriaAuxiliarId">
                       {{ sede.descripcion }}
                     </option>
                   </select>
-                </div>
-
-                <div
-                  *ngIf="
-                    filtroForm.get('sede')?.hasError('required') &&
-                    filtroForm.get('sede')?.touched
-                  "
-                  class="mt-2 text-sm text-fiori-error flex items-center"
-                >
-                  <mat-icon class="w-4 h-4 mr-1">error</mat-icon>
-                  Sede es requerida
-                </div>
-              </div>
-
-              <!-- Area Card -->
-              <div
-                class="bg-white border border-fiori-border rounded-xl p-6 shadow-fioriSm"
-              >
-                <div class="flex items-center space-x-3 mb-4">
-                  <div
-                    class="w-10 h-10 bg-fiori-accent/10 rounded-lg flex items-center justify-center"
-                  >
-                    <mat-icon class="text-fiori-accent">domain</mat-icon>
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-fiori-text">Área</h3>
-                    <p class="text-sm text-fiori-subtext">
-                      Selecciona un área específica
-                    </p>
+                  <div *ngIf="filtroForm.get('sede')?.hasError('required') && filtroForm.get('sede')?.touched"
+                       class="text-xs text-red-500">
+                    Sede es requerida
                   </div>
                 </div>
 
-                <div
-                  class="max-h-80 overflow-y-auto border border-fiori-border rounded-lg"
-                >
-                  <div
-                    *ngIf="areasFiltradas.length === 0"
-                    class="p-8 text-center text-fiori-subtext"
-                  >
-                    <mat-icon class="w-12 h-12 mx-auto mb-2 text-fiori-muted"
-                      >domain_disabled</mat-icon
-                    >
-                    <p>No hay áreas disponibles</p>
-                    <p class="text-sm">Selecciona una sede primero</p>
+                <!-- Centro de Costo -->
+                <div class="space-y-2">
+                  <div class="flex items-center space-x-2">
+                    <mat-icon class="text-gray-600 w-5 h-5">account_balance</mat-icon>
+                    <label class="text-sm font-medium text-gray-700">Centro de Costo <span class="text-red-500">*</span></label>
                   </div>
-
-                  <div
-                    *ngFor="let area of areasFiltradas"
-                    class="p-4 border-b border-fiori-border last:border-b-0 hover:bg-fiori-hover cursor-pointer transition-colors"
-                    [class.bg-blue-50]="
-                      filtroForm.get('area')?.value === area.areaId
-                    "
-                    [class.border-l-4]="
-                      filtroForm.get('area')?.value === area.areaId
-                    "
-                    [class.border-l-fiori-primary]="
-                      filtroForm.get('area')?.value === area.areaId
-                    "
-                    (click)="onAreaSeleccionada(area)"
-                  >
-                    <div class="flex items-center space-x-3">
-                      <input
-                        type="radio"
-                        name="areaRadio"
-                        [checked]="filtroForm.get('area')?.value === area.areaId"
-                        class="w-4 h-4 text-fiori-primary bg-fiori-surface border-fiori-border focus:ring-fiori-primary focus:ring-2"
-                      />
-                      <div class="flex-1">
-                        <div class="font-medium text-fiori-text">
-                          {{ area.descripcion }}
-                        </div>
-                        <div class="text-sm text-fiori-subtext">
-                          ID: {{ area.areaId }}
-                        </div>
+                  <div class="relative">
+                    <input 
+                      type="text" 
+                      [value]="getCostCenterFilterText()"
+                      (input)="onCostCenterFilterChange($event)"
+                      (focus)="onCostCenterFocus()"
+                      (blur)="onCostCenterBlur()"
+                      placeholder="Buscar centro de costo..."
+                      class="w-full pl-8 pr-3 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      [class.border-red-500]="filtroForm.get('centroCosto')?.hasError('required') && filtroForm.get('centroCosto')?.touched">
+                    <div class="absolute left-2.5 top-1/2 transform -translate-y-1/2">
+                      <mat-icon class="w-4 h-4 text-gray-400">search</mat-icon>
+                    </div>
+                    
+                    <!-- Dropdown de centros de costo -->
+                    <div *ngIf="showCostCenterDropdown && filteredCostCentersArray && filteredCostCentersArray.length > 0" 
+                         class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      <div *ngFor="let cc of filteredCostCentersArray; trackBy: trackByCostCenterId" 
+                           (mousedown)="onCostCenterSelected(cc)"
+                           class="px-3 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0">
+                        <div class="text-sm font-medium text-gray-900">{{ cc.descripcion }}</div>
+                        <div class="text-xs text-gray-500">ID: {{ cc.ccostoId }}</div>
                       </div>
                     </div>
                   </div>
+                  
+                  <div *ngIf="filtroForm.get('centroCosto')?.hasError('required') && filtroForm.get('centroCosto')?.touched"
+                       class="text-xs text-red-500">
+                    Centro de costo es requerido
+                  </div>
+
+                  <div class="p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
+                    El centro de costo es requerido para crear la asignación de turno.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Columna derecha: Área -->
+              <div class="space-y-2 h-48 relative">
+                <div class="flex items-center space-x-2">
+                  <mat-icon class="text-gray-600 w-5 h-5">domain</mat-icon>
+                  <label class="text-sm font-medium text-gray-700">Área</label>
                 </div>
 
-                <div
-                  *ngIf="
-                    filtroForm.get('area')?.hasError('required') &&
-                    filtroForm.get('area')?.touched
-                  "
-                  class="mt-2 text-sm text-fiori-error flex items-center"
-                >
-                  <mat-icon class="w-4 h-4 mr-1">error</mat-icon>
+                <!-- ag-Grid para áreas con scroll -->
+                <div class="ag-theme-quartz w-full h-full" >
+                    <ag-grid-angular
+                      [columnDefs]="areasColumnDefs"
+                      [rowData]="areasFiltradas"
+                      [gridOptions]="areasGridOptions"
+                      (gridReady)="onAreasGridReady($event)"
+                      class="w-full h-full">
+                    </ag-grid-angular>
+                  </div>
+                <!-- Estado vacío -->
+                <div *ngIf="areasFiltradas.length === 0" class="p-4 text-center text-gray-500 border border-gray-300 rounded-lg">
+                  <mat-icon class="w-8 h-8 mx-auto mb-1 text-gray-400">domain_disabled</mat-icon>
+                  <p class="text-xs">No hay áreas disponibles</p>
+                  <p class="text-xs">Selecciona una sede primero</p>
+                </div>
+
+                <div *ngIf="filtroForm.get('area')?.hasError('required') && filtroForm.get('area')?.touched"
+                     class="text-xs text-red-500">
                   Área es requerida
                 </div>
               </div>
             </div>
             
             <!-- Rango de Fechas -->
-            <div class="bg-white border border-fiori-border rounded-xl p-6 shadow-fioriSm">
-              <div class="flex items-center space-x-3 mb-6">
-                <div
-                  class="w-10 h-10 bg-fiori-info/10 rounded-lg flex items-center justify-center"
-                >
-                  <mat-icon class="text-fiori-info">date_range</mat-icon>
-                </div>
-                <div>
-                  <h3 class="font-semibold text-fiori-text">Rango de Fechas</h3>
-                  <p class="text-sm text-fiori-subtext">
-                    Define el período de aplicación de la asignación
-                  </p>
-                </div>
+            <div class="space-y-2">
+              <div class="flex items-center space-x-2">
+                <mat-icon class="text-gray-600 w-5 h-5">date_range</mat-icon>
+                <label class="text-sm font-medium text-gray-700">Rango de Fechas</label>
               </div>
               
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label
-                    for="fechaInicio"
-                    class="block text-sm font-medium text-fiori-text mb-2"
-                  >
-                    Fecha de Inicio <span class="text-fiori-error">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    id="fechaInicio"
-                    formControlName="fechaInicio"
-                    class="block w-full px-3 py-3 border border-fiori-border rounded-lg focus:ring-fiori-primary focus:border-fiori-primary text-sm bg-fiori-surface"
-                    [class.border-fiori-error]="
-                      filtroForm.get('fechaInicio')?.hasError('required') &&
-                      filtroForm.get('fechaInicio')?.touched
-                    "
-                  />
-                  <div
-                    *ngIf="
-                      filtroForm.get('fechaInicio')?.hasError('required') &&
-                      filtroForm.get('fechaInicio')?.touched
-                    "
-                    class="mt-1 text-sm text-fiori-error flex items-center"
-                  >
-                    <mat-icon class="w-4 h-4 mr-1">error</mat-icon>
-                    Fecha de inicio requerida
-                  </div>
+              <div class="space-y-2">
+                <label class="block text-sm text-gray-600">
+                  Rango de Fechas <span class="text-red-500">*</span>
+                </label>
+                <app-date-range-picker
+                  formControlName="dateRange"
+                  [required]="true"
+                  placeholder="01/07/2024 - 31/07/2024"
+                  size="sm"
+                  theme="default"
+                  (dateRangeChange)="onDateRangeSelected($event)">
+                </app-date-range-picker>
+                
+                <div *ngIf="filtroForm.get('dateRange')?.hasError('required') && filtroForm.get('dateRange')?.touched"
+                     class="text-xs text-red-500">
+                  Rango de fechas es requerido
                 </div>
 
-                <div>
-                  <label
-                    for="fechaFin"
-                    class="block text-sm font-medium text-fiori-text mb-2"
-                  >
-                    Fecha de Fin
-                    <span class="text-fiori-subtext">(opcional)</span>
-                  </label>
-                  <input
-                    type="date"
-                    id="fechaFin"
-                    formControlName="fechaFin"
-                    class="block w-full px-3 py-3 border border-fiori-border rounded-lg focus:ring-fiori-primary focus:border-fiori-primary text-sm bg-fiori-surface"
-                  />
+                <!-- Botones de rango rápido -->
+                <div class="flex flex-wrap gap-1">
+                  <button type="button" (click)="setPresetDateRange('thisWeek')" class="px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded hover:bg-blue-200">
+                    Esta Semana
+                  </button>
+                  <button type="button" (click)="setPresetDateRange('nextWeek')" class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200">
+                    Siguiente Semana
+                  </button>
+                  <button type="button" (click)="setPresetDateRange('thisMonth')" class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200">
+                    Este Mes
+                  </button>
+                  <button type="button" (click)="setPresetDateRange('wholeYear')" class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200">
+                    Todo el Año
+                  </button>
                 </div>
-              </div>
-              
-              <!-- Info sobre fechas -->
-              <div class="mt-4 p-3 bg-fiori-background rounded-lg border border-fiori-border">
-                <div class="flex items-start space-x-2 text-xs text-fiori-subtext">
-                  <mat-icon class="w-4 h-4 text-fiori-info mt-0.5">info</mat-icon>
-                  <div class="space-y-1">
-                    <p>• La fecha de inicio determina cuándo comenzará la asignación de turnos</p>
-                    <p>• Sin fecha de fin, la asignación será indefinida</p>
-                  </div>
+
+                <!-- Info compacto -->
+                <div class="text-xs text-gray-500 space-y-1">
+                  <p>• La fecha de inicio determina cuándo comenzará la asignación de turnos.</p>
+                  <p>• Sin fecha de fin, la asignación será indefinida.</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Actions -->
-          <div class="flex justify-end mt-8 pt-6 border-t border-fiori-border">
-            <button
-              type="button"
-              [disabled]="!filtroForm.valid"
-              (click)="nextStep()"
-              class="inline-flex items-center px-6 py-3 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary focus:outline-none focus:ring-4 focus:ring-fiori-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span>Siguiente</span>
-              <mat-icon class="ml-2 w-4 h-4">arrow_forward</mat-icon>
-            </button>
-          </div>
         </form>
       </div>
 
@@ -357,452 +250,247 @@
 
           <!-- Content -->
           <div *ngIf="!loadingPersonal">
-            <!-- Search and Stats -->
-            <div
-              class="bg-white border border-fiori-border rounded-xl p-6 mb-6 shadow-fioriSm"
-            >
-              <div
-                class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-              >
-                <div class="flex-1 max-w-md">
-                  <label for="search" class="sr-only">Buscar Personal</label>
-                  <div class="relative">
-                    <div
-                      class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                    >
-                      <mat-icon class="h-5 w-5 text-fiori-subtext"
-                        >search</mat-icon
-                      >
-                    </div>
-                    <input
-                      type="text"
-                      id="search"
-                      [(ngModel)]="searchTermPersonal"
-                      [ngModelOptions]="{ standalone: true }"
-                      (keyup.enter)="onSearchPersonalChange()"
-                      class="block w-full pl-10 pr-3 py-3 border border-fiori-border rounded-lg focus:ring-fiori-primary focus:border-fiori-primary text-sm bg-fiori-surface"
-                      placeholder="Buscar por nombre, documento..."
-                    />
-                  </div>
-                </div>
-
-                <div class="flex items-center space-x-6 text-sm">
-                  <div class="flex items-center space-x-2">
-                    <div class="w-3 h-3 bg-fiori-primary rounded-full"></div>
-                    <span class="text-fiori-subtext"
-                      >{{ personalFiltrado.length }} Personal</span
-                    >
-                  </div>
-                  <div class="flex items-center space-x-2">
-                    <div class="w-3 h-3 bg-fiori-success rounded-full"></div>
-                    <span class="text-fiori-subtext"
-                      >{{ getSelectedCount() }} seleccionados</span
-                    >
-                  </div>
-                  <button
-                    type="button"
-                    (click)="clearSelection()"
-                    [disabled]="getSelectedCount() === 0"
-                    class="text-fiori-primary hover:text-fiori-secondary text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Limpiar selección
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Personal Table -->
+            <!-- Personal ag-Grid -->
             <div
               class="bg-white border border-fiori-border rounded-xl shadow-fioriSm overflow-hidden"
             >
-              <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-fiori-border">
-                  <thead class="bg-fiori-muted">
-                    <tr>
-                      <th
-                        scope="col"
-                        class="px-6 py-4 text-left text-xs font-medium text-fiori-subtext uppercase tracking-wider"
-                      >
-                        <input
-                          type="checkbox"
-                          (change)="masterToggle()"
-                          [checked]="isAllSelected()"
-                          [indeterminate]="isIndeterminate()"
-                          class="w-4 h-4 text-fiori-primary bg-fiori-surface border-fiori-border rounded focus:ring-fiori-primary focus:ring-2"
-                        />
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-6 py-4 text-left text-xs font-medium text-fiori-subtext uppercase tracking-wider"
-                      >
-                        ID
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-6 py-4 text-left text-xs font-medium text-fiori-subtext uppercase tracking-wider"
-                      >
-                        Documento
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-6 py-4 text-left text-xs font-medium text-fiori-subtext uppercase tracking-wider"
-                      >
-                        Nombre Completo
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-fiori-surface divide-y divide-fiori-border">
-                    <tr
-                      *ngFor="let empleado of personalFiltrado"
-                      class="hover:bg-fiori-hover transition-colors"
+              <!-- Header con información -->
+              <div class="px-6 py-4 border-b border-fiori-border bg-fiori-muted">
+                <div class="flex items-center justify-between gap-4">
+                  <div class="text-lg font-semibold text-fiori-text">
+                    Personal Disponible
+                  </div>
+              
+                  <div class="flex items-center gap-4">
+                    <!-- Search Input -->
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <mat-icon class="h-5 w-5 text-fiori-subtext">search</mat-icon>
+                      </div>
+                      <input
+                        type="text"
+                        id="search"
+                        [(ngModel)]="searchTermPersonal"
+                        [ngModelOptions]="{ standalone: true }"
+                        (keyup.enter)="onSearchPersonalChange()"
+                        class="block w-64 pl-10 pr-3 py-2 border border-fiori-border rounded-lg focus:ring-fiori-primary focus:border-fiori-primary text-sm bg-white"
+                        placeholder="Buscar personal..."
+                      />
+                    </div>
+              
+                    <!-- Stats -->
+                    <div class="text-sm text-fiori-subtext whitespace-nowrap">
+                      <span class="font-medium text-fiori-text">{{ getSelectedCount() }}</span> / {{ personalFiltrado.length }} seleccionados
+                    </div>
+              
+                    <!-- Clear Button -->
+                    <button
+                      type="button"
+                      (click)="clearSelection()"
+                      [disabled]="getSelectedCount() === 0"
+                      class="text-fiori-primary hover:text-fiori-secondary text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="checkbox"
-                          (change)="toggleSelection(empleado)"
-                          [checked]="isSelected(empleado)"
-                          class="w-4 h-4 text-fiori-primary bg-fiori-surface border-fiori-border rounded focus:ring-fiori-primary focus:ring-2"
-                        />
-                      </td>
-                      <td
-                        class="px-6 py-4 whitespace-nowrap text-sm font-mono text-fiori-subtext"
-                      >
-                        {{ empleado.personalId }}
-                      </td>
-                      <td
-                        class="px-6 py-4 whitespace-nowrap text-sm font-mono text-fiori-text"
-                      >
-                        {{ empleado.nroDoc }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                          <div
-                            class="w-8 h-8 bg-fiori-primary/10 rounded-full flex items-center justify-center mr-3"
-                          >
-                            <mat-icon class="w-4 h-4 text-fiori-primary"
-                              >person</mat-icon
-                            >
-                          </div>
-                          <div>
-                            <div class="text-sm font-medium text-fiori-text">
-                              {{ empleado.nombres }}
-                              {{ empleado.apellidoPaterno }}
-                              {{ empleado.apellidoMaterno }}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr *ngIf="personalFiltrado.length === 0">
-                      <td colspan="4" class="px-6 py-12 text-center">
-                        <div class="text-fiori-subtext">
-                          <mat-icon
-                            class="w-12 h-12 mx-auto mb-2 text-fiori-muted"
-                            >search_off</mat-icon
-                          >
-                          <p>No se encontraron empleados</p>
-                          <p class="text-sm">Intenta ajustar los filtros</p>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                      Limpiar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Loading Overlay -->
+              <div
+                *ngIf="loadingPersonal"
+                class="absolute inset-0 z-10 flex items-center justify-center bg-white/70"
+              >
+                <div class="text-center p-4">
+                  <div
+                    class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-fiori-primary mb-2"
+                  ></div>
+                  <p class="text-sm text-fiori-subtext">Cargando empleados...</p>
+                </div>
+              </div>
+
+              <!-- ag-Grid Container, altura de acuerdo a la altura de la ventana -->
+              <div class="relative h-[calc(100vh-400px)]">
+                <!-- ag-Grid -->
+                <div class="ag-theme-quartz w-full h-full">
+                  <ag-grid-angular
+                    #agGrid
+                    [columnDefs]="columnDefs"
+                    [rowData]="personalFiltrado"
+                    class="w-full h-full"
+                    [gridOptions]="gridOptions"
+                    (gridReady)="onGridReady($event)"
+                  ></ag-grid-angular>
+                </div>
+
+                <!-- Estado vacío -->
+                <div
+                  *ngIf="!loadingPersonal && (!personalFiltrado || personalFiltrado.length === 0)"
+                  class="absolute inset-0 flex items-center justify-center bg-fiori-surface"
+                >
+                  <div class="text-center p-8">
+                    <div class="w-16 h-16 bg-fiori-background rounded-xl flex items-center justify-center mx-auto mb-4">
+                      <mat-icon class="w-8 h-8 text-fiori-subtext">search_off</mat-icon>
+                    </div>
+                    <div class="text-lg font-semibold text-fiori-text mb-2">
+                      No se encontraron empleados
+                    </div>
+                    <p class="text-fiori-subtext mb-4 max-w-sm">
+                      Intenta ajustar los filtros o seleccionar diferentes criterios
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <!-- Pagination -->
-               <app-fiori-paginator
+              <app-fiori-paginator
                 [totalRecords]="totalCount"
                 [pageSize]="pageSize"
                 [pageNumber]="paginaActual"
                 [pageSizeOptions]="[5, 10, 25, 50]"
                 [showAllOption]="true"
-                [loading]="false"
+                [loading]="loadingPersonal"
                 (pageChange)="onPageChangeCustom($event)">
               </app-fiori-paginator>
-
-
             </div>
           </div>
 
-          <!-- Actions -->
-          <div
-            class="flex justify-between mt-8 pt-6 border-t border-fiori-border"
-          >
-            <button
-              type="button"
-              (click)="previousStep()"
-              class="inline-flex items-center px-6 py-3 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-lg hover:bg-fiori-hover focus:outline-none focus:ring-4 focus:ring-fiori-muted/30 transition-colors"
-            >
-              <mat-icon class="mr-2 w-4 h-4">arrow_back</mat-icon>
-              <span>Anterior</span>
-            </button>
-
-            <button
-              type="button"
-              [disabled]="getSelectedCount() === 0"
-              (click)="nextStep()"
-              class="inline-flex items-center px-6 py-3 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary focus:outline-none focus:ring-4 focus:ring-fiori-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span>Siguiente</span>
-              <mat-icon class="ml-2 w-4 h-4">arrow_forward</mat-icon>
-            </button>
-          </div>
         </form>
       </div>
 
       <!-- Paso 3: Turno -->
-      <div *ngIf="currentStep === 3" class="p-8">
+      <div *ngIf="currentStep === 3" class="p-6 bg-gray-50">
         <form [formGroup]="turnoForm">
-          <!-- Progress Header -->
-          <div class="mb-8">
-            <h2 class="text-xl font-semibold text-fiori-text mb-2">
-              Selecciona Turno y Confirma
-            </h2>
-            <p class="text-fiori-subtext">
-              Define el turno y las fechas de asignación
-            </p>
+          <!-- Header -->
+          <div class="mb-6">
+            <h2 class="text-xl font-bold text-gray-800">Selecciona el Turno</h2>
+            <p class="text-sm text-gray-500">Elige un turno de la lista y revisa los detalles antes de confirmar la asignación.</p>
           </div>
 
           <!-- Loading -->
-          <div
-            *ngIf="loadingTurnos"
-            class="flex items-center justify-center py-16"
-          >
+          <div *ngIf="loadingTurnos" class="flex items-center justify-center py-16">
             <div class="text-center">
-              <div
-                class="animate-spin rounded-full h-12 w-12 border-b-2 border-fiori-primary mx-auto mb-4"
-              ></div>
-              <p class="text-fiori-subtext">Cargando turnos...</p>
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p class="text-gray-500">Cargando turnos...</p>
             </div>
           </div>
 
-          <!-- Content -->
-          <div
-            *ngIf="!loadingTurnos && turnos.length > 0"
-            class="grid grid-cols-1 lg:grid-cols-2 gap-8"
-          >
-            <!-- Turnos Available -->
-            <div
-              class="bg-white border border-fiori-border rounded-xl shadow-fioriSm overflow-hidden"
-            >
-              <div class="p-6 border-b border-fiori-border bg-fiori-muted">
-                <div class="flex items-center space-x-3">
-                  <div
-                    class="w-10 h-10 bg-fiori-primary/10 rounded-lg flex items-center justify-center"
-                  >
-                    <mat-icon class="text-fiori-primary">schedule</mat-icon>
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-fiori-text">
-                      Turnos Disponibles
-                    </h3>
-                    <p class="text-sm text-fiori-subtext">
-                      Selecciona un turno para ver detalles
-                    </p>
-                  </div>
-                </div>
+          <!-- Content Grid -->
+          <div *ngIf="!loadingTurnos && turnos.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Columna Izquierda: Lista de Turnos -->
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+              <!-- Header de la columna -->
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-gray-700">Turnos Disponibles</h3>
+                <button type="button" (click)="crearNuevoTurno()" class="flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium">
+                  <mat-icon class="w-4 h-4 mr-1">add_circle_outline</mat-icon>
+                  Crear Turno
+                </button>
               </div>
 
-              <div class="max-h-96 overflow-y-auto">
-                <div
-                  *ngFor="let turno of turnos"
-                  class="p-6 border-b border-fiori-border last:border-b-0 hover:bg-fiori-hover cursor-pointer transition-colors"
-                  [class.bg-blue-50]="
-                    turnoForm.get('turno')?.value === turno.id
-                  "
-                  [class.border-l-4]="
-                    turnoForm.get('turno')?.value === turno.id
-                  "
-                  [class.border-l-fiori-primary]="
-                    turnoForm.get('turno')?.value === turno.id
-                  "
-                  (click)="onTurnoSelected(turno)"
-                >
-                  <div class="flex items-start space-x-4">
-                    <input
-                      type="radio"
-                      name="turnoRadio"
-                      [checked]="turnoForm.get('turno')?.value === turno.id"
-                      class="mt-1 w-4 h-4 text-fiori-primary bg-fiori-surface border-fiori-border focus:ring-fiori-primary focus:ring-2"
-                    />
+              <!-- Buscador de Turnos -->
+              <div class="relative mb-4">
+                <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400">search</mat-icon>
+                <input 
+                  type="text"
+                  [(ngModel)]="turnoSearchTerm"
+                  (input)="filtrarTurnos()"
+                  [ngModelOptions]="{standalone: true}"
+                  placeholder="Buscar turno por nombre..."
+                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                />
+              </div>
 
-                    <div class="flex-1">
-                      <div class="flex items-center justify-between">
-                        <h4 class="font-medium text-fiori-text">
-                          {{ turno.alias }}
-                        </h4>
-                        <button
-                          type="button"
-                          (click)="
-                            toggleTurnoExpansion(turno.id.toString());
-                            $event.stopPropagation()
-                          "
-                          [disabled]="
-                            turnoForm.get('turno')?.value !== turno.id
-                          "
-                          class="text-fiori-primary hover:text-fiori-secondary disabled:opacity-50"
-                        >
-                          <mat-icon class="w-5 h-5">{{
-                            isTurnoExpanded(turno.id.toString())
-                              ? "expand_less"
-                              : "expand_more"
-                          }}</mat-icon>
-                        </button>
-                      </div>
-                      <p class="text-sm text-fiori-subtext mt-1">
-                        {{ getHorariosCount(turno) }} horario(s) configurado(s)
-                      </p>
-
-                      <!-- Expanded Details -->
-                      <div
-                        *ngIf="
-                          isTurnoExpanded(turno.id.toString()) &&
-                          turnoForm.get('turno')?.value === turno.id
-                        "
-                        class="mt-4 space-y-3"
-                      >
-                        <div
-                          *ngFor="let horario of getHorariosValidos(turno)"
-                          class="p-3 bg-fiori-background rounded-lg border border-fiori-border"
-                        >
-                          <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-3">
-                              <div
-                                class="w-8 h-8 bg-fiori-accent/10 rounded-lg flex items-center justify-center"
-                              >
-                                <span
-                                  class="text-xs font-medium text-fiori-accent"
-                                  >{{
-                                    getDayAbbreviation(horario.dayIndex)
-                                  }}</span
-                                >
-                              </div>
-                              <div>
-                                <div
-                                  class="font-medium text-fiori-text text-sm"
-                                >
-                                  {{ getDayName(horario.dayIndex) }}
-                                </div>
-                                <div class="text-xs text-fiori-subtext">
-                                  {{ formatHora(horario.inTime) }} -
-                                  {{
-                                    getHoraFin(
-                                      horario.inTime,
-                                      horario.workTimeDuration
-                                    )
-                                  }}
-                                </div>
-                              </div>
-                            </div>
-                            <div class="text-xs text-fiori-subtext">
-                              {{ formatDuracion(horario.workTimeDuration) }}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+              <!-- Lista de Turnos -->
+              <div class="max-h-[450px] overflow-y-auto space-y-2 pr-2">
+                <div *ngFor="let turno of turnosFiltrados"
+                     (click)="onTurnoSelected(turno)"
+                     class="p-4 border rounded-lg cursor-pointer transition-all duration-200"
+                     [class.bg-blue-50]="turnoForm.get('turno')?.value === turno.id"
+                     [class.border-blue-500]="turnoForm.get('turno')?.value === turno.id"
+                     [class.shadow-md]="turnoForm.get('turno')?.value === turno.id"
+                     [class.border-gray-200]="turnoForm.get('turno')?.value !== turno.id"
+                     [class.hover:border-blue-400]="turnoForm.get('turno')?.value !== turno.id"
+                     [class.hover:bg-gray-50]="turnoForm.get('turno')?.value !== turno.id">
+                  
+                  <div class="flex items-center justify-between">
+                    <h4 class="font-semibold text-gray-800">{{ turno.alias }}</h4>
+                    <div *ngIf="turnoForm.get('turno')?.value === turno.id" class="px-2 py-0.5 text-xs font-medium text-blue-700 bg-blue-200 rounded-full">
+                      Seleccionado
                     </div>
                   </div>
+                  <p class="text-sm text-gray-500">Total Semanal: {{ formatDuracion(getTurnoDuracionSemanal(turno)) }}</p>
+                </div>
+                <!-- Estado vacío de búsqueda -->
+                <div *ngIf="turnosFiltrados.length === 0 && turnos.length > 0" class="text-center py-8 text-gray-500">
+                  <mat-icon class="w-8 h-8 mx-auto mb-2">search_off</mat-icon>
+                  <p class="font-medium">No se encontraron turnos</p>
+                  <p class="text-sm">Intenta con otro término de búsqueda.</p>
                 </div>
               </div>
             </div>
 
-            <!-- Configuration Form -->
-            <div
-              class="bg-white border border-fiori-border rounded-xl shadow-fioriSm overflow-hidden"
-            >
-              <div class="p-6 border-b border-fiori-border bg-fiori-muted">
-                <div class="flex items-center space-x-3">
-                  <div
-                    class="w-10 h-10 bg-fiori-accent/10 rounded-lg flex items-center justify-center"
-                  >
-                    <mat-icon class="text-fiori-accent">settings</mat-icon>
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-fiori-text">Configuración</h3>
-                    <p class="text-sm text-fiori-subtext">
-                      Define fechas y observaciones
-                    </p>
-                  </div>
-                </div>
+            <!-- Columna Derecha: Detalles de Asignación -->
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+              <h3 class="font-semibold text-gray-700 mb-4 flex items-center">
+                <mat-icon class="w-5 h-5 mr-2 text-gray-500">wysiwyg</mat-icon>
+                Detalles de Asignación
+              </h3>
+
+              <div *ngIf="!getTurnoSeleccionado()" class="flex flex-col items-center justify-center h-full text-center text-gray-500 p-8 border-2 border-dashed rounded-lg">
+                <mat-icon class="w-12 h-12 mb-2">schedule</mat-icon>
+                <p class="font-medium">Selecciona un turno</p>
+                <p class="text-sm">Los detalles del horario aparecerán aquí.</p>
               </div>
 
-              <div class="p-6 space-y-6">
-                <!-- Summary -->
-                <div
-                  class="p-4 bg-fiori-primary/5 border border-fiori-primary/20 rounded-lg"
-                >
-                  <div class="text-sm font-medium text-fiori-primary mb-2">
-                    Resumen de Asignación
-                  </div>
-                  <div class="space-y-1 text-sm text-fiori-text">
-                    <div>
-                      Personal:
-                      <span class="font-medium"
-                        >{{ getSelectedCount() }} Personal(s)</span
-                      >
-                    </div>
-                    <div *ngIf="turnoForm.get('turno')?.value">
-                      Turno:
-                      <span class="font-medium">{{
-                        getTurnoSeleccionado()?.alias
-                      }}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Las fechas ahora están en el Paso 1 -->
-                <div class="p-4 bg-fiori-primary/5 border border-fiori-primary/20 rounded-lg">
-                  <div class="text-sm font-medium text-fiori-primary mb-2">
-                    Fechas de Asignación
-                  </div>
-                  <div class="space-y-1 text-sm text-fiori-text">
-                    <div *ngIf="filtroForm.get('fechaInicio')?.value">
-                      Inicio:
-                      <span class="font-medium">{{ filtroForm.get('fechaInicio')?.value | date:'dd/MM/yyyy' }}</span>
-                    </div>
-                    <div *ngIf="filtroForm.get('fechaFin')?.value">
-                      Fin:
-                      <span class="font-medium">{{ filtroForm.get('fechaFin')?.value | date:'dd/MM/yyyy' }}</span>
-                    </div>
-                    <div *ngIf="!filtroForm.get('fechaFin')?.value">
-                      <span class="text-fiori-accent font-medium">Asignación indefinida</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Observations -->
+              <div *ngIf="getTurnoSeleccionado() as turnoSeleccionado" class="space-y-4">
+                <!-- Horario del Turno -->
                 <div>
-                  <label
-                    for="observaciones"
-                    class="block text-sm font-medium text-fiori-text mb-2"
-                  >
-                    Observaciones
-                  </label>
+                  <h4 class="font-medium text-gray-600 mb-2">Horario del Turno Seleccionado</h4>
+                  <div class="space-y-2 border rounded-lg p-3 max-h-[220px] overflow-y-auto">
+                    <div *ngFor="let horario of getHorariosValidos(turnoSeleccionado)" class="flex justify-between items-center text-sm p-2 rounded-md bg-gray-50">
+                      <span class="font-medium text-gray-700">{{ getDayName(horario.dayIndex) }}</span>
+                      <div class="flex items-center">
+                        <span class="text-gray-600">{{ formatHora(horario.inTime) }} - {{ getHoraFin(horario.inTime, horario.workTimeDuration) }}</span>
+                        <span class="ml-4 text-xs text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">{{ formatDuracion(horario.workTimeDuration) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Observaciones -->
+                <div>
+                  <label for="observaciones" class="block text-sm font-medium text-gray-600 mb-1">Observaciones</label>
                   <textarea
                     id="observaciones"
                     formControlName="observaciones"
-                    rows="4"
-                    class="block w-full px-3 py-3 border border-fiori-border rounded-lg focus:ring-fiori-primary focus:border-fiori-primary text-sm bg-fiori-surface resize-none"
-                    placeholder="Ingrese observaciones adicionales sobre esta asignación..."
-                  ></textarea>
+                    rows="3"
+                    class="block w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm p-2"
+                    placeholder="Añade notas adicionales sobre esta asignación..."></textarea>
                 </div>
 
-                <!-- Info -->
-                <div
-                  class="p-3 bg-fiori-background rounded-lg border border-fiori-border"
-                >
-                  <div
-                    class="flex items-start space-x-2 text-xs text-fiori-subtext"
-                  >
-                    <mat-icon class="w-4 h-4 text-fiori-info mt-0.5"
-                      >info</mat-icon
-                    >
-                    <div class="space-y-1">
-                      <p>
-                        • La asignación se aplicará a todos los empleados
-                        seleccionados
+                <!-- Alerta de Confirmación -->
+                <div class="p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <mat-icon class="h-5 w-5 text-yellow-400">warning</mat-icon>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm">
+                        Estás a punto de asignar el turno <strong class="font-semibold">{{ turnoSeleccionado.alias }}</strong>
+                        a <strong class="font-semibold">{{ getSelectedCount() }} persona(s)</strong>
+                        <span *ngIf="filtroForm.get('dateRange')?.value?.start">
+                          desde el <strong class="font-semibold">{{ filtroForm.get('dateRange')?.value?.start | date:'dd/MM/yyyy' }}</strong>
+                        </span>
+                        <span *ngIf="filtroForm.get('dateRange')?.value?.end">
+                          hasta el <strong class="font-semibold">{{ filtroForm.get('dateRange')?.value?.end | date:'dd/MM/yyyy' }}</strong>.
+                        </span>
+                        <span *ngIf="!filtroForm.get('dateRange')?.value?.end">
+                          de forma indefinida.
+                        </span>
+                        Revisa los detalles antes de confirmar.
                       </p>
-                      <p>• Sin fecha de fin, la asignación será indefinida</p>
                     </div>
                   </div>
                 </div>
@@ -811,45 +499,84 @@
           </div>
 
           <!-- No turnos -->
-          <div
-            *ngIf="!loadingTurnos && turnos.length === 0"
-            class="text-center py-16"
-          >
-            <div class="text-fiori-subtext">
-              <mat-icon class="w-16 h-16 mx-auto mb-4 text-fiori-muted"
-                >schedule_disabled</mat-icon
-              >
+          <div *ngIf="!loadingTurnos && turnos.length === 0" class="text-center py-16">
+            <div class="text-gray-500">
+              <mat-icon class="w-16 h-16 mx-auto mb-4 text-gray-300">schedule</mat-icon>
               <p class="text-lg font-medium">No hay turnos disponibles</p>
-              <p class="text-sm">
-                Contacta al administrador para configurar turnos
-              </p>
+              <p class="text-sm">Contacta al administrador para configurar nuevos turnos.</p>
             </div>
           </div>
-
-          <!-- Actions -->
-          <div
-            class="flex justify-between mt-8 pt-6 border-t border-fiori-border"
-          >
-            <button
-              type="button"
-              (click)="previousStep()"
-              class="inline-flex items-center px-6 py-3 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-lg hover:bg-fiori-hover focus:outline-none focus:ring-4 focus:ring-fiori-muted/30 transition-colors"
-            >
-              <mat-icon class="mr-2 w-4 h-4">arrow_back</mat-icon>
-              <span>Anterior</span>
-            </button>
-
-            <button
-              type="button"
-              [disabled]="!turnoForm.valid"
-              (click)="guardarAsignacion()"
-              class="inline-flex items-center px-6 py-3 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary focus:outline-none focus:ring-4 focus:ring-fiori-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <mat-icon class="mr-2 w-4 h-4">save</mat-icon>
-              <span>Guardar Asignación</span>
-            </button>
-          </div>
         </form>
+      </div>
+  </div>
+
+  <!-- Footer fijo - Actions -->
+  <div class="flex-shrink-0 bg-gray-50 px-6 py-4 border-t border-gray-200">
+    <!-- Paso 1: Solo botón Siguiente -->
+    <div *ngIf="currentStep === 1" class="flex justify-end">
+      <button
+        type="button"
+        [disabled]="!filtroForm.valid"
+        (click)="nextStep()"
+        class="inline-flex items-center px-6 py-3 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary focus:outline-none focus:ring-4 focus:ring-fiori-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <span>Siguiente</span>
+        <mat-icon class="ml-2 w-4 h-4">arrow_forward</mat-icon>
+      </button>
+    </div>
+
+    <!-- Paso 2: Anterior y Siguiente -->
+    <div *ngIf="currentStep === 2" class="flex justify-between">
+      <button
+        type="button"
+        (click)="previousStep()"
+        class="inline-flex items-center px-6 py-3 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-lg hover:bg-fiori-hover focus:outline-none focus:ring-4 focus:ring-fiori-muted/30 transition-colors"
+      >
+        <mat-icon class="mr-2 w-4 h-4">arrow_back</mat-icon>
+        <span>Anterior</span>
+      </button>
+
+      <div class="flex items-center space-x-4">
+        <div class="text-sm text-gray-600">
+          <span class="font-medium">{{ getSelectedCount() }}</span> empleados seleccionados
+        </div>
+        <button
+          type="button"
+          [disabled]="getSelectedCount() === 0"
+          (click)="nextStep()"
+          class="inline-flex items-center px-6 py-3 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary focus:outline-none focus:ring-4 focus:ring-fiori-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span>Siguiente</span>
+          <mat-icon class="ml-2 w-4 h-4">arrow_forward</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Paso 3: Anterior y Guardar -->
+    <div *ngIf="currentStep === 3" class="flex justify-between">
+      <button
+        type="button"
+        (click)="previousStep()"
+        class="inline-flex items-center px-6 py-3 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-lg hover:bg-fiori-hover focus:outline-none focus:ring-4 focus:ring-fiori-muted/30 transition-colors"
+      >
+        <mat-icon class="mr-2 w-4 h-4">arrow_back</mat-icon>
+        <span>Anterior</span>
+      </button>
+
+      <div class="flex items-center space-x-4">
+        <div class="text-sm text-gray-600">
+          <span class="font-medium">{{ getSelectedCount() }}</span> empleados • 
+          <span class="font-medium">{{ getTurnoSeleccionado()?.alias || 'Sin turno' }}</span>
+        </div>
+        <button
+          type="button"
+          [disabled]="!turnoForm.valid"
+          (click)="guardarAsignacion()"
+          class="inline-flex items-center px-6 py-3 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary focus:outline-none focus:ring-4 focus:ring-fiori-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <mat-icon class="mr-2 w-4 h-4">save</mat-icon>
+          <span>Guardar Asignación</span>
+        </button>
       </div>
     </div>
   </div>

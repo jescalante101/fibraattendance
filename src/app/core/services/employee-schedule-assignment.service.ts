@@ -24,6 +24,11 @@ export interface EmployeeScheduleAssignment {
   createdBy: string | null;
   updatedBy: string | null;
   updatedAt: string | null;
+
+  //compania_id,ccost_id and ccost_description
+  companiaId: string | null;
+  ccostId: string | null;
+  ccostDescription: string | null;
 }
 export interface EmployeeScheduleAssignmentInsert {
   assignmentId:     number;
@@ -41,6 +46,10 @@ export interface EmployeeScheduleAssignmentInsert {
   areaDescription:  string;
   locationId:       string;
   locationName:     string;
+  companiaId:       string;
+  ccostId:          string;
+  ccostDescription: string;
+
 }
 
 export interface EmployeeScheduleAssignmentUpdate {
@@ -60,6 +69,9 @@ export interface EmployeeScheduleAssignmentUpdate {
   locationName: string;
   updatedBy: string | null;
   updatedAt: string | null;
+  companiaId: string | null;
+  ccostId: string | null;
+  ccostDescription: string | null;
 }
 
 

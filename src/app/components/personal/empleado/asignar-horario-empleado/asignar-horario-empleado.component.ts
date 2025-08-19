@@ -66,6 +66,8 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
     { key: 'scheduleName', label: 'Turno', visible: true, required: true, sortable: true, type: 'text' },
     { key: 'locationName', label: 'Ubicación', visible: true, required: false, sortable: true, type: 'text' },
     { key: 'areaName', label: 'Área', visible: true, required: false, sortable: true, type: 'text' },
+    { key: 'companiaId', label: 'Compañía', visible: false, required: false, sortable: true, type: 'text' },
+    { key: 'ccostDescription', label: 'Centro de Costo', visible: true, required: false, sortable: true, type: 'text' },
     { key: 'startDate', label: 'Fecha Inicio', visible: true, required: false, sortable: true, type: 'date' },
     { key: 'endDate', label: 'Fecha Fin', visible: true, required: false, sortable: true, type: 'date' },
     { key: 'acciones', label: 'Acciones', visible: true, required: true, sortable: false, type: 'actions' }
@@ -235,7 +237,7 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
     this.modalService.open({
       title: 'Asignación Masiva de Turnos',
       componentType: AsignarTurnoMasivoComponent,
-      width: '80vw',
+      width: '70vw',
       height: 'auto'
     }).then(result => {
      //TODO: refrescar la lista
@@ -279,7 +281,11 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       areaId: asignacion.areaId,
       areaName: asignacion.areaName,
       locationId: asignacion.locationId,
-      locationName: asignacion.locationName
+      locationName: asignacion.locationName,
+      // Nuevos campos
+      companiaId: asignacion.companiaId,
+      ccostId: asignacion.ccostId,
+      ccostDescription: asignacion.ccostDescription
     };
 
     this.modalService.open({
@@ -441,6 +447,35 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
             </svg>
             <span>${params.value}</span>
+          </div>`;
+        }
+      },
+      {
+        field: 'companiaId',
+        headerName: 'Compañía',
+        width: 120,
+        cellRenderer: (params: any) => {
+          if (!params.value) return '<span class="text-fiori-subtext">-</span>';
+          return `<div class="flex items-center text-sm">
+            <svg class="w-4 h-4 text-fiori-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+            <span class="font-medium">${params.value}</span>
+          </div>`;
+        }
+      },
+      {
+        field: 'ccostDescription',
+        headerName: 'Centro de Costo',
+        width: 300,
+        maxWidth: 400,
+        cellRenderer: (params: any) => {
+          if (!params.value) return '<span class="text-fiori-subtext">Sin asignar</span>';
+          return `<div class="flex items-center text-sm">
+            <svg class="w-4 h-4 text-fiori-warning mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="font-medium" title="${params.value}">${params.value}</span>
           </div>`;
         }
       },
@@ -607,7 +642,7 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
   
   onColumnsReset(): void {
     // Restaurar configuración por defecto
-    const defaultVisibleColumns = ['employeeId', 'nroDoc', 'fullNameEmployee', 'scheduleName', 'locationName', 'areaName', 'startDate', 'endDate', 'acciones'];
+    const defaultVisibleColumns = ['employeeId', 'nroDoc', 'fullNameEmployee', 'scheduleName', 'locationName', 'areaName', 'ccostDescription', 'startDate', 'endDate', 'acciones'];
     
     this.tableColumns.forEach(col => {
       col.visible = defaultVisibleColumns.includes(col.key);

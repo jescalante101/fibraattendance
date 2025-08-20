@@ -12,51 +12,47 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FlatpickrDefaultsInterface } from 'angularx-flatpickr';
 import { Spanish } from 'flatpickr/dist/l10n/es.js';
 
-export interface DateRange {
-  start: string;
-  end: string;
-}
-
 @Component({
-  selector: 'app-date-range-picker',
-  templateUrl: './date-range-picker.component.html',
-  styleUrls: ['./date-range-picker.component.css'],
+  selector: 'app-time-picker',
+  templateUrl: './time-picker.component.html',
+  styleUrls: ['./time-picker.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => DateRangePickerComponent),
+      useExisting: forwardRef(() => TimePickerComponent),
       multi: true
     }
   ]
 })
-export class DateRangePickerComponent implements ControlValueAccessor, OnInit, OnDestroy {
+export class TimePickerComponent implements ControlValueAccessor, OnInit, OnDestroy {
   
   // Input properties para configuración
-  @Input() placeholder = 'Seleccionar rango de fechas...';
+  @Input() placeholder = 'Seleccionar hora...';
   @Input() required = false;
   @Input() disabled = false;
-  @Input() minDate?: Date;
-  @Input() maxDate?: Date;
-  @Input() dateFormat = 'Y-m-d';
-  @Input() altFormat = 'd/m/Y';
+  @Input() minTime?: string; // Formato "HH:mm"
+  @Input() maxTime?: string; // Formato "HH:mm"
+  @Input() defaultTime?: string; // Formato "HH:mm"
   @Input() showIcon = true;
-  @Input() iconName = 'calendar';
+  @Input() iconName = 'clock';
   @Input() errorClass = 'border-red-500';
   @Input() size: 'sm' | 'md' | 'lg' = 'sm';
   @Input() theme: 'default' | 'fiori' = 'default';
+  @Input() time24hr = true; // Formato 24 horas por defecto
+  @Input() enableSeconds = false; // Habilitar segundos
   
   // Output events
-  @Output() dateRangeChange = new EventEmitter<DateRange>();
-  @Output() dateSelected = new EventEmitter<Date[]>();
+  @Output() timeChange = new EventEmitter<string>();
+  @Output() timeSelected = new EventEmitter<Date>();
   @Output() pickerOpen = new EventEmitter<void>();
   @Output() pickerClose = new EventEmitter<void>();
   
   // Internal state
-  selectedDateRange: Date[] = [];
-  currentValue: DateRange = { start: '', end: '' };
+  selectedTime: Date | null = null;
+  currentValue: string = '';
   
   // ControlValueAccessor callbacks
-  private onChange = (value: DateRange) => {};
+  private onChange = (value: string) => {};
   private onTouched = () => {
     this.wasTouched = true;
   };
@@ -68,6 +64,11 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
 
   ngOnInit(): void {
     this.initializeFlatpickrConfig();
+    
+    // Establecer tiempo por defecto si está configurado
+    if (this.defaultTime && !this.currentValue) {
+      this.writeValue(this.defaultTime);
+    }
   }
 
   ngOnDestroy(): void {
@@ -75,141 +76,117 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
   }
 
   /**
-   * Initialize Flatpickr configuration based on inputs
+   * Initialize Flatpickr configuration for time picker
    */
   private initializeFlatpickrConfig(): void {
     this.flatpickrDefaults = {
-      mode: 'range',
-      dateFormat: this.dateFormat,
+      enableTime: true,
+      noCalendar: true, // Solo mostrar selector de tiempo
+      dateFormat: this.enableSeconds ? 'H:i:S' : 'H:i',
+      time24hr: this.time24hr,
       locale: Spanish,
       allowInput: true,
       clickOpens: true,
-      altInput: true,
-      altFormat: this.altFormat,
-      minDate: this.minDate,
-      maxDate: this.maxDate,
+      minTime: this.minTime,
+      maxTime: this.maxTime,
+      // defaultDate no es válido para time picker, se manejará en writeValue
       disable: this.disabled ? [() => true] : undefined,
-      // Configuración para navegación de meses mejorada
-      showMonths: 1, // Mostrar un mes
-      enableTime: false, // Sin selector de tiempo
-      nextArrow: '<svg class="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="m2.1 0 3.5 3.5-3.5 3.5-.7-.7 2.8-2.8L.7.7 2.1 0z"/></svg>',
-      prevArrow: '<svg class="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M5.6 0l.7.7-2.8 2.8 2.8 2.8-.7.7L2.1 3.5 5.6 0z"/></svg>',
-      // Permitir navegación libre por meses/años
-      disableMobile: true // Evitar el picker nativo en móviles
+      // Configuración específica para time picker
+      disableMobile: true, // Evitar el picker nativo en móviles
+      minuteIncrement: 1, // Incremento de minutos
+      hourIncrement: 1, // Incremento de horas
     };
   }
 
   /**
-   * Handle date changes from Flatpickr
+   * Handle time changes from Flatpickr
    */
-  handleDateChange(event: any): void {
-    console.log('📅 DateRangePicker: handleDateChange called with:', event);
+  handleTimeChange(event: any): void {
+    console.log('🕐 TimePicker: handleTimeChange called with:', event);
     
-    let selectedDates: Date[] = [];
+    let selectedDate: Date | null = null;
     
-    // Extract dates based on event format
-    if (Array.isArray(event)) {
-      selectedDates = event;
-      console.log('📅 Array directo detectado');
-    } else if (event && event.selectedDates && Array.isArray(event.selectedDates)) {
-      selectedDates = event.selectedDates;
-      console.log('📅 Objeto angularx-flatpickr detectado');
-      console.log('📝 dateString:', event.dateString);
+    // Extract time based on event format
+    if (Array.isArray(event) && event.length > 0) {
+      selectedDate = event[0];
+      console.log('🕐 Array format detected');
+    } else if (event && event.selectedDates && Array.isArray(event.selectedDates) && event.selectedDates.length > 0) {
+      selectedDate = event.selectedDates[0];
+      console.log('🕐 angularx-flatpickr format detected');
+      console.log('🕐 dateString:', event.dateString);
     } else {
-      console.log('⚠️ Formato no reconocido, reseteando fechas');
-      this.resetDates();
+      console.log('⚠️ Unknown format or empty, resetting time');
+      this.resetTime();
       return;
     }
     
-    console.log('📅 Fechas extraídas:', selectedDates);
+    console.log('🕐 Time extracted:', selectedDate);
     
-    // Process extracted dates
-    if (selectedDates.length >= 2) {
-      // Complete range selected
-      this.selectedDateRange = selectedDates;
-      const startDate = this.formatDate(selectedDates[0]);
-      const endDate = this.formatDate(selectedDates[1]);
+    // Process extracted time
+    if (selectedDate && selectedDate instanceof Date) {
+      this.selectedTime = selectedDate;
+      this.currentValue = this.formatTime(selectedDate);
       
-      this.currentValue = {
-        start: startDate,
-        end: endDate
-      };
-      
-      console.log('✅ Full range selected:', this.currentValue);
+      console.log('✅ Time selected:', this.currentValue);
       
       // Emit events
-      this.dateRangeChange.emit(this.currentValue);
-      this.dateSelected.emit(selectedDates);
+      this.timeChange.emit(this.currentValue);
+      this.timeSelected.emit(selectedDate);
       this.onChange(this.currentValue);
       this.onTouched();
       
       // Force change detection
       this.cdr.detectChanges();
       
-    } else if (selectedDates.length === 1) {
-      // Only start date selected (incomplete range)
-      this.selectedDateRange = selectedDates;
-      const startDate = this.formatDate(selectedDates[0]);
-      
-      this.currentValue = {
-        start: startDate,
-        end: ''
-      };
-      
-      console.log('⚠️ Only start date selected:', this.currentValue);
-      
-      // Emit partial selection
-      this.dateRangeChange.emit(this.currentValue);
-      this.dateSelected.emit(selectedDates);
-      this.onChange(this.currentValue);
-      this.onTouched();
-      
-      this.cdr.detectChanges();
     } else {
-      // Empty selection
-      this.resetDates();
+      // Invalid time
+      this.resetTime();
     }
   }
 
   /**
-   * Reset dates to empty state
+   * Reset time to empty state
    */
-  private resetDates(): void {
-    this.selectedDateRange = [];
-    this.currentValue = { start: '', end: '' };
+  private resetTime(): void {
+    this.selectedTime = null;
+    this.currentValue = '';
     
-    this.dateRangeChange.emit(this.currentValue);
+    this.timeChange.emit(this.currentValue);
     this.onChange(this.currentValue);
     // Don't call onTouched() here to avoid marking as touched during reset
     
-    console.log('🔄 Dates reset');
+    console.log('🔄 Time reset');
     this.cdr.detectChanges();
   }
 
   /**
-   * Format date to string
+   * Format time to string
    */
-  private formatDate(date: Date): string {
+  private formatTime(date: Date): string {
     if (!date || !(date instanceof Date)) {
-      console.log('❌ formatDate: Invalid date, returning empty string');
+      console.log('❌ formatTime: Invalid date, returning empty string');
       return '';
     }
     
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
     
-    const formatted = `${year}-${month}-${day}`;
-    console.log('✅ formatDate result:', formatted);
+    let formatted = `${hours}:${minutes}`;
     
+    if (this.enableSeconds) {
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      formatted += `:${seconds}`;
+    }
+    
+    console.log('✅ formatTime result:', formatted);
     return formatted;
   }
 
   /**
-   * Check if the current selection is valid (both dates selected)
+   * Check if the current time is valid
    */
   isValid(): boolean {
-    return !!(this.currentValue.start && this.currentValue.end);
+    return !!this.currentValue;
   }
 
   /**
@@ -218,7 +195,7 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
   hasError(): boolean {
     // Show error only if:
     // 1. Component is required
-    // 2. Component is invalid (no proper date range)
+    // 2. Component is invalid (no time selected)
     // 3. User has interacted with it (touched) but hasn't provided valid input
     
     if (!this.required) {
@@ -228,8 +205,8 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
     const isInvalid = !this.isValid();
     const hasBeenTouched = this.wasTouched;
     
-    // Don't show error if we have valid dates
-    if (this.currentValue.start && this.currentValue.end) {
+    // Don't show error if we have valid time
+    if (this.currentValue) {
       return false;
     }
     
@@ -339,30 +316,48 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
   }
 
   // ControlValueAccessor implementation
-  writeValue(value: DateRange | null): void {
-    if (value && value.start && value.end) {
+  writeValue(value: string | null): void {
+    if (value) {
       this.currentValue = value;
       
-      // Convert string dates to Date objects for Flatpickr
-      const startDate = new Date(value.start);
-      const endDate = new Date(value.end);
+      // Convert string time to Date object for Flatpickr
+      const timeDate = this.parseTimeString(value);
       
-      if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
-        this.selectedDateRange = [startDate, endDate];
-        console.log('📅 writeValue: Updated with preset dates:', value);
+      if (timeDate) {
+        this.selectedTime = timeDate;
+        console.log('🕐 writeValue: Updated with time:', value);
         
-        // Don't mark as touched when programmatically setting value (e.g., via preset buttons)
+        // Don't mark as touched when programmatically setting value
         // This ensures we don't show error state immediately
         
         // Force change detection to update UI
         this.cdr.detectChanges();
       }
     } else {
-      this.resetDates();
+      this.resetTime();
     }
   }
 
-  registerOnChange(fn: (value: DateRange) => void): void {
+  /**
+   * Parse time string to Date object
+   */
+  private parseTimeString(timeStr: string): Date | null {
+    const timeMatch = timeStr.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+    if (timeMatch) {
+      const hours = parseInt(timeMatch[1], 10);
+      const minutes = parseInt(timeMatch[2], 10);
+      const seconds = timeMatch[3] ? parseInt(timeMatch[3], 10) : 0;
+      
+      // Create a Date object with today's date but with the specified time
+      const date = new Date();
+      date.setHours(hours, minutes, seconds, 0);
+      
+      return date;
+    }
+    return null;
+  }
+
+  registerOnChange(fn: (value: string) => void): void {
     this.onChange = fn;
   }
 

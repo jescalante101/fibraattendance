@@ -48,6 +48,11 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   datosListos = false;
   loadingPersonal = false;
   
+  // Estados para autocomplete de sede
+  showSedeDropdown = false;
+  filteredSedesArray: CategoriaAuxiliar[] = [];
+  sedeFilterTerm = '';
+
   // Estados para autocomplete de centro de costo
   showCostCenterDropdown = false;
   filteredCostCentersArray: CostCenter[] = [];
@@ -169,6 +174,9 @@ export class AsignarTurnoMasivoComponent implements OnInit {
           codigoAuxiliar: sede.siteId // Usar el siteId como código auxiliar
         }));
         
+        // Inicializar array filtrado para autocomplete
+        this.filteredSedesArray = [...this.sedes];
+        
         // Inicializar áreas vacías hasta que se seleccione una sede
         this.areas = [];
         this.areasFiltradas = [];
@@ -189,6 +197,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         this.toastService.error('Error al cargar', 'No se pudieron cargar las sedes y áreas disponibles');
         this.sedesAreas = [];
         this.sedes = [];
+        this.filteredSedesArray = [];
         this.areas = [];
         this.areasFiltradas = [];
         this.datosListos = true;
@@ -807,6 +816,54 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   }
   
   // ===============================
+  // MÉTODOS DE AUTOCOMPLETE - SEDE
+  // ===============================
+  
+  getSedeFilterText(): string {
+    if (this.filtroForm.get('sede')?.value) {
+      const selectedSede = this.sedes.find(sede => sede.categoriaAuxiliarId === this.filtroForm.get('sede')?.value);
+      return selectedSede?.descripcion || '';
+    }
+    return this.sedeFilterTerm;
+  }
+  
+  onSedeFilterChange(event: any): void {
+    const value = event.target?.value || '';
+    this.sedeFilterTerm = value;
+    this.filteredSedesArray = this.sedes.filter(sede => 
+      sede.descripcion.toLowerCase().includes(value.toLowerCase())
+    );
+    this.showSedeDropdown = this.filteredSedesArray.length > 0;
+  }
+  
+  onSedeFocus(): void {
+    if (this.filteredSedesArray.length === 0) {
+      this.filteredSedesArray = [...this.sedes];
+    }
+    this.showSedeDropdown = this.filteredSedesArray.length > 0;
+  }
+  
+  onSedeSelected(sede: CategoriaAuxiliar): void {
+    this.filtroForm.patchValue({ sede: sede.categoriaAuxiliarId });
+    this.sedeFilterTerm = sede.descripcion;
+    this.showSedeDropdown = false;
+    console.log('Sede seleccionada:', sede);
+    
+    // Llamar al método existente para filtrar áreas
+    this.onSedeSeleccionada(sede.categoriaAuxiliarId);
+  }
+  
+  onSedeBlur(): void {
+    setTimeout(() => {
+      this.showSedeDropdown = false;
+    }, 200);
+  }
+  
+  trackBySedeId(index: number, sede: CategoriaAuxiliar): string {
+    return sede.categoriaAuxiliarId;
+  }
+
+  // ===============================
   // MÉTODOS DE AUTOCOMPLETE - CENTRO DE COSTO
   // ===============================
   
@@ -857,7 +914,14 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   
   onDateRangeSelected(dateRange: DateRange): void {
     console.log('Rango de fechas seleccionado:', dateRange);
-    // El FormControl ya se actualiza automáticamente
+    
+    // Verificar que el rango sea válido y actualizar el FormControl
+    if (dateRange && dateRange.start && dateRange.end) {
+      // Marcar el control como touched para activar la validación
+      this.filtroForm.get('dateRange')?.markAsTouched();
+      this.filtroForm.get('dateRange')?.updateValueAndValidity();
+      console.log('✅ FormControl dateRange updated and validated');
+    }
   }
 
   /**
@@ -876,33 +940,54 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     let endDate: Date = new Date(today);
 
     switch (preset) {
-      case 'thisWeek':
-        // Esta semana: Lunes a Domingo
-        const dayOfWeek = today.getDay(); // 0 = Domingo, 1 = Lunes, etc.
-        const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Si es domingo, retroceder 6 días
-        startDate = new Date(today);
-        startDate.setDate(today.getDate() + mondayOffset);
-        endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + 6); // Domingo
+      case 'today':
+        // Hoy - crear copias independientes sin mutación
+        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
         break;
-      case 'nextWeek':
-        // Siguiente semana: Lunes a Domingo de la próxima semana
-        const currentDayOfWeek = today.getDay();
-        const nextMondayOffset = currentDayOfWeek === 0 ? 1 : 8 - currentDayOfWeek;
-        startDate = new Date(today);
-        startDate.setDate(today.getDate() + nextMondayOffset);
-        endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + 6);
+      case 'yesterday':
+        // Ayer - crear fecha específica
+        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        break;
+      case 'last7days':
+        // Últimos 7 días (incluyendo hoy) - desde hace 6 días hasta hoy
+        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 5);
+        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+        break;
+      case 'last30days':
+        // Últimos 30 días (incluyendo hoy) - desde hace 29 días hasta hoy
+        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 28);
+        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
         break;
       case 'thisMonth':
         // Este mes: primer día al último día del mes actual
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-        endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        startDate = new Date(today.getFullYear(), today.getMonth(), 2); // Día 2 para que aparezca como 1
+        endDate = new Date(today.getFullYear(), today.getMonth() + 1, 1); // Día 1 del siguiente mes para que aparezca como último día del mes actual
+        break;
+      case 'lastMonth':
+        // Mes pasado: primer día al último día del mes anterior
+        startDate = new Date(today.getFullYear(), today.getMonth() - 1, 2); // Día 2 para que aparezca como 1
+        endDate = new Date(today.getFullYear(), today.getMonth(), 1); // Día 1 del mes actual para que aparezca como último día del mes anterior
+        break;
+      case 'thisWeek':
+        // Esta semana: Lunes a Domingo (corregido con +1 día)
+        const dayOfWeek = today.getDay(); // 0 = Domingo, 1 = Lunes, etc.
+        const mondayOffset = dayOfWeek === 0 ? -5 : 2 - dayOfWeek; // Ajustado +1 día
+        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + mondayOffset);
+        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + mondayOffset + 7); // +7 días para el domingo
+        break;
+      case 'nextWeek':
+        // Siguiente semana: Lunes a Domingo de la próxima semana (corregido con +1 día)
+        const currentDayOfWeek = today.getDay();
+        const nextMondayOffset = currentDayOfWeek === 0 ? 2 : 9 - currentDayOfWeek; // Ajustado +1 día
+        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + nextMondayOffset);
+        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + nextMondayOffset + 7); // +7 días
         break;
       case 'wholeYear':
-        // Todo el año: 1 de enero al 31 de diciembre del año actual
-        startDate = new Date(today.getFullYear(), 0, 1); // 1 de enero
-        endDate = new Date(today.getFullYear(), 11, 31); // 31 de diciembre
+        // Todo el año: 1 de enero al 31 de diciembre del año actual (corregido con +1 día)
+        startDate = new Date(today.getFullYear(), 0, 2); // 2 de enero para que aparezca como 1
+        endDate = new Date(today.getFullYear() + 1, 0, 1); // 1 de enero del siguiente año para que aparezca como 31 de diciembre
         break;
       default:
         return;
@@ -913,10 +998,21 @@ export class AsignarTurnoMasivoComponent implements OnInit {
       end: formatDate(endDate)
     };
 
+    // Debug info
+    console.log(`📅 Preset "${preset}" calculation debug:`);
+    console.log('  Today:', today.toLocaleDateString('es-ES'));
+    console.log('  StartDate calculated:', startDate.toLocaleDateString('es-ES'));
+    console.log('  EndDate calculated:', endDate.toLocaleDateString('es-ES'));
+    console.log('  DateRange formatted:', dateRange);
+
     // Actualizar el form control del date range picker
     this.filtroForm.patchValue({ dateRange });
     
-    console.log(`📅 Preset "${preset}" aplicado:`, dateRange);
+    // Marcar como touched y válido después de aplicar el preset
+    this.filtroForm.get('dateRange')?.markAsTouched();
+    this.filtroForm.get('dateRange')?.updateValueAndValidity();
+    
+    console.log(`✅ Preset "${preset}" aplicado correctamente:`, dateRange);
   }
 
   // ===============================
@@ -993,6 +1089,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         field: 'select',
         headerName: '',
         width: 50,
+        maxWidth:50,
         pinned: 'left',
         lockPosition: true,
         resizable: false,

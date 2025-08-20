@@ -15,6 +15,7 @@ import { FioriPaginatorComponent } from './fiori-paginator/fiori-paginator.compo
 import { GenericFilterComponent } from './generic-filter/generic-filter.component';
 import { ColumnManagerComponent } from './column-manager/column-manager.component';
 import { DateRangePickerComponent } from './components/date-range-picker/date-range-picker.component';
+import { TimePickerComponent } from './components/time-picker/time-picker.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { DateRangePickerComponent } from './components/date-range-picker/date-ra
     FioriPaginatorComponent,
     GenericFilterComponent,
     ColumnManagerComponent,
-    DateRangePickerComponent
+    DateRangePickerComponent,
+    TimePickerComponent
   ],
   imports: [
     CommonModule,
@@ -45,7 +47,8 @@ import { DateRangePickerComponent } from './components/date-range-picker/date-ra
     FioriPaginatorComponent,
     GenericFilterComponent,
     ColumnManagerComponent,
-    DateRangePickerComponent
+    DateRangePickerComponent,
+    TimePickerComponent
   ]
 })
 export class SharedModule { }

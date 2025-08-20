@@ -226,10 +226,10 @@ export class HorarioComponent implements OnInit {
   // Método para abrir el modal de nuevo horario usando el modal personalizado
   abrirModalNuevoHorario(mode: number): void {
     console.log('Abrir modal para nuevo horario');
-    
     this.modalService.open({
       title: mode == 0 ? 'Nuevo Horario Normal' : 'Nuevo Horario Flexible',
       componentType: NuevoHorarioComponent,
+      width:'1200px',
       componentData: { use_mode: mode },
     }).then(result => {
       this.loadHoraiosData();
@@ -246,6 +246,7 @@ export class HorarioComponent implements OnInit {
     this.modalService.open({
       title: 'Editar Horario',
       componentType: NuevoHorarioComponent,
+      width:'1200px',
       componentData: { idHorario: idHorario, use_mode: use_mode },
     }).then(result => {
       if (result) {
@@ -296,22 +297,7 @@ export class HorarioComponent implements OnInit {
     });
   }
 
-  testModal() {
-    console.log('=== TEST MODAL BÁSICO ===');
-    try {
-      this.modalService.open({
-        title: 'Test Modal',
-        componentType: NuevoHorarioComponent,
-        componentData: { use_mode: 0 },
-        width: '600px',
-        height: 'auto'
-      }).then(result => {
-        console.log('Modal cerrado con resultado:', result);
-      });
-    } catch (e) {
-      console.error('Error en test modal:', e);
-    }
-  }
+ 
 
   // Métodos para estadísticas
   getHorariosEstandar(): number {

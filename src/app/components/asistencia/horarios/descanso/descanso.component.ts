@@ -281,32 +281,16 @@ calcularHoraFin(horaInicio: string, duracionEnMinutos: number): string {
         // Aquí puedes manejar el resultado del modal
         console.log('Resultado del modal:', result);
         // Recargar los descansos después de cerrar el modal
-        this.loadDescansos();
         this.toastService.success('Descanso creado', 'El descanso se guardó correctamente');
+        this.loadDescansos();
+
       }
     });
     console.log('Abrir modal para nuevo descanso');
   }
 
 
-  //Metodo para abrir un modal y editar un descanso
-  //vamos a abrir NuevoDescansoComponent
-  openModalEditarDescanso(idDescanso: number) {
-    this.dialog.open(NuevoDescansoComponent, {
-      hasBackdrop: true,
-      backdropClass: 'backdrop-modal', // Clase personalizada para el fondo
-      data: {
-        id: idDescanso
-      }
-    }).afterClosed().subscribe(result => {
-      if (result) {
-        console.log('Resultado del modal:', result);
-        this.loadDescansos();
-        this.toastService.success('Descanso actualizado', 'El descanso se guardó correctamente');
-      }
-    });
-    console.log('Abrir modal para editar descanso');
-  }
+  
   //Metodo para abrir un modal y editar un descanso
   //vamos a abrir NuevoDescansoComponent
   openModalEditarDescanso2(idDescanso: number) {
@@ -318,8 +302,8 @@ calcularHoraFin(horaInicio: string, duracionEnMinutos: number): string {
     }).then(result => {
       if (result) {
         console.log('Resultado del modal:', result);
-        this.loadDescansos();
         this.toastService.success('Descanso actualizado', 'El descanso se actualizó correctamente');
+          this.loadDescansos();
       }
     });
     console.log('Abrir modal para editar descanso');

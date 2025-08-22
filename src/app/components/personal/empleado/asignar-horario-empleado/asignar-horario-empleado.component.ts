@@ -8,6 +8,7 @@ import { AsignarTurnoMasivoComponent } from '../asignar-turno-masivo/asignar-tur
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ShiftsService } from 'src/app/core/services/shifts.service';
 import { ModalVerHorarioComponent } from './modal-ver-horario/modal-ver-horario.component';
+import { CalendarViewHorarioComponent } from './calendar-view-horario/calendar-view-horario.component';
 import { ModalEditarAsignacionComponent } from './modal-editar-asignacion/modal-editar-asignacion.component';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
@@ -15,6 +16,8 @@ import { GenericFilterConfig, FilterState, FilterChangeEvent } from 'src/app/sha
 import { ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { createFioriGridOptions } from 'src/app/shared/ag-grid-theme-fiori';
 import { ColumnManagerConfig, ColumnConfig, ColumnChangeEvent } from 'src/app/shared/column-manager/column-config.interface';
+import { ToastService } from 'src/app/shared/services/toast.service';
+import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 
 @Component({
   selector: 'app-asignar-horario-empleado',
@@ -28,7 +31,8 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
     private employeeScheduleAssignmentService: EmployeeScheduleAssignmentService,
     private snackBar: MatSnackBar,
     private shiftService: ShiftsService,
-    private modalService:ModalService
+    private modalService:ModalService,
+    private toastService:ToastService
   ) { }
 
   filtro = '';
@@ -227,6 +231,70 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       });
   }
 
+  verCalendario(empleado: EmployeeScheduleAssignment) {
+    this.loading = true;
+    this.shiftService.getShiftByAssignedIdAndShiftId(empleado.assignmentId, empleado.scheduleId)
+      .pipe(finalize(() => this.loading = false))
+      .subscribe({
+        next: (res) => {
+          if (res) {
+            // Preparar datos para el componente calendar-view
+            // Usar la misma estructura que espera CalendarViewHorarioComponent
+            const calendarData = {
+              employeeName: empleado.fullNameEmployee,
+              turno: {
+                alias: res.alias,
+                id: res.id
+              },
+              fecha_ini: empleado.startDate,
+              fecha_fin: empleado.endDate,
+              horarios: res.horario ? res.horario.map((h: any) => ({
+                dayIndex: h.dayIndex,
+                dayName: this.getDayName(h.dayIndex),
+                inTime: h.inTime,
+                outTime: h.outTime,
+                workTimeDuration: h.workTimeDuration,
+                hasException: h.hasException || false,
+                exceptionId: h.exceptionId
+              })) : []
+            };
+
+            console.log('Datos para calendario:', calendarData);
+
+            this.modalService.open({
+              title: `Calendario de Horarios - ${empleado.fullNameEmployee}`,
+              componentType: CalendarViewHorarioComponent,
+              componentData: calendarData,
+              width: '95vw',
+              height: '95vh'
+            });
+
+          } else {
+            this.snackBar.open('No se pudo obtener la información del horario.', 'Cerrar', {
+              duration: 4000,
+              verticalPosition: 'top',
+              horizontalPosition: 'end',
+              panelClass: ['snackbar-error']
+            });
+          }
+        },
+        error: (err) => {
+          console.error('Error obteniendo horario para calendario:', err);
+          this.snackBar.open('Error al obtener el horario del empleado.', 'Cerrar', {
+            duration: 4000,
+            verticalPosition: 'top',
+            horizontalPosition: 'end',
+            panelClass: ['snackbar-error']
+          });
+        }
+      });
+  }
+
+  private getDayName(dayIndex: number): string {
+    const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    return days[dayIndex] || `Día ${dayIndex}`;
+  }
+
   // Método para cerrar el modal
   onModalClose(): void {
     this.isModalOpen = false;
@@ -293,7 +361,7 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       componentType: ModalEditarAsignacionComponent,
       componentData: editData,
       width: '1200px',
-      height: '90vh'
+      height: '95vh'
     }).then(result => {
       if (result && result.updated) {
         this.snackBar.open('Asignación actualizada correctamente', 'Cerrar', {
@@ -309,7 +377,34 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
   }
 
   eliminar(asignacion: EmployeeScheduleAssignment) {
-    console.log('Eliminar asignación:', asignacion);
+
+    /// modal de confirmación 
+    const dialogRef = this.dialog.open(ModalConfirmComponent, {
+      width: '350px',
+      data: {
+        tipo: 'danger',
+        titulo: 'Eliminar usuario',
+        mensaje: `¿Seguro que deseas eliminar el usuario "${asignacion.fullNameEmployee}"?`,
+        confirmacion: true,
+        textoConfirmar: 'Eliminar'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.employeeScheduleAssignmentService.deleteEmployeeScheduleAssignment(asignacion.assignmentId).subscribe({
+          next: (res) => {
+            this.toastService.success('Asignación eliminada correctamente','Asignación eliminada correctamente  '+asignacion.fullNameEmployee);
+            this.cargarAsignaciones();
+          },
+          error: (err) => {
+            this.toastService.error('Error al eliminar la asignación','Error al eliminar la asignación');
+          }
+        });
+      }
+    });
+
+    // console.log('Eliminar asignación:', asignacion);
   }
 
   // ============ MÉTODOS PARA FILTRO GENÉRICO ============
@@ -394,8 +489,8 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       {
         field: 'fullNameEmployee',
         headerName: 'Personal',
-        width: 400,
-        maxWidth: 400,
+        width: 600,
+        maxWidth: 600,
         pinned: 'left',
         cellRenderer: (params: any) => {
           return `<div class="flex items-center py-1">
@@ -412,6 +507,7 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       },
       {
         field: 'scheduleName',
+       
         headerName: 'Turno',
         cellRenderer: (params: any) => {
           if (!params.value) return '<span class="text-fiori-subtext">-</span>';
@@ -424,6 +520,7 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       },
       {
         field: 'locationName',
+       
         headerName: 'Ubicación',
         cellRenderer: (params: any) => {
           if (!params.value) return '<span class="text-fiori-subtext">-</span>';
@@ -438,8 +535,7 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       {
         field: 'areaName',
         headerName: 'Área',
-        width: 400,
-        maxWidth: 400,
+     
         cellRenderer: (params: any) => {
           if (!params.value) return '<span class="text-fiori-subtext">-</span>';
           return `<div class="flex items-center text-sm">
@@ -453,7 +549,7 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       {
         field: 'companiaId',
         headerName: 'Compañía',
-        width: 120,
+      
         cellRenderer: (params: any) => {
           if (!params.value) return '<span class="text-fiori-subtext">-</span>';
           return `<div class="flex items-center text-sm">
@@ -467,8 +563,7 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       {
         field: 'ccostDescription',
         headerName: 'Centro de Costo',
-        width: 300,
-        maxWidth: 400,
+        
         cellRenderer: (params: any) => {
           if (!params.value) return '<span class="text-fiori-subtext">Sin asignar</span>';
           return `<div class="flex items-center text-sm">
@@ -514,17 +609,21 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       {
         field: 'acciones',
         headerName: 'Acciones',
-        width: 180,
+        width: 220,
         pinned: 'right',
         lockPosition: true,
         resizable: false,
         cellRenderer: (params: any) => {
           return `<div class="flex items-center justify-center space-x-1 h-full">
-            <button class="horario-btn inline-flex items-center px-3 py-1 text-xs bg-fiori-info text-white rounded-lg hover:bg-blue-700 transition-colors" title="Ver Horario">
-              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button class="horario-btn inline-flex items-center px-2 py-1 text-xs bg-fiori-info text-white rounded-lg hover:bg-blue-700 transition-colors" title="Ver Horario">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              
+            </button>
+            <button class="calendar-btn inline-flex items-center px-2 py-1 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors" title="Ver Calendario">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5a2.25 2.25 0 0 1 21 9v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"></path>
+              </svg>
             </button>
             <button class="edit-btn p-2 text-fiori-primary hover:bg-fiori-primary/10 rounded transition-colors" title="Editar">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -571,6 +670,15 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
             const rowData = this.gridApi.getDisplayedRowAtIndex(rowIndex)?.data;
             if (rowData) {
               this.getHorario(rowData);
+            }
+          }
+        } else if (button && button.classList.contains('calendar-btn')) {
+          const cell = button.closest('.ag-cell');
+          if (cell) {
+            const rowIndex = parseInt(cell.closest('.ag-row')?.getAttribute('row-index') || '0');
+            const rowData = this.gridApi.getDisplayedRowAtIndex(rowIndex)?.data;
+            if (rowData) {
+              this.verCalendario(rowData);
             }
           }
         } else if (button && button.classList.contains('edit-btn')) {

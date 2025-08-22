@@ -63,20 +63,20 @@
                     class="w-4 h-4 text-fiori-primary border-fiori-border rounded focus:ring-fiori-primary focus:ring-2"
                   />
                 </td>
-                <td class="p-3 text-fiori-text font-medium">{{ horario.nombre }}</td>
+                <td class="p-3 text-fiori-text font-medium">{{ horario.alias }}</td>
                 <td class="p-3 text-center">
                   <span class="inline-flex items-center px-2 py-1 rounded-full bg-fiori-success/10 text-fiori-success text-xs font-medium">
-                    {{ horario.horaEntrada }}
+                    {{ horario.formattedStartTime }}
                   </span>
                 </td>
                 <td class="p-3 text-center">
                   <span class="inline-flex items-center px-2 py-1 rounded-full bg-fiori-error/10 text-fiori-error text-xs font-medium">
-                    {{ horario.horaSalida }}
+                    {{ horario.scheduledEndTime }}
                   </span>
                 </td>
                 <td class="p-3 text-center">
                   <span class="inline-flex items-center px-2 py-1 rounded-full bg-fiori-warning/10 text-fiori-warning text-xs font-medium">
-                    {{ horario.descanso }}
+                    {{ horario.breaks?.length || 0 }} break(s)
                   </span>
                 </td>
               </tr>
@@ -140,7 +140,7 @@
                     <div class="flex flex-wrap gap-1 min-h-[1.5rem]">
                       <span *ngFor="let horario of row" 
                             class="inline-flex items-center px-2 py-1 rounded-full bg-fiori-primary/10 text-fiori-primary text-xs font-medium border border-fiori-primary/20">
-                        {{ horario.nombre }}
+                        {{ horario.alias }}
                       </span>
                     </div>
                     <p class="text-fiori-subtext text-xs mt-2 flex items-center gap-1">
@@ -171,7 +171,7 @@
                     <div class="flex flex-wrap gap-1 min-h-[1.5rem]">
                       <span *ngFor="let horario of row[dia]" 
                             class="inline-flex items-center px-2 py-1 rounded-full bg-fiori-primary/10 text-fiori-primary text-xs font-medium border border-fiori-primary/20">
-                        {{ horario.nombre }}
+                        {{ horario.alias }}
                       </span>
                     </div>
                     <p class="text-fiori-subtext text-xs mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -202,7 +202,7 @@
                     <div class="flex flex-wrap gap-1 min-h-[1.5rem]">
                       <span *ngFor="let horario of cell" 
                             class="inline-flex items-center px-1 py-0.5 rounded bg-fiori-primary/10 text-fiori-primary text-xs font-medium border border-fiori-primary/20">
-                        {{ horario.nombre }}
+                        {{ horario.alias }}
                       </span>
                     </div>
                     <p class="text-fiori-subtext text-xs mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">

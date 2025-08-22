@@ -35,6 +35,8 @@ export class ModalEditarAsignacionComponent implements OnInit {
   
   editForm: FormGroup;
   turnos: Shift[] = [];
+  turnosFiltrados: Shift[] = [];
+  turnoSearchTerm: string = '';
   loading = false;
   isMultipleEdit = false;
 
@@ -56,8 +58,7 @@ export class ModalEditarAsignacionComponent implements OnInit {
   ) {
     this.editForm = this.fb.group({
       scheduleId: [null, Validators.required],
-      startDate: [null, Validators.required],
-      endDate: [null],
+      dateRange: [null, Validators.required],
       remarks: ['']
     });
   }
@@ -86,6 +87,9 @@ export class ModalEditarAsignacionComponent implements OnInit {
     console.log('this.componentData:', this.componentData);
     console.log('this.data:', this.data);
     
+    // Obtener usuario actual
+    this.getCurrentUserLogin();
+    
     // El modal service asigna los datos a 'data', usar ese directamente
     this.datat = this.data || { assignmentIds: [] };
     this.isMultipleEdit = this.datat.assignmentIds?.length > 1;
@@ -95,20 +99,26 @@ export class ModalEditarAsignacionComponent implements OnInit {
     
     // Pre-cargar datos actuales si es edición individual
     if (!this.isMultipleEdit && this.datat.currentScheduleId) {
+      const dateRange = {
+        start: this.datat.currentStartDate || '',
+        end: this.datat.currentEndDate || ''
+      };
+      
       console.log('Pre-llenando formulario con:', {
         scheduleId: this.datat.currentScheduleId,
-        startDate: this.datat.currentStartDate,
-        endDate: this.datat.currentEndDate,
+        dateRange: dateRange,
         remarks: this.datat.currentRemarks
       });
       
-      this.editForm.patchValue({
-        scheduleId: this.datat.currentScheduleId,
-        startDate: this.datat.currentStartDate,
-        endDate: this.datat.currentEndDate,
-        remarks: this.datat.currentRemarks
-      });
-      console.log('Form después de pre-llenar:', this.editForm.value);
+      // Usar setTimeout para asegurar que el componente date-range-picker esté inicializado
+      setTimeout(() => {
+        this.editForm.patchValue({
+          scheduleId: this.datat.currentScheduleId,
+          dateRange: dateRange,
+          remarks: this.datat.currentRemarks
+        });
+        console.log('Form después de pre-llenar:', this.editForm.value);
+      }, 200);
     }
 
     this.cargarTurnos();
@@ -130,16 +140,19 @@ export class ModalEditarAsignacionComponent implements OnInit {
           console.log('Respuesta completa del servicio de turnos:', response);
           if (response && response.data) {
             this.turnos = response.data;
+            this.turnosFiltrados = [...this.turnos]; // Inicializar filtrados
             console.log('Turnos asignados:', this.turnos);
             console.log('Cantidad de turnos:', this.turnos.length);
           } else {
             this.turnos = [];
+            this.turnosFiltrados = [];
             console.log('No hay datos en la respuesta');
           }
         },
         error: (err) => {
           console.error('Error cargando turnos:', err);
           this.turnos = [];
+          this.turnosFiltrados = [];
           this.snackBar.open('Error al cargar los turnos', 'Cerrar', {
             duration: 3000,
             verticalPosition: 'top',
@@ -202,6 +215,21 @@ export class ModalEditarAsignacionComponent implements OnInit {
     return this.turnos.find(t => t.id === selectedId) || null;
   }
 
+  filtrarTurnos(): void {
+    if (!this.turnoSearchTerm.trim()) {
+      this.turnosFiltrados = [...this.turnos];
+    } else {
+      const searchTerm = this.turnoSearchTerm.toLowerCase().trim();
+      this.turnosFiltrados = this.turnos.filter(turno => 
+        turno.alias?.toLowerCase().includes(searchTerm) 
+      );
+    }
+  }
+
+  onDateRangeSelected(dateRange: {start: string, end: string}): void {
+    this.editForm.patchValue({ dateRange });
+  }
+
   onSubmit(): void {
     if (this.editForm.valid) {
       const formData = this.editForm.value;
@@ -221,6 +249,7 @@ export class ModalEditarAsignacionComponent implements OnInit {
     this.loading = true;
     
     // Crear array de asignaciones para actualizar
+    const dateRange = formData.dateRange || {};
     const updateDataArray: EmployeeScheduleAssignmentUpdate[] = this.datat.assignmentIds.map((assignmentId) => ({
       assignmentId: assignmentId, // Incluir el ID de la asignación
       employeeId: this.datat.employeeId || '',
@@ -228,8 +257,8 @@ export class ModalEditarAsignacionComponent implements OnInit {
       fullNameEmployee: this.datat.employeeName || '',
       scheduleName: this.getTurnoSeleccionado()?.alias || '',
       scheduleId: formData.scheduleId,
-      startDate: formData.startDate,
-      endDate: formData.endDate || '',
+      startDate: dateRange.start || '',
+      endDate: dateRange.end || '',
       remarks: formData.remarks || '',
       createdAt: new Date().toISOString(),
       createdWeek: 0, // TODO: calcular la semana

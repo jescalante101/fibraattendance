@@ -75,6 +75,7 @@ export class NuevoDescansoComponent implements OnInit {
       this.idDescanso = this.data.id ;
       this.loadDescansoData(this.data.id);
     }
+    this.getCurrentUserLogin();
 
     console.log(`DESCANSO: ${this.idDescanso}`)
   }

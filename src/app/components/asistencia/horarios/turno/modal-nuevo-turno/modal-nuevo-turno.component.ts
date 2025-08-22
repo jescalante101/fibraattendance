@@ -1,6 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
-import { AttendanceService } from 'src/app/core/services/attendance.service';
+import { TimeIntervalService } from 'src/app/core/services/time-interval.service';
+import { TimeIntervalDetailDto } from 'src/app/core/models/att-time-interval-responde.model';
+import { HeaderConfigService } from 'src/app/core/services/header-config.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { ShiftsService, ShiftRegister, Detalle, ShiftRegisterUpdate } from 'src/app/core/services/shifts.service';
 import { ModalService } from 'src/app/shared/modal/modal.service';
@@ -24,8 +26,8 @@ export class ModalNuevoTurnoComponent implements OnInit {
   turnoId: number | null = null;
 
   // Propiedades para la tabla de horarios
-  dataHorarios: any[] = [];
-  horariosSeleccionados: any[] = [];
+  dataHorarios: TimeIntervalDetailDto[] = [];
+  horariosSeleccionados: TimeIntervalDetailDto[] = [];
   totalRecords: number = 0;
   pageSize: number = 50;
   pageNumber: number = 1;
@@ -61,7 +63,8 @@ export class ModalNuevoTurnoComponent implements OnInit {
 
 
   constructor(
-    private attendanceService: AttendanceService,
+    private timeIntervalService: TimeIntervalService,
+    private headerConfigService: HeaderConfigService,
     private shiftsService: ShiftsService,
     private modalService: ModalService,
     private authService: AuthService,
@@ -90,10 +93,19 @@ export class ModalNuevoTurnoComponent implements OnInit {
 
 
   loadHorarios() {
-    this.attendanceService.getHorarios(this.pageNumber, this.pageSize).subscribe(
-      (data) => {
-        this.dataHorarios = data.data;
-        this.totalRecords = data.totalRecords;
+    // Obtener companyId desde el header config
+    const header = this.headerConfigService.getCurrentHeaderConfig();
+    const companyId = header?.selectedEmpresa?.companiaId || '';
+    
+    if (!companyId) {
+      this.toastService.error('Error', 'No se ha seleccionado una empresa');
+      return;
+    }
+
+    this.timeIntervalService.getTimeIntervals(companyId, this.pageNumber, this.pageSize).subscribe(
+      (response) => {
+        this.dataHorarios = response.data;
+        this.totalRecords = response.totalRecords;
         
         // Si estamos en modo edición, cargar los datos después de obtener los horarios
         if (this.modalMode === 'edit' && this.data && this.data.turno) {
@@ -113,8 +125,8 @@ export class ModalNuevoTurnoComponent implements OnInit {
     this.loadHorarios();
   }
 
-  toggleHorarioSelection(horario: any) {
-    const index = this.horariosSeleccionados.findIndex(h => h.idHorio === horario.idHorio);
+  toggleHorarioSelection(horario: TimeIntervalDetailDto) {
+    const index = this.horariosSeleccionados.findIndex(h => h.id === horario.id);
     if (index === -1) {
       this.horariosSeleccionados.push(horario);
     } else {
@@ -122,8 +134,8 @@ export class ModalNuevoTurnoComponent implements OnInit {
     }
   }
 
-  isSelected(horario: any): boolean {
-    return this.horariosSeleccionados.findIndex(h => h.idHorio === horario.idHorio) !== -1;
+  isSelected(horario: TimeIntervalDetailDto): boolean {
+    return this.horariosSeleccionados.findIndex(h => h.id === horario.id) !== -1;
   }
 
   // Inicializa para Día
@@ -175,8 +187,8 @@ export class ModalNuevoTurnoComponent implements OnInit {
   }
 
   // Para agregar/quitar horarios seleccionados en cada card
-  toggleHorarioEnDia(i: number, horario: any) {
-    const idx = this.horariosDiaPorFila[i].findIndex(h => h.idHorio === horario.idHorio);
+  toggleHorarioEnDia(i: number, horario: TimeIntervalDetailDto) {
+    const idx = this.horariosDiaPorFila[i].findIndex(h => h.id === horario.id);
     if (idx === -1) {
       this.horariosDiaPorFila[i].push(horario);
     } else {
@@ -184,8 +196,8 @@ export class ModalNuevoTurnoComponent implements OnInit {
     }
   }
 
-  toggleHorarioEnSemana(i: number, dia: string, horario: any) {
-    const idx = this.horariosSemanaPorFila[i][dia].findIndex(h => h.idHorio === horario.idHorio);
+  toggleHorarioEnSemana(i: number, dia: string, horario: TimeIntervalDetailDto) {
+    const idx = this.horariosSemanaPorFila[i][dia].findIndex(h => h.id === horario.id);
     if (idx === -1) {
       this.horariosSemanaPorFila[i][dia].push(horario);
     } else {
@@ -193,8 +205,8 @@ export class ModalNuevoTurnoComponent implements OnInit {
     }
   }
 
-  toggleHorarioEnMes(i: number, j: number, horario: any) {
-    const idx = this.horariosMesPorFila[i][j].findIndex(h => h.idHorio === horario.idHorio);
+  toggleHorarioEnMes(i: number, j: number, horario: TimeIntervalDetailDto) {
+    const idx = this.horariosMesPorFila[i][j].findIndex(h => h.id === horario.id);
     if (idx === -1) {
       this.horariosMesPorFila[i][j].push(horario);
     } else {
@@ -204,13 +216,13 @@ export class ModalNuevoTurnoComponent implements OnInit {
 
   // Devuelve los horarios seleccionados para mostrar en el card
   getHorariosSeleccionadosPorCardDia(i: number): string {
-    return this.horariosDiaPorFila[i].map(h => h.nombre).join(', ') || 'Sin horario';
+    return this.horariosDiaPorFila[i].map(h => h.alias).join(', ') || 'Sin horario';
   }
   getHorariosSeleccionadosPorCardSemana(i: number, dia: string): string {
-    return this.horariosSemanaPorFila[i][dia].map(h => h.nombre).join(', ') || 'Sin horario';
+    return this.horariosSemanaPorFila[i][dia].map(h => h.alias).join(', ') || 'Sin horario';
   }
   getHorariosSeleccionadosPorCardMes(i: number, j: number): string {
-    return this.horariosMesPorFila[i][j].map(h => h.nombre).join(', ') || 'Sin horario';
+    return this.horariosMesPorFila[i][j].map(h => h.alias).join(', ') || 'Sin horario';
   }
 
   guardarTurno() {
@@ -275,18 +287,18 @@ export class ModalNuevoTurnoComponent implements OnInit {
     }
   }
 
-  isHorarioCheckedDia(i: number, horario: any): boolean {
-    return this.horariosDiaPorFila[i].some(h => h.idHorio === horario.idHorio);
+  isHorarioCheckedDia(i: number, horario: TimeIntervalDetailDto): boolean {
+    return this.horariosDiaPorFila[i].some(h => h.id === horario.id);
   }
 
   // Para Semana
-  isHorarioCheckedSemana(i: number, dia: string, horario: any): boolean {
-    return this.horariosSemanaPorFila[i][dia].some(h => h.idHorio === horario.idHorio);
+  isHorarioCheckedSemana(i: number, dia: string, horario: TimeIntervalDetailDto): boolean {
+    return this.horariosSemanaPorFila[i][dia].some(h => h.id === horario.id);
   }
 
   // Para Mes
-  isHorarioCheckedMes(i: number, j: number, horario: any): boolean {
-    return this.horariosMesPorFila[i][j].some(h => h.idHorio === horario.idHorio);
+  isHorarioCheckedMes(i: number, j: number, horario: TimeIntervalDetailDto): boolean {
+    return this.horariosMesPorFila[i][j].some(h => h.id === horario.id);
   }
 
   asignarHorariosSeleccionadosASemana(i: number, dia: string) {
@@ -405,7 +417,7 @@ export class ModalNuevoTurnoComponent implements OnInit {
           horariosDelDia.forEach(horario => {
             const dayIndex = this.calculateDayIndex(semanaIndex, diaIndex);
             detalles.push({
-              timeIntervalId: horario.idHorio,
+              timeIntervalId: horario.id,
               dayIndex: dayIndex
             });
           });
@@ -426,7 +438,7 @@ export class ModalNuevoTurnoComponent implements OnInit {
       if (horarios && horarios.length > 0) {
         horarios.forEach(horario => {
           detalles.push({
-            timeIntervalId: horario.idHorio,
+            timeIntervalId: horario.id,
             dayIndex: diaIndex
           });
         });
@@ -448,7 +460,7 @@ export class ModalNuevoTurnoComponent implements OnInit {
           horarios.forEach(horario => {
             const dayIndex = this.calculateDayIndexForMonth(mesIndex, diaIndex);
             detalles.push({
-              timeIntervalId: horario.idHorio,
+              timeIntervalId: horario.id,
               dayIndex: dayIndex
             });
           });
@@ -548,40 +560,40 @@ export class ModalNuevoTurnoComponent implements OnInit {
       }
       
       // Buscar el horario completo en dataHorarios por diferentes criterios
-      let horarioCompleto = this.dataHorarios.find(h => h.idHorio === timeIntervalId);
+      let horarioCompleto = this.dataHorarios.find(h => h.id === timeIntervalId);
       
-      // Si no se encuentra por idHorio, intentar por alias si existe
+      // Si no se encuentra por id, intentar por alias si existe
       if (!horarioCompleto && horario.alias) {
-        horarioCompleto = this.dataHorarios.find(h => h.nombre === horario.alias);
+        horarioCompleto = this.dataHorarios.find(h => h.alias === horario.alias);
         console.log(`Búsqueda por alias "${horario.alias}":`, horarioCompleto ? 'Encontrado' : 'No encontrado');
       }
       
-      // Si aún no se encuentra, intentar por inTime
+      // Si aún no se encuentra, intentar por formattedStartTime
       if (!horarioCompleto && horario.inTime) {
-        horarioCompleto = this.dataHorarios.find(h => h.horaEntrada === horario.inTime);
-        console.log(`Búsqueda por horaEntrada "${horario.inTime}":`, horarioCompleto ? 'Encontrado' : 'No encontrado');
+        horarioCompleto = this.dataHorarios.find(h => h.formattedStartTime === horario.inTime);
+        console.log(`Búsqueda por formattedStartTime "${horario.inTime}":`, horarioCompleto ? 'Encontrado' : 'No encontrado');
       }
       
       if (horarioCompleto) {
         horariosByDayIndex.get(dayIndex)!.push(horarioCompleto);
-        console.log(`✅ Horario encontrado: ${horarioCompleto.nombre} para dayIndex ${dayIndex}`);
+        console.log(`✅ Horario encontrado: ${horarioCompleto.alias} para dayIndex ${dayIndex}`);
         
         // Agregarlo a horariosSeleccionados si no está ya
-        if (!this.horariosSeleccionados.find(h => h.idHorio === horarioCompleto.idHorio)) {
+        if (!this.horariosSeleccionados.find(h => h.id === horarioCompleto.id)) {
           this.horariosSeleccionados.push(horarioCompleto);
         }
       } else {
         console.error(`❌ No se encontró horario con ningún criterio para:`, horario);
         console.log('Horarios disponibles en dataHorarios:', this.dataHorarios.map(h => ({
-          idHorio: h.idHorio,
-          nombre: h.nombre,
-          horaEntrada: h.horaEntrada
+          id: h.id,
+          alias: h.alias,
+          formattedStartTime: h.formattedStartTime
         })));
       }
     });
 
     console.log('📊 Mapa final de horarios por dayIndex:', horariosByDayIndex);
-    console.log('📝 Horarios seleccionados:', this.horariosSeleccionados.map(h => h.nombre));
+    console.log('📝 Horarios seleccionados:', this.horariosSeleccionados.map(h => h.alias));
 
     // Asignar a las estructuras según el tipo de vista
     if (this.tipoVistaHorario === 'Semana') {
@@ -679,7 +691,7 @@ export class ModalNuevoTurnoComponent implements OnInit {
         this.diasSemana.forEach(dia => {
           const horarios = semana[dia];
           if (horarios && horarios.length > 0) {
-            console.log(`    ${dia}: ${horarios.map(h => h.nombre).join(', ')}`);
+            console.log(`    ${dia}: ${horarios.map(h => h.alias).join(', ')}`);
           }
         });
       });
@@ -689,7 +701,7 @@ export class ModalNuevoTurnoComponent implements OnInit {
       console.log('📅 Estructura Diaria:');
       this.horariosDiaPorFila.forEach((horarios, diaIndex) => {
         if (horarios && horarios.length > 0) {
-          console.log(`  Día ${diaIndex}: ${horarios.map(h => h.nombre).join(', ')}`);
+          console.log(`  Día ${diaIndex}: ${horarios.map(h => h.alias).join(', ')}`);
         }
       });
     }
@@ -700,7 +712,7 @@ export class ModalNuevoTurnoComponent implements OnInit {
         console.log(`  Mes ${mesIndex}:`);
         mes.forEach((horarios, diaIndex) => {
           if (horarios && horarios.length > 0) {
-            console.log(`    Día ${diaIndex}: ${horarios.map(h => h.nombre).join(', ')}`);
+            console.log(`    Día ${diaIndex}: ${horarios.map(h => h.alias).join(', ')}`);
           }
         });
       });

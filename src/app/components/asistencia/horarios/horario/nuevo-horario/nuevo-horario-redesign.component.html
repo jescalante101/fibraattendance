@@ -1,0 +1,775 @@
+<!-- Modal Content para Gestor de Horarios -->
+<div class="h-full flex flex-col">
+
+  <!-- Header fijo - Steps Navigation compacto -->
+  <div class="flex-shrink-0 bg-gray-100 border-b border-gray-200 px-4 py-2">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-6">
+        <!-- Paso 1: Configuración Principal -->
+        <div class="flex items-center space-x-2"
+             [class]="currentStep >= 1 ? 'text-blue-600' : 'text-gray-400'">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium"
+               [class]="currentStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'">
+            <lucide-icon name="info" class="w-3 h-3"></lucide-icon>
+          </div>
+          <span class="text-sm font-medium">Configuración</span>
+          <span class="text-xs text-gray-500">Principal</span>
+        </div>
+
+        <!-- Separador -->
+        <div class="w-8 h-px bg-gray-300"></div>
+
+        <!-- Paso 2: Reglas Avanzadas -->
+        <div class="flex items-center space-x-2"
+             [class]="currentStep >= 2 ? 'text-blue-600' : 'text-gray-400'">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium"
+               [class]="currentStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'">
+            <lucide-icon name="settings" class="w-3 h-3"></lucide-icon>
+          </div>
+          <span class="text-sm font-medium">Avanzadas</span>
+          <span class="text-xs text-gray-500">Tiempo Extra</span>
+        </div>
+
+        <!-- Separador -->
+        <div class="w-8 h-px bg-gray-300"></div>
+
+        <!-- Paso 3: Resumen -->
+        <div class="flex items-center space-x-2"
+             [class]="currentStep >= 3 ? 'text-blue-600' : 'text-gray-400'">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium"
+               [class]="currentStep >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'">
+            <lucide-icon name="check-circle" class="w-3 h-3"></lucide-icon>
+          </div>
+          <span class="text-sm font-medium">Resumen</span>
+          <span class="text-xs text-gray-500">y Guardar</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal con scroll -->
+  <div class="flex-1 overflow-y-auto">
+
+
+    <!-- Form Content -->
+    <form [formGroup]="horarioForm" class="px-6 py-6">
+    
+    <!-- PASO 1: Configuración Principal -->
+    <div *ngIf="currentStep === 1" class="space-y-6">
+      
+      <!-- 1. Información General -->
+      <div class="bg-white border border-gray-200 rounded-lg p-4">
+        <div class="flex items-center mb-4">
+          <lucide-icon name="info" class="w-5 h-5 text-blue-600 mr-2"></lucide-icon>
+          <h3 class="text-lg font-semibold text-gray-900">1. Información General</h3>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <label for="scheduleName" class="block text-sm font-medium text-gray-700 mb-1">
+              Nombre del Horario <span class="text-red-500">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="scheduleName" 
+              formControlName="alias"
+              placeholder="Ej: Turno de Día 8h con Extras"
+              class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              [class.border-red-500]="horarioForm.get('alias')?.invalid && (horarioForm.get('alias')?.touched || horarioForm.get('alias')?.dirty)"
+            />
+            <div *ngIf="horarioForm.get('alias')?.hasError('required') && (horarioForm.get('alias')?.touched || horarioForm.get('alias')?.dirty)" 
+                 class="text-red-500 text-sm mt-1">
+              El nombre del horario es obligatorio
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Definición del Horario y Jornada -->
+      <div class="bg-white border border-gray-200 rounded-lg p-4">
+        <div class="flex items-center mb-4">
+          <lucide-icon name="clock" class="w-5 h-5 text-blue-600 mr-2"></lucide-icon>
+          <h3 class="text-lg font-semibold text-gray-900">2. Definición del Horario y Jornada</h3>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+          <!-- Hora de Inicio -->
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">
+              Hora de Inicio <span class="text-red-500">*</span>
+            </label>
+            <app-time-picker
+              formControlName="horaEntrada"
+              [required]="true"
+              placeholder="08:00"
+              size="sm"
+              (timeChange)="onStartTimeChange($event)">
+            </app-time-picker>
+          </div>
+
+          <!-- Hora de Fin -->
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">
+              Hora de Fin <span class="text-red-500">*</span>
+            </label>
+            <app-time-picker
+              formControlName="horaSalida"
+              [required]="true"
+              placeholder="17:00"
+              size="sm"
+              (timeChange)="onEndTimeChange($event)">
+            </app-time-picker>
+          </div>
+
+          <!-- Jornada Normal -->
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">
+              Jornada (min) <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input 
+                type="number" 
+                formControlName="workTimeDuration"
+                min="1"
+                max="1440"
+                class="block w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                placeholder="480"
+              />
+              <div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+                <span class="text-gray-500 text-xs">min</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Marcaciones -->
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">
+              Marcaciones <span class="text-red-500">*</span>
+            </label>
+            <input 
+              type="number" 
+              formControlName="totalMarkings"
+              min="1"
+              max="10"
+              class="block w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+              placeholder="2"
+            />
+          </div>
+        </div>
+
+        <!-- Tipo de Jornada - Compacto -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">
+              Tipo de Jornada <span class="text-red-500">*</span>
+            </label>
+            <select 
+              formControlName="workDay"
+              class="block w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm">
+              <option value="1">Tiempo Completo (1.0)</option>
+              <option value="0.75">3/4 Tiempo (0.75)</option>
+              <option value="0.5">Medio Tiempo (0.5)</option>
+              <option value="0.25">1/4 Tiempo (0.25)</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <div class="flex items-center space-x-1 text-xs">
+              <div class="flex items-center px-2 py-1 bg-blue-50 border border-blue-200 rounded-md">
+                <lucide-icon name="info" class="w-3 h-3 text-blue-600 mr-1"></lucide-icon>
+                <span class="text-blue-700 font-medium">1.0 = tiempo completo, 0.5 = medio tiempo</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ventanas de Marcación -->
+        <div class="mb-6">
+          <div class="flex items-center mb-4">
+            <lucide-icon name="clock-4" class="w-4 h-4 text-blue-600 mr-2"></lucide-icon>
+            <h4 class="text-sm font-semibold text-gray-900">Ventanas de Marcación Permitidas</h4>
+          </div>
+          
+          <!-- Ventana de Entrada y Salida -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-2">
+                <lucide-icon name="log-in" class="w-3 h-3 inline mr-1"></lucide-icon>
+                Ventana de Entrada
+              </label>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-xs text-gray-500 mb-1">Desde</label>
+                  <app-time-picker
+                    formControlName="punchInStartTime"
+                    placeholder="07:45"
+                    size="sm">
+                  </app-time-picker>
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-500 mb-1">Hasta</label>
+                  <app-time-picker
+                    formControlName="punchInEndTime"
+                    placeholder="08:45"
+                    size="sm">
+                  </app-time-picker>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Ventana de Salida -->
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-2">
+                <lucide-icon name="log-out" class="w-3 h-3 inline mr-1"></lucide-icon>
+                Ventana de Salida
+              </label>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-xs text-gray-500 mb-1">Desde</label>
+                  <app-time-picker
+                    formControlName="punchOutStartTime"
+                    placeholder="16:45"
+                    size="sm">
+                  </app-time-picker>
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-500 mb-1">Hasta</label>
+                  <app-time-picker
+                    formControlName="punchOutEndTime"
+                    placeholder="17:45"
+                    size="sm">
+                  </app-time-picker>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Descansos Asignados -->
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-3">
+            <label class="text-sm font-medium text-gray-700">Descansos Asignados</label>
+            <div class="relative">
+              <button 
+                type="button"
+                id="breaksPopoverButton"
+                data-popover-target="breaksPopover"
+                data-popover-placement="bottom-end"
+                (click)="addBreak()"
+                class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <lucide-icon name="plus" class="w-3 h-3 mr-1"></lucide-icon>
+                Añadir Descanso
+              </button>
+
+              <!-- Flowbite Popover -->
+              <div 
+                id="breaksPopover"
+                role="tooltip"
+                [class.opacity-0]="!showBreaksPopover"
+                [class.invisible]="!showBreaksPopover"
+                [class.opacity-100]="showBreaksPopover"
+                [class.visible]="showBreaksPopover"
+                class="absolute z-10 w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm">
+                
+                <!-- Arrow -->
+                <div class="absolute -top-2 right-4 bg-white border-l border-t border-gray-200 w-4 h-4 transform rotate-45"></div>
+                
+                <!-- Header -->
+                <div class="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg flex items-center justify-between">
+                  <h3 class="font-semibold text-gray-900 text-sm">Seleccionar Descanso</h3>
+                  <button 
+                    type="button"
+                    (click)="closeBreaksPopover()"
+                    class="text-gray-400 hover:text-gray-600">
+                    <lucide-icon name="x" class="w-4 h-4"></lucide-icon>
+                  </button>
+                </div>
+                
+                <!-- Content -->
+                <div class="px-3 py-2">
+                  <div *ngIf="loadingBreaks" class="flex items-center justify-center py-4">
+                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    <span class="ml-2 text-sm text-gray-600">Cargando...</span>
+                  </div>
+                  
+                  <div *ngIf="!loadingBreaks && availableBreaks.length === 0" class="text-center py-4 text-gray-500">
+                    <lucide-icon name="coffee" class="w-6 h-6 mx-auto mb-2 text-gray-400"></lucide-icon>
+                    <p class="text-xs">No hay descansos disponibles</p>
+                  </div>
+                  
+                  <div *ngIf="!loadingBreaks && availableBreaks.length > 0" class="max-h-48 overflow-y-auto">
+                    <div 
+                      *ngFor="let breakItem of availableBreaks"
+                      (click)="selectBreak(breakItem)"
+                      class="flex items-center justify-between p-2 rounded-md hover:bg-gray-100 cursor-pointer">
+                      <div class="flex items-center space-x-2">
+                        <lucide-icon name="coffee" class="w-4 h-4 text-gray-500"></lucide-icon>
+                        <div>
+                          <div class="text-sm font-medium text-gray-900">{{ breakItem.alias }}</div>
+                          <div class="text-xs text-gray-500">{{ breakItem.duration }} min</div>
+                        </div>
+                      </div>
+                      <div class="text-xs text-blue-600">
+                        <lucide-icon name="plus-circle" class="w-4 h-4"></lucide-icon>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Lista de descansos -->
+          <div class="space-y-2">
+            <div *ngFor="let break of assignedBreaks; let i = index" 
+                 class="flex items-center justify-between p-3 bg-gray-50 rounded-md border">
+              <div class="flex items-center space-x-3">
+                <lucide-icon name="coffee" class="w-4 h-4 text-gray-500"></lucide-icon>
+                <div>
+                  <span class="text-sm font-medium text-gray-900">{{ break.name }}</span>
+                  <span class="text-xs text-gray-500 ml-2">({{ break.duration }} min)</span>
+                </div>
+              </div>
+              <button 
+                type="button"
+                (click)="removeBreak(i)"
+                class="text-red-500 hover:text-red-700">
+                <lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon>
+              </button>
+            </div>
+            
+            <!-- Estado vacío -->
+            <div *ngIf="assignedBreaks.length === 0" 
+                 class="text-center py-4 text-gray-500 text-sm border-2 border-dashed border-gray-200 rounded-md">
+              No hay descansos asignados
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Espacio liberado para más campos -->
+    </div>
+
+    <!-- PASO 2: Reglas de Tiempo Extra y Avanzadas -->
+    <div *ngIf="currentStep === 2" class="space-y-6">
+      
+      <!-- 3. Configuración de Horas Extras (H.E.) - Diseño Simplificado -->
+      <div class="bg-white border border-gray-200 rounded-lg p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center">
+            <lucide-icon name="clock" class="w-5 h-5 text-blue-600 mr-2"></lucide-icon>
+            <h3 class="text-lg font-semibold text-gray-900">3. Configuración de Horas Extras (H.E.)</h3>
+          </div>
+          
+          <!-- Master Switch para habilitar H.E. -->
+          <label class="inline-flex items-center cursor-pointer" id="enableOvertimeSwitch">
+            <input type="checkbox" formControlName="overtimeLv" [value]="1" class="sr-only peer">
+            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            <span class="ms-3 text-sm font-medium text-gray-900">Habilitar cálculo</span>
+          </label>
+        </div>
+
+        <!-- Panel de Configuración de H.E. (visible solo si está habilitado) -->
+        <div *ngIf="horarioForm.get('overtimeLv')?.value" class="space-y-6">
+          
+          <!-- Umbral de activación -->
+          <div class="flex items-center space-x-4">
+            <label class="text-sm font-medium text-gray-700">Activar cómputo de H.E. después de:</label>
+            <div class="flex items-center space-x-2">
+              <input 
+                type="number" 
+                formControlName="minLateOut"
+                min="1"
+                class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                placeholder="15"
+              />
+              <span class="text-sm text-gray-500">minutos</span>
+            </div>
+          </div>
+
+          <!-- Definición de Niveles de H.E. - Layout Simplificado -->
+          <div>
+            <h4 class="text-md font-medium text-gray-900 mb-4">Definición de Niveles de H.E.</h4>
+            
+            <!-- Headers -->
+            <div class="grid grid-cols-3 gap-4 mb-3">
+              <div class="text-xs font-medium text-gray-500 uppercase tracking-wider">NIVEL</div>
+              <div class="text-xs font-medium text-gray-500 uppercase tracking-wider">DURACIÓN (MIN)</div>
+              <div class="text-xs font-medium text-gray-500 uppercase tracking-wider">RECARGO (%)</div>
+            </div>
+
+            <!-- Nivel 1 -->
+            <div class="grid grid-cols-3 gap-4 items-center py-3 border-b border-gray-100">
+              <div class="flex items-center">
+                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-sm font-medium bg-amber-100 text-amber-800">1</span>
+              </div>
+              <div>
+                <input 
+                  type="number" 
+                  formControlName="overtimeLv1" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                  placeholder="120">
+              </div>
+              <div>
+                <input 
+                  type="number" 
+                  formControlName="overtimeLv1Percentage" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                  placeholder="25">
+              </div>
+            </div>
+
+            <!-- Nivel 2 - Independiente -->
+            <div class="grid grid-cols-3 gap-4 items-center py-3 border-b border-gray-100">
+              <div class="flex items-center">
+                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-sm font-medium bg-red-100 text-red-800">2</span>
+              </div>
+              <div>
+                <input 
+                  type="number" 
+                  formControlName="overtimeLv2" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                  placeholder="120">
+              </div>
+              <div>
+                <input 
+                  type="number" 
+                  formControlName="overtimeLv2Percentage" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                  placeholder="35">
+              </div>
+            </div>
+
+            <!-- Nivel 3 - Feriados (Opcional) -->
+            <div class="grid grid-cols-3 gap-4 items-center py-3" [class.opacity-50]="!horarioForm.get('enableHolidayOvertime')?.value">
+              <div class="flex items-center space-x-2">
+                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-sm font-medium bg-slate-100 text-slate-800">3</span>
+                <label class="inline-flex items-center cursor-pointer">
+                  <input type="checkbox" formControlName="enableHolidayOvertime" class="sr-only peer">
+                  <div class="relative w-6 h-3 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-slate-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-2.5 after:w-2.5 after:transition-all peer-checked:bg-slate-600"></div>
+                </label>
+              </div>
+              <div>
+                <input 
+                  type="text" 
+                  readonly 
+                  [value]="getLevel3Label()"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-sm text-gray-600"
+                  [disabled]="!horarioForm.get('enableHolidayOvertime')?.value">
+              </div>
+              <div>
+                <input 
+                  type="number" 
+                  formControlName="overtimeLv3Percentage" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                  placeholder="100"
+                  [disabled]="!horarioForm.get('enableHolidayOvertime')?.value">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reglas Avanzadas - Diseño Mejorado -->
+      <div class="bg-white border border-gray-200 rounded-lg" id="advancedRulesPanel">
+        <button 
+          type="button"
+          (click)="toggleAdvancedRules()"
+          class="w-full px-6 py-4 text-left flex items-center justify-between focus:outline-none hover:bg-gray-50 transition-colors">
+          <div class="flex items-center">
+            <lucide-icon name="settings" class="w-5 h-5 text-blue-600 mr-3"></lucide-icon>
+            <h3 class="text-lg font-semibold text-gray-900">Reglas Avanzadas</h3>
+          </div>
+          <lucide-icon 
+            [name]="showAdvancedRules ? 'chevron-up' : 'chevron-down'" 
+            class="w-5 h-5 text-gray-500">
+          </lucide-icon>
+        </button>
+        
+        <div *ngIf="showAdvancedRules" class="px-6 pb-6 border-t border-gray-200">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6">
+            
+            <!-- Entrada Temprana - Grupo con Master Control -->
+            <div class="space-y-4">
+              <h4 class="text-sm font-semibold text-gray-800 mb-3">Gestión de Entrada</h4>
+              
+              <label class="flex items-center">
+                <input type="checkbox" formControlName="inRequired" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span class="ml-2 text-sm text-gray-700">Exigir marcación de Entrada</span>
+              </label>
+              
+              <label class="flex items-center">
+                <input type="checkbox" formControlName="allowLate" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span class="ml-2 text-sm text-gray-700">Tolerancia para llegadas tarde (sin penalización)</span>
+              </label>
+              
+              <!-- Master Control para H.E. por entrada temprana -->
+              <div class="border-l-4 border-blue-200 pl-4">
+                <label class="flex items-center" id="earlyInCheckbox">
+                  <input type="checkbox" formControlName="earlyIn" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                  <span class="ml-2 text-sm text-gray-700 font-medium">Calcular H.E. por entrada temprana</span>
+                </label>
+                
+                <!-- Dependent Control -->
+                <div *ngIf="horarioForm.get('earlyIn')?.value" class="mt-3 ml-6" id="earlyInThresholdInput">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Umbral de minutos:</label>
+                  <input 
+                    type="number" 
+                    formControlName="minEarlyIn" 
+                    class="block w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                    min="0" 
+                    placeholder="15">
+                </div>
+              </div>
+            </div>
+
+            <!-- Salida Tardía - Grupo con Master Control -->
+            <div class="space-y-4">
+              <h4 class="text-sm font-semibold text-gray-800 mb-3">Gestión de Salida</h4>
+              
+              <label class="flex items-center">
+                <input type="checkbox" formControlName="outRequired" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span class="ml-2 text-sm text-gray-700">Exigir marcación de Salida</span>
+              </label>
+              
+              <label class="flex items-center">
+                <input type="checkbox" formControlName="allowLeaveEarly" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span class="ml-2 text-sm text-gray-700">Tolerancia para salidas tempranas (sin penalización)</span>
+              </label>
+              
+              <!-- Master Control para H.E. por salida tardía -->
+              <div class="border-l-4 border-orange-200 pl-4">
+                <label class="flex items-center" id="lateOutCheckbox">
+                  <input type="checkbox" formControlName="lateOut" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                  <span class="ml-2 text-sm text-gray-700 font-medium">Calcular H.E. por salida tardía</span>
+                </label>
+                
+                <!-- Dependent Control -->
+                <div *ngIf="horarioForm.get('lateOut')?.value" class="mt-3 ml-6" id="lateOutThresholdInput">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Umbral de minutos:</label>
+                  <input 
+                    type="number" 
+                    formControlName="minLateOut" 
+                    class="block w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                    min="0" 
+                    placeholder="15">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 3: Resumen y Guardar -->
+    <div *ngIf="currentStep === 3" class="space-y-6">
+      <div class="bg-white border border-gray-200 rounded-lg p-6">
+        <div class="flex items-center mb-4">
+          <lucide-icon name="check-circle" class="w-5 h-5 text-green-600 mr-2"></lucide-icon>
+          <h3 class="text-lg font-semibold text-gray-900">Resumen del Horario</h3>
+        </div>
+        
+        <!-- Resumen del horario configurado -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-sm font-medium text-gray-700">Nombre:</span>
+              <span class="text-sm text-gray-900">{{ horarioForm.get('alias')?.value }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm font-medium text-gray-700">Horario Base:</span>
+              <span class="text-sm text-gray-900">{{ getStartTime() }} - {{ getBaseEndTime() }}</span>
+            </div>
+            <div class="flex justify-between" *ngIf="horarioForm.get('overtimeLv')?.value">
+              <span class="text-sm font-medium text-gray-700">Horario Total:</span>
+              <span class="text-sm text-gray-900 font-semibold text-purple-600">{{ getStartTime() }} - {{ getEndTime() }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm font-medium text-gray-700">Jornada Normal:</span>
+              <span class="text-sm text-gray-900 font-semibold text-blue-600">{{ getWorkTimeDurationFormatted() }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm font-medium text-gray-700">Descansos:</span>
+              <span class="text-sm text-gray-900">{{ assignedBreaks.length }} configurados</span>
+            </div>
+          </div>
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-sm font-medium text-gray-700">Horas Extras:</span>
+              <span class="text-sm text-gray-900 font-semibold text-orange-600">{{ getOvertimeFormatted() }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm font-medium text-gray-700">Total Horas Trabajo:</span>
+              <span class="text-sm text-gray-900 font-bold text-green-600">{{ getTotalWorkingHours() }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm font-medium text-gray-700">Duración Total:</span>
+              <span class="text-sm text-gray-900">{{ currentSummary?.totalDuration || 'Calculando...' }}</span>
+            </div>
+            <div class="flex justify-between" *ngIf="horarioForm.get('enableHolidayOvertime')?.value">
+              <span class="text-sm font-medium text-gray-700">Feriados:</span>
+              <span class="text-sm text-gray-900 font-medium text-slate-600">Habilitado</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ventanas de Marcación en el Resumen -->
+        <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div class="flex items-start space-x-3">
+            <lucide-icon name="clock-4" class="w-5 h-5 text-yellow-600 mt-0.5"></lucide-icon>
+            <div class="text-sm text-yellow-800">
+              <p class="font-medium mb-2">Ventanas de Marcación Permitidas:</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs mb-3">
+                <div class="flex items-center space-x-2">
+                  <lucide-icon name="log-in" class="w-3 h-3 text-green-600"></lucide-icon>
+                  <span><strong>Entrada:</strong> {{ getPunchInWindow() }}</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <lucide-icon name="log-out" class="w-3 h-3 text-red-600"></lucide-icon>
+                  <span><strong>Salida:</strong> {{ getPunchOutWindow() }}</span>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2 text-xs">
+                <lucide-icon name="hash" class="w-3 h-3 text-blue-600"></lucide-icon>
+                <span><strong>Total Marcaciones Esperadas:</strong> {{ horarioForm.get('totalMarkings')?.value || 2 }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información adicional mejorada -->
+        <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div class="flex items-start space-x-3">
+            <lucide-icon name="info" class="w-5 h-5 text-blue-600 mt-0.5"></lucide-icon>
+            <div class="text-sm text-blue-800">
+              <p class="font-medium mb-2">Resumen de Configuración:</p>
+              <ul class="space-y-1 text-xs">
+                <li>• <strong>Jornada efectiva:</strong> {{ getWorkTimeDurationFormatted() }} de trabajo</li>
+                <li *ngIf="assignedBreaks.length > 0">• <strong>Descansos:</strong> {{ assignedBreaks.length }} descansos ({{ getTotalBreakMinutes() }}min)</li>
+                <li *ngIf="horarioForm.get('enableOvertime')?.value">• <strong>Tiempo extra:</strong> {{ getOvertimeFormatted() }} configurado</li>
+                <li *ngIf="horarioForm.get('enableHolidayOvertime')?.value">• <strong>Feriados:</strong> Nivel 3 de horas extras habilitado</li>
+                <li>• <strong>Duración total del turno:</strong> {{ currentSummary?.totalDuration || 'Calculando...' }}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ejemplo de cálculo -->
+        <div class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div class="flex items-start space-x-3">
+            <lucide-icon name="calculator" class="w-5 h-5 text-green-600 mt-0.5"></lucide-icon>
+            <div class="text-sm text-green-800">
+              <p class="font-medium mb-2">Ejemplo de Turno:</p>
+              <p class="text-xs">
+                <strong>Base:</strong> {{ getStartTime() }} - {{ getBaseEndTime() }} = {{ getWorkTimeDurationFormatted() }} trabajo + {{ getTotalBreakMinutes() }}min descansos<br>
+                <strong *ngIf="horarioForm.get('overtimeLv')?.value">Total con H.E.:</strong> 
+                <span *ngIf="horarioForm.get('overtimeLv')?.value">{{ getStartTime() }} - {{ getEndTime() }} (+ {{ getOvertimeFormatted() }} extras)</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </form>
+  </div>
+
+  <!-- Footer fijo con línea de tiempo comprimida y botones -->
+  <div class="bg-gray-50 border-t border-gray-200 flex-shrink-0">
+    
+    <!-- Línea de tiempo super comprimida -->
+    <div class="px-4 py-2 border-b border-gray-200">
+      <div class="flex items-center justify-between text-xs text-gray-600 mb-1">
+        <span class="font-medium">{{ getStartTime() || '08:00' }}</span>
+        <div class="flex items-center space-x-2 text-xs">
+          <span class="text-blue-600">{{ getWorkTimeDurationFormatted() }}</span>
+          <span class="text-yellow-600">{{ assignedBreaks.length }}d</span>
+          <span class="text-orange-600">{{ getOvertimeFormatted() !== 'No configurado' ? getOvertimeFormatted() : '0h' }}</span>
+        </div>
+        <span class="font-medium">{{ getEndTime() || '17:00' }}</span>
+      </div>
+      
+      <!-- Barra visual comprimida -->
+      <div class="relative h-3 bg-gray-200 rounded-full overflow-hidden">
+        <!-- Tiempo de trabajo -->
+        <div class="absolute top-0 left-0 h-full bg-blue-500 rounded-full transition-all duration-300"
+             [style.width.%]="getWorkTimePercentage()"></div>
+        
+        <!-- Descansos -->
+        <div *ngFor="let break of assignedBreaks; let i = index"
+             class="absolute top-0 h-full bg-yellow-400 transition-all duration-300"
+             [style.left.%]="getBreakPosition(break)"
+             [style.width.%]="getBreakWidth(break)"></div>
+        
+        <!-- Horas Extras - Nivel 1 y 2 por separado -->
+        <div *ngIf="getOvertimeLevel1Percentage() > 0" 
+             class="absolute top-0 h-full bg-amber-600 transition-all duration-300"
+             [style.right.%]="getOvertimeLevel2Percentage()"
+             [style.width.%]="getOvertimeLevel1Percentage()"></div>
+        
+        <div *ngIf="getOvertimeLevel2Percentage() > 0"
+             class="absolute top-0 right-0 h-full bg-red-600 rounded-r-full transition-all duration-300"
+             [style.width.%]="getOvertimeLevel2Percentage()"></div>
+      </div>
+      
+      <!-- Leyenda compacta -->
+      <div class="flex items-center justify-center space-x-4 mt-1 text-[10px] text-gray-500">
+        <div class="flex items-center space-x-1">
+          <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+          <span>Trabajo</span>
+        </div>
+        <div class="flex items-center space-x-1">
+          <div class="w-2 h-2 bg-yellow-400 rounded-full"></div>
+          <span>Descansos</span>
+        </div>
+        <div class="flex items-center space-x-1">
+          <div class="w-2 h-2 bg-amber-600 rounded-full"></div>
+          <span>H.E. Lv1</span>
+        </div>
+        <div class="flex items-center space-x-1">
+          <div class="w-2 h-2 bg-red-600 rounded-full"></div>
+          <span>H.E. Lv2</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de navegación -->
+    <div class="px-6 py-4">
+      <div class="flex justify-between">
+        <!-- Botón Anterior -->
+        <button 
+          *ngIf="currentStep > 1"
+          type="button"
+          (click)="previousStep()"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <lucide-icon name="chevron-left" class="w-4 h-4 mr-1"></lucide-icon>
+          Atrás
+        </button>
+        
+        <div></div> <!-- Spacer -->
+
+        <div class="flex justify-end">
+          <!-- Botón Siguiente/Guardar -->
+          <button 
+            *ngIf="currentStep < 3"
+            type="button"
+            (click)="nextStep()"
+            [disabled]="!canProceedToNextStep()"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+            Siguiente
+            <lucide-icon name="chevron-right" class="w-4 h-4 ml-1"></lucide-icon>
+          </button>
+
+          <button 
+            *ngIf="currentStep === 3"
+            type="button"
+            (click)="guardarHorario()"
+            [disabled]="horarioForm.invalid || loading"
+            class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            <div *ngIf="loading" class="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <lucide-icon *ngIf="!loading" name="save" class="w-4 h-4 mr-2"></lucide-icon>
+            Guardar Horario
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

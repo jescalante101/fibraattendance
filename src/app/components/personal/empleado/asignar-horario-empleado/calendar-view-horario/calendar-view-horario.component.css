@@ -1,0 +1,255 @@
+/* Estilos personalizados para el Calendar View de Horarios */
+
+/* Personalización general del calendario */
+::ng-deep .fc {
+  font-family: inherit;
+}
+
+/* Header del calendario */
+::ng-deep .fc-header-toolbar {
+  display: none !important; /* Ocultamos el header por defecto ya que tenemos el nuestro */
+}
+
+/* Días de la semana */
+::ng-deep .fc-col-header-cell {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+  padding: 12px 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+/* Celdas de días */
+::ng-deep .fc-daygrid-day {
+  border-color: #e2e8f0;
+  min-height: 100px;
+}
+
+::ng-deep .fc-daygrid-day-number {
+  padding: 8px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+/* Día actual */
+::ng-deep .fc-day-today {
+  background-color: #eff6ff !important;
+}
+
+::ng-deep .fc-day-today .fc-daygrid-day-number {
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Eventos de horarios */
+::ng-deep .fc-event {
+  border-radius: 6px;
+  border: none;
+  padding: 2px 6px;
+  margin: 1px 2px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+::ng-deep .fc-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Eventos de horario normal */
+::ng-deep .fc-event[style*="background-color: rgb(219, 234, 254)"] {
+  background-color: #dbeafe !important;
+  border-left: 3px solid #3b82f6 !important;
+  color: #1e40af !important;
+}
+
+/* Eventos de excepción */
+::ng-deep .fc-event.horario-excepcion,
+::ng-deep .fc-event[style*="background-color: rgb(254, 215, 170)"] {
+  background-color: #fed7aa !important;
+  border-left: 3px solid #fb923c !important;
+  color: #ea580c !important;
+}
+
+/* Eventos de fecha pasada */
+::ng-deep .fc-event.horario-pasado,
+::ng-deep .fc-event[style*="background-color: rgb(229, 231, 235)"] {
+  background-color: #e5e7eb !important;
+  border-left: 3px solid #9ca3af !important;
+  color: #6b7280 !important;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Texto de eventos */
+::ng-deep .fc-event-title {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Más eventos (cuando hay muchos en un día) */
+::ng-deep .fc-more-popover {
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+::ng-deep .fc-more-popover .fc-popover-header {
+  background-color: #f8fafc;
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Botón "más eventos" */
+::ng-deep .fc-daygrid-more-link {
+  color: #3b82f6;
+  font-weight: 500;
+  font-size: 0.75rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+::ng-deep .fc-daygrid-more-link:hover {
+  background-color: #eff6ff;
+}
+
+/* Días del mes anterior/siguiente */
+::ng-deep .fc-day-other {
+  opacity: 0.3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  ::ng-deep .fc-daygrid-day {
+    min-height: 80px;
+  }
+  
+  ::ng-deep .fc-event {
+    font-size: 0.6875rem;
+    padding: 1px 4px;
+  }
+  
+  ::ng-deep .fc-col-header-cell {
+    padding: 8px 4px;
+    font-size: 0.75rem;
+  }
+}
+
+/* Animaciones */
+::ng-deep .fc-event {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Clase personalizada para día actual */
+::ng-deep .dia-actual {
+  position: relative;
+}
+
+::ng-deep .dia-actual::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  border-radius: 0 0 4px 4px;
+}
+
+/* Mejoras de accesibilidad */
+::ng-deep .fc-event:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+::ng-deep .fc-daygrid-day:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+}
+
+/* Estilos para el contenedor principal */
+.calendar-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Toolbar personalizado */
+.calendar-toolbar {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-bottom: 1px solid #cbd5e1;
+}
+
+/* Botones de navegación */
+.nav-button {
+  transition: all 0.2s ease;
+}
+
+.nav-button:hover {
+  background-color: #e2e8f0;
+  transform: scale(1.05);
+}
+
+/* Leyenda de colores */
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Estados de loading */
+.loading-calendar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  background-color: #f8fafc;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

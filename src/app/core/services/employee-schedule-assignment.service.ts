@@ -174,6 +174,18 @@ export class EmployeeScheduleAssignmentService {
     );
   }
 
+  /**
+   * Eliminar asignación de horario por id
+   * @param id 
+   * @returns  Observable<ApiResponse<EmployeeScheduleAssignment>>
+   */
+  deleteEmployeeScheduleAssignment(id: number): Observable<ApiResponse<EmployeeScheduleAssignment>> {
+    return this.http.delete<ApiResponse<EmployeeScheduleAssignment>>(
+      `${this.apiUrl}api/employee-schedule-assignment/delete/${id}`
+    );
+  }
+
+
 
 
 } 

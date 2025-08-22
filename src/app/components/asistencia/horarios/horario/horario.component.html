@@ -10,8 +10,7 @@
         <div>
           <div class="text-lg font-semibold text-fiori-text">Gestión de Horarios</div>
           <div class="text-xs text-fiori-subtext">
-            {{ filtroTexto ? dataHorariosFiltrados.length + ' de ' + totalRecords : totalRecords }} horarios 
-            ({{ getHorariosEstandar() }} estándar, {{ getHorariosFlexibles() }} flexibles)
+            {{ filtroTexto ? dataHorariosFiltrados.length + ' de ' + totalRecords : totalRecords }} horarios configurados
           </div>
         </div>
       </div>
@@ -24,13 +23,7 @@
           (click)="abrirModalNuevoHorario(0)" 
           class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors">
           <lucide-icon name="plus" class="w-4 h-4 mr-1"></lucide-icon>
-          Estándar
-        </button>
-        <button 
-          (click)="abrirModalNuevoHorario(1)" 
-          class="inline-flex items-center px-3 py-1.5 bg-fiori-secondary text-white text-sm font-medium rounded-lg hover:bg-fiori-primary transition-colors">
-          <lucide-icon name="clock" class="w-4 h-4 mr-1"></lucide-icon>
-          Flexible
+          Nuevo Horario
         </button>
       </div>
       <div class="flex-grow"></div>

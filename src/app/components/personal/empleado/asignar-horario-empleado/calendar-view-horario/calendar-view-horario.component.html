@@ -1,0 +1,144 @@
+<!-- Componente Calendar View para Horarios de Empleados -->
+<div class="h-full flex flex-col bg-white">
+  
+  <!-- Header fijo con información del empleado -->
+  <div class="flex-shrink-0 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200 px-6 py-4">
+    <div class="flex items-center justify-between">
+      <!-- Información del empleado -->
+      <div class="flex items-center space-x-4">
+        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-white">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5a2.25 2.25 0 0 1 21 9v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-gray-800">{{ componentData?.employeeName || 'Empleado' }}</h3>
+          <p class="text-sm text-gray-600">Horarios de Trabajo</p>
+        </div>
+      </div>
+
+      <!-- Información del turno -->
+      <div class="text-right">
+        <div class="text-sm font-medium text-gray-700">
+          Turno: <span class="text-blue-600 font-semibold">{{ componentData?.turno?.alias || 'No definido' }}</span>
+        </div>
+        <div class="text-xs text-gray-500 mt-1">
+          <span *ngIf="componentData?.fecha_ini">
+            Desde: {{ componentData.fecha_ini | date:'dd/MM/yyyy' }}
+          </span>
+          <span *ngIf="componentData?.fecha_fin" class="ml-2">
+            Hasta: {{ componentData.fecha_fin | date:'dd/MM/yyyy' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen de horarios -->
+    <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white rounded-lg p-3 border border-blue-200">
+        <div class="flex items-center space-x-2">
+          <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+          <span class="text-sm font-medium text-gray-700">Total Horarios</span>
+        </div>
+        <p class="text-lg font-bold text-blue-600 mt-1">{{ (componentData?.horarios || []).length }} configurado(s)</p>
+      </div>
+      
+      <div class="bg-white rounded-lg p-3 border border-orange-200">
+        <div class="flex items-center space-x-2">
+          <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
+          <span class="text-sm font-medium text-gray-700">Excepciones</span>
+        </div>
+        <p class="text-lg font-bold text-orange-600 mt-1">{{ getExceptionsCount() }} activa(s)</p>
+      </div>
+
+      <div class="bg-white rounded-lg p-3 border border-green-200">
+        <div class="flex items-center space-x-2">
+          <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+          <span class="text-sm font-medium text-gray-700">Estado</span>
+        </div>
+        <p class="text-lg font-bold text-green-600 mt-1">Activo</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controles del calendario -->
+  <div class="flex-shrink-0 bg-gray-50 border-b border-gray-200 px-6 py-3">
+    <div class="flex items-center justify-between">
+      <!-- Navegación del calendario -->
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-1">
+          <button 
+            (click)="previousMonth()"
+            class="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+            title="Mes anterior">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+          
+          <button 
+            (click)="goToToday()"
+            class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors">
+            Hoy
+          </button>
+          
+          <button 
+            (click)="nextMonth()"
+            class="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+            title="Mes siguiente">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Título del mes/año actual -->
+        <h2 class="text-lg font-semibold text-gray-800">
+          {{ getCurrentViewTitle() }}
+        </h2>
+      </div>
+
+      <!-- Leyenda -->
+      <div class="flex items-center space-x-4 text-xs">
+        <div class="flex items-center space-x-2">
+          <div class="w-3 h-3 rounded-sm" style="background-color: #dbeafe; border: 1px solid #3b82f6;"></div>
+          <span class="text-gray-600">Horario Normal</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <div class="w-3 h-3 rounded-sm" style="background-color: #fed7aa; border: 1px solid #fb923c;"></div>
+          <span class="text-gray-600">Excepción</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <div class="w-3 h-3 rounded-sm" style="background-color: #e5e7eb; border: 1px solid #9ca3af;"></div>
+          <span class="text-gray-600">Fecha Pasada</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendario principal -->
+  <div class="flex-1 overflow-hidden">
+    <div class="h-full p-4">
+      <full-calendar 
+        #calendar
+        [options]="calendarOptions"
+        class="h-full">
+      </full-calendar>
+    </div>
+  </div>
+
+  <!-- Footer con información adicional -->
+  <div class="flex-shrink-0 bg-gray-50 border-t border-gray-200 px-6 py-3">
+    <div class="flex items-center justify-between text-sm text-gray-600">
+      <div class="flex items-center space-x-4">
+        <span>💡 <strong>Tip:</strong> Haz clic en un horario para editarlo</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+        <span>Vista de Calendario - {{ componentData?.turno?.alias }}</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,13 +1,16 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { AttendanceService } from 'src/app/core/services/attendance.service';
-import { NuevoHorarioComponent } from './nuevo-horario/nuevo-horario.component';
+import { TimeIntervalService } from 'src/app/core/services/time-interval.service';
+import { TimeIntervalDetailDto, PaginatedResponse } from 'src/app/core/models/att-time-interval-responde.model';
+import { NuevoHorarioRedesignComponent } from './nuevo-horario/nuevo-horario-redesign.component';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 import { FixedSizeVirtualScrollStrategy } from '@angular/cdk/scrolling';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { ToastService } from 'src/app/shared/services/toast.service';
+import { AuthService } from 'src/app/core/services/auth.service';
 import * as XLSX from 'xlsx-js-style';
 import * as FileSaver from 'file-saver';
 import jsPDF from 'jspdf';
@@ -16,16 +19,19 @@ import { finalize } from 'rxjs';
 import { ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { createFioriGridOptions } from 'src/app/shared/ag-grid-theme-fiori';
 import { ColumnManagerConfig, ColumnConfig, ColumnChangeEvent } from 'src/app/shared/column-manager/column-config.interface';
+import { HeaderConfigService, HeaderConfig } from '../../../../core/services/header-config.service';
 
 @Component({
   selector: 'app-horario',
   templateUrl: './horario.component.html',
   styleUrls: ['./horario.component.css']
 })
-export class HorarioComponent implements OnInit {
+export class HorarioComponent implements OnInit, OnDestroy {
+  
+  private destroy$ = new Subject<void>();
 
-  dataHorarios: any[] = [];
-  dataHorariosFiltrados: any[] = [];
+  dataHorarios: TimeIntervalDetailDto[] = [];
+  dataHorariosFiltrados: TimeIntervalDetailDto[] = [];
   filtroTexto: string = '';
   loading: boolean = false;
 
@@ -44,15 +50,14 @@ export class HorarioComponent implements OnInit {
   };
   gridApi: any;
 
-  // Column Manager
+  // Column Manager - Actualizado para TimeIntervalDetailDto
   tableColumns: ColumnConfig[] = [
-    { key: 'idHorio', label: 'ID', visible: true, required: true, sortable: true, type: 'number' },
-    { key: 'nombre', label: 'Nombre', visible: true, required: true, sortable: true, type: 'text' },
-    { key: 'tipo', label: 'Tipo', visible: true, required: true, sortable: true, type: 'text' },
-    { key: 'horario', label: 'Horario', visible: true, required: true, sortable: true, type: 'text' },
-    { key: 'tiempoTrabajo', label: 'Tiempo Trabajo', visible: true, required: false, sortable: true, type: 'number' },
-    { key: 'descanso', label: 'Descanso', visible: true, required: false, sortable: true, type: 'number' },
-    { key: 'diasLaboral', label: 'Días', visible: true, required: false, sortable: true, type: 'number' },
+    { key: 'id', label: 'ID', visible: true, required: true, sortable: true, type: 'number' },
+    { key: 'alias', label: 'Nombre', visible: true, required: true, sortable: true, type: 'text' },
+    { key: 'horario', label: 'Horario', visible: true, required: true, sortable: false, type: 'text' },
+    { key: 'totalDurationMinutes', label: 'Duración Total', visible: true, required: false, sortable: true, type: 'number' },
+    { key: 'normalWorkDay', label: 'Jornada Normal', visible: true, required: false, sortable: true, type: 'text' },
+    { key: 'breaks', label: 'Descansos', visible: true, required: false, sortable: false, type: 'text' },
     { key: 'acciones', label: 'Acciones', visible: true, required: true, sortable: false, type: 'actions' }
   ];
 
@@ -61,16 +66,31 @@ export class HorarioComponent implements OnInit {
   };
 
   constructor(
-    private service: AttendanceService,
+    private timeIntervalService: TimeIntervalService,
+    private authService: AuthService,
     private dialog: MatDialog,
     private modalService: ModalService,
     private toastService: ToastService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private HeaderConfig: HeaderConfigService
+
   ) { }
 
   ngOnInit() {
     this.setupAgGrid();
     this.loadHoraiosData();
+    this.setupModalEventListener();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private setupModalEventListener() {
+    // Por ahora no hay modalClosed$ observable disponible
+    // La lógica de refresco está en el finally() de cada modal
+    console.log('Modal event listener configurado (usando finally() como backup)');
   }
 
   exportToExcel() {
@@ -91,14 +111,12 @@ export class HorarioComponent implements OnInit {
 
   private getGridDataForExport(): any[] {
     return this.dataHorariosFiltrados.map(item => ({
-      'ID': item.idHorio,
-      'Nombre': item.nombre,
-      'Tipo': item.tipo === 0 ? 'Estándar' : 'Flexible',
-      'Entrada': item.horaEntrada,
-      'Salida': item.horaSalida,
-      'Tiempo Trabajo (min)': item.tiempoTrabajo,
-      'Descanso (min)': item.descanso,
-      'Días Laborales': item.diasLaboral
+      'ID': item.id,
+      'Nombre': item.alias,
+      'Horario': `${item.formattedStartTime} - ${item.scheduledEndTime}`,
+      'Duración Total (min)': item.totalDurationMinutes,
+      'Jornada Normal': item.normalWorkDay,
+      'Descansos': item.breaks?.map(b => `${b.alias} (${b.duration}min)`).join(', ') || 'Sin descansos'
     }));
   }
 
@@ -112,16 +130,14 @@ export class HorarioComponent implements OnInit {
     const columnWidths = [
       { wch: 10 }, // ID
       { wch: 25 }, // Nombre
-      { wch: 15 }, // Tipo
-      { wch: 15 }, // Entrada
-      { wch: 15 }, // Salida
-      { wch: 20 }, // Tiempo Trabajo (min)
-      { wch: 20 }, // Descanso (min)
-      { wch: 20 }  // Días Laborales
+      { wch: 20 }, // Horario
+      { wch: 20 }, // Duración Total (min)
+      { wch: 20 }, // Jornada Normal
+      { wch: 30 }  // Descansos
     ];
     worksheet['!cols'] = columnWidths;
 
-    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:H1');
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:F1');
     for (let C = range.s.c; C <= range.e.c; ++C) {
       const address = XLSX.utils.encode_cell({ r: 0, c: C });
       if (worksheet[address]) {
@@ -144,16 +160,14 @@ export class HorarioComponent implements OnInit {
     }
 
     const doc = new jsPDF();
-    const head = [['ID', 'Nombre', 'Tipo', 'Entrada', 'Salida', 'Tiempo Trabajo (min)', 'Descanso (min)', 'Días Laborales']];
+    const head = [['ID', 'Nombre', 'Horario', 'Duración Total (min)', 'Jornada Normal', 'Descansos']];
     const body = dataToExport.map(row => [
       row.ID,
       row.Nombre,
-      row.Tipo,
-      row.Entrada,
-      row.Salida,
-      row['Tiempo Trabajo (min)'],
-      row['Descanso (min)'],
-      row['Días Laborales']
+      row.Horario,
+      row['Duración Total (min)'],
+      row['Jornada Normal'],
+      row.Descansos
     ]);
 
     doc.setFontSize(18);
@@ -178,10 +192,23 @@ export class HorarioComponent implements OnInit {
   }
 
   loadHoraiosData(){
+    console.log('🚀 Iniciando loadHoraiosData()...');
     this.loading = true;
     this.cdr.detectChanges();
     
-    this.service.getHorarios(this.pageNumber,this.pageSize)
+    // Obtener company ID del usuario autenticado
+    const header= this.HeaderConfig.getCurrentHeaderConfig();
+    const companyId = header?.selectedEmpresa?.companiaId || '';
+
+
+    
+    if (!companyId) {
+      this.toastService.error('Error', 'No se pudo obtener la información de la compañía');
+      this.loading = false;
+      return;
+    }
+    
+    this.timeIntervalService.getTimeIntervals(companyId, this.pageNumber, this.pageSize)
       .pipe(
         finalize(() => {
           this.loading = false;
@@ -189,15 +216,17 @@ export class HorarioComponent implements OnInit {
         })
       )
       .subscribe({
-        next: (data) => {
-          console.log(data);
-          this.dataHorarios=data.data;
-          this.dataHorariosFiltrados = [...data.data];
-          this.totalRecords=data.totalRecords;
+        next: (response: PaginatedResponse<TimeIntervalDetailDto>) => {
+          console.log('✅ Time intervals cargados exitosamente:', response);
+          console.log(`📊 Total de registros: ${response.totalRecords}, Datos recibidos: ${response.data.length}`);
+          this.dataHorarios = response.data;
+          this.dataHorariosFiltrados = [...response.data];
+          this.totalRecords = response.totalRecords;
           
           // Update ag-Grid data
           if (this.gridApi) {
             this.gridApi.setRowData(this.dataHorariosFiltrados);
+            console.log('🔄 ag-Grid actualizado con nuevos datos');
           }
         },
         error: (error) => {
@@ -225,45 +254,51 @@ export class HorarioComponent implements OnInit {
 
   // Método para abrir el modal de nuevo horario usando el modal personalizado
   abrirModalNuevoHorario(mode: number): void {
-    console.log('Abrir modal para nuevo horario');
-    this.modalService.open({
+    console.log('=== ABRIR MODAL NUEVO HORARIO ===');
+    console.log('Mode:', mode);
+    
+     this.modalService.open({
       title: mode == 0 ? 'Nuevo Horario Normal' : 'Nuevo Horario Flexible',
-      componentType: NuevoHorarioComponent,
-      width:'1200px',
+      componentType: NuevoHorarioRedesignComponent,
+      width: '1200px',
       componentData: { use_mode: mode },
     }).then(result => {
+      console.log('✅ Modal CREAR cerrado con resultado:', result);
+    }).catch(error => {
+      console.error('❌ Error al abrir el modal:', error);
+    }).finally(() => {
+      console.log('🔄 Ejecutando loadHoraiosData() desde CREAR modal...');
       this.loadHoraiosData();
-      if (result?.id) {
-        this.toastService.success('Horario creado', 'El horario se guardó correctamente');
-      }
     });
+    
   }
 
   // Método para abrir el modal de edición usando el modal personalizado
   editarHorario(idHorario: number, use_mode: number) {
-    console.log('Abrir modal para Editar horario');
+    console.log('=== ABRIR MODAL EDITAR HORARIO ===');
+    console.log('ID:', idHorario, 'Mode:', use_mode);
     
     this.modalService.open({
       title: 'Editar Horario',
-      componentType: NuevoHorarioComponent,
+      componentType: NuevoHorarioRedesignComponent,
       width:'1200px',
       componentData: { idHorario: idHorario, use_mode: use_mode },
     }).then(result => {
-      if (result) {
-        if(result.id){
-          this.loadHoraiosData();
-          this.toastService.success('Horario actualizado', 'El horario se actualizó correctamente');
-        }
-        console.log('Horario actualizado:', result);
-      }
+      console.log('✅ Modal EDITAR cerrado con resultado:', result);
+    }).catch(error => {
+      console.error('❌ Error al abrir el modal:', error);
+    }).finally(() => {
+      console.log('🔄 Ejecutando loadHoraiosData() desde EDITAR modal...');
+      this.loadHoraiosData();
     });
+
   }
 
   // Método para eliminar un horario
   eliminarHorario(idHorario: number) {
-    this.service.deleteHorario(idHorario).subscribe({
-      next: (response) => {
-        console.log('Horario eliminado:', response);
+    this.timeIntervalService.deleteTimeInterval(idHorario).subscribe({
+      next: () => {
+        console.log('Horario eliminado:', idHorario);
         this.toastService.success('Horario eliminado', 'El horario ha sido eliminado correctamente');
         this.loadHoraiosData();
       },
@@ -301,11 +336,11 @@ export class HorarioComponent implements OnInit {
 
   // Métodos para estadísticas
   getHorariosEstandar(): number {
-    return this.dataHorarios?.filter(h => h.tipo === 0)?.length || 0;
+    return this.dataHorarios?.length || 0;
   }
 
   getHorariosFlexibles(): number {
-    return this.dataHorarios?.filter(h => h.tipo !== 0)?.length || 0;
+    return 0; // Ya no diferenciamos por tipo en el nuevo modelo
   }
 
   // Métodos para filtrado local
@@ -317,14 +352,13 @@ export class HorarioComponent implements OnInit {
 
     const filtro = this.filtroTexto.toLowerCase().trim();
     this.dataHorariosFiltrados = this.dataHorarios.filter(horario => 
-      horario.nombre?.toLowerCase().includes(filtro) ||
-      horario.idHorio?.toString().includes(filtro) ||
-      horario.horaEntrada?.toLowerCase().includes(filtro) ||
-      horario.horaSalida?.toLowerCase().includes(filtro) ||
-      (horario.tipo === 0 ? 'estandar' : 'flexible').includes(filtro) ||
-      horario.diasLaboral?.toString().includes(filtro) ||
-      horario.tiempoTrabajo?.toString().includes(filtro) ||
-      horario.descanso?.toString().includes(filtro)
+      horario.alias?.toLowerCase().includes(filtro) ||
+      horario.id?.toString().includes(filtro) ||
+      horario.formattedStartTime?.toLowerCase().includes(filtro) ||
+      horario.scheduledEndTime?.toLowerCase().includes(filtro) ||
+      horario.normalWorkDay?.toLowerCase().includes(filtro) ||
+      horario.totalDurationMinutes?.toString().includes(filtro) ||
+      horario.breaks?.some(b => b.alias?.toLowerCase().includes(filtro))
     );
     
     // Update ag-Grid data with filtered results
@@ -360,7 +394,7 @@ export class HorarioComponent implements OnInit {
         filter: false
       },
       {
-        field: 'idHorio',
+        field: 'id',
         headerName: 'ID',
         maxWidth: 75,
         width: 50,
@@ -374,7 +408,7 @@ export class HorarioComponent implements OnInit {
         }
       },
       {
-        field: 'nombre',
+        field: 'alias',
         headerName: 'Nombre',
         width: 350,
         maxWidth: 350,
@@ -393,38 +427,18 @@ export class HorarioComponent implements OnInit {
         }
       },
       {
-        field: 'tipo',
-        headerName: 'Tipo',
-        cellRenderer: (params: any) => {
-          if (params.value === 0) {
-            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-fiori-info/10 text-fiori-info border border-fiori-info/20">
-              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              Estándar
-            </span>`;
-          } else {
-            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-fiori-warning/10 text-fiori-warning border border-fiori-warning/20">
-              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              Flexible
-            </span>`;
-          }
-        }
-      },
-      {
         field: 'horario',
         headerName: 'Horario',
-        maxWidth: 300,
-        width:300,
+        width: 200,
         cellRenderer: (params: any) => {
+          const startTime = params.data.formattedStartTime;
+          const endTime = params.data.scheduledEndTime;
           return `<div class="flex items-center space-x-2">
             <div class="flex items-center space-x-1">
               <svg class="w-3 h-3 text-fiori-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              <span class="text-sm text-fiori-text font-medium">${params.data.horaEntrada}</span>
+              <span class="text-sm text-fiori-text font-medium">${startTime}</span>
             </div>
             <svg class="w-3 h-3 text-fiori-subtext" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
@@ -433,17 +447,18 @@ export class HorarioComponent implements OnInit {
               <svg class="w-3 h-3 text-fiori-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              <span class="text-sm text-fiori-text font-medium">${params.data.horaSalida}</span>
+              <span class="text-sm text-fiori-text font-medium">${endTime}</span>
             </div>
           </div>`;
         }
       },
       {
-        field: 'tiempoTrabajo',
-        headerName: 'T. Trabajo',
+        field: 'totalDurationMinutes',
+        headerName: 'Duración Total',
+        width: 130,
         cellRenderer: (params: any) => {
-          return `<div class="flex items-center justify-center space-x-2">
-            <svg class="w-4 h-4 text-fiori-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          return `<div class="flex items-center justify-center space-x-1">
+            <svg class="w-3 h-3 text-fiori-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <span class="text-sm font-medium text-fiori-text">${params.value} min</span>
@@ -451,25 +466,41 @@ export class HorarioComponent implements OnInit {
         }
       },
       {
-        field: 'descanso',
-        headerName: 'Descanso',
+        field: 'normalWorkDay',
+        headerName: 'Jornada Normal',
+        width: 140,
         cellRenderer: (params: any) => {
-          return `<div class="flex items-center justify-center space-x-2">
-            <svg class="w-4 h-4 text-fiori-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          return `<div class="flex items-center justify-center space-x-1">
+            <svg class="w-3 h-3 text-fiori-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <span class="text-sm font-medium text-fiori-text">${params.value} min</span>
+            <span class="text-sm font-medium text-fiori-text">${params.value}</span>
           </div>`;
         }
       },
       {
-        field: 'diasLaboral',
-        headerName: 'Días',
+        field: 'breaks',
+        headerName: 'Descansos',
+        width: 200,
         cellRenderer: (params: any) => {
-          return `<div class="flex items-center justify-center">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-fiori-muted text-fiori-text">
-              ${params.value} días
-            </span>
+          const breaks = params.value || [];
+          if (breaks.length === 0) {
+            return `<div class="flex items-center justify-center">
+              <span class="text-xs text-fiori-subtext">Sin descansos</span>
+            </div>`;
+          }
+          
+          const breaksList = breaks.map((breakItem: any) => 
+            `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-fiori-warning/10 text-fiori-warning border border-fiori-warning/20">
+              ${breakItem.alias} (${breakItem.duration}min)
+            </span>`
+          ).join(' ');
+          
+          return `<div class="flex items-center space-x-1 py-1">
+            <svg class="w-3 h-3 text-fiori-warning flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+            </svg>
+            <div class="flex flex-wrap gap-1">${breaksList}</div>
           </div>`;
         }
       },
@@ -526,7 +557,7 @@ export class HorarioComponent implements OnInit {
             const rowIndex = parseInt(cell.closest('.ag-row')?.getAttribute('row-index') || '0');
             const rowData = this.gridApi.getDisplayedRowAtIndex(rowIndex)?.data;
             if (rowData) {
-              this.editarHorario(rowData.idHorio, rowData.tipo);
+              this.editarHorario(rowData.id, 0); // Default mode since useMode is not available
             }
           }
         } else if (button && button.classList.contains('delete-btn')) {
@@ -535,7 +566,7 @@ export class HorarioComponent implements OnInit {
             const rowIndex = parseInt(cell.closest('.ag-row')?.getAttribute('row-index') || '0');
             const rowData = this.gridApi.getDisplayedRowAtIndex(rowIndex)?.data;
             if (rowData) {
-              this.openConfirmationDialog(rowData.idHorio);
+              this.openConfirmationDialog(rowData.id);
             }
           }
         }
@@ -589,7 +620,7 @@ export class HorarioComponent implements OnInit {
   
   onColumnsReset(): void {
     // Restaurar configuración por defecto
-    const defaultVisibleColumns = ['idHorio', 'nombre', 'tipo', 'horario', 'tiempoTrabajo', 'descanso', 'diasLaboral', 'acciones'];
+    const defaultVisibleColumns = ['id', 'alias', 'horario', 'totalDurationMinutes', 'normalWorkDay', 'breaks', 'acciones'];
     
     this.tableColumns.forEach(col => {
       col.visible = defaultVisibleColumns.includes(col.key);

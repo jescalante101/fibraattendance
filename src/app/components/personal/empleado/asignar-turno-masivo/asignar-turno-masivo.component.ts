@@ -17,6 +17,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { createFioriGridOptions } from 'src/app/shared/ag-grid-theme-fiori';
 import { DateRange } from 'src/app/shared/components/date-range-picker/date-range-picker.component';
+import { ShiftListDto } from 'src/app/core/models/shift.model';
 
 @Component({
   selector: 'app-asignar-turno-masivo',
@@ -35,8 +36,8 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   areasFiltradas: RhArea[] = [];
   
   // Propiedades para turnos
-  turnos: Shift[] = [];
-  turnosFiltrados: Shift[] = [];
+  turnos: ShiftListDto[] = [];
+  turnosFiltrados: ShiftListDto[] = [];
   turnoSearchTerm: string = '';
   loadingTurnos = false;
   
@@ -260,42 +261,50 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     }
   }
 
-  getTurnoDuracionSemanal(turno: Shift): number {
-    if (!turno.horario) return 0;
-    // Sumar la duración de todos los horarios válidos (workTimeDuration > 0)
-    return turno.horario.reduce((total, h) => total + (h.workTimeDuration || 0), 0);
+  getTurnoDuracionSemanal(turno: ShiftListDto): number {
+    if (!turno.horario || turno.horario.length === 0) return 0;
+    // Sumar la duración de trabajo de todos los días (convertir de "8h 30m" a minutos)
+    return turno.horario.reduce((total, h) => {
+      const minutes = this.convertDurationToMinutes(h.workHours || '0h 0m');
+      return total + minutes;
+    }, 0);
   }
 
   // Método para obtener resumen del horario
-  getHorarioResumen(turno: Shift): string {
+  getHorarioResumen(turno: ShiftListDto): string {
     if (!turno.horario || turno.horario.length === 0) {
       return 'Sin horario definido';
-  }
+    }
     
-    const diasLaborables = turno.horario.filter(h => h.workTimeDuration > 0);
+    // Filtrar días con horas de trabajo > 0
+    const diasLaborables = turno.horario.filter(h => {
+      const workMinutes = this.convertDurationToMinutes(h.workHours || '0h 0m');
+      return workMinutes > 0;
+    });
+    
     if (diasLaborables.length === 0) {
       return 'Sin días laborables';
     }
     
     const primerHorario = diasLaborables[0];
-    const horaInicio = new Date(primerHorario.inTime).toLocaleTimeString('es-ES', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    const horaInicio = primerHorario.inTime; // Ya viene en formato "08:00"
     
     return `${diasLaborables.length} días, ${horaInicio}`;
   }
   
-  getPrimerHorarioValido(turno: Shift): any {
+  getPrimerHorarioValido(turno: ShiftListDto): any {
     if (!turno.horario || turno.horario.length === 0) return null;
-    // Busca el primer horario con duración > 0
-    const valido = turno.horario.find(h => h.workTimeDuration > 0);
+    // Busca el primer horario con duración de trabajo > 0
+    const valido = turno.horario.find(h => {
+      const workMinutes = this.convertDurationToMinutes(h.workHours || '0h 0m');
+      return workMinutes > 0;
+    });
     // Si no hay, retorna el primero
     return valido || turno.horario[0];
   }
 
   // Método para obtener tipo de ciclo
-  getTipoCiclo(turno: Shift): string {
+  getTipoCiclo(turno: ShiftListDto): string {
     if (turno.shiftCycle === 1) {
       return 'Semanal';
     } else if (turno.shiftCycle === 2) {
@@ -668,12 +677,12 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   }
 
   // Método para mostrar detalle del horario en tooltip
-  getHorarioDetalle(turno: Shift): string {
+  getHorarioDetalle(turno: ShiftListDto): string {
     if (!turno.horario || turno.horario.length === 0) {
       return 'Sin detalle de horario';
     }
     return turno.horario
-      .map(h => `${this.getNombreDia(h.dayIndex)}: ${this.formatHora(h.inTime)} (${h.workTimeDuration} min) \nn`)
+      .map(h => `${this.getNombreDia(h.dayIndex)}: ${h.inTime} - ${h.outTime} (${h.workHours})\n`)
       .join('\n');
   }
 
@@ -730,7 +739,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   }
 
   // Métodos para expansión de turnos
-  onTurnoSelected(turno: Shift): void {
+  onTurnoSelected(turno: ShiftListDto): void {
     this.turnoForm.patchValue({ turno: turno.id });
     // Auto-expandir el turno seleccionado
     this.expandedTurnos.add(turno.id.toString());
@@ -749,13 +758,16 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   }
 
   // Métodos para obtener información de horarios
-  getHorariosCount(turno: Shift): number {
+  getHorariosCount(turno: ShiftListDto): number {
     return turno.horario ? turno.horario.length : 0;
   }
 
-  getHorariosValidos(turno: Shift): any[] {
+  getHorariosValidos(turno: ShiftListDto): any[] {
     if (!turno.horario) return [];
-    return turno.horario.filter(h => h.workTimeDuration > 0);
+    return turno.horario.filter(h => {
+      const workMinutes = this.convertDurationToMinutes(h.workHours || '0h 0m');
+      return workMinutes > 0;
+    });
   }
 
   formatDuracion(minutos: number): string {
@@ -764,8 +776,49 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     return `${horas}h ${mins}m`;
   }
 
+  // Método para convertir duración "8h 30m" a minutos (para compatibilidad con nuevo formato)
+  private convertDurationToMinutes(duration: string): number {
+    if (!duration) return 0;
+    
+    const regex = /(\d+)h\s*(\d+)m/;
+    const match = duration.match(regex);
+    
+    if (match) {
+      const hours = parseInt(match[1]);
+      const minutes = parseInt(match[2]);
+      return (hours * 60) + minutes;
+    }
+    
+    return 0;
+  }
+
+  // Métodos para obtener totales semanales por tipo de hora
+  getTotalBreakHours(turno: ShiftListDto): number {
+    if (!turno.horario || turno.horario.length === 0) return 0;
+    return turno.horario.reduce((total, h) => {
+      const minutes = this.convertDurationToMinutes(h.breakHours || '0h 0m');
+      return total + minutes;
+    }, 0);
+  }
+
+  getTotalOvertimeHours(turno: ShiftListDto): number {
+    if (!turno.horario || turno.horario.length === 0) return 0;
+    return turno.horario.reduce((total, h) => {
+      const minutes = this.convertDurationToMinutes(h.overtimeHours || '0h 0m');
+      return total + minutes;
+    }, 0);
+  }
+
+  getTotalDurationHours(turno: ShiftListDto): number {
+    if (!turno.horario || turno.horario.length === 0) return 0;
+    return turno.horario.reduce((total, h) => {
+      const minutes = this.convertDurationToMinutes(h.totalDuration || '0h 0m');
+      return total + minutes;
+    }, 0);
+  }
+
   // Método para obtener el turno seleccionado
-  getTurnoSeleccionado(): Shift | null {
+  getTurnoSeleccionado(): ShiftListDto | null {
     const turnoId = this.turnoForm.get('turno')?.value;
     if (!turnoId) return null;
     return this.turnos.find(t => t.id === turnoId) || null;

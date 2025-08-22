@@ -46,11 +46,31 @@ export class ThorassemanalComponent implements OnChanges  {
   }
 
   formatTime(timeString: string): string {
-    return timeString.substring(11, 16); // Extrae la parte de la hora (HH:MM)
+    // Si ya está en formato HH:MM, devolverlo tal como está
+    if (timeString && timeString.match(/^\d{2}:\d{2}$/)) {
+      return timeString;
+    }
+    // Si es una fecha completa, extraer la hora
+    if (timeString && timeString.length > 10) {
+      return timeString.substring(11, 16);
+    }
+    return timeString || '00:00';
   }
 
   calcularHoraFin(inTime: string, workTimeDuration: number): string {
-    const date = new Date(inTime);
+    // Si inTime está en formato HH:MM, crear una fecha temporal para los cálculos
+    let date: Date;
+    
+    if (inTime.match(/^\d{2}:\d{2}$/)) {
+      // Formato HH:MM - crear fecha temporal
+      const [hours, minutes] = inTime.split(':').map(Number);
+      date = new Date();
+      date.setHours(hours, minutes, 0, 0);
+    } else {
+      // Formato de fecha completa
+      date = new Date(inTime);
+    }
+    
     date.setMinutes(date.getMinutes() + workTimeDuration);
     return date.toTimeString().substring(0, 5); // Devuelve HH:MM
   }

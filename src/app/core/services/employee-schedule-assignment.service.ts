@@ -54,6 +54,7 @@ export interface EmployeeScheduleAssignmentInsert {
 
 export interface EmployeeScheduleAssignmentUpdate {
   assignmentId: number;
+  shiftId: number;
   employeeId: string;
   nroDoc: string;
   fullNameEmployee: string | null;

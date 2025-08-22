@@ -40,6 +40,6 @@ export interface ScheduleResponseDto {
   fullNameEmployee: string;
   assignmentId: number;
   shiftInfo: ShiftInfoDto;
-  queryRange: DateRangeDto;
+  queryRange?: DateRangeDto;  // Made optional since API may not include it
   schedule: ScheduleDayDto[];
 }

@@ -15,6 +15,7 @@ import { ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { createFioriGridOptions } from 'src/app/shared/ag-grid-theme-fiori';
 import { ColumnManagerConfig, ColumnConfig, ColumnChangeEvent } from 'src/app/shared/column-manager/column-config.interface';
 import { ChangeDetectorRef } from '@angular/core';
+import { ShiftListDto } from 'src/app/core/models/shift.model';
 
 @Component({
   selector: 'app-turno',
@@ -23,8 +24,8 @@ import { ChangeDetectorRef } from '@angular/core';
 })
 export class TurnoComponent implements OnInit {
 
-  dataHorarios: Shift[] = [];
-  dataHorariosFiltrados: Shift[] = [];
+  dataHorarios: ShiftListDto[] = [];
+  dataHorariosFiltrados: ShiftListDto[] = [];
   filtroTexto: string = '';
   isLoading: boolean = false;
   errorMessage: string = '';
@@ -90,14 +91,20 @@ export class TurnoComponent implements OnInit {
   }
 
   private getGridDataForExport(): any[] {
-    return this.dataHorariosFiltrados.map(item => ({
-      'ID': item.id,
-      'Nombre': item.alias,
-      'Horarios': this.getAreas(item.horario),
-      'Tipo': item.cycleUnit === 1 ? 'Semanal' : 'Diario',
-      'Ciclo': `${item.shiftCycle} ${item.cycleUnit === 1 ? 'semanas' : 'días'}`,
-      'Estado': item.autoShift ? 'Automático' : 'Manual'
-    }));
+    return this.dataHorariosFiltrados.map(item => {
+      const primerHorario = item.horario?.[0];
+      return {
+        'ID': item.id,
+        'Nombre': item.alias,
+        'Horario': primerHorario ? `${primerHorario.inTime} - ${primerHorario.outTime}` : 'Sin horario',
+        'Días': item.horario?.length || 0,
+        'Horas Trabajo': primerHorario?.workHours || 'N/A',
+        'Duración Total': primerHorario?.totalDuration || 'N/A',
+        'Tipo': item.cycleUnit === 1 ? 'Semanal' : 'Diario',
+        'Ciclo': `${item.shiftCycle} ${item.cycleUnit === 1 ? 'semanas' : 'días'}`,
+        'Estado': item.autoShift ? 'Automático' : 'Manual'
+      };
+    });
   }
 
   private styleExcelSheet(worksheet: XLSX.WorkSheet) {
@@ -108,16 +115,19 @@ export class TurnoComponent implements OnInit {
     };
 
     const columnWidths = [
-      { wch: 10 }, // ID
+      { wch: 8 },  // ID
       { wch: 25 }, // Nombre
-      { wch: 40 }, // Horarios
-      { wch: 15 }, // Tipo
-      { wch: 20 }, // Ciclo
-      { wch: 15 }  // Estado
+      { wch: 18 }, // Horario
+      { wch: 8 },  // Días
+      { wch: 15 }, // Horas Trabajo
+      { wch: 15 }, // Duración Total
+      { wch: 12 }, // Tipo
+      { wch: 15 }, // Ciclo
+      { wch: 12 }  // Estado
     ];
     worksheet['!cols'] = columnWidths;
 
-    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:F1');
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:I1');
     for (let C = range.s.c; C <= range.e.c; ++C) {
       const address = XLSX.utils.encode_cell({ r: 0, c: C });
       if (worksheet[address]) {
@@ -140,11 +150,14 @@ export class TurnoComponent implements OnInit {
     }
 
     const doc = new jsPDF();
-    const head = [['ID', 'Nombre', 'Horarios', 'Tipo', 'Ciclo', 'Estado']];
+    const head = [['ID', 'Nombre', 'Horario', 'Días', 'H.Trabajo', 'Duración', 'Tipo', 'Ciclo', 'Estado']];
     const body = dataToExport.map(row => [
       row.ID,
       row.Nombre,
-      row.Horarios,
+      row.Horario,
+      row.Días,
+      row['Horas Trabajo'],
+      row['Duración Total'],
       row.Tipo,
       row.Ciclo,
       row.Estado
@@ -172,8 +185,20 @@ export class TurnoComponent implements OnInit {
   }
 
   updateThorarioSelect(select: any[]) {
-    console.log(select);
-    this.datosSeleccionado = select;
+    console.log('Datos originales recibidos:', select);
+    
+    // Transformar ShiftDayDto[] al formato esperado por thorassemanal
+    if (select && Array.isArray(select)) {
+      this.datosSeleccionado = select.map(item => ({
+        dayIndex: item.dayIndex,
+        inTime: item.inTime,
+        workTimeDuration: this.convertDurationToMinutes(item.totalDuration || item.workHours || '0h 0m')
+      }));
+      
+      console.log('Datos transformados para thorassemanal:', this.datosSeleccionado);
+    } else {
+      this.datosSeleccionado = [];
+    }
   }
 
   loadTurnosData() {
@@ -217,42 +242,25 @@ export class TurnoComponent implements OnInit {
   }
 
   getAreas(horario: any[]): string {
-    // Extrae los alias únicos
-    const aliasUnicos = Array.from(new Set(horario.map(item => item.alias)));
+    // Extrae los timeIntervalAlias únicos de la nueva estructura
+    const aliasUnicos = Array.from(new Set(horario.map(item => item.timeIntervalAlias)));
     return aliasUnicos.join(', ');
   }
 
-  timeToMinutes(time: string): number {
-    const [hours, minutes] = time.split(':').map(Number);
-    return hours * 60 + minutes;
-  }
-
-  minutesToTime(totalMinutes: number): string {
-    const hours = Math.floor(totalMinutes / 60) % 24; // Usamos el módulo 24 para manejar el cambio de día
-    const minutes = totalMinutes % 60;
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-  }
-
-  ExtraerHoraDeFecha(fechaHora: string ): string {
-    const fecha = new Date(fechaHora);
-    const hora = fecha.getHours();
-    const minutos = fecha.getMinutes();
-    const segundos = fecha.getSeconds();
-    return `${hora.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-  }
-
-  calcularHoraSalida(horaIngreso: string, tiempoTrabajoMinutos: number): string {
-    const horaIngresoCorta = horaIngreso.substring(0, 5);
-    const minutosIngreso = this.timeToMinutes(horaIngresoCorta);
-    const minutosSalidaTotales = minutosIngreso + tiempoTrabajoMinutos;
-    const horaSalida = this.minutesToTime(minutosSalidaTotales);
-
-    if (horaIngreso.length > 5) {
-      const segundos = horaIngreso.substring(5);
-      return horaSalida + segundos;
+  // Método para convertir duración "8h 30m" a minutos (para compatibilidad con modal de edición)
+  private convertDurationToMinutes(duration: string): number {
+    if (!duration) return 0;
+    
+    const regex = /(\d+)h\s*(\d+)m/;
+    const match = duration.match(regex);
+    
+    if (match) {
+      const hours = parseInt(match[1]);
+      const minutes = parseInt(match[2]);
+      return (hours * 60) + minutes;
     }
-
-    return horaSalida;
+    
+    return 0;
   }
 
   onPageChangeCustom(event: any) {
@@ -285,16 +293,38 @@ export class TurnoComponent implements OnInit {
     });
   }
 
-  openEditTurnoModal(turno: Shift): void {
+  openEditTurnoModal(turno: ShiftListDto): void {
+    // Transformar ShiftListDto a formato compatible con el modal de edición
+    const turnoForEdit = {
+      id: turno.id,
+      alias: turno.alias,
+      shiftCycle: turno.shiftCycle,
+      cycleUnit: turno.cycleUnit,
+      autoShift: turno.autoShift,
+      // Transformar horario de ShiftDayDto[] a formato esperado por el modal
+      horario: turno.horario?.map((h, index) => ({
+        dayIndex: h.dayIndex,
+        alias: h.timeIntervalAlias,
+        inTime: h.inTime,
+        outTime: h.outTime,
+        workTimeDuration: this.convertDurationToMinutes(h.totalDuration),
+        // Campos adicionales que podrían necesitarse
+        timeIntervalAlias: h.timeIntervalAlias,
+        workHours: h.workHours,
+        breakHours: h.breakHours,
+        totalDuration: h.totalDuration
+      })) || []
+    };
+
+    console.log('Datos transformados para edición:', turnoForEdit);
+
     this.modalService.open({
       title: 'Editar Turno',
       componentType: ModalNuevoTurnoComponent,
-      componentData: { turno: turno },
+      componentData: { turno: turnoForEdit },
       width: '900px'
     }).then(result => {
       if (result) {
-        // console.log('Turno actualizado:', result);
-        // this.toastService.success('Turno actualizado', `El turno "${turno.alias}" ha sido actualizado correctamente`);
         this.loadTurnosData();
       }
     });
@@ -360,14 +390,20 @@ export class TurnoComponent implements OnInit {
     }
 
     const filtro = this.filtroTexto.toLowerCase().trim();
-    this.dataHorariosFiltrados = this.dataHorarios.filter(turno => 
-      turno.alias?.toLowerCase().includes(filtro) ||
-      turno.id?.toString().includes(filtro) ||
-      this.getAreas(turno.horario)?.toLowerCase().includes(filtro) ||
-      (turno.cycleUnit === 1 ? 'semanal' : 'diario').includes(filtro) ||
-      turno.shiftCycle?.toString().includes(filtro) ||
-      (turno.autoShift ? 'automatico' : 'manual').includes(filtro)
-    );
+    this.dataHorariosFiltrados = this.dataHorarios.filter(turno => {
+      const primerHorario = turno.horario?.[0];
+      return (
+        turno.alias?.toLowerCase().includes(filtro) ||
+        turno.id?.toString().includes(filtro) ||
+        primerHorario?.timeIntervalAlias?.toLowerCase().includes(filtro) ||
+        primerHorario?.inTime?.includes(filtro) ||
+        primerHorario?.outTime?.includes(filtro) ||
+        primerHorario?.workHours?.toLowerCase().includes(filtro) ||
+        (turno.cycleUnit === 1 ? 'semanal' : 'diario').includes(filtro) ||
+        turno.shiftCycle?.toString().includes(filtro) ||
+        (turno.autoShift ? 'automatico' : 'manual').includes(filtro)
+      );
+    });
     
     // Update ag-Grid data with filtered results
     if (this.gridApi) {
@@ -438,15 +474,27 @@ export class TurnoComponent implements OnInit {
         field: 'horario',
         headerName: 'Horarios',
         width: 500,
-        maxWidth: 500,
-
         cellRenderer: (params: any) => {
-          const horarios = this.getAreas(params.value);
-          return `<div class="flex items-center text-sm">
-            <svg class="w-4 h-4 text-fiori-info mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
-            <span class="text-fiori-text" title="${horarios}">${horarios}</span>
+          const horarios = params.value;
+          if (!horarios || horarios.length === 0) {
+            return `<span class="text-fiori-subtext text-sm">Sin horarios</span>`;
+          }
+
+          // Mostrar el primer horario con información detallada
+          const primerHorario = horarios[0];
+          const totalDias = horarios.length;
+          
+          return `<div class="py-1">
+            <div class="flex items-center text-sm mb-1">
+              <svg class="w-4 h-4 text-fiori-info mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span class="font-medium text-fiori-text">${primerHorario.inTime} - ${primerHorario.outTime}</span>
+              <span class="ml-2 px-2 py-0.5 bg-fiori-info/10 text-fiori-info text-xs rounded-full">${totalDias} día${totalDias > 1 ? 's' : ''}</span>
+            </div>
+            <div class="text-xs text-fiori-subtext ml-6">
+              ${primerHorario.workHours} trabajo • ${primerHorario.totalDuration} total
+            </div>
           </div>`;
         }
       },

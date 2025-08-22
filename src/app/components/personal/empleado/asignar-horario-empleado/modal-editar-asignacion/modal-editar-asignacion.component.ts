@@ -7,6 +7,7 @@ import { ModalService } from 'src/app/shared/modal/modal.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { ShiftListDto } from 'src/app/core/models/shift.model';
 
 export interface EditarAsignacionData {
   assignmentIds: number[];
@@ -34,8 +35,8 @@ export class ModalEditarAsignacionComponent implements OnInit {
   modalRef: any; // Referencia al modal padre
   
   editForm: FormGroup;
-  turnos: Shift[] = [];
-  turnosFiltrados: Shift[] = [];
+  turnos: ShiftListDto[] = [];
+  turnosFiltrados: ShiftListDto[] = [];
   turnoSearchTerm: string = '';
   loading = false;
   isMultipleEdit = false;
@@ -163,7 +164,7 @@ export class ModalEditarAsignacionComponent implements OnInit {
       });
   }
 
-  onTurnoSelected(turno: Shift): void {
+  onTurnoSelected(turno: ShiftListDto): void {
     this.editForm.patchValue({ scheduleId: turno.id });
   }
 
@@ -179,24 +180,35 @@ export class ModalEditarAsignacionComponent implements OnInit {
   }
 
   formatHora(timeString: string): string {
-    if (!timeString) return '';
-    try {
-      const date = new Date(timeString);
-      return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
-    } catch {
+    // Si ya está en formato HH:MM, devolverlo tal como está
+    if (timeString && timeString.match(/^\d{2}:\d{2}$/)) {
       return timeString;
     }
+    // Si es una fecha completa, extraer la hora
+    if (timeString && timeString.length > 10) {
+      return timeString.substring(11, 16);
+    }
+    return timeString || '00:00';
   }
 
   getHoraFin(inTime: string, workTimeDuration: number): string {
-    if (!inTime || !workTimeDuration) return '';
-    try {
-      const startDate = new Date(inTime);
-      const endDate = new Date(startDate.getTime() + (workTimeDuration * 60 * 1000));
-      return endDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
-    } catch {
-      return '';
+    // Si inTime está en formato HH:MM, crear una fecha temporal para los cálculos
+    let date: Date;
+    
+    if (inTime.match(/^\d{2}:\d{2}$/)) {
+      // Formato HH:MM - crear fecha temporal
+      const [hours, minutes] = inTime.split(':').map(Number);
+      date = new Date();
+      date.setHours(hours, minutes, 0, 0);
+    } else {
+      // Formato de fecha completa
+      date = new Date(inTime);
     }
+    
+    if (isNaN(date.getTime())) return '';
+    
+    date.setMinutes(date.getMinutes() + workTimeDuration);
+    return date.toTimeString().substring(0, 5); // Devuelve HH:MM
   }
 
   formatDuracion(minutes: number): string {
@@ -206,11 +218,65 @@ export class ModalEditarAsignacionComponent implements OnInit {
     return `${hours}h ${mins}m`;
   }
 
-  getHorariosValidos(turno: Shift): any[] {
-    return turno.horario?.filter(h => h.dayIndex !== undefined && h.inTime && h.workTimeDuration) || [];
+  // Método para convertir duración "8h 30m" a minutos (para compatibilidad con nuevo formato)
+  private convertDurationToMinutes(duration: string): number {
+    if (!duration) return 0;
+    
+    const regex = /(\d+)h\s*(\d+)m/;
+    const match = duration.match(regex);
+    
+    if (match) {
+      const hours = parseInt(match[1]);
+      const minutes = parseInt(match[2]);
+      return (hours * 60) + minutes;
+    }
+    
+    return 0;
   }
 
-  getTurnoSeleccionado(): Shift | null {
+  // Métodos para obtener totales semanales por tipo de hora
+  getTotalBreakHours(turno: ShiftListDto): number {
+    if (!turno.horario || turno.horario.length === 0) return 0;
+    return turno.horario.reduce((total, h) => {
+      const minutes = this.convertDurationToMinutes(h.breakHours || '0h 0m');
+      return total + minutes;
+    }, 0);
+  }
+
+  getTotalOvertimeHours(turno: ShiftListDto): number {
+    if (!turno.horario || turno.horario.length === 0) return 0;
+    return turno.horario.reduce((total, h) => {
+      const minutes = this.convertDurationToMinutes(h.overtimeHours || '0h 0m');
+      return total + minutes;
+    }, 0);
+  }
+
+  getTotalDurationHours(turno: ShiftListDto): number {
+    if (!turno.horario || turno.horario.length === 0) return 0;
+    return turno.horario.reduce((total, h) => {
+      const minutes = this.convertDurationToMinutes(h.totalDuration || '0h 0m');
+      return total + minutes;
+    }, 0);
+  }
+
+  getTurnoDuracionSemanal(turno: ShiftListDto): number {
+    if (!turno.horario || turno.horario.length === 0) return 0;
+    // Sumar la duración de trabajo de todos los días (convertir de "8h 30m" a minutos)
+    return turno.horario.reduce((total, h) => {
+      const minutes = this.convertDurationToMinutes(h.workHours || '0h 0m');
+      return total + minutes;
+    }, 0);
+  }
+
+  getHorariosValidos(turno: ShiftListDto): any[] {
+    if (!turno.horario) return [];
+    return turno.horario.filter(h => {
+      const workMinutes = this.convertDurationToMinutes(h.workHours || '0h 0m');
+      return workMinutes > 0;
+    });
+  }
+
+  getTurnoSeleccionado(): ShiftListDto | null {
     const selectedId = this.editForm.get('scheduleId')?.value;
     return this.turnos.find(t => t.id === selectedId) || null;
   }
@@ -270,7 +336,8 @@ export class ModalEditarAsignacionComponent implements OnInit {
       updatedBy: this.userLogin || '',
       companiaId:  '', // DEL FILTRO GLOBAL
       ccostId: '',
-      ccostDescription: ''
+      ccostDescription: '',
+      shiftId: formData.scheduleId,
     }));
 
     console.log('Datos a enviar al API:', updateDataArray);

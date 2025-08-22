@@ -517,7 +517,8 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       },
       {
         field: 'locationName',
-       
+        width: 400,
+        maxWidth: 400,
         headerName: 'Ubicación',
         cellRenderer: (params: any) => {
           if (!params.value) return '<span class="text-fiori-subtext">-</span>';
@@ -532,7 +533,9 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       {
         field: 'areaName',
         headerName: 'Área',
-     
+        width: 600,
+        maxWidth: 600,
+
         cellRenderer: (params: any) => {
           if (!params.value) return '<span class="text-fiori-subtext">-</span>';
           return `<div class="flex items-center text-sm">
@@ -606,7 +609,8 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       {
         field: 'acciones',
         headerName: 'Acciones',
-        width: 220,
+        width: 400,
+        maxWidth: 400,
         pinned: 'right',
         lockPosition: true,
         resizable: false,

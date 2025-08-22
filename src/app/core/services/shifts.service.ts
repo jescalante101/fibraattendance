@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { environment } from "src/environments/environment";
+import { PaginatedShiftsResponse } from "../models/shift.model";
 
 // Interfaces para tipar la respuesta del endpoint de turnos
 export interface Horario {
@@ -124,8 +125,9 @@ export class ShiftsService{
      * @param pageSize - Tamaño de la página
      * @returns Observable con la lista de turnos y el total de registros
      */
-    getShifts(page: number, pageSize: number): Observable<ShiftsResponse> {
-        return this.http.get<ShiftsResponse>(`${this.apiUrl}api/Shift/lstShifts?page=${page}&pageSize=${pageSize}`);
+
+    getShifts(page: number, pageSize: number): Observable<PaginatedShiftsResponse> {
+        return this.http.get<PaginatedShiftsResponse>(`${this.apiUrl}api/Shift/shifts?page=${page}&pageSize=${pageSize}`);
     }
 
     getShiftById(id:number):Observable<Shift>{

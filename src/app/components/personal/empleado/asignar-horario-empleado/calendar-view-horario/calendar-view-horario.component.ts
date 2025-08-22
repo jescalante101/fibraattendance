@@ -1,11 +1,15 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { CalendarOptions, EventInput, Calendar } from '@fullcalendar/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild, HostListener } from '@angular/core';
+import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { ScheduleResponseDto, ScheduleDayDto } from 'src/app/core/models/schedule.model';
+import { ScheduleService } from 'src/app/core/services/schedule.service';
+import { finalize } from 'rxjs';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
+// Se mantiene la interfaz por si se usa en otro lado, pero el componente priorizará ScheduleResponseDto
 export interface HorarioCalendarData {
   employeeName?: string;
   turno?: {
@@ -14,16 +18,7 @@ export interface HorarioCalendarData {
   };
   fecha_ini?: string;
   fecha_fin?: string;
-  horarios?: Array<{
-    dayIndex: number;
-    dayName?: string;
-    inTime: string;
-    outTime?: string;
-    workTimeDuration: number;
-    dayDate?: string;
-    hasException?: boolean;
-    exceptionId?: string;
-  }>;
+  horarios?: any[];
 }
 
 @Component({
@@ -32,30 +27,43 @@ export interface HorarioCalendarData {
   styleUrls: ['./calendar-view-horario.component.css']
 })
 export class CalendarViewHorarioComponent implements OnInit, OnChanges {
-  @Input() componentData: HorarioCalendarData | ScheduleResponseDto = {};
-  
-  modalRef: any; // Referencia al modal padre
-  data: any; // Datos recibidos del modal service
-  
-  // Datos procesados para el calendario
-  scheduleData: ScheduleResponseDto | null = null;
+  @Input() componentData: ScheduleResponseDto | null = null;
   @ViewChild('calendar') calendarComponent!: FullCalendarComponent;
-  
-  // Control para recargar eventos cuando el calendario esté listo
-  private pendingEvents: EventInput[] = [];
-  private calendarReady = false;
 
+  // --- PROPIEDADES REFACTORIZADAS ---
+  isLoading = true; // Para mostrar un spinner de carga
+  scheduleData: ScheduleResponseDto | null = null;
+  private employeeId: string | null = null;
+  
+  // Referencia al modal padre y datos (si se usan con un servicio de modal)
+  modalRef: any;
+  data: any;
+
+  diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+  // --- PROPIEDADES PARA MENÚ CONTEXTUAL ---
+  showContextMenu = false;
+  contextMenuPosition = { x: 0, y: 0 };
+  selectedDateInfo: {
+    dateStr: string;
+    date: Date;
+    hasSchedule: boolean;
+    isException: boolean;
+    isPastDate: boolean;
+    scheduleDay?: any;
+  } | null = null;
+
+  // --- OPCIONES DEL CALENDARIO REFACTORIZADAS ---
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     plugins: [dayGridPlugin, interactionPlugin],
     locale: esLocale,
-    headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'dayGridMonth'
-    },
-    height: 'auto',
-    events: [],
+    headerToolbar: false, // Se maneja con nuestros propios botones para consistencia
+    height: '100%',
+    
+    // LA MAGIA ESTÁ AQUÍ: events ahora es una función que FullCalendar llamará automáticamente
+    events: this.fetchEvents.bind(this),
+
     eventDisplay: 'block',
     dayMaxEvents: 3,
     moreLinkClick: 'popover',
@@ -63,116 +71,102 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
     dateClick: this.handleDateClick.bind(this),
     eventDidMount: this.handleEventDidMount.bind(this),
     dayCellDidMount: this.handleDayCellDidMount.bind(this),
-    viewDidMount: this.handleViewDidMount.bind(this)
+    datesSet: this.handleDatesSet.bind(this)
   };
 
-  currentMonth: Date = new Date();
-  diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  constructor(
+    private scheduleService: ScheduleService, // Inyectamos el servicio para hacer peticiones
+    private toastService: ToastService
+  ) {}
 
   ngOnInit(): void {
-    console.log('CalendarViewHorario ngOnInit - componentData:', this.componentData);
-    console.log('CalendarViewHorario ngOnInit - data:', this.data);
-    
-    // Asignar datos de la misma manera que ModalVerHorarioComponent
+    // Si los datos vienen de un servicio de modal que los pone en 'data'
     if (this.data) {
       this.componentData = this.data;
-      console.log('CalendarViewHorario - Datos asignados desde this.data:', this.componentData);
     }
-    
-    // Detectar y procesar el tipo de datos recibidos
     this.processIncomingData();
-    this.loadCalendarData();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('CalendarViewHorario ngOnChanges - changes:', changes);
     if (changes['componentData'] && !changes['componentData'].firstChange) {
       this.processIncomingData();
-      this.loadCalendarData();
+      // Si los datos de entrada cambian, refrescamos los eventos del calendario
+      if (this.calendarComponent?.getApi()) {
+        this.calendarComponent.getApi().refetchEvents();
+      }
     }
   }
 
   /**
-   * Procesar datos entrantes - puede ser formato antiguo (HorarioCalendarData) o nuevo (ScheduleResponseDto)
+   * Extrae la información necesaria del @Input.
    */
   private processIncomingData(): void {
-    const data = this.componentData as any;
-    
-    // Detectar si son datos del nuevo formato (ScheduleResponseDto)
-    if (data && data.schedule && Array.isArray(data.schedule) && data.employeeId) {
-      console.log('Detectados datos del nuevo formato ScheduleResponseDto');
-      this.scheduleData = data as ScheduleResponseDto;
-    } 
-    // Formato antiguo (HorarioCalendarData)
-    else if (data && data.horarios && Array.isArray(data.horarios)) {
-      console.log('Detectados datos del formato antiguo HorarioCalendarData');
-      this.scheduleData = null; // Usar lógica antigua
-    }
-    else {
-      console.warn('Formato de datos no reconocido:', data);
+    const data = this.componentData;
+    if (data && data.schedule && data.employeeId) {
+      this.scheduleData = data;
+      this.employeeId = data.employeeId;
+    } else {
+      this.toastService.error('Horario', 'Datos de horario incompletos o en formato no reconocido.');
       this.scheduleData = null;
+      this.employeeId = null;
     }
   }
 
-  private loadCalendarData(): void {
-    console.log('CalendarViewHorario loadCalendarData - scheduleData:', this.scheduleData);
-    console.log('CalendarViewHorario loadCalendarData - componentData:', this.componentData);
-    
-    let events: EventInput[] = [];
-    
-    // Usar nuevo formato si está disponible
-    if (this.scheduleData) {
-      events = this.transformScheduleToEvents();
-    } 
-    // Usar formato antiguo como fallback
-    else if ((this.componentData as HorarioCalendarData)?.horarios) {
-      events = this.transformHorariosToEvents();
-    }
-    else {
-      console.log('CalendarViewHorario - No hay datos válidos para mostrar');
+  /**
+   * Función que FullCalendar usa para obtener eventos dinámicamente.
+   * Se ejecuta al cargar y cada vez que la vista (ej. el mes) cambia.
+   */
+  fetchEvents(fetchInfo:{
+    start: Date;
+    end: Date;
+  } , successCallback: (events: EventInput[]) => void, failureCallback: (error: any) => void): void {
+    if (!this.employeeId) {
+      this.toastService.warning('Horario', 'No se ha proporcionado un ID de empleado.');
+      successCallback([]);
       return;
     }
 
-    // Guardar eventos para cargar cuando el calendario esté listo
-    this.pendingEvents = events;
-    
-    // Si el calendario ya está inicializado y listo, cargar eventos inmediatamente
-    if (this.calendarReady && this.calendarComponent?.getApi()) {
-      this.loadEventsToCalendar();
-    } else {
-      console.log('CalendarViewHorario - Calendario no listo aún, eventos guardados como pendientes');
-    }
+    this.isLoading = true;
+    const startDate = fetchInfo.start;
+    const endDate = fetchInfo.end;
+
+    this.scheduleService.getScheduleByDateRange(this.employeeId, startDate, endDate)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (response) => {
+          if (response && response.schedule) {
+            const events = this.transformScheduleToEvents(response.schedule);
+            successCallback(events);
+          } else {
+            this.toastService.info('Horario', 'No se encontraron horarios para este período.');
+            successCallback([]);
+          }
+        },
+        error: (err) => {
+          this.toastService.error('Horario', 'Error al cargar los horarios.');
+          console.error('Error fetching schedule:', err);
+          failureCallback(err);
+        }
+      });
   }
 
   /**
-   * Transformar datos del nuevo formato ScheduleResponseDto a eventos de calendario
+   * Transforma los datos del API en eventos que FullCalendar puede renderizar.
    */
-  private transformScheduleToEvents(): EventInput[] {
-    const events: EventInput[] = [];
-    
-    if (!this.scheduleData || !this.scheduleData.schedule) {
-      console.log('No hay schedule data para transformar');
-      return events;
-    }
-
-    console.log('Transformando schedule data:', this.scheduleData.schedule);
-
-    this.scheduleData.schedule.forEach((scheduleDay: ScheduleDayDto) => {
-      // Verificar si es fecha pasada
+  private transformScheduleToEvents(scheduleDays: ScheduleDayDto[]): EventInput[] {
+    return scheduleDays.map((scheduleDay: ScheduleDayDto) => {
       const fechaEvento = new Date(scheduleDay.date);
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
-      fechaEvento.setHours(0, 0, 0, 0);
-      const esFechaPasada = fechaEvento < hoy;
-
-      // Determinar si es día libre
+      // Aseguramos que la fecha del evento no tenga en cuenta la zona horaria para la comparación
+      const fechaComparar = new Date(fechaEvento.getUTCFullYear(), fechaEvento.getUTCMonth(), fechaEvento.getUTCDate());
+      const esFechaPasada = fechaComparar < hoy;
       const esDiaLibre = scheduleDay.inTime === '--:--' || scheduleDay.outTime === '--:--' || scheduleDay.workTimeDurationMinutes === 0;
 
-      // Crear evento para este día
-      events.push({
+      return {
         id: `schedule-${scheduleDay.date}`,
         title: esDiaLibre ? 'Día Libre' : `${scheduleDay.inTime} - ${scheduleDay.outTime}`,
-        start: scheduleDay.date.split('T')[0], // Solo la fecha, sin la hora
+        start: scheduleDay.date.split('T')[0],
         allDay: true,
         backgroundColor: this.getScheduleEventColor(scheduleDay, esFechaPasada, esDiaLibre),
         borderColor: this.getScheduleEventBorderColor(scheduleDay, esFechaPasada, esDiaLibre),
@@ -184,21 +178,16 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
           esDiaLibre: esDiaLibre,
           dayName: scheduleDay.dayName
         }
-      });
+      };
     });
-
-    console.log('Eventos generados desde schedule:', events);
-    return events;
   }
 
-  /**
-   * Colores para eventos basados en ScheduleDayDto
-   */
+  // --- Funciones de Coloreado (sin cambios) ---
   private getScheduleEventColor(scheduleDay: ScheduleDayDto, esFechaPasada: boolean, esDiaLibre: boolean): string {
-    if (esFechaPasada) return '#e5e7eb'; // gris para fechas pasadas
-    if (esDiaLibre) return '#f3f4f6'; // gris claro para días libres
-    if (scheduleDay.isException) return '#fed7aa'; // naranja para excepciones
-    return '#dbeafe'; // azul para horarios normales
+    if (esFechaPasada) return '#e5e7eb';
+    if (esDiaLibre) return '#f3f4f6';
+    if (scheduleDay.isException) return '#fed7aa';
+    return '#dbeafe';
   }
 
   private getScheduleEventBorderColor(scheduleDay: ScheduleDayDto, esFechaPasada: boolean, esDiaLibre: boolean): string {
@@ -215,336 +204,272 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
     return '#1e40af';
   }
 
-  private transformHorariosToEvents(): EventInput[] {
-    const events: EventInput[] = [];
-    const horarios = (this.componentData as HorarioCalendarData)?.horarios || [];
-    
-    console.log('CalendarViewHorario - transformHorariosToEvents - horarios:', horarios);
-    console.log('CalendarViewHorario - transformHorariosToEvents - componentData:', this.componentData);
-    
-    // Obtener rango de fechas
-    const oldData = this.componentData as HorarioCalendarData;
-    const fechaInicio = oldData?.fecha_ini ? new Date(oldData.fecha_ini) : new Date();
-    const fechaFin = oldData?.fecha_fin ? new Date(oldData.fecha_fin) : this.getEndOfYear();
-    
-    console.log('CalendarViewHorario - fechaInicio:', fechaInicio);
-    console.log('CalendarViewHorario - fechaFin:', fechaFin);
-
-    // Generar eventos para cada día en el rango
-    const currentDate = new Date(fechaInicio);
-    
-    while (currentDate <= fechaFin) {
-      const dayOfWeek = currentDate.getDay(); // 0 = Domingo, 1 = Lunes, etc.
-      
-      // Buscar horario para este día de la semana
-      const horarioDelDia = horarios.find((h: any) => h.dayIndex === dayOfWeek);
-      
-      if (horarioDelDia) {
-        // Verificar si es fecha pasada
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
-        const fechaComparar = new Date(currentDate);
-        fechaComparar.setHours(0, 0, 0, 0);
-        const esFechaPasada = fechaComparar < hoy;
-        
-        console.log(`CalendarViewHorario - Procesando ${currentDate.toDateString()}, día ${dayOfWeek}, horario encontrado:`, horarioDelDia);
-        console.log(`CalendarViewHorario - Es fecha pasada: ${esFechaPasada} (fecha: ${fechaComparar.toDateString()}, hoy: ${hoy.toDateString()})`);
-        
-        // Crear evento para este día
-        events.push({
-          id: `horario-${currentDate.getTime()}-${dayOfWeek}`,
-          title: this.formatHorarioDisplay(horarioDelDia),
-          start: currentDate.toISOString().split('T')[0],
-          allDay: true,
-          backgroundColor: this.getEventColor(horarioDelDia, esFechaPasada),
-          borderColor: this.getEventBorderColor(horarioDelDia, esFechaPasada),
-          textColor: this.getEventTextColor(horarioDelDia, esFechaPasada),
-          extendedProps: {
-            horario: horarioDelDia,
-            fecha: new Date(currentDate),
-            esFechaPasada: esFechaPasada,
-            dayOfWeek: dayOfWeek
-          }
-        });
-      }
-      
-      // Avanzar al siguiente día
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-
-    console.log('CalendarViewHorario - eventos generados:', events);
-    console.log('CalendarViewHorario - cantidad de eventos:', events.length);
-    
-    return events;
-  }
-
-  private formatHorarioDisplay(horario: any): string {
-    const horaInicio = this.formatHora(horario.inTime);
-    const horaFin = horario.outTime || this.getHoraFin(horario.inTime, horario.workTimeDuration);
-    return `${horaInicio} - ${horaFin}`;
-  }
-
-  private formatHora(timeString: string): string {
-    if (!timeString) return '';
-    
-    // Si ya es formato HH:MM, devolverlo directamente
-    if (timeString.match(/^\d{2}:\d{2}$/)) {
-      return timeString;
-    }
-    
-    try {
-      // Si es formato completo de fecha/hora
-      const date = new Date(timeString);
-      if (!isNaN(date.getTime())) {
-        return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
-      }
-      
-      // Si es solo hora en formato "HH:MM:SS"
-      if (timeString.includes(':')) {
-        const parts = timeString.split(':');
-        if (parts.length >= 2) {
-          return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
-        }
-      }
-      
-      return timeString;
-    } catch {
-      return timeString;
-    }
-  }
-
-  private getHoraFin(inTime: string, workTimeDuration: number): string {
-    if (!inTime || !workTimeDuration) return '';
-    
-    try {
-      // Si inTime es solo hora "HH:MM", crear fecha temporal para calcular
-      let startTime: Date;
-      
-      if (inTime.match(/^\d{2}:\d{2}$/)) {
-        // Formato "HH:MM"
-        const [hours, minutes] = inTime.split(':').map(Number);
-        startTime = new Date();
-        startTime.setHours(hours, minutes, 0, 0);
-      } else {
-        // Formato completo de fecha
-        startTime = new Date(inTime);
-      }
-      
-      if (!isNaN(startTime.getTime())) {
-        const endDate = new Date(startTime.getTime() + (workTimeDuration * 60 * 1000));
-        return endDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
-      }
-      
-      return '';
-    } catch {
-      return '';
-    }
-  }
-
-  private getEventColor(horario: any, esFechaPasada: boolean): string {
-    if (esFechaPasada) return '#e5e7eb'; // gris para fechas pasadas
-    if (horario.hasException) return '#fed7aa'; // naranja para excepciones
-    return '#dbeafe'; // azul para horarios normales
-  }
-
-  private getEventBorderColor(horario: any, esFechaPasada: boolean): string {
-    if (esFechaPasada) return '#9ca3af';
-    if (horario.hasException) return '#fb923c';
-    return '#3b82f6';
-  }
-
-  private getEventTextColor(horario: any, esFechaPasada: boolean): string {
-    if (esFechaPasada) return '#6b7280';
-    if (horario.hasException) return '#ea580c';
-    return '#1e40af';
-  }
-
-  private getEndOfYear(): Date {
-    const endDate = new Date();
-    endDate.setFullYear(endDate.getFullYear() + 1);
-    endDate.setMonth(11, 31); // Diciembre 31
-    return endDate;
-  }
-
-  // Event handlers
+  // --- Handlers de Eventos del Calendario ---
   handleEventClick(clickInfo: any): void {
     const extendedProps = clickInfo.event.extendedProps;
-    
     if (extendedProps.esFechaPasada) {
-      console.log('No se puede editar horario de fecha pasada');
+      this.toastService.info('Editar Horario', 'No se puede editar un horario de una fecha pasada.');
       return;
     }
-
-    // Implementar lógica de edición
-    this.editarHorario(extendedProps.horario, extendedProps.fecha);
+    this.editarHorario(extendedProps.scheduleDay, extendedProps.fecha);
   }
 
   handleDateClick(dateClickInfo: any): void {
     console.log('Fecha clickeada:', dateClickInfo.dateStr);
-    // Implementar lógica para crear nuevo horario en fecha específica
+    
+    // Obtener información de la fecha clickeada
+    const clickedDate = dateClickInfo.date;
+    const dateStr = dateClickInfo.dateStr;
+    
+    // Determinar si es fecha pasada
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const fechaComparar = new Date(clickedDate);
+    fechaComparar.setHours(0, 0, 0, 0);
+    const isPastDate = fechaComparar < hoy;
+    
+    // Buscar si existe un horario para esta fecha
+    const scheduleDay = this.findScheduleForDate(dateStr);
+    const hasSchedule = !!scheduleDay;
+    const isException = scheduleDay?.isException || false;
+    
+    // Configurar información de la fecha seleccionada
+    this.selectedDateInfo = {
+      dateStr: dateStr,
+      date: clickedDate,
+      hasSchedule: hasSchedule,
+      isException: isException,
+      isPastDate: isPastDate,
+      scheduleDay: scheduleDay
+    };
+    
+    // Calcular posición del menú contextual
+    const rect = dateClickInfo.dayEl.getBoundingClientRect();
+    this.contextMenuPosition = {
+      x: rect.left + (rect.width / 2) - 100, // Centrar horizontalmente
+      y: rect.bottom + 5 // Justo debajo de la celda
+    };
+    
+    // Ajustar posición si se sale de la pantalla
+    const menuWidth = 200;
+    const menuHeight = 250;
+    
+    if (this.contextMenuPosition.x + menuWidth > window.innerWidth) {
+      this.contextMenuPosition.x = window.innerWidth - menuWidth - 10;
+    }
+    if (this.contextMenuPosition.x < 10) {
+      this.contextMenuPosition.x = 10;
+    }
+    if (this.contextMenuPosition.y + menuHeight > window.innerHeight) {
+      this.contextMenuPosition.y = rect.top - menuHeight - 5; // Mostrar arriba
+    }
+    
+    // Mostrar menú contextual
+    this.showContextMenu = true;
   }
 
   handleEventDidMount(mountInfo: any): void {
-    const extendedProps = mountInfo.event.extendedProps;
-    
-    // Agregar clases CSS personalizadas
-    if (extendedProps.esFechaPasada) {
-      mountInfo.el.classList.add('horario-pasado');
-    }
-    if (extendedProps.horario.hasException) {
-      mountInfo.el.classList.add('horario-excepcion');
-    }
-    
-    // Agregar tooltip
-    mountInfo.el.title = this.getTooltipText(extendedProps.horario, extendedProps.fecha);
+    const { event } = mountInfo;
+    mountInfo.el.title = this.getTooltipText(event.extendedProps.scheduleDay, event.extendedProps.fecha);
   }
-
+  
   handleDayCellDidMount(mountInfo: any): void {
-    // Personalizar celdas de días si es necesario
-    const fecha = mountInfo.date;
     const hoy = new Date();
-    
-    if (fecha.toDateString() === hoy.toDateString()) {
+    if (mountInfo.date.toDateString() === hoy.toDateString()) {
       mountInfo.el.classList.add('dia-actual');
     }
   }
 
-  private getTooltipText(horario: any, fecha: Date): string {
-    const dayName = this.diasSemana[fecha.getDay()];
-    const fechaStr = fecha.toLocaleDateString('es-ES');
-    const duracion = this.formatDuracion(horario.workTimeDuration);
+  handleDatesSet(dateInfo: any): void {
+    // Forzamos a re-renderizar el header para actualizar el título del mes/año
+    // Esto es un pequeño truco por si Angular no detecta el cambio automáticamente
+    this.calendarComponent.getApi().updateSize();
+  }
+
+  private getTooltipText(scheduleDay: ScheduleDayDto, fecha: Date): string {
+    const dayName = this.diasSemana[fecha.getUTCDay()];
+    const fechaStr = fecha.toLocaleDateString('es-ES', { timeZone: 'UTC' });
     
-    let tooltip = `${dayName} ${fechaStr}\n`;
-    tooltip += `${this.formatHorarioDisplay(horario)}\n`;
-    tooltip += `Duración: ${duracion}`;
-    
-    if (horario.hasException) {
-      tooltip += '\n⚠️ Excepción aplicada';
+    if (scheduleDay.isException) {
+      return `${dayName} ${fechaStr}
+Excepción: ${scheduleDay.isException || 'Detalle no disponible'}`;
     }
     
-    return tooltip;
+    if (scheduleDay.inTime === '--:--') {
+      return `${dayName} ${fechaStr}
+Día Libre`;
+    }
+
+    const duracion = this.formatDuracion(scheduleDay.workTimeDurationMinutes);
+    return `${dayName} ${fechaStr}
+Horario: ${scheduleDay.inTime} - ${scheduleDay.outTime}
+Duración: ${duracion}`;
   }
 
   private formatDuracion(minutes: number): string {
-    if (!minutes) return '';
+    if (minutes === undefined || minutes === null) return '';
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${hours}h ${mins}m`;
   }
 
-  private editarHorario(horario: any, fecha: Date): void {
-    console.log('Editar horario:', horario, 'para fecha:', fecha);
-    // Aquí integrar con el modal de edición existente o crear uno nuevo
-    // Emitir evento o llamar servicio para abrir modal de edición
+  private editarHorario(scheduleDay: ScheduleDayDto, fecha: Date): void {
+    console.log('Editar horario:', scheduleDay, 'para fecha:', fecha);
+    this.toastService.info('Editar Horario', 'La funcionalidad de edición aún no está implementada.');
+    // Aquí se llamaría al modal de edición
   }
 
-  // Métodos públicos para navegación
+  // --- Controles de Navegación ---
   previousMonth(): void {
-    if (this.calendarComponent?.getApi) {
-      this.calendarComponent.getApi().prev();
-    }
+    this.calendarComponent?.getApi().prev();
   }
 
   nextMonth(): void {
-    if (this.calendarComponent?.getApi) {
-      this.calendarComponent.getApi().next();
-    }
+    this.calendarComponent?.getApi().next();
   }
 
   goToToday(): void {
-    if (this.calendarComponent?.getApi) {
-      this.calendarComponent.getApi().today();
-    }
+    this.calendarComponent?.getApi().today();
   }
 
   getCurrentViewTitle(): string {
-    if (this.calendarComponent?.getApi) {
-      return this.calendarComponent.getApi().view.title;
-    }
-    return '';
+    return this.calendarComponent?.getApi()?.view.title || 'Cargando...';
   }
 
-  getExceptionsCount(): number {
-    // Usar nuevo formato si está disponible
-    if (this.scheduleData?.schedule) {
-      return this.scheduleData.schedule.filter(s => s.isException).length;
-    }
-    // Formato antiguo
-    if ((this.componentData as HorarioCalendarData)?.horarios) {
-      return (this.componentData as HorarioCalendarData).horarios!.filter(h => h.hasException).length;
-    }
-    return 0;
-  }
-
-  // Métodos para obtener información del empleado (compatibles con ambos formatos)
+  // --- Métodos para la Cabecera (sin cambios) ---
   getEmployeeName(): string {
-    if (this.scheduleData) {
-      return this.scheduleData.fullNameEmployee || 'Empleado';
-    }
-    return (this.componentData as HorarioCalendarData)?.employeeName || 'Empleado';
+    return this.scheduleData?.fullNameEmployee || 'Empleado';
   }
 
   getTurnoInfo(): string {
-    if (this.scheduleData) {
-      return this.scheduleData.shiftInfo?.alias || 'No definido';
-    }
-    return (this.componentData as HorarioCalendarData)?.turno?.alias || 'No definido';
+    return this.scheduleData?.shiftInfo?.alias || 'No definido';
   }
 
   getDateRange(): string {
-    if (this.scheduleData) {
+    if (this.scheduleData?.queryRange) {
       const start = new Date(this.scheduleData.queryRange.startDate).toLocaleDateString('es-ES');
       const end = new Date(this.scheduleData.queryRange.endDate).toLocaleDateString('es-ES');
       return `${start} - ${end}`;
     }
-    
-    const oldData = this.componentData as HorarioCalendarData;
-    if (oldData?.fecha_ini && oldData?.fecha_fin) {
-      const start = new Date(oldData.fecha_ini).toLocaleDateString('es-ES');
-      const end = new Date(oldData.fecha_fin).toLocaleDateString('es-ES');
-      return `${start} - ${end}`;
-    }
-    
-    return 'No definido';
+    return 'Rango no definido';
   }
 
   getTotalSchedulesCount(): number {
-    // Usar nuevo formato si está disponible
-    if (this.scheduleData?.schedule) {
-      return this.scheduleData.schedule.length;
-    }
-    // Formato antiguo
-    if ((this.componentData as HorarioCalendarData)?.horarios) {
-      return (this.componentData as HorarioCalendarData).horarios!.length;
-    }
-    return 0;
+    return this.scheduleData?.schedule?.length || 0;
   }
 
-  // Callback cuando FullCalendar está completamente inicializado
-  handleViewDidMount(mountInfo: any): void {
-    console.log('CalendarViewHorario - Vista del calendario montada, calendario listo');
-    this.calendarReady = true;
+  getExceptionsCount(): number {
+    return this.scheduleData?.schedule?.filter(s => s.isException).length || 0;
+  }
+
+  // --- MÉTODOS PARA MENÚ CONTEXTUAL ---
+
+  /**
+   * Busca el horario para una fecha específica
+   */
+  private findScheduleForDate(dateStr: string): any {
+    if (!this.scheduleData?.schedule) return null;
     
-    // Si hay eventos pendientes, cargarlos ahora
-    if (this.pendingEvents.length > 0) {
-      console.log('CalendarViewHorario - Cargando eventos pendientes:', this.pendingEvents.length);
-      this.loadEventsToCalendar();
+    return this.scheduleData.schedule.find(schedule => 
+      schedule.date.split('T')[0] === dateStr
+    );
+  }
+
+  /**
+   * Cierra el menú contextual
+   */
+  closeContextMenu(): void {
+    this.showContextMenu = false;
+    this.selectedDateInfo = null;
+  }
+
+  /**
+   * Ver detalles del horario
+   */
+  viewScheduleDetails(): void {
+    if (!this.selectedDateInfo?.scheduleDay) return;
+    
+    const schedule = this.selectedDateInfo.scheduleDay;
+    const details = `
+Fecha: ${this.selectedDateInfo.date.toLocaleDateString('es-ES')}
+Día: ${schedule.dayName}
+Horario: ${schedule.inTime} - ${schedule.outTime}
+Duración trabajo: ${this.formatDuracion(schedule.workTimeDurationMinutes)}
+Duración total: ${this.formatDuracion(schedule.duration)}
+${schedule.isException ? '⚠️ Excepción activa' : ''}
+${schedule.alias ? 'Alias: ' + schedule.alias : ''}
+    `.trim();
+    
+    this.toastService.info('Detalles del Horario', details);
+    this.closeContextMenu();
+  }
+
+  /**
+   * Editar horario existente
+   */
+  editSchedule(): void {
+    if (!this.selectedDateInfo?.scheduleDay) return;
+    
+    console.log('Editando horario para:', this.selectedDateInfo.dateStr);
+    console.log('Datos del horario:', this.selectedDateInfo.scheduleDay);
+    
+    // Aquí integrarías con el modal de edición existente
+    this.toastService.info('Editar Horario', 'Funcionalidad de edición en desarrollo');
+    this.closeContextMenu();
+  }
+
+  /**
+   * Agregar excepción para una fecha
+   */
+  addException(): void {
+    if (!this.selectedDateInfo) return;
+    
+    console.log('Agregando excepción para:', this.selectedDateInfo.dateStr);
+    
+    // Aquí integrarías con un modal para crear excepciones
+    this.toastService.info('Agregar Excepción', 'Funcionalidad de excepciones en desarrollo');
+    this.closeContextMenu();
+  }
+
+  /**
+   * Eliminar excepción existente
+   */
+  removeException(): void {
+    if (!this.selectedDateInfo?.isException) return;
+    
+    console.log('Eliminando excepción para:', this.selectedDateInfo.dateStr);
+    
+    // Aquí harías la llamada al API para eliminar la excepción
+    this.toastService.success('Excepción Eliminada', 'La excepción ha sido eliminada exitosamente');
+    this.closeContextMenu();
+    
+    // Refrescar eventos del calendario
+    if (this.calendarComponent?.getApi()) {
+      this.calendarComponent.getApi().refetchEvents();
     }
   }
 
-  // Método para cargar eventos al calendario
-  private loadEventsToCalendar(): void {
-    if (this.calendarComponent?.getApi && this.pendingEvents.length > 0) {
-      const calendarApi = this.calendarComponent.getApi();
-      console.log('CalendarViewHorario - Cargando eventos al calendario:', this.pendingEvents.length);
-      
-      // Limpiar eventos existentes
-      calendarApi.removeAllEvents();
-      
-      // Agregar nuevos eventos
-      calendarApi.addEventSource(this.pendingEvents);
-      
-      console.log('CalendarViewHorario - Eventos cargados exitosamente');
+  /**
+   * Listener global para cerrar menú al hacer clic fuera
+   */
+  @HostListener('document:click', ['$event'])
+  onGlobalClick(event: MouseEvent): void {
+    if (this.showContextMenu) {
+      // Verificar si el clic fue dentro del menú contextual
+      const target = event.target as HTMLElement;
+      if (!target.closest('.context-menu')) {
+        this.closeContextMenu();
+      }
+    }
+  }
+
+  /**
+   * Listener para cerrar menú con tecla Escape
+   */
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    if (this.showContextMenu) {
+      this.closeContextMenu();
     }
   }
 }

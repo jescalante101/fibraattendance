@@ -253,3 +253,122 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* === ESTILOS PARA MENÚ CONTEXTUAL === */
+
+/* Animación de entrada para el menú contextual */
+@keyframes contextMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: contextMenuFadeIn 0.2s ease-out forwards;
+}
+
+/* Estilos del menú contextual */
+.context-menu {
+  backdrop-filter: blur(8px);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.context-menu button {
+  transition: all 0.2s ease;
+}
+
+.context-menu button:hover {
+  transform: translateX(2px);
+}
+
+/* Mejoras visuales para fechas clickeables */
+::ng-deep .fc-daygrid-day:hover {
+  background-color: rgba(59, 130, 246, 0.05) !important;
+  cursor: pointer !important;
+  position: relative;
+}
+
+::ng-deep .fc-daygrid-day.fc-day-past:hover {
+  background-color: rgba(156, 163, 175, 0.05) !important;
+}
+
+/* Indicador visual al hacer hover en fechas */
+::ng-deep .fc-daygrid-day:hover::after {
+  content: '✚';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: #3b82f6;
+  font-size: 12px;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+::ng-deep .fc-daygrid-day.fc-day-past:hover::after {
+  content: '🔒';
+  color: #9ca3af;
+}
+
+/* Responsive para menú contextual */
+@media (max-width: 768px) {
+  .context-menu {
+    min-width: 200px;
+    max-width: calc(100vw - 20px);
+    font-size: 0.875rem;
+  }
+  
+  .context-menu button {
+    padding: 12px 16px;
+  }
+}
+
+/* Estados de loading para acciones individuales */
+.loading-action {
+  position: relative;
+  pointer-events: none;
+}
+
+.loading-action::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f4f6;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  transform: translate(-50%, -50%);
+}
+
+/* Mejoras de accesibilidad para el menú */
+.context-menu button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+}
+
+/* Animación de salida */
+.context-menu.closing {
+  animation: contextMenuFadeOut 0.15s ease-in forwards;
+}
+
+@keyframes contextMenuFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.98);
+  }
+}

@@ -11,6 +11,8 @@ import { ModalVerHorarioComponent } from './modal-ver-horario/modal-ver-horario.
 import { CalendarViewHorarioComponent } from './calendar-view-horario/calendar-view-horario.component';
 import { ModalEditarAsignacionComponent } from './modal-editar-asignacion/modal-editar-asignacion.component';
 import { ModalService } from 'src/app/shared/modal/modal.service';
+import { ScheduleService } from 'src/app/core/services/schedule.service';
+import { ScheduleResponseDto } from 'src/app/core/models/schedule.model';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
 import { GenericFilterConfig, FilterState, FilterChangeEvent } from 'src/app/shared/generic-filter/filter-config.interface';
 import { ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
@@ -32,7 +34,8 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
     private snackBar: MatSnackBar,
     private shiftService: ShiftsService,
     private modalService:ModalService,
-    private toastService:ToastService
+    private toastService:ToastService,
+    private scheduleService: ScheduleService
   ) { }
 
   filtro = '';
@@ -233,38 +236,25 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
 
   verCalendario(empleado: EmployeeScheduleAssignment) {
     this.loading = true;
-    this.shiftService.getShiftByAssignedIdAndShiftId(empleado.assignmentId, empleado.scheduleId)
+    
+    // Calcular rango de fechas para el calendario (mes actual + siguiente)
+    const startDate = empleado.startDate ? new Date(empleado.startDate) : new Date();
+    const endDate = empleado.endDate ? new Date(empleado.endDate) : this.getDefaultEndDate();
+    
+    console.log('Obteniendo calendario para:', empleado.fullNameEmployee);
+    console.log('Rango de fechas:', startDate, 'a', endDate);
+    
+    this.scheduleService.getScheduleByDateRange(empleado.employeeId, startDate, endDate)
       .pipe(finalize(() => this.loading = false))
       .subscribe({
-        next: (res) => {
-          if (res) {
-            // Preparar datos para el componente calendar-view
-            // Usar la misma estructura que espera CalendarViewHorarioComponent
-            const calendarData = {
-              employeeName: empleado.fullNameEmployee,
-              turno: {
-                alias: res.alias,
-                id: res.id
-              },
-              fecha_ini: empleado.startDate,
-              fecha_fin: empleado.endDate,
-              horarios: res.horario ? res.horario.map((h: any) => ({
-                dayIndex: h.dayIndex,
-                dayName: this.getDayName(h.dayIndex),
-                inTime: h.inTime,
-                outTime: h.outTime,
-                workTimeDuration: h.workTimeDuration,
-                hasException: h.hasException || false,
-                exceptionId: h.exceptionId
-              })) : []
-            };
-
-            console.log('Datos para calendario:', calendarData);
+        next: (scheduleResponse: ScheduleResponseDto) => {
+          if (scheduleResponse && scheduleResponse.schedule) {
+            console.log('Schedule data received:', scheduleResponse);
 
             this.modalService.open({
               title: `Calendario de Horarios - ${empleado.fullNameEmployee}`,
               componentType: CalendarViewHorarioComponent,
-              componentData: calendarData,
+              componentData: scheduleResponse, // Pasar directamente ScheduleResponseDto
               width: '95vw',
               height: '95vh'
             });
@@ -293,6 +283,13 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
   private getDayName(dayIndex: number): string {
     const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     return days[dayIndex] || `Día ${dayIndex}`;
+  }
+
+  private getDefaultEndDate(): Date {
+    // Si no hay fecha fin, mostrar 3 meses desde hoy
+    const endDate = new Date();
+    endDate.setMonth(endDate.getMonth() + 3);
+    return endDate;
   }
 
   // Método para cerrar el modal

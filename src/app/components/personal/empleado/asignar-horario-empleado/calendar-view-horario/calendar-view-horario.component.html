@@ -12,7 +12,7 @@
           </svg>
         </div>
         <div>
-          <h3 class="text-lg font-bold text-gray-800">{{ componentData?.employeeName || 'Empleado' }}</h3>
+          <h3 class="text-lg font-bold text-gray-800">{{ getEmployeeName() }}</h3>
           <p class="text-sm text-gray-600">Horarios de Trabajo</p>
         </div>
       </div>
@@ -20,15 +20,10 @@
       <!-- Información del turno -->
       <div class="text-right">
         <div class="text-sm font-medium text-gray-700">
-          Turno: <span class="text-blue-600 font-semibold">{{ componentData?.turno?.alias || 'No definido' }}</span>
+          Turno: <span class="text-blue-600 font-semibold">{{ getTurnoInfo() }}</span>
         </div>
         <div class="text-xs text-gray-500 mt-1">
-          <span *ngIf="componentData?.fecha_ini">
-            Desde: {{ componentData.fecha_ini | date:'dd/MM/yyyy' }}
-          </span>
-          <span *ngIf="componentData?.fecha_fin" class="ml-2">
-            Hasta: {{ componentData.fecha_fin | date:'dd/MM/yyyy' }}
-          </span>
+          <span>{{ getDateRange() }}</span>
         </div>
       </div>
     </div>
@@ -40,7 +35,7 @@
           <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
           <span class="text-sm font-medium text-gray-700">Total Horarios</span>
         </div>
-        <p class="text-lg font-bold text-blue-600 mt-1">{{ (componentData?.horarios || []).length }} configurado(s)</p>
+        <p class="text-lg font-bold text-blue-600 mt-1">{{ getTotalSchedulesCount() }} configurado(s)</p>
       </div>
       
       <div class="bg-white rounded-lg p-3 border border-orange-200">
@@ -137,7 +132,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
         </svg>
-        <span>Vista de Calendario - {{ componentData?.turno?.alias }}</span>
+        <span>Vista de Calendario - {{ getTurnoInfo() }}</span>
       </div>
     </div>
   </div>

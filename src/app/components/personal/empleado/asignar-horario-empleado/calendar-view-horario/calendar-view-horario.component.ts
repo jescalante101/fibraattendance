@@ -4,6 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
 import { FullCalendarComponent } from '@fullcalendar/angular';
+import { ScheduleResponseDto, ScheduleDayDto } from 'src/app/core/models/schedule.model';
 
 export interface HorarioCalendarData {
   employeeName?: string;
@@ -31,11 +32,18 @@ export interface HorarioCalendarData {
   styleUrls: ['./calendar-view-horario.component.css']
 })
 export class CalendarViewHorarioComponent implements OnInit, OnChanges {
-  @Input() componentData: HorarioCalendarData = {};
+  @Input() componentData: HorarioCalendarData | ScheduleResponseDto = {};
   
   modalRef: any; // Referencia al modal padre
   data: any; // Datos recibidos del modal service
+  
+  // Datos procesados para el calendario
+  scheduleData: ScheduleResponseDto | null = null;
   @ViewChild('calendar') calendarComponent!: FullCalendarComponent;
+  
+  // Control para recargar eventos cuando el calendario esté listo
+  private pendingEvents: EventInput[] = [];
+  private calendarReady = false;
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
@@ -54,7 +62,8 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
     eventClick: this.handleEventClick.bind(this),
     dateClick: this.handleDateClick.bind(this),
     eventDidMount: this.handleEventDidMount.bind(this),
-    dayCellDidMount: this.handleDayCellDidMount.bind(this)
+    dayCellDidMount: this.handleDayCellDidMount.bind(this),
+    viewDidMount: this.handleViewDidMount.bind(this)
   };
 
   currentMonth: Date = new Date();
@@ -70,55 +79,153 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
       console.log('CalendarViewHorario - Datos asignados desde this.data:', this.componentData);
     }
     
+    // Detectar y procesar el tipo de datos recibidos
+    this.processIncomingData();
     this.loadCalendarData();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('CalendarViewHorario ngOnChanges - changes:', changes);
     if (changes['componentData'] && !changes['componentData'].firstChange) {
+      this.processIncomingData();
       this.loadCalendarData();
     }
   }
 
-  private loadCalendarData(): void {
-    console.log('CalendarViewHorario loadCalendarData - componentData:', this.componentData);
-    console.log('CalendarViewHorario loadCalendarData - horarios:', this.componentData?.horarios);
+  /**
+   * Procesar datos entrantes - puede ser formato antiguo (HorarioCalendarData) o nuevo (ScheduleResponseDto)
+   */
+  private processIncomingData(): void {
+    const data = this.componentData as any;
     
-    if (!this.componentData?.horarios) {
-      console.log('CalendarViewHorario - No hay horarios, retornando');
+    // Detectar si son datos del nuevo formato (ScheduleResponseDto)
+    if (data && data.schedule && Array.isArray(data.schedule) && data.employeeId) {
+      console.log('Detectados datos del nuevo formato ScheduleResponseDto');
+      this.scheduleData = data as ScheduleResponseDto;
+    } 
+    // Formato antiguo (HorarioCalendarData)
+    else if (data && data.horarios && Array.isArray(data.horarios)) {
+      console.log('Detectados datos del formato antiguo HorarioCalendarData');
+      this.scheduleData = null; // Usar lógica antigua
+    }
+    else {
+      console.warn('Formato de datos no reconocido:', data);
+      this.scheduleData = null;
+    }
+  }
+
+  private loadCalendarData(): void {
+    console.log('CalendarViewHorario loadCalendarData - scheduleData:', this.scheduleData);
+    console.log('CalendarViewHorario loadCalendarData - componentData:', this.componentData);
+    
+    let events: EventInput[] = [];
+    
+    // Usar nuevo formato si está disponible
+    if (this.scheduleData) {
+      events = this.transformScheduleToEvents();
+    } 
+    // Usar formato antiguo como fallback
+    else if ((this.componentData as HorarioCalendarData)?.horarios) {
+      events = this.transformHorariosToEvents();
+    }
+    else {
+      console.log('CalendarViewHorario - No hay datos válidos para mostrar');
       return;
     }
 
-    const events: EventInput[] = this.transformHorariosToEvents();
+    // Guardar eventos para cargar cuando el calendario esté listo
+    this.pendingEvents = events;
     
-    // Actualizar eventos del calendario
-    this.calendarOptions = {
-      ...this.calendarOptions,
-      events: events
-    };
-
-    // Si el calendario ya está inicializado, actualizar eventos
-    if (this.calendarComponent?.getApi) {
-      const calendarApi = this.calendarComponent.getApi();
-      console.log('CalendarViewHorario - Actualizando eventos en calendario existente');
-      calendarApi.removeAllEvents();
-      calendarApi.addEventSource(events);
-      console.log('CalendarViewHorario - Eventos actualizados en calendario');
+    // Si el calendario ya está inicializado y listo, cargar eventos inmediatamente
+    if (this.calendarReady && this.calendarComponent?.getApi()) {
+      this.loadEventsToCalendar();
     } else {
-      console.log('CalendarViewHorario - Calendario no inicializado aún, eventos se aplicarán en la inicialización');
+      console.log('CalendarViewHorario - Calendario no listo aún, eventos guardados como pendientes');
     }
+  }
+
+  /**
+   * Transformar datos del nuevo formato ScheduleResponseDto a eventos de calendario
+   */
+  private transformScheduleToEvents(): EventInput[] {
+    const events: EventInput[] = [];
+    
+    if (!this.scheduleData || !this.scheduleData.schedule) {
+      console.log('No hay schedule data para transformar');
+      return events;
+    }
+
+    console.log('Transformando schedule data:', this.scheduleData.schedule);
+
+    this.scheduleData.schedule.forEach((scheduleDay: ScheduleDayDto) => {
+      // Verificar si es fecha pasada
+      const fechaEvento = new Date(scheduleDay.date);
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      fechaEvento.setHours(0, 0, 0, 0);
+      const esFechaPasada = fechaEvento < hoy;
+
+      // Determinar si es día libre
+      const esDiaLibre = scheduleDay.inTime === '--:--' || scheduleDay.outTime === '--:--' || scheduleDay.workTimeDurationMinutes === 0;
+
+      // Crear evento para este día
+      events.push({
+        id: `schedule-${scheduleDay.date}`,
+        title: esDiaLibre ? 'Día Libre' : `${scheduleDay.inTime} - ${scheduleDay.outTime}`,
+        start: scheduleDay.date.split('T')[0], // Solo la fecha, sin la hora
+        allDay: true,
+        backgroundColor: this.getScheduleEventColor(scheduleDay, esFechaPasada, esDiaLibre),
+        borderColor: this.getScheduleEventBorderColor(scheduleDay, esFechaPasada, esDiaLibre),
+        textColor: this.getScheduleEventTextColor(scheduleDay, esFechaPasada, esDiaLibre),
+        extendedProps: {
+          scheduleDay: scheduleDay,
+          fecha: fechaEvento,
+          esFechaPasada: esFechaPasada,
+          esDiaLibre: esDiaLibre,
+          dayName: scheduleDay.dayName
+        }
+      });
+    });
+
+    console.log('Eventos generados desde schedule:', events);
+    return events;
+  }
+
+  /**
+   * Colores para eventos basados en ScheduleDayDto
+   */
+  private getScheduleEventColor(scheduleDay: ScheduleDayDto, esFechaPasada: boolean, esDiaLibre: boolean): string {
+    if (esFechaPasada) return '#e5e7eb'; // gris para fechas pasadas
+    if (esDiaLibre) return '#f3f4f6'; // gris claro para días libres
+    if (scheduleDay.isException) return '#fed7aa'; // naranja para excepciones
+    return '#dbeafe'; // azul para horarios normales
+  }
+
+  private getScheduleEventBorderColor(scheduleDay: ScheduleDayDto, esFechaPasada: boolean, esDiaLibre: boolean): string {
+    if (esFechaPasada) return '#9ca3af';
+    if (esDiaLibre) return '#d1d5db';
+    if (scheduleDay.isException) return '#fb923c';
+    return '#3b82f6';
+  }
+
+  private getScheduleEventTextColor(scheduleDay: ScheduleDayDto, esFechaPasada: boolean, esDiaLibre: boolean): string {
+    if (esFechaPasada) return '#6b7280';
+    if (esDiaLibre) return '#9ca3af';
+    if (scheduleDay.isException) return '#ea580c';
+    return '#1e40af';
   }
 
   private transformHorariosToEvents(): EventInput[] {
     const events: EventInput[] = [];
-    const horarios = this.componentData?.horarios || [];
+    const horarios = (this.componentData as HorarioCalendarData)?.horarios || [];
     
     console.log('CalendarViewHorario - transformHorariosToEvents - horarios:', horarios);
     console.log('CalendarViewHorario - transformHorariosToEvents - componentData:', this.componentData);
     
     // Obtener rango de fechas
-    const fechaInicio = this.componentData?.fecha_ini ? new Date(this.componentData.fecha_ini) : new Date();
-    const fechaFin = this.componentData?.fecha_fin ? new Date(this.componentData.fecha_fin) : this.getEndOfYear();
+    const oldData = this.componentData as HorarioCalendarData;
+    const fechaInicio = oldData?.fecha_ini ? new Date(oldData.fecha_ini) : new Date();
+    const fechaFin = oldData?.fecha_fin ? new Date(oldData.fecha_fin) : this.getEndOfYear();
     
     console.log('CalendarViewHorario - fechaInicio:', fechaInicio);
     console.log('CalendarViewHorario - fechaFin:', fechaFin);
@@ -130,7 +237,7 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
       const dayOfWeek = currentDate.getDay(); // 0 = Domingo, 1 = Lunes, etc.
       
       // Buscar horario para este día de la semana
-      const horarioDelDia = horarios.find(h => h.dayIndex === dayOfWeek);
+      const horarioDelDia = horarios.find((h: any) => h.dayIndex === dayOfWeek);
       
       if (horarioDelDia) {
         // Verificar si es fecha pasada
@@ -358,7 +465,86 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
   }
 
   getExceptionsCount(): number {
-    if (!this.componentData?.horarios) return 0;
-    return this.componentData.horarios.filter(h => h.hasException).length;
+    // Usar nuevo formato si está disponible
+    if (this.scheduleData?.schedule) {
+      return this.scheduleData.schedule.filter(s => s.isException).length;
+    }
+    // Formato antiguo
+    if ((this.componentData as HorarioCalendarData)?.horarios) {
+      return (this.componentData as HorarioCalendarData).horarios!.filter(h => h.hasException).length;
+    }
+    return 0;
+  }
+
+  // Métodos para obtener información del empleado (compatibles con ambos formatos)
+  getEmployeeName(): string {
+    if (this.scheduleData) {
+      return this.scheduleData.fullNameEmployee || 'Empleado';
+    }
+    return (this.componentData as HorarioCalendarData)?.employeeName || 'Empleado';
+  }
+
+  getTurnoInfo(): string {
+    if (this.scheduleData) {
+      return this.scheduleData.shiftInfo?.alias || 'No definido';
+    }
+    return (this.componentData as HorarioCalendarData)?.turno?.alias || 'No definido';
+  }
+
+  getDateRange(): string {
+    if (this.scheduleData) {
+      const start = new Date(this.scheduleData.queryRange.startDate).toLocaleDateString('es-ES');
+      const end = new Date(this.scheduleData.queryRange.endDate).toLocaleDateString('es-ES');
+      return `${start} - ${end}`;
+    }
+    
+    const oldData = this.componentData as HorarioCalendarData;
+    if (oldData?.fecha_ini && oldData?.fecha_fin) {
+      const start = new Date(oldData.fecha_ini).toLocaleDateString('es-ES');
+      const end = new Date(oldData.fecha_fin).toLocaleDateString('es-ES');
+      return `${start} - ${end}`;
+    }
+    
+    return 'No definido';
+  }
+
+  getTotalSchedulesCount(): number {
+    // Usar nuevo formato si está disponible
+    if (this.scheduleData?.schedule) {
+      return this.scheduleData.schedule.length;
+    }
+    // Formato antiguo
+    if ((this.componentData as HorarioCalendarData)?.horarios) {
+      return (this.componentData as HorarioCalendarData).horarios!.length;
+    }
+    return 0;
+  }
+
+  // Callback cuando FullCalendar está completamente inicializado
+  handleViewDidMount(mountInfo: any): void {
+    console.log('CalendarViewHorario - Vista del calendario montada, calendario listo');
+    this.calendarReady = true;
+    
+    // Si hay eventos pendientes, cargarlos ahora
+    if (this.pendingEvents.length > 0) {
+      console.log('CalendarViewHorario - Cargando eventos pendientes:', this.pendingEvents.length);
+      this.loadEventsToCalendar();
+    }
+  }
+
+  // Método para cargar eventos al calendario
+  private loadEventsToCalendar(): void {
+    if (this.calendarComponent?.getApi && this.pendingEvents.length > 0) {
+      const calendarApi = this.calendarComponent.getApi();
+      console.log('CalendarViewHorario - Cargando eventos al calendario:', this.pendingEvents.length);
+      
+      // Limpiar eventos existentes
+      calendarApi.removeAllEvents();
+      
+      // Agregar nuevos eventos
+      calendarApi.addEventSource(this.pendingEvents);
+      
+      console.log('CalendarViewHorario - Eventos cargados exitosamente');
+    }
   }
 }

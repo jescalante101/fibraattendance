@@ -3,6 +3,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AttendanceService } from '../../../../../core/services/attendance.service';
 import { ShiftsService, ScheduleExceptionRegister, HorarioShift } from '../../../../../core/services/shifts.service';
 import { ToastService } from '../../../../../shared/services/toast.service';
+import { HeaderConfig } from 'src/app/core/services/header-config.service';
+import { HeaderConfigService } from '../../../../../core/services/header-config.service';
+import { TimeIntervalService } from 'src/app/core/services/time-interval.service';
+import { AuthService } from '../../../../../core/services/auth.service';
+import { TimeIntervalDetailDto } from 'src/app/core/models/att-time-interval-responde.model';
 
 @Component({
   selector: 'app-modal-registrar-excepcion',
@@ -20,32 +25,56 @@ export class ModalRegistrarExcepcionComponent implements OnInit {
   selectedHorario: any = null;
 
   // Datos del horario seleccionado (viene del componente padre)
-  selectedHorarioShift!: HorarioShift;
+  selectedHorarioShift!: TimeIntervalDetailDto;
   employeeData: any;
+  selectedDateInfo: any;
+  
+  // Horario actual del empleado (basado en scheduleId)
+  currentSchedule: any = null;
+
+  //header configuration
+  headerConfig: any =null;
+  //login user
+  usernameLogin:any;
+
+
 
   constructor(
     private fb: FormBuilder,
-    private attendanceService: AttendanceService,
     private shiftsService: ShiftsService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private headerConfigService:HeaderConfigService,
+    private timeIntervalService:TimeIntervalService,
+    private authService:AuthService
+
   ) {}
 
   ngOnInit(): void {
     console.log('Modal Registrar Excepción - data:', this.data);
     
-    // Extraer datos del horario seleccionado
-    this.selectedHorarioShift = this.data?.horario;
+    // Extraer datos del horario y fecha seleccionada
+    this.selectedDateInfo = this.data?.horario;
+    this.selectedHorarioShift = this.selectedDateInfo?.scheduleDay;
     this.employeeData = this.data?.employeeData;
     
+    console.log('selectedDateInfo:', this.selectedDateInfo);
     console.log('selectedHorarioShift:', this.selectedHorarioShift);
     console.log('employeeData:', this.employeeData);
     console.log('employeeId capturado:', this.employeeData?.employeeId);
+    console.log('fecha seleccionada:', this.selectedDateInfo?.date);
+    console.log('scheduleId desde calendar:', this.employeeData?.scheduleId);
+    console.log('scheduleId desde scheduleDay:', this.selectedHorarioShift?.id);
     
     // Inicializar selectedHorario como null explícitamente
     this.selectedHorario = null;
     
+    // Inicializar headerConfig ANTES de cargar horarios
+    this.headerConfig = this.headerConfigService.getCurrentHeaderConfig();
+    console.log('headerConfig:', this.headerConfig);
+    
     this.initializeForm();
     this.loadHorarios();
+    this.loadUserLogin();
   }
 
   initializeForm(): void {
@@ -55,12 +84,37 @@ export class ModalRegistrarExcepcionComponent implements OnInit {
     });
   }
 
+  loadUserLogin(){
+   const user=this.authService.getCurrentUser();
+   if(user){
+    this.usernameLogin=user.username;
+   }
+  }
+
+
   loadHorarios(): void {
     this.loading = true;
-    this.attendanceService.getHorarios(1, 100).subscribe({
+    
+    // Obtener companyId igual que en horario.component.ts
+    const header = this.headerConfigService.getCurrentHeaderConfig();
+    const companyId = header?.selectedEmpresa?.companiaId || '';
+    console.log('header:', header);
+    console.log('companyId:', companyId);
+
+    if (!companyId) {
+      this.toastService.error('Error', 'No se pudo obtener la información de la compañía');
+      this.loading = false;
+      return;
+    }
+    
+    this.timeIntervalService.getTimeIntervals(companyId, 1, 100).subscribe({
       next: (response) => {
         console.log('Horarios cargados:', response);
+        console.log('Estructura de un horario:', response.data?.[0]);
         this.horarios = response.data || response || [];
+        
+        // Buscar el horario actual del empleado basado en scheduleId
+        this.findCurrentSchedule();
         
         // Pre-seleccionar el horario actual si existe coincidencia por hora
         this.preselectCurrentSchedule();
@@ -74,19 +128,47 @@ export class ModalRegistrarExcepcionComponent implements OnInit {
     });
   }
 
+  findCurrentSchedule(): void {
+    const scheduleId = this.employeeData?.scheduleId;
+    console.log('Buscando horario actual con scheduleId:', scheduleId);
+    
+    if (scheduleId && this.horarios.length > 0) {
+      this.currentSchedule = this.horarios.find(h => h.id === scheduleId);
+      console.log('Horario actual encontrado:', this.currentSchedule);
+      
+      if (!this.currentSchedule) {
+        console.warn('No se encontró horario con scheduleId:', scheduleId);
+      }
+    } else {
+      console.warn('No se puede buscar horario actual - scheduleId o horarios faltantes');
+    }
+  }
+
   preselectCurrentSchedule(): void {
-    if (this.selectedHorarioShift?.inTime && this.horarios.length > 0) {
-      const currentHour = this.selectedHorarioShift.inTime;
+    // Si encontramos el horario actual, lo pre-seleccionamos
+    if (this.currentSchedule) {
+      this.selectedHorario = this.currentSchedule;
+      this.exceptionForm.patchValue({
+        timeIntervalId: this.currentSchedule.id
+      });
+      console.log('Horario actual pre-seleccionado:', this.currentSchedule);
+      return;
+    }
+    
+    // Fallback: buscar por hora si no se encontró por ID
+    if (this.selectedHorarioShift?.formattedStartTime && this.horarios.length > 0) {
+      const currentHour = this.selectedHorarioShift.formattedStartTime;
       const matchingHorario = this.horarios.find(h => 
-        h.horaEntrada === currentHour || 
-        this.formatHora(h.horaEntrada) === this.formatHora(currentHour)
+        h.formattedStartTime === currentHour || 
+        this.formatHora(h.formattedStartTime) === this.formatHora(currentHour)
       );
       
       if (matchingHorario) {
         this.selectedHorario = matchingHorario;
         this.exceptionForm.patchValue({
-          timeIntervalId: matchingHorario.idHorio
+          timeIntervalId: matchingHorario.id
         });
+        console.log('Horario pre-seleccionado por coincidencia de hora:', matchingHorario);
       }
     }
   }
@@ -94,7 +176,7 @@ export class ModalRegistrarExcepcionComponent implements OnInit {
   onHorarioSelect(horario: any): void {
     this.selectedHorario = horario;
     this.exceptionForm.patchValue({
-      timeIntervalId: horario.idHorio
+      timeIntervalId: horario.id
     });
   }
 
@@ -115,6 +197,14 @@ export class ModalRegistrarExcepcionComponent implements OnInit {
     return `${horas}h ${mins}m`;
   }
 
+  calculateDayIndex(selectedDate: Date): number {
+    // El dayIndex representa el día de la semana (1 = Lunes, 7 = Domingo)
+    const dayOfWeek = selectedDate.getDay();
+    // JavaScript getDay() retorna 0 = Domingo, 1 = Lunes, etc.
+    // Convertimos a formato donde 1 = Lunes, 7 = Domingo
+    return dayOfWeek === 0 ? 7 : dayOfWeek;
+  }
+
   onSubmit(): void {
     if (this.exceptionForm.valid) {
       this.loading = true;
@@ -123,17 +213,24 @@ export class ModalRegistrarExcepcionComponent implements OnInit {
       console.log('- employeeId:', this.employeeData?.employeeId);
       console.log('- assignmentId:', this.employeeData?.assignmentId);
       console.log('- employeeName:', this.employeeData?.employeeName);
+      console.log('- scheduleId (horario actual):', this.employeeData?.scheduleId || this.selectedHorarioShift?.id);
+      console.log('- selectedHorario (nuevo horario):', this.selectedHorario);
+      console.log('- timeIntervalId from form (nuevo):', this.exceptionForm.value.timeIntervalId);
+      
+      // Obtener la fecha seleccionada desde el calendario
+      const selectedDate = this.selectedDateInfo?.date || new Date();
+      const dayIndex = this.calculateDayIndex(selectedDate);
       
       const exceptionData: ScheduleExceptionRegister = {
         employeeId: this.employeeData?.employeeId || '',
         assignmentId: this.employeeData?.assignmentId || 0,
-        exceptionDate: new Date(this.selectedHorarioShift.dayDate),
-        dayIndex: this.selectedHorarioShift.dayIndex,
+        exceptionDate: selectedDate,
+        dayIndex: dayIndex,
         timeIntervalId: parseInt(this.exceptionForm.value.timeIntervalId),
         exceptionType: 1,
-        startDate: new Date(this.selectedHorarioShift.dayDate),
+        startDate: selectedDate,
         remarks: this.exceptionForm.value.remarks,
-        createdBy: 'Huali'
+        createdBy: this.usernameLogin
       };
 
       console.log('Registrando excepción:', exceptionData);

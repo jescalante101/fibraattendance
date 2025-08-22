@@ -8,6 +8,8 @@ import { ScheduleResponseDto, ScheduleDayDto } from 'src/app/core/models/schedul
 import { ScheduleService } from 'src/app/core/services/schedule.service';
 import { finalize } from 'rxjs';
 import { ToastService } from 'src/app/shared/services/toast.service';
+import { ModalService } from 'src/app/shared/modal/modal.service';
+import { ModalRegistrarExcepcionComponent } from '../modal-registrar-excepcion/modal-registrar-excepcion.component';
 
 // Se mantiene la interfaz por si se usa en otro lado, pero el componente priorizará ScheduleResponseDto
 export interface HorarioCalendarData {
@@ -76,7 +78,9 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
 
   constructor(
     private scheduleService: ScheduleService, // Inyectamos el servicio para hacer peticiones
-    private toastService: ToastService
+    private toastService: ToastService,
+    private modalService: ModalService
+
   ) {}
 
   ngOnInit(): void {
@@ -423,6 +427,28 @@ ${schedule.alias ? 'Alias: ' + schedule.alias : ''}
    */
   addException(): void {
     if (!this.selectedDateInfo) return;
+
+    console.log('selectedDateInfo para excepción:', this.selectedDateInfo);
+    console.log('scheduleDay con scheduleId:', this.selectedDateInfo.scheduleDay);
+
+    const modalData = {
+      horario: this.selectedDateInfo,
+      employeeData: {
+        employeeId: this.componentData?.employeeId || this.data?.employeeId,
+        employeeName: this.componentData?.fullNameEmployee || this.data?.employeeName,
+        assignmentId: this.componentData?.assignmentId || this.data?.assignmentId,
+        scheduleId: this.selectedDateInfo.scheduleDay?.scheduleId // Nuevo campo agregado
+      }
+    };
+
+    this.modalService.open({
+      title: 'Registrar Excepción de Horario',
+      componentType: ModalRegistrarExcepcionComponent,
+      componentData: modalData,
+      width: '900px',
+      height: 'auto'
+    });
+
     
     console.log('Agregando excepción para:', this.selectedDateInfo.dateStr);
     

@@ -8,7 +8,7 @@
     </div>
     <div>
       <h6 class="text-xl font-bold text-gray-900">Registrar Excepción de Horario</h6>
-      <p class="text-sm text-gray-600">{{ employeeData?.employeeName || 'Empleado' }} - {{ selectedHorarioShift.dayName }}</p>
+      <p class="text-sm text-gray-600">{{ employeeData?.employeeName || 'Empleado' }} - {{ selectedDateInfo?.dateStr | date:'fullDate':'':'es-ES' }}</p>
     </div>
   </div>
 
@@ -17,15 +17,24 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
       <div>
         <span class="font-medium text-orange-900">Día:</span>
-        <span class="text-orange-800 ml-2">{{ selectedHorarioShift!.dayName }}</span>
+        <span class="text-orange-800 ml-2">{{ selectedDateInfo?.date | date:'EEEE':'':'es-ES' }}</span>
       </div>
       <div>
         <span class="font-medium text-orange-900">Fecha:</span>
-        <span class="text-orange-800 ml-2">{{ selectedHorarioShift.dayDate | date:'dd/MM/yyyy' }}</span>
+        <span class="text-orange-800 ml-2">{{ selectedDateInfo?.date | date:'dd/MM/yyyy' }}</span>
       </div>
       <div>
         <span class="font-medium text-orange-900">Horario Actual:</span>
-        <span class="text-orange-800 ml-2">{{ selectedHorarioShift.inTime }} - {{ selectedHorarioShift.outTime }}</span>
+        <span class="text-orange-800 ml-2">
+          <ng-container *ngIf="currentSchedule; else fallbackSchedule">
+            {{ currentSchedule.formattedStartTime }} - {{ currentSchedule.scheduledEndTime }}
+            <span class="text-xs text-orange-600 ml-1">({{ currentSchedule.alias }})</span>
+          </ng-container>
+          <ng-template #fallbackSchedule>
+            {{ selectedHorarioShift?.formattedStartTime || 'Sin horario' }}
+            <span *ngIf="selectedHorarioShift?.formattedStartTime && selectedHorarioShift?.scheduledEndTime"> - {{ selectedHorarioShift?.scheduledEndTime }}</span>
+          </ng-template>
+        </span>
       </div>
     </div>
   </div>
@@ -55,18 +64,18 @@
             <div 
               *ngFor="let horario of horarios" 
               (click)="onHorarioSelect(horario)"
-              [class]="'p-3 cursor-pointer border-b border-gray-100 hover:bg-blue-50 transition-colors ' + (selectedHorario && selectedHorario.idHorio && selectedHorario.idHorio === horario.idHorio ? 'bg-blue-100 border-blue-300' : '')">
+              [class]="'p-3 cursor-pointer border-b border-gray-100 hover:bg-blue-50 transition-colors ' + (selectedHorario && selectedHorario.id && selectedHorario.id === horario.id ? 'bg-blue-100 border-blue-300' : '')">
               <div class="flex items-center justify-between">
                 <div>
-                  <div class="font-medium text-gray-900">{{ horario.nombre || 'Horario ' + horario.idHorio }}</div>
+                  <div class="font-medium text-gray-900">{{ horario.alias || 'Horario ' + horario.id }}</div>
                   <div class="text-sm text-gray-600">
-                    {{ horario.horaEntrada }} - {{ horario.horaSalida }}
+                    {{ horario.formattedStartTime }} - {{ horario.scheduledEndTime }}
                   </div>
                   <div class="text-xs text-gray-500">
-                    Duración: {{ formatDuracion(horario.tiempoTrabajo) }}
+                    Duración: {{ formatDuracion(horario.totalDurationMinutes) }}
                   </div>
                 </div>
-                <div *ngIf="selectedHorario && selectedHorario.idHorio && selectedHorario.idHorio === horario.idHorio" class="text-blue-600">
+                <div *ngIf="selectedHorario && selectedHorario.id && selectedHorario.id === horario.id" class="text-blue-600">
                   <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                   </svg>
@@ -133,7 +142,16 @@
         <!-- Horario actual -->
         <div class="mb-3 p-3 bg-red-50 border border-red-200 rounded">
           <div class="text-sm font-medium text-red-800">Horario Actual</div>
-          <div class="text-red-700">{{ selectedHorarioShift.inTime }} - {{ selectedHorarioShift.outTime }}</div>
+          <div class="text-red-700">
+            <ng-container *ngIf="currentSchedule; else fallbackCurrentSchedule">
+              {{ currentSchedule.formattedStartTime }} - {{ currentSchedule.scheduledEndTime }}
+              <div class="text-xs text-red-600 mt-1">{{ currentSchedule.alias }}</div>
+            </ng-container>
+            <ng-template #fallbackCurrentSchedule>
+              {{ selectedHorarioShift?.formattedStartTime || 'Sin horario' }}
+              <span *ngIf="selectedHorarioShift?.formattedStartTime && selectedHorarioShift?.scheduledEndTime"> - {{ selectedHorarioShift?.scheduledEndTime }}</span>
+            </ng-template>
+          </div>
         </div>
         
         <!-- Flecha -->
@@ -146,8 +164,8 @@
         <!-- Nuevo horario -->
         <div *ngIf="selectedHorario" class="p-3 bg-green-50 border border-green-200 rounded">
           <div class="text-sm font-medium text-green-800">Nuevo Horario</div>
-          <div class="text-green-700">{{ selectedHorario.horaEntrada }} - {{ selectedHorario.horaSalida }}</div>
-          <div class="text-xs text-green-600">{{ selectedHorario.nombre }}</div>
+          <div class="text-green-700">{{ selectedHorario.formattedStartTime }} - {{ selectedHorario.scheduledEndTime }}</div>
+          <div class="text-xs text-green-600">{{ selectedHorario.alias }}</div>
         </div>
         
         <div *ngIf="!selectedHorario" class="p-3 bg-gray-100 border border-gray-200 rounded text-center text-gray-500">
@@ -164,16 +182,20 @@
             <span class="text-blue-900 font-medium">1 (Cambio de horario)</span>
           </div>
           <div class="flex justify-between">
+            <span class="text-blue-700">Horario actual ID:</span>
+            <span class="text-blue-900 font-medium">{{ employeeData?.scheduleId || '--' }}</span>
+          </div>
+          <div class="flex justify-between">
             <span class="text-blue-700">Creado por:</span>
-            <span class="text-blue-900 font-medium">Hauali</span>
+            <span class="text-blue-900 font-medium">{{ usernameLogin || '--' }}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-blue-700">Fecha de inicio:</span>
-            <span class="text-blue-900 font-medium">{{ selectedHorarioShift.dayDate | date:'dd/MM/yyyy' }}</span>
+            <span class="text-blue-900 font-medium">{{ selectedDateInfo?.date | date:'dd/MM/yyyy' }}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-blue-700">Índice del día:</span>
-            <span class="text-blue-900 font-medium">{{ selectedHorarioShift.dayIndex }}</span>
+            <span class="text-blue-900 font-medium">{{ selectedDateInfo?.date ? calculateDayIndex(selectedDateInfo.date) : 1 }}</span>
           </div>
         </div>
       </div>

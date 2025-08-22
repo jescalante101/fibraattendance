@@ -27,6 +27,7 @@ export interface ScheduleDayDto {
   inTime: string;  // Formatted as "HH:mm" or "--:--"
   outTime: string; // Formatted as "HH:mm" or "--:--"
   workTimeDurationMinutes: number;
+  scheduleId: number;
   duration: number;
   isException: boolean;
 }

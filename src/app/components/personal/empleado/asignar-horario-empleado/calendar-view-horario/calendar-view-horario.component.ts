@@ -158,7 +158,12 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
    * Transforma los datos del API en eventos que FullCalendar puede renderizar.
    */
   private transformScheduleToEvents(scheduleDays: ScheduleDayDto[]): EventInput[] {
-    return scheduleDays.map((scheduleDay: ScheduleDayDto) => {
+    return scheduleDays
+      .filter((scheduleDay: ScheduleDayDto) => {
+        // Filtrar días con "Sin Asignación" para mostrar celdas vacías
+        return scheduleDay.alias !== "Sin Asignación";
+      })
+      .map((scheduleDay: ScheduleDayDto) => {
       const fechaEvento = new Date(scheduleDay.date);
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
@@ -359,7 +364,10 @@ Duración: ${duracion}`;
   }
 
   getTotalSchedulesCount(): number {
-    return this.scheduleData?.schedule?.length || 0;
+    if (!this.scheduleData?.schedule) return 0;
+    
+    // Contar solo los días que tienen horario real (no "Sin Asignación")
+    return this.scheduleData.schedule.filter(s => s.alias !== "Sin Asignación").length;
   }
 
   getExceptionsCount(): number {

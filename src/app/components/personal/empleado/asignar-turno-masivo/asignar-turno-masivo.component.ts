@@ -159,7 +159,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
 
   private cargarDatosIniciales(): void {
     this.datosListos = false;
-    
+    const companiaId = this.headerConfig?.selectedEmpresa?.companiaId || '01';
     // Usar el nuevo servicio para obtener sedes y áreas
     this.appUserService.getSedesAreas(
       this.idUser
@@ -171,7 +171,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         this.sedes = sedesAreas.map(sede => ({
           categoriaAuxiliarId: sede.siteId,
           descripcion: sede.siteName,
-          companiaId: '01', // Valor por defecto
+          companiaId: companiaId, // Valor por defecto
           codigoAuxiliar: sede.siteId // Usar el siteId como código auxiliar
         }));
         

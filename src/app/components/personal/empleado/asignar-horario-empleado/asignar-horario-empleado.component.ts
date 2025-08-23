@@ -20,6 +20,8 @@ import { createFioriGridOptions } from 'src/app/shared/ag-grid-theme-fiori';
 import { ColumnManagerConfig, ColumnConfig, ColumnChangeEvent } from 'src/app/shared/column-manager/column-config.interface';
 import { ToastService } from 'src/app/shared/services/toast.service';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
+import { AuthService, User } from 'src/app/core/services/auth.service';
+import { AppUserService, SedeArea } from 'src/app/core/services/app-user.services';
 
 @Component({
   selector: 'app-asignar-horario-empleado',
@@ -35,7 +37,9 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
     private shiftService: ShiftsService,
     private modalService:ModalService,
     private toastService:ToastService,
-    private scheduleService: ScheduleService
+    private scheduleService: ScheduleService,
+    private appUserService: AppUserService,
+    private authService: AuthService
   ) { }
 
   filtro = '';
@@ -132,15 +136,32 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
 
   currentFilters: FilterState = {};
 
+  user:any;
+
+  sedesAreas: SedeArea[] = [];
+
   ngOnInit(): void {
     this.setupGenericFilter();
     this.setupAgGrid();
-    this.cargarAsignaciones();
+    this.cargarAsignaciones();   
   }
+
+
 
   cargarAsignaciones() {
     this.loading = true;
-    this.employeeScheduleAssignmentService.getEmployeeScheduleAssignments(this.pageNumber, this.pageSize, this.filtro, this.startDate, this.endDate)
+
+    //recuperamos la sede 
+     const userna = this.authService.getCurrentUser();
+   if(userna){
+    this.appUserService.getSedesAreas(userna.id).subscribe({
+      next: (sedesAreas) => {
+        this.sedesAreas = sedesAreas;
+        console.log('sedesAreas',sedesAreas);
+        let locationId = sedesAreas.map(item => item.siteId);
+        console.log('locationId',locationId);
+       if(locationId.length > 0){
+         this.employeeScheduleAssignmentService.getEmployeeScheduleAssignments(this.pageNumber, this.pageSize, this.filtro, this.startDate, this.endDate,locationId)
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: (res) => {
@@ -176,6 +197,23 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
           }
         }
       });
+       }
+        
+      },
+      error: (err) => {
+        this.loading = false;
+        this.toastService.info('Error cargando sedes:', err);
+        this.employees = [];
+        this.totalCount = 0;
+        if (this.gridApi) {
+          this.gridApi.setRowData([]);
+        }
+        console.error('Error cargando sedes:', err);
+      }
+    })  
+   }
+    
+   
   }
 
   getHorario(empleado: EmployeeScheduleAssignment) {
@@ -616,11 +654,7 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
         resizable: false,
         cellRenderer: (params: any) => {
           return `<div class="flex items-center justify-center space-x-1 h-full">
-            <button class="horario-btn inline-flex items-center px-2 py-1 text-xs bg-fiori-info text-white rounded-lg hover:bg-blue-700 transition-colors" title="Ver Horario">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </button>
+          
             <button class="calendar-btn inline-flex items-center px-2 py-1 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors" title="Ver Calendario">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5a2.25 2.25 0 0 1 21 9v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"></path>

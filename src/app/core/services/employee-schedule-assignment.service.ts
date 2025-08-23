@@ -94,13 +94,14 @@ export class EmployeeScheduleAssignmentService {
 
   constructor(private http: HttpClient) { }
 
-  getEmployeeScheduleAssignments(page = 1, pageSize = 15, filter = '',startDate = '',endDate = ''): Observable<ApiResponse<EmployeeScheduleAssignment>> {
+  getEmployeeScheduleAssignments(page = 1, pageSize = 15, filter = '',startDate = '',endDate = '',locationId = [] as string[]): Observable<ApiResponse<EmployeeScheduleAssignment>> {
     const params = new HttpParams()
       .set('pageNumber', page)
       .set('pageSize', pageSize)
       .set('searchText', filter)
       .set('startDate', startDate)
-      .set('endDate', endDate);
+      .set('endDate', endDate)
+      .set('locationId', locationId.join(','))
 
     return this.http.get<ApiResponse<EmployeeScheduleAssignment>>(`${this.apiUrl}api/employee-schedule-assignment/search`, { params });
   }

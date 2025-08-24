@@ -10,6 +10,7 @@ import { finalize } from 'rxjs';
 import { ToastService } from 'src/app/shared/services/toast.service';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { ModalRegistrarExcepcionComponent } from '../modal-registrar-excepcion/modal-registrar-excepcion.component';
+import { ShiftsService } from 'src/app/core/services/shifts.service';
 
 // Se mantiene la interfaz por si se usa en otro lado, pero el componente priorizará ScheduleResponseDto
 export interface HorarioCalendarData {
@@ -79,7 +80,9 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
   constructor(
     private scheduleService: ScheduleService, // Inyectamos el servicio para hacer peticiones
     private toastService: ToastService,
-    private modalService: ModalService
+    private modalService: ModalService,
+    private shiftService: ShiftsService
+
 
   ) {}
 
@@ -471,16 +474,24 @@ ${schedule.alias ? 'Alias: ' + schedule.alias : ''}
   removeException(): void {
     if (!this.selectedDateInfo?.isException) return;
     
-    console.log('Eliminando excepción para:', this.selectedDateInfo.dateStr);
+    console.log('Eliminando excepción para:', this.selectedDateInfo.scheduleDay);
     
     // Aquí harías la llamada al API para eliminar la excepción
-    this.toastService.success('Excepción Eliminada', 'La excepción ha sido eliminada exitosamente');
-    this.closeContextMenu();
-    
-    // Refrescar eventos del calendario
-    if (this.calendarComponent?.getApi()) {
-      this.calendarComponent.getApi().refetchEvents();
-    }
+    this.shiftService.removerExeption(this.selectedDateInfo.scheduleDay.scheduleId).subscribe({
+
+      next: () => {
+        this.toastService.success('Excepción Eliminada', 'La excepción ha sido eliminada exitosamente');
+        this.closeContextMenu();
+        
+        // Refrescar eventos del calendario
+        if (this.calendarComponent?.getApi()) {
+          this.calendarComponent.getApi().refetchEvents();
+        }
+      },
+      error: (error) => {
+        this.toastService.error('Error', 'Ocurrió un error al eliminar la excepción');
+      }
+    });
   }
 
   /**

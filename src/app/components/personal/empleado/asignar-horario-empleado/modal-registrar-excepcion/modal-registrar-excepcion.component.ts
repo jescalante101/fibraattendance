@@ -198,11 +198,11 @@ export class ModalRegistrarExcepcionComponent implements OnInit {
   }
 
   calculateDayIndex(selectedDate: Date): number {
-    // El dayIndex representa el día de la semana (1 = Lunes, 7 = Domingo)
+    // El dayIndex representa el día de la semana (1 = Lunes, 0 = Domingo)
     const dayOfWeek = selectedDate.getDay();
     // JavaScript getDay() retorna 0 = Domingo, 1 = Lunes, etc.
-    // Convertimos a formato donde 1 = Lunes, 7 = Domingo
-    return dayOfWeek === 0 ? 7 : dayOfWeek;
+    // Convertimos a formato donde 1 = Lunes, 0 = Domingo
+   return dayOfWeek
   }
 
   onSubmit(): void {

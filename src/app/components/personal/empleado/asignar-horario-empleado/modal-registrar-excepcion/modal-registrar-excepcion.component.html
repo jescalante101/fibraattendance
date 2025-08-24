@@ -21,7 +21,7 @@
     </div>
 
     <!-- Content Grid -->
-    <div *ngIf="!loading" class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div *ngIf="!loading" class="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
       
       <!-- Columna Izquierda: Lista de Horarios y Observaciones -->
       <div class="bg-white p-4 rounded-lg border border-gray-200">
@@ -35,7 +35,7 @@
 
         <form [formGroup]="exceptionForm" (ngSubmit)="onSubmit()">
           <!-- Lista de horarios -->
-          <div class="max-h-[350px] overflow-y-auto space-y-2 pr-2 mb-6">
+          <div class="max-h-[200px] sm:max-h-[250px] lg:max-h-[300px] overflow-y-auto space-y-2 pr-2 mb-4">
             <div *ngFor="let horario of horarios"
                  (click)="onHorarioSelect(horario)"
                  class="p-4 border rounded-lg cursor-pointer transition-all duration-200"
@@ -74,15 +74,13 @@
           </div>
 
           <!-- Campo de Observaciones -->
-          <div class="space-y-3">
+          <div class="space-y-2">
             <div class="flex items-center space-x-2">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="text-gray-700 w-5 h-5">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="text-gray-700 w-4 h-4">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
               </svg>
-              <h3 class="text-base font-semibold text-gray-800">Motivo del Cambio</h3>
+              <h3 class="text-sm font-semibold text-gray-800">Motivo del Cambio</h3>
             </div>
-            
-            <p class="text-sm text-gray-600">Especifica la razón del cambio de horario</p>
             
             <div class="space-y-2">
               <label class="block text-sm font-medium text-gray-700">
@@ -92,8 +90,8 @@
               <textarea
                 id="remarks"
                 formControlName="remarks"
-                rows="4"
-                class="block w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm p-3"
+                rows="3"
+                class="block w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm p-2"
                 placeholder="Ingrese el motivo del cambio de horario..."></textarea>
               
               <!-- Error del campo remarks -->
@@ -115,77 +113,64 @@
           Vista del Cambio
         </h3>
 
-        <div *ngIf="!selectedHorario" class="flex flex-col items-center justify-center h-full text-center text-gray-500 p-8 border-2 border-dashed rounded-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mb-2">
+        <div *ngIf="!selectedHorario" class="flex flex-col items-center justify-center text-center text-gray-500 p-6 border-2 border-dashed rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mb-2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
           </svg>
-          <p class="font-medium">Selecciona un horario</p>
-          <p class="text-sm">La vista previa del cambio aparecerá aquí.</p>
+          <p class="text-sm font-medium">Selecciona un horario</p>
+          <p class="text-xs">Vista previa aquí</p>
         </div>
 
-        <div *ngIf="selectedHorario" class="space-y-4">
+        <div *ngIf="selectedHorario" class="space-y-3">
           <!-- Resumen del cambio -->
-          <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <div class="text-sm font-medium text-blue-900 mb-2">Resumen del Cambio:</div>
-            <div class="text-sm text-blue-800 space-y-1">
-              <div>
-                Empleado: <strong>{{ employeeData?.employeeName || 'Empleado' }}</strong>
-              </div>
-              <div>
-                Fecha: <strong>{{ selectedDateInfo?.date | date:'dd/MM/yyyy' }}</strong>
-              </div>
-              <div>
-                Nuevo horario: <strong>{{ selectedHorario.alias }}</strong>
-              </div>
+          <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div class="text-xs font-medium text-blue-900 mb-1">Resumen:</div>
+            <div class="text-xs text-blue-800 space-y-0.5">
+              <div>{{ employeeData?.employeeName || 'Empleado' }} - {{ selectedDateInfo?.date | date:'dd/MM/yyyy' }}</div>
+              <div><strong>{{ selectedHorario.alias }}</strong></div>
             </div>
           </div>
 
-          <!-- Horario actual -->
-          <div class="p-4 bg-red-50 border-l-4 border-red-400 rounded-lg">
-            <div class="text-sm font-medium text-red-800 mb-2">Horario Actual</div>
-            <div class="text-xl font-bold text-red-700">
-              <ng-container *ngIf="currentSchedule; else fallbackCurrentSchedule">
-                {{ currentSchedule.formattedStartTime }} - {{ currentSchedule.scheduledEndTime }}
-                <div class="text-sm font-normal text-red-600 mt-1">{{ currentSchedule.alias }}</div>
-              </ng-container>
-              <ng-template #fallbackCurrentSchedule>
-                {{ selectedHorarioShift?.formattedStartTime || 'Sin horario' }}
-                <span *ngIf="selectedHorarioShift?.formattedStartTime && selectedHorarioShift?.scheduledEndTime"> - {{ selectedHorarioShift?.scheduledEndTime }}</span>
-              </ng-template>
+          <!-- Comparación de horarios - Compacto -->
+          <div class="bg-gray-50 rounded-lg p-3">
+            <!-- Horario actual -->
+            <div class="mb-2 p-2 bg-red-50 border-l-2 border-red-400 rounded">
+              <div class="text-xs font-medium text-red-800">Actual</div>
+              <div class="text-lg font-bold text-red-700">
+                <ng-container *ngIf="currentSchedule; else fallbackCurrentSchedule">
+                  {{ currentSchedule.formattedStartTime }} - {{ currentSchedule.scheduledEndTime }}
+                </ng-container>
+                <ng-template #fallbackCurrentSchedule>
+                  {{ selectedHorarioShift?.formattedStartTime || 'Sin horario' }}
+                  <span *ngIf="selectedHorarioShift?.formattedStartTime && selectedHorarioShift?.scheduledEndTime"> - {{ selectedHorarioShift?.scheduledEndTime }}</span>
+                </ng-template>
+              </div>
             </div>
-          </div>
 
-          <!-- Flecha de cambio -->
-          <div class="flex justify-center">
-            <div class="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full">
-              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Flecha pequeña -->
+            <div class="flex justify-center my-1">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
               </svg>
             </div>
+
+            <!-- Nuevo horario -->
+            <div class="p-2 bg-green-50 border-l-2 border-green-400 rounded">
+              <div class="text-xs font-medium text-green-800">Nuevo</div>
+              <div class="text-lg font-bold text-green-700">{{ selectedHorario.formattedStartTime }} - {{ selectedHorario.scheduledEndTime }}</div>
+              <div class="text-xs text-green-600">{{ selectedHorario.alias }}</div>
+            </div>
           </div>
 
-          <!-- Nuevo horario -->
-          <div class="p-4 bg-green-50 border-l-4 border-green-400 rounded-lg">
-            <div class="text-sm font-medium text-green-800 mb-2">Nuevo Horario</div>
-            <div class="text-xl font-bold text-green-700">{{ selectedHorario.formattedStartTime }} - {{ selectedHorario.scheduledEndTime }}</div>
-            <div class="text-sm text-green-600 mt-1">{{ selectedHorario.alias }}</div>
-            <div class="text-xs text-green-600 mt-1">Duración: {{ formatDuracion(selectedHorario.totalDurationMinutes) }}</div>
-          </div>
-
-          <!-- Alerta de Confirmación -->
-          <div class="p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 text-yellow-400">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                </svg>
-              </div>
-              <div class="ml-3">
-                <p class="text-sm">
-                  Este cambio aplicará <strong class="font-semibold">solo para el día {{ selectedDateInfo?.date | date:'dd/MM/yyyy' }}</strong>.
-                  El horario volverá a la normalidad al día siguiente.
-                </p>
-              </div>
+          <!-- Alerta compacta -->
+          <div class="p-2 bg-yellow-50 border-l-2 border-yellow-400 rounded">
+            <div class="flex items-start">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 text-yellow-500 mt-0.5 mr-2 flex-shrink-0">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+              </svg>
+              <p class="text-xs text-yellow-800">
+                Solo para <strong>{{ selectedDateInfo?.date | date:'dd/MM/yyyy' }}</strong>. Vuelve al horario normal el día siguiente.
+              </p>
             </div>
           </div>
         </div>

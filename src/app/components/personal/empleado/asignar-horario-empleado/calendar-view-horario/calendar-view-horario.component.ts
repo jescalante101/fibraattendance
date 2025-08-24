@@ -218,20 +218,66 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
 
   // --- Handlers de Eventos del Calendario ---
   handleEventClick(clickInfo: any): void {
+    // Prevenir la propagación del evento para evitar que se active dateClick
+    clickInfo.jsEvent.preventDefault();
+    clickInfo.jsEvent.stopPropagation();
+    
     const extendedProps = clickInfo.event.extendedProps;
-    if (extendedProps.esFechaPasada) {
-      this.toastService.info('Editar Horario', 'No se puede editar un horario de una fecha pasada.');
-      return;
+    
+    // Configurar información de la fecha seleccionada
+    this.selectedDateInfo = {
+      dateStr: clickInfo.event.startStr,
+      date: extendedProps.fecha,
+      hasSchedule: true,
+      isException: extendedProps.scheduleDay?.isException || false,
+      isPastDate: extendedProps.esFechaPasada,
+      scheduleDay: extendedProps.scheduleDay
+    };
+    
+    // Calcular posición del menú contextual basada en el evento clickeado
+    const rect = clickInfo.el.getBoundingClientRect();
+    this.contextMenuPosition = {
+      x: rect.left + (rect.width / 2) - 100, // Centrar horizontalmente
+      y: rect.bottom + 5 // Justo debajo del evento
+    };
+    
+    // Ajustar posición si se sale de la pantalla
+    const menuWidth = 200;
+    const menuHeight = 250;
+    
+    if (this.contextMenuPosition.x + menuWidth > window.innerWidth) {
+      this.contextMenuPosition.x = window.innerWidth - menuWidth - 10;
     }
-    this.editarHorario(extendedProps.scheduleDay, extendedProps.fecha);
+    if (this.contextMenuPosition.x < 10) {
+      this.contextMenuPosition.x = 10;
+    }
+    if (this.contextMenuPosition.y + menuHeight > window.innerHeight) {
+      this.contextMenuPosition.y = rect.top - menuHeight - 5; // Mostrar arriba
+    }
+    
+    // Mostrar menú contextual
+    this.showContextMenu = true;
   }
 
   handleDateClick(dateClickInfo: any): void {
-    console.log('Fecha clickeada:', dateClickInfo.dateStr);
+    // Verificar si es un clic directo en la celda (no en un evento)
+    const target = dateClickInfo.jsEvent.target as HTMLElement;
+    if (target.closest('.fc-event')) {
+      return;
+    }
     
     // Obtener información de la fecha clickeada
     const clickedDate = dateClickInfo.date;
     const dateStr = dateClickInfo.dateStr;
+    
+    // Buscar si existe un horario para esta fecha
+    const scheduleDay = this.findScheduleForDate(dateStr);
+    const hasSchedule = !!scheduleDay && scheduleDay.alias !== "Sin Asignación";
+    
+    // Solo mostrar menú si hay un horario asignado
+    if (!hasSchedule) {
+      return;
+    }
     
     // Determinar si es fecha pasada
     const hoy = new Date();
@@ -240,9 +286,6 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
     fechaComparar.setHours(0, 0, 0, 0);
     const isPastDate = fechaComparar < hoy;
     
-    // Buscar si existe un horario para esta fecha
-    const scheduleDay = this.findScheduleForDate(dateStr);
-    const hasSchedule = !!scheduleDay;
     const isException = scheduleDay?.isException || false;
     
     // Configurar información de la fecha seleccionada
@@ -325,11 +368,6 @@ Duración: ${duracion}`;
     return `${hours}h ${mins}m`;
   }
 
-  private editarHorario(scheduleDay: ScheduleDayDto, fecha: Date): void {
-    console.log('Editar horario:', scheduleDay, 'para fecha:', fecha);
-    this.toastService.info('Editar Horario', 'La funcionalidad de edición aún no está implementada.');
-    // Aquí se llamaría al modal de edición
-  }
 
   // --- Controles de Navegación ---
   previousMonth(): void {

@@ -16,6 +16,8 @@ export interface PersonalTransferDto {
   createdAt: string; // ISO datetime string
   updatedBy?: string | null;
   updatedAt?: string | null; // ISO datetime string
+  companyId: string | null;
+
 }
 
 export interface CreatePersonalTransferDto {
@@ -31,6 +33,8 @@ export interface CreatePersonalTransferDto {
   endDate?: string | null; // ISO date string
   observation?: string | null;
   createdBy: string;
+  companyId: string | null;
+
 }
 
 export interface UpdatePersonalTransferDto {

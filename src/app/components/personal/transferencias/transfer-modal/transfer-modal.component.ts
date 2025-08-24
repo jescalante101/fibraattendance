@@ -554,7 +554,8 @@ export class TransferModalComponent implements OnInit, OnDestroy {
       startDate: this.formData.startDate,
       endDate: this.formData.isPermanent ? null : this.formData.endDate,
       observation: this.formData.observations || null,
-      createdBy: this.currentUser?.username || 'Sistema'
+      createdBy: this.currentUser?.username || 'Sistema',
+      companyId: this.headerConfig?.selectedEmpresa?.companiaId || ''
     };
 
     this.personalTransferService.createPersonalTransfer(createData)

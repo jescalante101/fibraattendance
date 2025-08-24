@@ -11,7 +11,6 @@ import {
   AttTimeIntervalCreateDto, 
   AttTimeIntervalUpdateDto, 
   AttTimeIntervalDto,
-  BreakTimeDto 
 } from 'src/app/core/models/att-time-interval-responde.model';
 import { TimeIntervalSummary } from './util/calculate-summary';
 
@@ -291,13 +290,7 @@ export class NuevoHorarioRedesignComponent implements OnInit, OnDestroy {
       overtimeLv2Percentage: data.overtimeLv2Percentage,
       overtimeLv3: data.overtimeLv3,
       overtimeLv3Percentage: data.overtimeLv3Percentage,
-
-      /**
-       * recuperamos de 
-       *  punchInWindow: string;  // Ej: "07:00 - 10:00"
-       * punchOutWindow: string; // Ej: "16:00 - 20:00"
-       */
-
+      
       punchInStartTime: data.punchInWindow ? extractTimeFromDateTime(data.punchInWindow.split('-')[0].trim()) : '07:45',
       punchInEndTime: data.punchInWindow ? extractTimeFromDateTime(data.punchInWindow.split('-')[1].trim()) : '08:45',
       punchOutStartTime: data.punchOutWindow ? extractTimeFromDateTime(data.punchOutWindow.split('-')[0].trim()) : '16:45',

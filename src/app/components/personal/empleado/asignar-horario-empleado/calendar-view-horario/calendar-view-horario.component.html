@@ -17,7 +17,7 @@
         </div>
       </div>
 
-      <!-- Información del turno -->
+      <!-- Información del turno y estadísticas compactas -->
       <div class="text-right">
         <div class="text-sm font-medium text-gray-700">
           Turno: <span class="text-blue-600 font-semibold">{{ getTurnoInfo() }}</span>
@@ -25,33 +25,21 @@
         <div class="text-xs text-gray-500 mt-1">
           <span>{{ getDateRange() }}</span>
         </div>
-      </div>
-    </div>
-
-    <!-- Resumen de horarios -->
-    <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="bg-white rounded-lg p-3 border border-blue-200">
-        <div class="flex items-center space-x-2">
-          <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-          <span class="text-sm font-medium text-gray-700">Total Horarios</span>
+        <!-- Estadísticas compactas -->
+        <div class="flex items-center justify-end space-x-3 mt-2">
+          <div class="flex items-center space-x-1 text-xs text-gray-600">
+            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+            <span>{{ getTotalSchedulesCount() }} horarios</span>
+          </div>
+          <div class="flex items-center space-x-1 text-xs" 
+               [class.text-orange-600]="getExceptionsCount() > 0"
+               [class.text-gray-500]="getExceptionsCount() === 0">
+            <div class="w-2 h-2 rounded-full" 
+                 [class.bg-orange-500]="getExceptionsCount() > 0"
+                 [class.bg-gray-400]="getExceptionsCount() === 0"></div>
+            <span>{{ getExceptionsCount() }} excepciones</span>
+          </div>
         </div>
-        <p class="text-lg font-bold text-blue-600 mt-1">{{ getTotalSchedulesCount() }} configurado(s)</p>
-      </div>
-      
-      <div class="bg-white rounded-lg p-3 border border-orange-200">
-        <div class="flex items-center space-x-2">
-          <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
-          <span class="text-sm font-medium text-gray-700">Excepciones</span>
-        </div>
-        <p class="text-lg font-bold text-orange-600 mt-1">{{ getExceptionsCount() }} activa(s)</p>
-      </div>
-
-      <div class="bg-white rounded-lg p-3 border border-green-200">
-        <div class="flex items-center space-x-2">
-          <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-          <span class="text-sm font-medium text-gray-700">Estado</span>
-        </div>
-        <p class="text-lg font-bold text-green-600 mt-1">Activo</p>
       </div>
     </div>
   </div>

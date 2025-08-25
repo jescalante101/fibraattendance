@@ -362,27 +362,55 @@
           
           <!-- Master Switch para habilitar H.E. -->
           <label class="inline-flex items-center cursor-pointer" id="enableOvertimeSwitch">
-            <input type="checkbox" formControlName="overtimeLv" [value]="1" class="sr-only peer">
+            <input type="checkbox" formControlName="enableOvertime" class="sr-only peer">
             <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
             <span class="ms-3 text-sm font-medium text-gray-900">Habilitar cálculo</span>
           </label>
         </div>
 
         <!-- Panel de Configuración de H.E. (visible solo si está habilitado) -->
-        <div *ngIf="horarioForm.get('overtimeLv')?.value" class="space-y-6">
+        <div *ngIf="horarioForm.get('enableOvertime')?.value" class="space-y-6">
           
-          <!-- Umbral de activación -->
-          <div class="flex items-center space-x-4">
-            <label class="text-sm font-medium text-gray-700">Activar cómputo de H.E. después de:</label>
-            <div class="flex items-center space-x-2">
-              <input 
-                type="number" 
-                formControlName="minLateOut"
-                min="1"
-                class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                placeholder="15"
-              />
-              <span class="text-sm text-gray-500">minutos</span>
+          <!-- Reglas de Activación de H.E. -->
+          <div class="space-y-4">
+            <h4 class="text-sm font-semibold text-gray-800">Reglas de Activación</h4>
+            
+            <!-- H.E. por entrada temprana -->
+            <div class="border-l-4 border-blue-200 pl-4">
+              <label class="flex items-center" id="earlyInOvertimeCheckbox">
+                <input type="checkbox" formControlName="earlyInToggle" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span class="ml-2 text-sm text-gray-700 font-medium">Calcular H.E. por entrada temprana</span>
+              </label>
+              
+              <!-- Umbral de minutos para entrada temprana -->
+              <div *ngIf="horarioForm.get('earlyInToggle')?.value" class="mt-3 ml-6" id="minEarlyInThresholdInput">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Umbral de minutos para activar:</label>
+                <input 
+                  type="number" 
+                  formControlName="minEarlyIn" 
+                  class="block w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                  min="0" 
+                  placeholder="0">
+              </div>
+            </div>
+            
+            <!-- H.E. por salida tardía -->
+            <div class="border-l-4 border-orange-200 pl-4">
+              <label class="flex items-center" id="lateOutOvertimeCheckbox">
+                <input type="checkbox" formControlName="lateOutToggle" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span class="ml-2 text-sm text-gray-700 font-medium">Calcular H.E. por salida tardía</span>
+              </label>
+              
+              <!-- Umbral de minutos para salida tardía -->
+              <div *ngIf="horarioForm.get('lateOutToggle')?.value" class="mt-3 ml-6" id="minLateOutThresholdInput">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Umbral de minutos para activar:</label>
+                <input 
+                  type="number" 
+                  formControlName="minLateOut" 
+                  class="block w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                  min="0" 
+                  placeholder="45">
+              </div>
             </div>
           </div>
 
@@ -440,29 +468,24 @@
             </div>
 
             <!-- Nivel 3 - Feriados (Opcional) -->
-            <div class="grid grid-cols-3 gap-4 items-center py-3" [class.opacity-50]="!horarioForm.get('enableHolidayOvertime')?.value">
+            <div class="grid grid-cols-3 gap-4 items-center py-3">
               <div class="flex items-center space-x-2">
                 <span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-sm font-medium bg-slate-100 text-slate-800">3</span>
-                <label class="inline-flex items-center cursor-pointer">
-                  <input type="checkbox" formControlName="enableHolidayOvertime" class="sr-only peer">
-                  <div class="relative w-6 h-3 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-slate-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-2.5 after:w-2.5 after:transition-all peer-checked:bg-slate-600"></div>
-                </label>
+                <span class="text-sm text-gray-600">Feriado</span>
               </div>
               <div>
                 <input 
-                  type="text" 
-                  readonly 
-                  [value]="getLevel3Label()"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-sm text-gray-600"
-                  [disabled]="!horarioForm.get('enableHolidayOvertime')?.value">
+                  type="number" 
+                  formControlName="overtimeLv3" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                  placeholder="0">
               </div>
               <div>
                 <input 
                   type="number" 
                   formControlName="overtimeLv3Percentage" 
                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
-                  placeholder="100"
-                  [disabled]="!horarioForm.get('enableHolidayOvertime')?.value">
+                  placeholder="100">
               </div>
             </div>
           </div>
@@ -486,7 +509,39 @@
         </button>
         
         <div *ngIf="showAdvancedRules" class="px-6 pb-6 border-t border-gray-200">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6">
+          <!-- Reglas de Redondeo de Tiempo -->
+          <div class="mb-8 pt-6">
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div class="flex items-start space-x-3">
+                <lucide-icon name="clock" class="w-5 h-5 text-yellow-600 mt-0.5"></lucide-icon>
+                <div class="flex-1">
+                  <h4 class="text-sm font-semibold text-yellow-800 mb-2">Redondeo de Tiempo para Nómina</h4>
+                  <p class="text-sm text-yellow-700 mb-4">
+                    Define la unidad mínima de tiempo que la empresa paga. Si un empleado trabaja una fracción de hora, ¿se le paga completo o se le trunca?
+                  </p>
+                  <div class="flex items-center space-x-4">
+                    <label class="text-sm font-medium text-yellow-800">Redondear tiempo trabajado a:</label>
+                    <div class="flex items-center space-x-2">
+                      <input 
+                        type="number" 
+                        formControlName="roundingThresholdMinutes"
+                        min="1"
+                        max="60"
+                        class="w-20 px-3 py-2 border border-yellow-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 text-sm bg-white"
+                        placeholder="45"
+                      />
+                      <span class="text-sm text-yellow-700">minutos</span>
+                    </div>
+                  </div>
+                  <div class="mt-2 text-xs text-yellow-600">
+                    <span class="font-medium">Ejemplo:</span> Con 45 min, si trabajó 8h 20min → se paga 8h. Si trabajó 8h 50min → se paga 9h.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             
             <!-- Entrada Temprana - Grupo con Master Control -->
             <div class="space-y-4">
@@ -498,28 +553,21 @@
               </label>
               
               <label class="flex items-center">
-                <input type="checkbox" formControlName="allowLate" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <input type="checkbox" formControlName="allowLateToggle" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                 <span class="ml-2 text-sm text-gray-700">Tolerancia para llegadas tarde (sin penalización)</span>
               </label>
               
-              <!-- Master Control para H.E. por entrada temprana -->
-              <div class="border-l-4 border-blue-200 pl-4">
-                <label class="flex items-center" id="earlyInCheckbox">
-                  <input type="checkbox" formControlName="earlyIn" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                  <span class="ml-2 text-sm text-gray-700 font-medium">Calcular H.E. por entrada temprana</span>
-                </label>
-                
-                <!-- Dependent Control -->
-                <div *ngIf="horarioForm.get('earlyIn')?.value" class="mt-3 ml-6" id="earlyInThresholdInput">
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Umbral de minutos:</label>
-                  <input 
-                    type="number" 
-                    formControlName="minEarlyIn" 
-                    class="block w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
-                    min="0" 
-                    placeholder="15">
-                </div>
+              <!-- Campo de minutos condicionalmente visible -->
+              <div *ngIf="horarioForm.get('allowLateToggle')?.value" class="ml-6">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Minutos de tolerancia:</label>
+                <input 
+                  type="number" 
+                  formControlName="allowLateMinutes" 
+                  class="block w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                  min="0" 
+                  placeholder="10">
               </div>
+              
             </div>
 
             <!-- Salida Tardía - Grupo con Master Control -->
@@ -532,28 +580,21 @@
               </label>
               
               <label class="flex items-center">
-                <input type="checkbox" formControlName="allowLeaveEarly" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <input type="checkbox" formControlName="allowLeaveEarlyToggle" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                 <span class="ml-2 text-sm text-gray-700">Tolerancia para salidas tempranas (sin penalización)</span>
               </label>
               
-              <!-- Master Control para H.E. por salida tardía -->
-              <div class="border-l-4 border-orange-200 pl-4">
-                <label class="flex items-center" id="lateOutCheckbox">
-                  <input type="checkbox" formControlName="lateOut" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                  <span class="ml-2 text-sm text-gray-700 font-medium">Calcular H.E. por salida tardía</span>
-                </label>
-                
-                <!-- Dependent Control -->
-                <div *ngIf="horarioForm.get('lateOut')?.value" class="mt-3 ml-6" id="lateOutThresholdInput">
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Umbral de minutos:</label>
-                  <input 
-                    type="number" 
-                    formControlName="minLateOut" 
-                    class="block w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
-                    min="0" 
-                    placeholder="15">
-                </div>
+              <!-- Campo de minutos condicionalmente visible -->
+              <div *ngIf="horarioForm.get('allowLeaveEarlyToggle')?.value" class="ml-6">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Minutos de tolerancia:</label>
+                <input 
+                  type="number" 
+                  formControlName="allowLeaveEarlyMinutes" 
+                  class="block w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                  min="0" 
+                  placeholder="5">
               </div>
+              
             </div>
           </div>
         </div>
@@ -579,7 +620,7 @@
               <span class="text-sm font-medium text-gray-700">Horario Base:</span>
               <span class="text-sm text-gray-900">{{ getStartTime() }} - {{ getBaseEndTime() }}</span>
             </div>
-            <div class="flex justify-between" *ngIf="horarioForm.get('overtimeLv')?.value">
+            <div class="flex justify-between" *ngIf="horarioForm.get('enableOvertime')?.value">
               <span class="text-sm font-medium text-gray-700">Horario Total:</span>
               <span class="text-sm text-gray-900 font-semibold text-purple-600">{{ getStartTime() }} - {{ getEndTime() }}</span>
             </div>
@@ -605,7 +646,7 @@
               <span class="text-sm font-medium text-gray-700">Duración Total:</span>
               <span class="text-sm text-gray-900">{{ currentSummary?.totalDuration || 'Calculando...' }}</span>
             </div>
-            <div class="flex justify-between" *ngIf="horarioForm.get('enableHolidayOvertime')?.value">
+            <div class="flex justify-between" *ngIf="horarioForm.get('overtimeLv3')?.value && horarioForm.get('overtimeLv3')?.value > 0">
               <span class="text-sm font-medium text-gray-700">Feriados:</span>
               <span class="text-sm text-gray-900 font-medium text-slate-600">Habilitado</span>
             </div>
@@ -646,7 +687,7 @@
                 <li>• <strong>Jornada efectiva:</strong> {{ getWorkTimeDurationFormatted() }} de trabajo</li>
                 <li *ngIf="assignedBreaks.length > 0">• <strong>Descansos:</strong> {{ assignedBreaks.length }} descansos ({{ getTotalBreakMinutes() }}min)</li>
                 <li *ngIf="horarioForm.get('enableOvertime')?.value">• <strong>Tiempo extra:</strong> {{ getOvertimeFormatted() }} configurado</li>
-                <li *ngIf="horarioForm.get('enableHolidayOvertime')?.value">• <strong>Feriados:</strong> Nivel 3 de horas extras habilitado</li>
+                <li *ngIf="horarioForm.get('overtimeLv3')?.value && horarioForm.get('overtimeLv3')?.value > 0">• <strong>Feriados:</strong> Nivel 3 de horas extras habilitado</li>
                 <li>• <strong>Duración total del turno:</strong> {{ currentSummary?.totalDuration || 'Calculando...' }}</li>
               </ul>
             </div>
@@ -661,8 +702,8 @@
               <p class="font-medium mb-2">Ejemplo de Turno:</p>
               <p class="text-xs">
                 <strong>Base:</strong> {{ getStartTime() }} - {{ getBaseEndTime() }} = {{ getWorkTimeDurationFormatted() }} trabajo + {{ getTotalBreakMinutes() }}min descansos<br>
-                <strong *ngIf="horarioForm.get('overtimeLv')?.value">Total con H.E.:</strong> 
-                <span *ngIf="horarioForm.get('overtimeLv')?.value">{{ getStartTime() }} - {{ getEndTime() }} (+ {{ getOvertimeFormatted() }} extras)</span>
+                <strong *ngIf="horarioForm.get('enableOvertime')?.value">Total con H.E.:</strong> 
+                <span *ngIf="horarioForm.get('enableOvertime')?.value">{{ getStartTime() }} - {{ getEndTime() }} (+ {{ getOvertimeFormatted() }} extras)</span>
               </p>
             </div>
           </div>

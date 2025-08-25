@@ -54,6 +54,8 @@ export interface AttTimeIntervalDto {
   punchInWindow: string;  // Ej: "07:00 - 10:00"
   punchOutWindow: string; // Ej: "16:00 - 20:00"
 
+  roundingThresholdMinutes: number;
+
   // UPDATED: Now contains an array of break objects
   breaks: BreakTimeDto[];
 }
@@ -107,6 +109,7 @@ export interface AttTimeIntervalCreateDto {
   overtimeLv2Percentage?: number;
   overtimeLv3: number;
   overtimeLv3Percentage?: number;
+  roundingThresholdMinutes: number;
 
   punchInStartTime: string;
   punchInEndTime: string;

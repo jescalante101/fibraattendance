@@ -29,6 +29,7 @@ import { ReporteCentroCostosComponent } from "./components/asistencia/marcacione
 import { ReporteAsistenciaMensualComponent } from "./components/asistencia/marcaciones/reportes-excel/reporte-asistencia-mensual/reporte-asistencia-mensual.component";
 import { ReporteMarcacionesDetalleComponent } from "./components/asistencia/marcaciones/reportes-excel/reporte-marcaciones-detalle/reporte-marcaciones-detalle.component";
 import { ReporteAsistenciaComponent } from "./components/asistencia/reportes/reporte-asistencia/reporte-asistencia.component";
+import { ReporteHorasExtrasComponent } from "./components/asistencia/reportes/reporte-horas-extras/reporte-horas-extras.component";
 import { HolidaysComponent } from "./components/asistencia/holidays/holidays.component";
 import { NoPermissionsComponent } from "./components/no-permissions/no-permissions.component";
 import { PersonalTransferComponent } from "./components/personal/transferencias/personal-transfer.component";
@@ -79,7 +80,8 @@ const appRoutes: Routes = [
         { path: 'asistencia/marcaciones/reportes-excel/centro-costos', component: ReporteCentroCostosComponent },
         { path: 'asistencia/marcaciones/reportes-excel/asistencia-mensual', component: ReporteAsistenciaMensualComponent },
         { path: 'asistencia/marcaciones/reportes-excel/marcaciones-detalle', component: ReporteMarcacionesDetalleComponent },
-        { path: 'asistencia/marcaciones/reportes-excel/matrix', component: ReporteAsistenciaComponent }
+        { path: 'asistencia/marcaciones/reportes-excel/matrix', component: ReporteAsistenciaComponent },
+        { path: 'asistencia/reportes/horas-extras', component: ReporteHorasExtrasComponent }
       ]
     },
     

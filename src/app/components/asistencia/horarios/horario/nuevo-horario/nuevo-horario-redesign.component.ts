@@ -123,45 +123,42 @@ export class NuevoHorarioRedesignComponent implements OnInit, OnDestroy {
 
   private initializeForm() {
     this.horarioForm = this.fb.group({
-      // Basic info
+      // --- Campos que se envían directamente ---
       alias: ['', [Validators.required, Validators.minLength(3)]],
       useMode: [0],
-      
-      // Schedule timing
-      horaEntrada: ['08:00', [Validators.required]],
-      horaSalida: ['17:00', [Validators.required]],
-      workTimeDuration: [480, [Validators.required, Validators.min(1), Validators.max(1440)]],
-      workDay: [1.0, [Validators.min(0.1), Validators.max(1.0)]], // 0.0-1.0 where 0.5=part-time, 1.0=full-time
-      overtimeLv: [0],
-
-      // Punching rules
+      workTimeDuration: [480, [Validators.required, Validators.min(1)]],
+      workDay: [1.0],
       inRequired: [true],
       outRequired: [true],
-      allowLate: [false],
-      allowLeaveEarly: [false],
-      totalMarkings: [2],
-      
-      // Early/Late settings (these are switches, not minutes)
-      earlyIn: [1], // 1 = enabled, 0 = disabled
-      lateOut: [1], // 1 = enabled, 0 = disabled  
-      minEarlyIn: [15], // threshold in minutes
-      minLateOut: [15], // threshold in minutes
-      
-      // Overtime settings
-      enableOvertime: [false],
+      totalMarkings: [4],
+      minEarlyIn: [0],
+      minLateOut: [45],
       overtimeLv1: [120],
       overtimeLv1Percentage: [25],
       overtimeLv2: [60],
       overtimeLv2Percentage: [35],
       overtimeLv3: [0],
-      overtimeLv3Percentage: [75],
-      enableHolidayOvertime: [true],
+      overtimeLv3Percentage: [100],
+      punchInStartTime: ['06:00'],
+      punchInEndTime: ['08:00'],
+      punchOutStartTime: ['18:00'],
+      punchOutEndTime: ['20:00'],
+      breakTimeIds: [[]],
+      roundingThresholdMinutes: [45],
 
-      // Punching times
-      punchInStartTime: ['07:45'],
-      punchInEndTime: ['08:45'],
-      punchOutStartTime: ['16:45'],
-      punchOutEndTime: ['17:45'],
+      // --- Controles solo para la UI ---
+      horaEntrada: ['07:00', Validators.required],
+      horaSalida: ['19:00', Validators.required],
+      enableOvertime: [true],
+      allowLateToggle: [true],
+      allowLeaveEarlyToggle: [true],
+      earlyInToggle: [false],
+      lateOutToggle: [true],
+
+
+      // --- Valores numéricos para las tolerancias ---
+      allowLateMinutes: [10],
+      allowLeaveEarlyMinutes: [5]
     });
 
     // Watch for time changes to auto-calculate work duration
@@ -266,35 +263,40 @@ export class NuevoHorarioRedesignComponent implements OnInit, OnDestroy {
     const endTime = this.calculateEndTimeFromDuration(startTimeFormatted, baseScheduleDuration);
     
     this.horarioForm.patchValue({
+      // Campos que se envían directamente
       alias: data.alias,
       useMode: data.useMode,
-      horaEntrada: startTimeFormatted,
-      horaSalida: endTime,
       workTimeDuration: data.workTimeDuration,
       workDay: data.workDay,
       inRequired: data.inRequired === 1,
       outRequired: data.outRequired === 1,
-      allowLate: data.allowLate === 1,
-      allowLeaveEarly: data.allowLeaveEarly === 1,
       totalMarkings: data.totalMarkings,
-      earlyIn: data.earlyIn === 1,  // Convert 1/0 to boolean
-      lateOut: data.lateOut === 1,  // Convert 1/0 to boolean
       minEarlyIn: data.minEarlyIn,
       minLateOut: data.minLateOut,
-      overtimeLv: data.overtimeLv === 1, // Master switch para H.E.
-      enableOvertime: data.overtimeLv1 > 0 || data.overtimeLv2 > 0 || data.overtimeLv3 > 0,
-      enableHolidayOvertime: data.overtimeLv3 > 0,
       overtimeLv1: data.overtimeLv1,
       overtimeLv1Percentage: data.overtimeLv1Percentage,
       overtimeLv2: data.overtimeLv2,
       overtimeLv2Percentage: data.overtimeLv2Percentage,
       overtimeLv3: data.overtimeLv3,
       overtimeLv3Percentage: data.overtimeLv3Percentage,
+      punchInStartTime: data.punchInWindow ? extractTimeFromDateTime(data.punchInWindow.split('-')[0].trim()) : '06:00',
+      punchInEndTime: data.punchInWindow ? extractTimeFromDateTime(data.punchInWindow.split('-')[1].trim()) : '08:00',
+      punchOutStartTime: data.punchOutWindow ? extractTimeFromDateTime(data.punchOutWindow.split('-')[0].trim()) : '18:00',
+      punchOutEndTime: data.punchOutWindow ? extractTimeFromDateTime(data.punchOutWindow.split('-')[1].trim()) : '20:00',
+      roundingThresholdMinutes: data.roundingThresholdMinutes,
+
+      // Controles para la UI
+      horaEntrada: startTimeFormatted,
+      horaSalida: endTime,
+      enableOvertime: data.overtimeLv === 1,
+      allowLateToggle: data.allowLate > 0,
+      allowLeaveEarlyToggle: data.allowLeaveEarly > 0,
+      earlyInToggle: data.earlyIn === 1,
+      lateOutToggle: data.lateOut === 1,
       
-      punchInStartTime: data.punchInWindow ? extractTimeFromDateTime(data.punchInWindow.split('-')[0].trim()) : '07:45',
-      punchInEndTime: data.punchInWindow ? extractTimeFromDateTime(data.punchInWindow.split('-')[1].trim()) : '08:45',
-      punchOutStartTime: data.punchOutWindow ? extractTimeFromDateTime(data.punchOutWindow.split('-')[0].trim()) : '16:45',
-      punchOutEndTime: data.punchOutWindow ? extractTimeFromDateTime(data.punchOutWindow.split('-')[1].trim()) : '17:45',
+      // Valores numéricos para tolerancias
+      allowLateMinutes: data.allowLate > 0 ? data.allowLate : 10,
+      allowLeaveEarlyMinutes: data.allowLeaveEarly > 0 ? data.allowLeaveEarly : 5
     });
 
     // Load assigned breaks
@@ -304,6 +306,10 @@ export class NuevoHorarioRedesignComponent implements OnInit, OnDestroy {
       alias: breakItem.alias,
       duration: breakItem.duration
     }));
+
+    // Update breakTimeIds in form with existing breaks
+    const existingBreakIds = this.assignedBreaks.filter(b => b.id).map(b => b.id!);
+    this.horarioForm.patchValue({ breakTimeIds: existingBreakIds });
   }
 
   private calculateEndTimeFromDuration(startTime: string, durationMinutes: number): string {
@@ -407,6 +413,11 @@ export class NuevoHorarioRedesignComponent implements OnInit, OnDestroy {
     };
     
     this.assignedBreaks.push(newBreak);
+    
+    // Update breakTimeIds in form
+    const breakIds = this.assignedBreaks.filter(b => b.id).map(b => b.id!);
+    this.horarioForm.patchValue({ breakTimeIds: breakIds });
+    
     this.calculateWorkDuration();
     this.showBreaksPopover = false;
     this.cdr.detectChanges();
@@ -418,6 +429,11 @@ export class NuevoHorarioRedesignComponent implements OnInit, OnDestroy {
 
   removeBreak(index: number) {
     this.assignedBreaks.splice(index, 1);
+    
+    // Update breakTimeIds in form
+    const breakIds = this.assignedBreaks.filter(b => b.id).map(b => b.id!);
+    this.horarioForm.patchValue({ breakTimeIds: breakIds });
+    
     this.calculateWorkDuration();
   }
 
@@ -433,18 +449,18 @@ export class NuevoHorarioRedesignComponent implements OnInit, OnDestroy {
 
   // Helper methods for template
   getStartTime(): string {
-    return this.horarioForm.get('horaEntrada')?.value || '08:00';
+    return this.horarioForm.get('horaEntrada')?.value || '07:00';
   }
 
   getBaseEndTime(): string {
-    return this.horarioForm.get('horaSalida')?.value || '17:00';
+    return this.horarioForm.get('horaSalida')?.value || '19:00';
   }
 
   getEndTime(): string {
-    const baseEndTime = this.horarioForm.get('horaSalida')?.value || '17:00';
+    const baseEndTime = this.horarioForm.get('horaSalida')?.value || '19:00';
     
     // Si no hay horas extras habilitadas, retornar tiempo base
-    if (!this.horarioForm.get('overtimeLv')?.value) {
+    if (!this.horarioForm.get('enableOvertime')?.value) {
       return baseEndTime;
     }
     
@@ -490,7 +506,7 @@ export class NuevoHorarioRedesignComponent implements OnInit, OnDestroy {
   }
 
   getOvertimeLevel1Percentage(): number {
-    if (!this.horarioForm.get('overtimeLv')?.value) {
+    if (!this.horarioForm.get('enableOvertime')?.value) {
       return 0;
     }
     
@@ -504,7 +520,7 @@ export class NuevoHorarioRedesignComponent implements OnInit, OnDestroy {
   }
 
   getOvertimeLevel2Percentage(): number {
-    if (!this.horarioForm.get('overtimeLv')?.value) {
+    if (!this.horarioForm.get('enableOvertime')?.value) {
       return 0;
     }
     
@@ -596,28 +612,25 @@ export class NuevoHorarioRedesignComponent implements OnInit, OnDestroy {
   }
 
   private prepareDataForSave(): AttTimeIntervalCreateDto {
-    const formValue = this.horarioForm.value as any;
+    const formValue = this.horarioForm.value;
     
-    // Calculate components correctly
+    // Calculate components correctly - como estaba antes
     const workDuration = formValue.workTimeDuration || 0;
     const totalBreakTime = this.assignedBreaks.reduce((sum, breakItem) => sum + breakItem.duration, 0);
     
     // Calculate planned overtime (only when enabled)
     let plannedOvertimeMinutes = 0;
-    if (formValue.overtimeLv) {
+    if (formValue.enableOvertime) {
       plannedOvertimeMinutes += formValue.overtimeLv1 || 0;
       plannedOvertimeMinutes += formValue.overtimeLv2 || 0;
-      if (formValue.enableHolidayOvertime) {
-        plannedOvertimeMinutes += formValue.overtimeLv3 || 0;
-      }
+      plannedOvertimeMinutes += formValue.overtimeLv3 || 0;
     }
     
     // Total duration = work time + breaks + planned overtime
     const totalDuration = workDuration + totalBreakTime + plannedOvertimeMinutes;
 
     // Get company ID from header config service
-    const header = this.headerConfigService.getCurrentHeaderConfig();
-    const companyId = header?.selectedEmpresa?.companiaId || '';
+    const companyId = this.headerConfigService.getCurrentHeaderConfig()?.selectedEmpresa?.companiaId || '';
 
     // Format time as DateTime using fixed date (2000-01-01) - only time matters
     const formatTimeAsDateTime = (timeString: string): string => {
@@ -634,10 +647,10 @@ export class NuevoHorarioRedesignComponent implements OnInit, OnDestroy {
       return `${baseDate}T${hours}:${minutes}:00`;
     };
 
-    return {
+    const dto: AttTimeIntervalCreateDto = {
       alias: formValue.alias || '',
       useMode: formValue.useMode || 0,
-      inTime: formatTimeAsDateTime(formValue.horaEntrada || '08:00'),
+      inTime: formatTimeAsDateTime(formValue.horaEntrada || '07:00'),
       duration: totalDuration,
       workTimeDuration: workDuration,
       workDay: formValue.workDay || 1,
@@ -646,36 +659,38 @@ export class NuevoHorarioRedesignComponent implements OnInit, OnDestroy {
       // Punching Rules
       inRequired: formValue.inRequired ? 1 : 0,
       outRequired: formValue.outRequired ? 1 : 0,
-      allowLate: formValue.allowLate ? 1 : 0,
-      allowLeaveEarly: formValue.allowLeaveEarly ? 1 : 0,
-      totalMarkings: formValue.totalMarkings || 2,
+      allowLate: formValue.allowLateToggle ? formValue.allowLateMinutes : 0,
+      allowLeaveEarly: formValue.allowLeaveEarlyToggle ? formValue.allowLeaveEarlyMinutes : 0,
+      totalMarkings: formValue.totalMarkings || 4,
       
       // Early/Late settings (these are boolean flags, not minutes)
-      earlyIn: formValue.earlyIn ? 1 : 0,  // Switch: 1 = enabled, 0 = disabled
-      lateOut: formValue.lateOut ? 1 : 0,  // Switch: 1 = enabled, 0 = disabled
+      earlyIn: formValue.earlyInToggle ? 1 : 0,  // Switch: 1 = enabled, 0 = disabled
+      lateOut: formValue.lateOutToggle ? 1 : 0,  // Switch: 1 = enabled, 0 = disabled
       minEarlyIn: formValue.minEarlyIn || 0,  // Threshold in minutes
-      minLateOut: formValue.minLateOut || 0,  // Threshold in minutes
+      minLateOut: formValue.minLateOut || 45,  // Threshold in minutes
       
       // Overtime (only include if overtime is enabled)
-      overtimeLv: formValue.overtimeLv ? 1 : 0,  // Master switch for overtime
-      overtimeLv1: formValue.overtimeLv ? (formValue.overtimeLv1 || 0) : 0,
-      overtimeLv1Percentage: formValue.overtimeLv ? formValue.overtimeLv1Percentage : undefined,
-      overtimeLv2: formValue.overtimeLv ? (formValue.overtimeLv2 || 0) : 0,
-      overtimeLv2Percentage: formValue.overtimeLv ? formValue.overtimeLv2Percentage : undefined,
-      overtimeLv3: formValue.overtimeLv && formValue.enableHolidayOvertime ? (formValue.overtimeLv3 || 0) : 0,
-      overtimeLv3Percentage: formValue.overtimeLv && formValue.enableHolidayOvertime ? formValue.overtimeLv3Percentage : undefined,
+      overtimeLv: formValue.enableOvertime ? 1 : 0,  // Master switch for overtime
+      overtimeLv1: formValue.enableOvertime ? (formValue.overtimeLv1 || 0) : 0,
+      overtimeLv1Percentage: formValue.enableOvertime ? formValue.overtimeLv1Percentage : undefined,
+      overtimeLv2: formValue.enableOvertime ? (formValue.overtimeLv2 || 0) : 0,
+      overtimeLv2Percentage: formValue.enableOvertime ? formValue.overtimeLv2Percentage : undefined,
+      overtimeLv3: formValue.enableOvertime ? (formValue.overtimeLv3 || 0) : 0,
+      overtimeLv3Percentage: formValue.enableOvertime ? formValue.overtimeLv3Percentage : undefined,
       
       // Punch times - send as HH:mm format only (no DateTime)
-      punchInStartTime: formValue.punchInStartTime || '07:45',
-      punchInEndTime: formValue.punchInEndTime || '08:45', 
-      punchOutStartTime: formValue.punchOutStartTime || '16:45',
-      punchOutEndTime: formValue.punchOutEndTime || '17:45',
+      punchInStartTime: formValue.punchInStartTime || '06:00',
+      punchInEndTime: formValue.punchInEndTime || '08:00', 
+      punchOutStartTime: formValue.punchOutStartTime || '18:00',
+      punchOutEndTime: formValue.punchOutEndTime || '20:00',
+      roundingThresholdMinutes: formValue.roundingThresholdMinutes,
 
-
-
-      // Break IDs
-      breakTimeIds: this.assignedBreaks.filter(b => b.id).map(b => b.id!)
+      // Break IDs - Use form value if available, otherwise fall back to assignedBreaks
+      breakTimeIds: (formValue.breakTimeIds && formValue.breakTimeIds.length > 0) 
+        ? formValue.breakTimeIds 
+        : this.assignedBreaks.filter(b => b.id).map(b => b.id!)
     };
+    return dto;
   }
 
   cancelar() {
@@ -747,12 +762,11 @@ export class NuevoHorarioRedesignComponent implements OnInit, OnDestroy {
   }
 
   getTotalOvertimeMinutes(): number {
-    if (!this.horarioForm.get('overtimeLv')?.value) return 0;
+    if (!this.horarioForm.get('enableOvertime')?.value) return 0;
     
     const lv1 = this.horarioForm.get('overtimeLv1')?.value || 0;
     const lv2 = this.horarioForm.get('overtimeLv2')?.value || 0;
-    const lv3 = this.horarioForm.get('enableHolidayOvertime')?.value ? 
-      (this.horarioForm.get('overtimeLv3')?.value || 0) : 0;
+    const lv3 = this.horarioForm.get('overtimeLv3')?.value || 0;
     
     return lv1 + lv2 + lv3;
   }

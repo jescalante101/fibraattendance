@@ -1,0 +1,274 @@
+<div class="p-4 max-w-full">
+  <!-- Header -->
+  <div class="mb-6 flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border">
+    <div class="flex items-center gap-3">
+      <div class="w-1 h-8 bg-orange-600 rounded-full"></div>
+      <div>
+        <h6 class="text-xl font-semibold text-gray-900">Reporte de Horas Extras</h6>
+        <p class="text-sm text-gray-500">Control detallado de horas normales y extras por empleado</p>
+      </div>
+      <div class="ml-4 flex items-center gap-1 text-sm text-gray-500">
+        <mat-icon class="text-base">access_time</mat-icon>
+        <span>{{ processedData?.length || 0 }}</span> empleados
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button 
+        (click)="exportToExcel()" 
+        [disabled]="isExporting || !reportData"
+        class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-orange-50 text-orange-700 border border-orange-200 rounded-md hover:bg-orange-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        <mat-icon class="text-sm" [class.animate-spin]="isExporting">{{ isExporting ? 'refresh' : 'download' }}</mat-icon>
+        {{ isExporting ? 'Generando Excel...' : 'Descargar Excel' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Formulario de filtros -->
+  <form [formGroup]="filterForm" (ngSubmit)="onSearch()" class="p-4 bg-gray-50 rounded-lg border shadow-sm mb-6">
+    <!-- Filtros principales -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      
+      <!-- Fecha Inicio -->
+      <div class="space-y-1">
+        <label class="block text-sm font-medium text-gray-700">
+          Fecha Inicio <span class="text-red-500">*</span>
+        </label>
+        <input 
+          type="date" 
+          formControlName="fechaInicio"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+          [class.border-red-500]="filterForm.get('fechaInicio')?.hasError('required') && filterForm.get('fechaInicio')?.touched">
+      </div>
+
+      <!-- Fecha Fin -->
+      <div class="space-y-1">
+        <label class="block text-sm font-medium text-gray-700">
+          Fecha Fin <span class="text-red-500">*</span>
+        </label>
+        <input 
+          type="date" 
+          formControlName="fechaFin"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+          [class.border-red-500]="filterForm.get('fechaFin')?.hasError('required') && filterForm.get('fechaFin')?.touched">
+      </div>
+
+      <!-- Área -->
+      <div class="space-y-1">
+        <label class="block text-sm font-medium text-gray-700">
+          <mat-icon class="text-sm mr-1">business</mat-icon>
+          Área
+        </label>
+        <div class="relative">
+          <input 
+            type="text" 
+            formControlName="areaFilter"
+            (input)="onAreaFilterChange($event)"
+            (focus)="showAreaDropdown = true"
+            (blur)="onAreaBlur()"
+            placeholder="Buscar área..."
+            class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all">
+          <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">business</mat-icon>
+          
+          <!-- Dropdown -->
+          <div *ngIf="showAreaDropdown" 
+               class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+            <div 
+              (mousedown)="onAreaSelected(null)"
+              class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-2 border-b border-gray-200 sticky top-0 bg-white">
+              <mat-icon class="text-sm text-orange-600">public</mat-icon>
+              <span class="text-gray-700 font-medium">Todas las áreas</span>
+            </div>
+            <div *ngFor="let area of filteredAreas" 
+                 (mousedown)="onAreaSelected(area)"
+                 class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-2">
+              <mat-icon class="text-sm text-gray-400">business</mat-icon>
+              <span class="text-gray-700">{{ area.descripcion }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sede -->
+      <div class="space-y-1">
+        <label class="block text-sm font-medium text-gray-700">
+          <mat-icon class="text-sm mr-1">location_on</mat-icon>
+          Sede
+        </label>
+        <div class="relative">
+          <input 
+            type="text" 
+            formControlName="sedeFilter"
+            (input)="onSedeFilterChange($event)"
+            (focus)="showSedeDropdown = true"
+            (blur)="onSedeBlur()"
+            placeholder="Buscar sede..."
+            class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all text-sm">
+          <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">location_on</mat-icon>
+          
+          <!-- Dropdown -->
+          <div *ngIf="showSedeDropdown" 
+               class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+            <div 
+              (mousedown)="onSedeSelected(null)"
+              class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-2 border-b border-gray-200 sticky top-0 bg-white">
+              <mat-icon class="text-sm text-orange-600">public</mat-icon>
+              <span class="text-gray-700 font-medium">Todas las sedes</span>
+            </div>
+            <div *ngFor="let sede of filteredSedes" 
+                 (mousedown)="onSedeSelected(sede)"
+                 class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-2">
+              <mat-icon class="text-sm text-gray-400">location_on</mat-icon>
+              <span class="text-gray-700">{{ sede.descripcion }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="flex items-center gap-3 mt-4 pt-4 border-t">
+      <button 
+        type="submit"
+        [disabled]="isLoading || filterForm.invalid"
+        class="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 focus:ring-2 focus:ring-orange-600 focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        <mat-icon [class]="isLoading ? 'animate-spin' : ''">{{ isLoading ? 'refresh' : 'search' }}</mat-icon>
+        <span>{{ isLoading ? 'Generando...' : 'Generar Reporte' }}</span>
+      </button>
+
+      <button 
+        type="button"
+        (click)="onClearFilters()"
+        class="inline-flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-800 text-sm font-medium rounded-md hover:bg-gray-300 transition-colors">
+        <mat-icon>refresh</mat-icon>
+        <span>Limpiar</span>
+      </button>
+    </div>
+
+    <!-- Información de validación -->
+    <div class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+      <div class="flex items-start">
+        <mat-icon class="text-yellow-600 text-sm mr-2 mt-0.5">info</mat-icon>
+        <div class="text-xs text-yellow-800">
+          <p class="font-medium mb-1">Limitaciones del reporte:</p>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Rango máximo: 62 días</li>
+            <li>La fecha fin debe ser mayor o igual a la fecha inicio</li>
+            <li>Los filtros de área y sede son opcionales</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Resumen ejecutivo -->
+  <div *ngIf="summaryData && summaryData.success" 
+       class="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-4 mb-6">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-6">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-gray-900">{{ summaryData.data.totalEmpleados }}</div>
+          <div class="text-sm text-gray-600">Empleados</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-blue-600">{{ formatHours(summaryData.data.totalHorasNormales) }}</div>
+          <div class="text-sm text-gray-600">Horas Normales</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-orange-600">{{ formatHours(summaryData.data.totalHorasExtras25) }}</div>
+          <div class="text-sm text-gray-600">H.E. 25%</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-red-600">{{ formatHours(summaryData.data.totalHorasExtras35) }}</div>
+          <div class="text-sm text-gray-600">H.E. 35%</div>
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="text-sm text-gray-600">Período:</div>
+        <div class="font-medium">{{ formatDateForDisplay(summaryData.data.periodoReporte.fechaInicio) }} - {{ formatDateForDisplay(summaryData.data.periodoReporte.fechaFin) }}</div>
+        <div class="text-xs text-gray-500 mt-1">{{ summaryData.data.periodoReporte.totalDias }} días</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AG-Grid Tabla matricial -->
+  <div *ngIf="!isLoading && reportData && reportData.data && reportData.data.length > 0" 
+       class="bg-white rounded-lg shadow-sm border overflow-hidden">
+    
+    <!-- Header de la tabla -->
+    <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">
+          Reporte de Horas Extras
+          <span class="text-sm font-normal text-gray-500 ml-2">
+            ({{ formatDateForDisplay(filterForm.value.fechaInicio) }} - 
+             {{ formatDateForDisplay(filterForm.value.fechaFin) }})
+          </span>
+        </h3>
+        <div class="flex items-center gap-2">
+          <div class="text-sm text-gray-500">
+            {{ reportData.data.length }} empleado{{ reportData.data.length !== 1 ? 's' : '' }}
+          </div>
+          <!-- Controles AG-Grid -->
+          <button 
+            type="button"
+            (click)="autoSizeColumns()"
+            class="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-50 text-orange-700 border border-orange-200 rounded-md hover:bg-orange-100 text-sm transition-colors">
+            <mat-icon class="text-sm">view_column</mat-icon>
+            Ajustar Columnas
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AG-Grid Container -->
+    <div class="relative h-[700px]">
+      <!-- ag-Grid -->
+      <div class="ag-theme-quartz w-full h-full">
+        <ag-grid-angular
+          #agGrid
+          [columnDefs]="columnDefs"
+          [rowData]="rowData"
+          class="w-full h-full"
+          [gridOptions]="gridOptions">
+        </ag-grid-angular>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado de loading -->
+  <div *ngIf="isLoading" 
+       class="bg-white rounded-lg shadow-sm border p-12 text-center">
+    <div class="flex flex-col items-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-orange-600 border-t-transparent mb-4"></div>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Generando reporte...</h3>
+      <p class="text-sm text-gray-500">
+        Procesando datos de horas extras, por favor espera
+      </p>
+    </div>
+  </div>
+
+  <!-- Estado vacío -->
+  <div *ngIf="!isLoading && (!reportData || !reportData.data || reportData.data.length === 0)" 
+       class="bg-white rounded-lg shadow-sm border p-12 text-center">
+    <div class="flex flex-col items-center">
+      <div class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+        <mat-icon class="text-4xl text-orange-400">access_time</mat-icon>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No hay datos de horas extras</h3>
+      <p class="text-sm text-gray-500 mb-6">
+        Ajusta los filtros y genera un nuevo reporte para ver los resultados
+      </p>
+      <button 
+        type="button"
+        (click)="onSearch()"
+        [disabled]="filterForm.invalid"
+        class="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 transition-colors disabled:opacity-50">
+        <mat-icon>search</mat-icon>
+        Generar Reporte
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,224 @@
+<!-- Permission Manager - Solo para desarrolladores -->
+<div class="min-h-screen bg-fiori-background p-6">
+  
+  <!-- Header principal -->
+  <div class="mb-6">
+    <div class="bg-gradient-to-r from-red-500 to-orange-500 p-6 rounded-xl text-white shadow-lg">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+            <lucide-icon name="shield-alert" size="24" class="text-white"></lucide-icon>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold">Permission Manager</h1>
+            <p class="text-white/90">Herramienta exclusiva para desarrolladores - Gestión de permisos del sistema</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="bg-white/10 px-3 py-1 rounded-lg text-sm">
+            <lucide-icon name="user" size="16" class="inline mr-1"></lucide-icon>
+            sistemas&#64;dev.com
+          </div>
+          <button 
+            (click)="refresh()" 
+            [disabled]="loading"
+            class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors disabled:opacity-50">
+            <lucide-icon name="refresh-cw" size="16" [class.animate-spin]="loading"></lucide-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-xl border border-fiori-border shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+          <lucide-icon name="database" size="24" class="text-blue-600"></lucide-icon>
+        </div>
+        <div>
+          <h3 class="text-2xl font-bold text-fiori-text">{{ stats.total }}</h3>
+          <p class="text-sm text-fiori-subtext">Permisos Totales</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl border border-fiori-border shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+          <lucide-icon name="check-circle" size="24" class="text-green-600"></lucide-icon>
+        </div>
+        <div>
+          <h3 class="text-2xl font-bold text-green-600">{{ stats.existing }}</h3>
+          <p class="text-sm text-fiori-subtext">Ya Registrados</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl border border-fiori-border shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+          <lucide-icon name="alert-circle" size="24" class="text-red-600"></lucide-icon>
+        </div>
+        <div>
+          <h3 class="text-2xl font-bold text-red-600">{{ stats.missing }}</h3>
+          <p class="text-sm text-fiori-subtext">Faltantes</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acciones principales -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-4">
+      <h2 class="text-xl font-semibold text-fiori-text">Permisos del Sistema</h2>
+      <div class="text-sm text-fiori-subtext">
+        Comparación entre sidebar y base de datos
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3" *ngIf="missingPermissions.length > 0">
+      <button 
+        (click)="registerAllMissingPermissions()"
+        [disabled]="registering"
+        class="bg-fiori-primary hover:bg-fiori-primary-dark text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2">
+        <lucide-icon name="plus-circle" size="16"></lucide-icon>
+        <span *ngIf="!registering">Registrar Todos ({{ missingPermissions.length }})</span>
+        <span *ngIf="registering">Registrando...</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="bg-white p-12 rounded-xl border border-fiori-border shadow-sm text-center">
+    <lucide-icon name="loader-2" size="48" class="text-fiori-primary animate-spin mx-auto mb-4"></lucide-icon>
+    <p class="text-fiori-subtext">Cargando permisos del sistema...</p>
+  </div>
+
+  <!-- Tabla de permisos -->
+  <div *ngIf="!loading" class="bg-white rounded-xl border border-fiori-border shadow-sm overflow-hidden">
+    
+    <!-- Header de tabla -->
+    <div class="bg-fiori-surface px-6 py-4 border-b border-fiori-border">
+      <div class="grid grid-cols-12 gap-4 items-center text-sm font-semibold text-fiori-subtext">
+        <div class="col-span-1">Estado</div>
+        <div class="col-span-3">Permission Key</div>
+        <div class="col-span-3">Nombre</div>
+        <div class="col-span-3">Ubicación</div>
+        <div class="col-span-2">Acciones</div>
+      </div>
+    </div>
+
+    <!-- Filas de permisos -->
+    <div class="max-h-96 overflow-y-auto">
+      <div *ngFor="let permission of permissionComparisons; trackBy: trackByPermissionKey" 
+           class="px-6 py-4 border-b border-fiori-border hover:bg-fiori-hover transition-colors">
+        
+        <div class="grid grid-cols-12 gap-4 items-center">
+          
+          <!-- Estado -->
+          <div class="col-span-1">
+            <div *ngIf="permission.existsInDB" 
+                 class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+              <lucide-icon name="check" size="16" class="text-green-600"></lucide-icon>
+            </div>
+            <div *ngIf="!permission.existsInDB" 
+                 class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+              <lucide-icon name="x" size="16" class="text-red-600"></lucide-icon>
+            </div>
+          </div>
+
+          <!-- Permission Key -->
+          <div class="col-span-3">
+            <code class="bg-slate-100 px-2 py-1 rounded text-xs font-mono">
+              {{ permission.key }}
+            </code>
+          </div>
+
+          <!-- Nombre -->
+          <div class="col-span-3">
+            <div class="text-sm font-medium text-fiori-text">{{ permission.name }}</div>
+            <div class="text-xs text-fiori-subtext mt-1">{{ permission.description }}</div>
+          </div>
+
+          <!-- Ubicación -->
+          <div class="col-span-3">
+            <div class="text-xs text-fiori-subtext bg-blue-50 px-2 py-1 rounded">
+              {{ permission.location }}
+            </div>
+          </div>
+
+          <!-- Acciones -->
+          <div class="col-span-2">
+            <button 
+              *ngIf="!permission.existsInDB"
+              (click)="registerPermission(permission)"
+              class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1">
+              <lucide-icon name="plus" size="12"></lucide-icon>
+              Registrar
+            </button>
+            
+            <div *ngIf="permission.existsInDB" 
+                 class="text-green-600 text-xs font-medium flex items-center gap-1">
+              <lucide-icon name="check-circle" size="12"></lucide-icon>
+              Registrado
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer de tabla -->
+    <div class="bg-fiori-surface px-6 py-3 border-t border-fiori-border">
+      <div class="flex items-center justify-between text-sm text-fiori-subtext">
+        <span>Total: {{ permissionComparisons.length }} permisos</span>
+        <div class="flex items-center gap-4">
+          <span class="text-green-600">✓ {{ stats.existing }} registrados</span>
+          <span class="text-red-600">✗ {{ stats.missing }} faltantes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado vacío -->
+  <div *ngIf="!loading && permissionComparisons.length === 0" 
+       class="bg-white p-12 rounded-xl border border-fiori-border shadow-sm text-center">
+    <lucide-icon name="database" size="48" class="text-fiori-subtext mx-auto mb-4"></lucide-icon>
+    <h3 class="text-lg font-semibold text-fiori-text mb-2">No se encontraron permisos</h3>
+    <p class="text-fiori-subtext">No se pudieron extraer permisos del sidebar</p>
+  </div>
+
+  <!-- Advertencias importantes -->
+  <div class="mt-8 space-y-4">
+    <!-- Advertencia de permisos dev -->
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+      <div class="flex items-start gap-3">
+        <lucide-icon name="info" size="20" class="text-blue-600 mt-0.5"></lucide-icon>
+        <div>
+          <h4 class="font-semibold text-blue-800">Permisos de Desarrollador</h4>
+          <p class="text-sm text-blue-700 mt-1">
+            Los permisos <code>system.dev.*</code> no se registran en la base de datos para evitar dependencias circulares. 
+            Solo requieren el email autorizado <strong>sistemas&#64;dev.com</strong>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Advertencia de seguridad -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+      <div class="flex items-start gap-3">
+        <lucide-icon name="shield-alert" size="20" class="text-yellow-600 mt-0.5"></lucide-icon>
+        <div>
+          <h4 class="font-semibold text-yellow-800">Advertencia de Seguridad</h4>
+          <p class="text-sm text-yellow-700 mt-1">
+            Esta herramienta está disponible únicamente para el usuario <strong>sistemas&#64;dev.com</strong>. 
+            Los permisos registrados aquí afectan directamente la funcionalidad y seguridad del sistema.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

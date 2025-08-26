@@ -57,8 +57,8 @@
 
   <!-- Contenido del menú dinámico -->
   <div
-    class="flex-1 py-2"
-    [ngClass]="{ 'px-2': isCollapsed, 'px-4': !isCollapsed }"
+    class="flex-1 py-2 "
+    [ngClass]="{ 'px-2': isCollapsed, 'px-4': !isCollapsed ,'overflow-y-auto':!isCollapsed}"
   >
     <!-- SECCIONES DINÁMICAS DEL MENÚ -->
     <div 

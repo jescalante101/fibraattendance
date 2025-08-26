@@ -94,7 +94,7 @@ export class EmployeeScheduleAssignmentService {
 
   constructor(private http: HttpClient) { }
 
-  getEmployeeScheduleAssignments(page = 1, pageSize = 15, filter = '',startDate = '',endDate = '',locationId = [] as string[]): Observable<ApiResponse<EmployeeScheduleAssignment>> {
+  getEmployeeScheduleAssignments(page = 1, pageSize = 15, filter = '',startDate = '',endDate = '',locationId = [] as string[],areaId=''): Observable<ApiResponse<EmployeeScheduleAssignment>> {
     const params = new HttpParams()
       .set('pageNumber', page)
       .set('pageSize', pageSize)
@@ -102,6 +102,7 @@ export class EmployeeScheduleAssignmentService {
       .set('startDate', startDate)
       .set('endDate', endDate)
       .set('locationId', locationId.join(','))
+      .set('areaId', areaId)
 
     return this.http.get<ApiResponse<EmployeeScheduleAssignment>>(`${this.apiUrl}api/employee-schedule-assignment/search`, { params });
   }

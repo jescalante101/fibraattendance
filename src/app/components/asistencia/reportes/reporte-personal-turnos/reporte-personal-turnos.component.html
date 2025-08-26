@@ -44,52 +44,35 @@
   </div>
 
   <!-- Filtros compactos -->
-  <div class="bg-gradient-to-r from-fiori-muted to-blue-50 border border-fiori-border rounded-lg p-4 shadow-sm mb-6">
+  <div class="bg-gradient-to-r from-fiori-muted to-blue-50 border border-fiori-border rounded-lg p-3 shadow-sm mb-4">
     <form (ngSubmit)="onSearch()">
-      <!-- Header compacto -->
-      <div class="flex items-center justify-between mb-3">
+      <!-- Header minimalista -->
+      <div class="flex items-center justify-between mb-2">
         <div class="flex items-center space-x-2">
-          <div class="w-6 h-6 bg-gradient-to-br from-fiori-info to-blue-600 rounded-lg flex items-center justify-center">
-            <lucide-icon name="filter" class="w-3.5 h-3.5 text-white"></lucide-icon>
+          <div class="w-5 h-5 bg-gradient-to-br from-fiori-info to-blue-600 rounded flex items-center justify-center">
+            <lucide-icon name="filter" class="w-3 h-3 text-white"></lucide-icon>
           </div>
-          <div>
-            <h3 class="text-base font-semibold text-slate-800">Filtros del Reporte</h3>
-            <p class="text-xs text-slate-600">Las fechas solo afectan al personal con turnos asignados</p>
-          </div>
+          <h3 class="text-sm font-semibold text-slate-800">Filtros del Reporte</h3>
         </div>
-        
-        <!-- Estado del formulario -->
-        <div class="px-2 py-1 rounded-full border text-xs transition-all"
-             [ngClass]="dateRangeControl.valid ? 
-               'bg-emerald-50 border-emerald-200 text-emerald-700' : 
-               'bg-amber-50 border-amber-200 text-amber-700'">
-          <div class="flex items-center space-x-1">
-            <div class="w-1.5 h-1.5 rounded-full"
-                 [ngClass]="dateRangeControl.valid ? 'bg-emerald-500' : 'bg-amber-500'"></div>
-            <span class="font-medium">
-              {{ dateRangeControl.valid ? 'Listo' : 'Pendiente' }}
-            </span>
-          </div>
-        </div>
+        <span class="text-xs text-slate-600">Fechas solo para personal con turno</span>
       </div>
       
       <!-- Filtros en grid compacto -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
         
         <!-- Card 1: Período (solo afecta personal CON turno) -->
-        <div class="bg-white rounded-lg border border-slate-200 p-3 shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex items-center space-x-2 mb-2">
-            <div class="w-5 h-5 bg-blue-100 rounded flex items-center justify-center">
-              <lucide-icon name="calendar" class="w-3 h-3 text-blue-600"></lucide-icon>
+        <div class="bg-white rounded-lg border border-slate-200 p-2.5 shadow-sm">
+          <div class="flex items-center space-x-1 mb-1.5">
+            <div class="w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
+              <lucide-icon name="calendar" class="w-2.5 h-2.5 text-blue-600"></lucide-icon>
             </div>
-            <span class="text-xs font-semibold text-slate-700">Período de Fechas</span>
-            <div class="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
+            <span class="text-xs font-semibold text-slate-700">Período</span>
+            <div class="px-1 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-medium">
               Solo Con Turno
             </div>
           </div>
           
           <div>
-            <label class="block text-xs font-medium text-slate-600 mb-1">Rango de Fechas *</label>
             <app-date-range-picker
               placeholder="Seleccionar período..."
               [formControl]="dateRangeControl"
@@ -103,16 +86,15 @@
         </div>
         
         <!-- Card 2: Sede -->
-        <div class="bg-white rounded-lg border border-slate-200 p-3 shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex items-center space-x-2 mb-2">
-            <div class="w-5 h-5 bg-green-100 rounded flex items-center justify-center">
-              <lucide-icon name="map-pin" class="w-3 h-3 text-green-600"></lucide-icon>
+        <div class="bg-white rounded-lg border border-slate-200 p-2.5 shadow-sm">
+          <div class="flex items-center space-x-1 mb-1.5">
+            <div class="w-4 h-4 bg-green-100 rounded flex items-center justify-center">
+              <lucide-icon name="map-pin" class="w-2.5 h-2.5 text-green-600"></lucide-icon>
             </div>
-            <span class="text-xs font-semibold text-slate-700">Filtro por Sede</span>
+            <span class="text-xs font-semibold text-slate-700">Sede</span>
           </div>
           
           <div class="relative">
-            <label class="block text-xs font-medium text-slate-600 mb-1">Sede (Opcional)</label>
             <input 
               type="text" 
               [value]="getSedeFilterText()"
@@ -145,16 +127,15 @@
         </div>
         
         <!-- Card 3: Área -->
-        <div class="bg-white rounded-lg border border-slate-200 p-3 shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex items-center space-x-2 mb-2">
-            <div class="w-5 h-5 bg-purple-100 rounded flex items-center justify-center">
-              <lucide-icon name="layers" class="w-3 h-3 text-purple-600"></lucide-icon>
+        <div class="bg-white rounded-lg border border-slate-200 p-2.5 shadow-sm">
+          <div class="flex items-center space-x-1 mb-1.5">
+            <div class="w-4 h-4 bg-purple-100 rounded flex items-center justify-center">
+              <lucide-icon name="layers" class="w-2.5 h-2.5 text-purple-600"></lucide-icon>
             </div>
-            <span class="text-xs font-semibold text-slate-700">Filtro por Área</span>
+            <span class="text-xs font-semibold text-slate-700">Área</span>
           </div>
           
           <div class="relative">
-            <label class="block text-xs font-medium text-slate-600 mb-1">Área (Opcional)</label>
             <input 
               type="text" 
               [value]="getAreaFilterText()"
@@ -189,33 +170,30 @@
       </div>
       
       <!-- Botones de acción compactos -->
-      <div class="flex items-center justify-between mt-4 pt-3 border-t border-blue-200">
-        <div class="flex items-center space-x-3">
+      <div class="flex items-center justify-between mt-3 pt-2 border-t border-blue-200">
+        <div class="flex items-center space-x-2">
           <button 
             type="submit"
             [disabled]="loading || !dateRangeControl.valid"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-fiori-info text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-600 focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            class="inline-flex items-center gap-2 px-3 py-1.5 bg-fiori-info text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             <lucide-icon [name]="loading ? 'loader-2' : 'search'" 
                          [class]="loading ? 'animate-spin' : ''"
-                         class="w-4 h-4"></lucide-icon>
-            <span>{{ loading ? 'Buscando...' : 'Generar Reporte' }}</span>
+                         class="w-3.5 h-3.5"></lucide-icon>
+            <span>{{ loading ? 'Buscando...' : 'Generar' }}</span>
           </button>
 
           <button 
             type="button"
             (click)="onClearFilters()"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-slate-200 text-slate-800 text-sm font-medium rounded-lg hover:bg-slate-300 transition-colors">
-            <lucide-icon name="refresh-cw" class="w-4 h-4"></lucide-icon>
+            class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-200 text-slate-800 text-sm font-medium rounded hover:bg-slate-300 transition-colors">
+            <lucide-icon name="refresh-cw" class="w-3.5 h-3.5"></lucide-icon>
             <span>Limpiar</span>
           </button>
         </div>
         
         <!-- Info compacta -->
-        <div class="text-xs text-slate-600 bg-white px-3 py-2 rounded-lg border border-slate-200">
-          <div class="flex items-center space-x-1">
-            <lucide-icon name="info" class="w-3 h-3 text-blue-500"></lucide-icon>
-            <span>Fechas solo para personal con turno • Filtros opcionales</span>
-          </div>
+        <div class="text-xs text-slate-600">
+          <span>Filtros opcionales • Fechas solo con turno</span>
         </div>
       </div>
     </form>

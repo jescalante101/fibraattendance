@@ -169,7 +169,25 @@ export class SidebarComponent implements OnInit, OnDestroy {
             { label: 'Reporte Centro Costo', link: '/panel/asistencia/marcaciones/reportes-excel/centro-costos', permission: 'asistencia.reportes.centro_costos' },
             { label: 'Reporte Marcación Detalle', link: '/panel/asistencia/marcaciones/reportes-excel/marcaciones-detalle', permission: 'asistencia.reportes.detalle' },
             { label: 'Reporte Asistencia', link: '/panel/asistencia/marcaciones/reportes-excel/matrix', permission: 'asistencia.reportes.matrix' },
-            { label: 'Reporte Horas Extras', link: '/panel/asistencia/reportes/horas-extras', permission: 'asistencia.reportes.horas_extras' }
+            { label: 'Reporte Horas Extras', link: '/panel/asistencia/reportes/horas-extras', permission: 'asistencia.reportes.horas_extras' },
+            { label: 'Reporte Personal Turnos', link: '/panel/asistencia/reportes/personal-turnos', permission: 'asistencia.reportes.personal_turnos' }
+          ]
+        }
+      ]
+    },
+    
+    // 🔧 SECCIÓN DEV TOOLS (Solo para desarrolladores)
+    {
+      key: 'dev-tools',
+      label: 'Dev Tools',
+      items: [
+        {
+          key: 'dev-tools',
+          label: 'Herramientas Dev',
+          icon: 'code',
+          permission: 'system.dev.tools',
+          submenu: [
+            { label: 'Permission Manager', link: '/panel/dev/permission-manager', permission: 'system.dev.permission_manager' }
           ]
         }
       ]
@@ -245,8 +263,23 @@ export class SidebarComponent implements OnInit, OnDestroy {
   hasPermission(permission?: string): boolean {
     if (!permission) return true;
     
+    // Restricción especial para herramientas de desarrollador
+    // Solo requiere email dev, no permisos en BD (para evitar dependencia circular)
+    if (permission.startsWith('system.dev.')) {
+      return this.isDevUser();
+    }
+    
     // Integrar con AuthService.hasPermission()
     return this.authService.hasPermission(permission);
+  }
+
+  /**
+   * Verifica si el usuario actual es un desarrollador autorizado
+   * @returns true si es el email sistemas@dev.com
+   */
+  private isDevUser(): boolean {
+    const user = this.authService.getCurrentUser();
+    return user?.email === 'sistemas@dev.com';
   }
 
   /**

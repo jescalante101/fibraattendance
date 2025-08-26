@@ -14,6 +14,11 @@ import { HeaderConfigService } from 'src/app/core/services/header-config.service
 import { ToastService } from 'src/app/shared/services/toast.service';
 import { Employee } from 'src/app/components/personal/empleado/empleado/model/employeeDto';
 
+// Extender Employee para incluir campos calculados
+interface EmployeeWithFormatted extends Employee {
+  fullNameFormatted?: string;
+}
+
 // Shared Components
 import { DateRange } from 'src/app/shared/components/date-range-picker/date-range-picker.component';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
@@ -36,7 +41,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
   // ============================================================================
   
   personalConTurno: EmployeeScheduleAssignment[] = [];
-  personalSinTurno: Employee[] = [];
+  personalSinTurno: EmployeeWithFormatted[] = [];
   
   // ============================================================================
   // FILTROS Y CONTROLES
@@ -64,12 +69,12 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
   
   // Personal CON turno
   pageConTurno = 1;
-  pageSizeConTurno = 25;
+  pageSizeConTurno = 50;
   totalConTurno = 0;
   
   // Personal SIN turno
   pageSinTurno = 1;
-  pageSizeSinTurno = 25;
+  pageSizeSinTurno = 50;
   totalSinTurno = 0;
   
   // ============================================================================
@@ -121,14 +126,22 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
   // ============================================================================
   
   private initializeDateRange(): void {
-    // Configurar fechas por defecto (última semana)
+    // Configurar fechas por defecto (semana actual)
     const today = new Date();
-    const lastWeek = new Date(today);
-    lastWeek.setDate(today.getDate() - 7);
+    
+    // Obtener el lunes de la semana actual
+    const currentWeekStart = new Date(today);
+    const dayOfWeek = today.getDay(); // 0 = Domingo, 1 = Lunes, etc.
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Si es domingo, retroceder 6 días
+    currentWeekStart.setDate(today.getDate() - daysFromMonday);
+    
+    // Obtener el domingo de la semana actual
+    const currentWeekEnd = new Date(currentWeekStart);
+    currentWeekEnd.setDate(currentWeekStart.getDate() + 6);
     
     const defaultDateRange: DateRange = {
-      start: lastWeek.toISOString().split('T')[0],
-      end: today.toISOString().split('T')[0]
+      start: currentWeekStart.toISOString().split('T')[0],
+      end: currentWeekEnd.toISOString().split('T')[0]
     };
     
     this.dateRangeControl.setValue(defaultDateRange);
@@ -198,6 +211,15 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
         }
       },
       {
+        headerName: 'Sede',
+        field: 'locationName',
+        minWidth: 120,
+        maxWidth: 180,
+        cellRenderer: (params: any) => {
+          return `<div class="text-sm text-fiori-text">${params.value || '-'}</div>`;
+        }
+      },
+      {
         headerName: 'Área',
         field: 'areaName',
         minWidth: 150,
@@ -225,13 +247,11 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
       },
       {
         headerName: 'Empleado',
-        field: 'personalId',
+        field: 'fullNameFormatted',
         minWidth: 250,
         maxWidth: 300,
         cellRenderer: (params: any) => {
-          const emp = params.data as Employee;
-          const fullName = this.getEmployeeFullName(emp);
-          return `<div class="font-medium text-fiori-text">${fullName}</div>`;
+          return `<div class="font-medium text-fiori-text">${params.value}</div>`;
         }
       },
       {
@@ -318,7 +338,8 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
       '', // filter general
       startDate,
       endDate,
-      locationIds
+      locationIds,
+      this.selectedArea?.areaId || '',
     ).pipe(takeUntil(this.destroy$))
     .subscribe({
       next: (response) => {
@@ -333,7 +354,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
         } else {
           this.personalConTurno = [];
           this.totalConTurno = 0;
-          this.loadPersonalSinTurno();
+        //  this.loadPersonalSinTurno();
         }
       },
       error: (error) => {
@@ -363,11 +384,20 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
       areaId: this.selectedArea?.areaId || null,
       ccostoId: null,
       sede: this.selectedSede?.categoriaAuxiliarId || null,
-      periodoId: null,
-      planillaId: null,
+      periodoId: headerConfig?.selectedPeriodo?.periodoId || null,
+      planillaId: headerConfig?.selectedPlanilla?.planillaId || null,
       companiaId: companyId,
       personalIds: empleadosConTurnoIds // ← EXCLUIR estos IDs
     };
+    
+    // 🐛 DEBUG: Verificar parámetros enviados
+    console.log('🔍 DEBUG - loadPersonalSinTurno:');
+    console.log('- empleadosConTurnoIds:', empleadosConTurnoIds);
+    console.log('- empleadosConTurnoIds.length:', empleadosConTurnoIds.length);
+    console.log('- companyId:', companyId);
+    console.log('- selectedArea:', this.selectedArea);
+    console.log('- selectedSede:', this.selectedSede);
+    console.log('- params completos:', params);
     
     this.personService.getPersonalWithoutShift(params)
       .pipe(takeUntil(this.destroy$))
@@ -376,8 +406,19 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
           this.loadingSinTurno = false;
           this.loading = false;
           
+          // 🐛 DEBUG: Verificar respuesta del servicio
+          console.log('📥 DEBUG - Respuesta getPersonalWithoutShift:');
+          console.log('- response.exito:', response.exito);
+          console.log('- response.mensaje:', response.mensaje);
+          console.log('- response.data?.items?.length:', response.data?.items?.length);
+          console.log('- response.data?.totalCount:', response.data?.totalCount);
+          console.log('- response completa:', response);
+          
           if (response.exito && response.data) {
-            this.personalSinTurno = response.data.items || [];
+            this.personalSinTurno = (response.data.items || []).map((emp: Employee): EmployeeWithFormatted => ({
+              ...emp,
+              fullNameFormatted: this.getEmployeeFullName(emp)
+            }));
             this.totalSinTurno = response.data.totalCount || 0;
           } else {
             this.personalSinTurno = [];
@@ -387,6 +428,13 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
         error: (error) => {
           this.loadingSinTurno = false;
           this.loading = false;
+          
+          // 🐛 DEBUG: Error en el servicio
+          console.log('❌ DEBUG - Error getPersonalWithoutShift:');
+          console.log('- error completo:', error);
+          console.log('- error.status:', error.status);
+          console.log('- error.message:', error.message);
+          
           console.error('Error loading personal sin turno:', error);
           this.toastService.error('Error', 'Error al cargar personal sin turno');
           this.personalSinTurno = [];
@@ -563,7 +611,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
       // Hoja 2: Personal SIN Turno
       const dataSinTurno = this.personalSinTurno.map(emp => ({
         'ID Personal': emp.personalId,
-        'Nombre Completo': this.getEmployeeFullName(emp),
+        'Nombre Completo': emp.fullNameFormatted || '',
         'Sede': emp.categoriaAuxiliarDescripcion || '',
         'Área': emp.areaDescripcion || '',
         'Centro de Costo': emp.ccostoDescripcion || ''
@@ -628,7 +676,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
       
       const dataSinTurno = this.personalSinTurno.map(emp => [
         emp.personalId,
-        this.getEmployeeFullName(emp),
+        emp.fullNameFormatted || '',
         emp.categoriaAuxiliarDescripcion || '',
         emp.areaDescripcion || '',
         emp.ccostoDescripcion || ''
@@ -666,7 +714,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
     const apellidoPaterno = employee.apellidoPaterno || '';
     const apellidoMaterno = employee.apellidoMaterno || '';
     
-    return `${nombres} ${apellidoPaterno} ${apellidoMaterno}`.trim();
+    return `${apellidoPaterno} ${apellidoMaterno}, ${nombres}`.trim();
   }
   
   // ============================================================================

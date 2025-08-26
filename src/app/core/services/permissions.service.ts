@@ -9,6 +9,11 @@ export interface Permission {
   permissionName: string;
   description: string;
 }
+export interface PermissionRegister{
+  permissionKey: string;
+  permissionName: string;
+  description: string;
+}
 
 export interface UserPermission {
   permissionId: number;
@@ -62,6 +67,13 @@ export class PermissionsService {
    */
   removePermission(userId: number, permissionId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}api/users/${userId}/permissions/${permissionId}`);
+  }
+
+  /**
+   * Registrar un nuevo permiso en el sistema
+   */
+  registerPermission(permission: PermissionRegister): Observable<Permission> {
+    return this.http.post<Permission>(`${this.apiUrl}api/permission`, permission);
   }
 
   /**

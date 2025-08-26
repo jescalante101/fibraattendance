@@ -15,6 +15,9 @@ import { CostCenterService, CostCenter } from '../../../core/services/cost-cente
 import { HeaderConfigService, HeaderConfig } from '../../../core/services/header-config.service';
 import { ColDef, GridOptions, GridReadyEvent, SelectionChangedEvent } from 'ag-grid-community';
 import { createFioriGridOptionsWithFullDynamicResize, applyDynamicResizeToColumnsWithPriority, createFioriGridOptions } from 'src/app/shared/ag-grid-theme-fiori';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ModalConfirmComponent, ModalConfirmData } from '../../../shared/modal-confirm/modal-confirm.component';
 
 @Component({
   selector: 'app-personal-transfer',
@@ -31,7 +34,7 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
   
   // Paginación
   page = 1;
-  pageSize = 10;
+  pageSize = 50;
   
   // Filtros
   currentFilters: FilterState = {};
@@ -112,6 +115,7 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
     { key: 'costCenterDescription', label: 'Centro de Costos', visible: false, required: false, sortable: true, type: 'text' },
     { key: 'startDate', label: 'Fecha Inicio', visible: true, required: false, sortable: true, type: 'date' },
     { key: 'endDate', label: 'Fecha Fin', visible: true, required: false, sortable: true, type: 'date' },
+    { key: 'approvalStatus', label: 'Estado Aprobación', visible: true, required: false, sortable: true, type: 'text' },
     { key: 'observation', label: 'Observación', visible: false, required: false, sortable: false, type: 'text' },
     { key: 'createdBy', label: 'Creado Por', visible: false, required: false, sortable: true, type: 'text' },
     { key: 'createdAt', label: 'Fecha Creación', visible: false, required: false, sortable: true, type: 'datetime' },
@@ -133,6 +137,9 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
   // Configuración del header
   headerConfig: HeaderConfig | null = null;
 
+  /// usuario que inicio sesion
+  userLogin: string = '';
+  userLoginId:number = 0;
   // ag-Grid configuration
   columnDefs: ColDef[] = [];
   gridOptions: GridOptions = createFioriGridOptions();
@@ -145,10 +152,13 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
     private categoriaAuxiliarService: CategoriaAuxiliarService,
     private rhAreaService: RhAreaService,
     private costCenterService: CostCenterService,
-    private headerConfigService: HeaderConfigService
+    private headerConfigService: HeaderConfigService,
+    private authService: AuthService,
+    private dialog: MatDialog
   ) {}
   
   ngOnInit(): void {
+    this.loadUser()
     this.headerConfig = this.headerConfigService.loadHeaderConfig();
     this.setupAgGrid();
     this.loadAutocompleteData();
@@ -158,6 +168,14 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  loadUser(){
+    const user=this.authService.getCurrentUser()
+    if(user){
+      this.userLogin=user.username;
+      this.userLoginId=user.id;
+    }
   }
   
   /**
@@ -239,9 +257,11 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
    */
   loadTransfers(): void {
     this.loading = true;
-    
+    // recuperamos el companyID
+    const companyId= this.headerConfig?.selectedEmpresa?.companiaId || '01';
     // Usar paginación avanzada con filtros
     this.personalTransferService.getPersonalTransfersPaginatedAdvanced(
+      companyId,
       this.page,
       this.pageSize,
       this.currentFilters['searchText'],
@@ -250,12 +270,16 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
       this.currentFilters['costCenterId'],
       undefined, // isActive - por ahora sin filtrar por estado
       'personalId', // sortBy
-      'asc' // sortDirection
+      'asc', // sortDirection
+      '', // approvalStatus
+      this.userLoginId, // createdBy
     )
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
           this.loading = false;
+          console.log('response', response);
+          
           if (response.success && response.data) {
             this.transfers = response.data.data.map(transfer => ({
               ...transfer,
@@ -347,24 +371,104 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
    * Eliminar transferencia
    */
   deleteTransfer(transfer: PersonalTransferDto): void {
-    if (confirm(`¿Estás seguro de eliminar la transferencia del personal ${transfer.personalId}?`)) {
-      this.personalTransferService.deletePersonalTransfer(transfer.personalId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.toastService.success('Éxito', 'Transferencia eliminada correctamente');
-              this.loadTransfers();
-            } else {
-              this.toastService.error('Error', response.message || 'Error al eliminar transferencia');
+    const confirmData: ModalConfirmData = {
+      tipo: 'danger',
+      titulo: 'Confirmar Eliminación',
+      mensaje: `¿Estás seguro de eliminar la transferencia de ${transfer.fullName}? Esta acción no se puede deshacer.`,
+      confirmacion: true,
+      textoConfirmar: 'Eliminar Transferencia'
+    };
+
+    const dialogRef = this.dialog.open(ModalConfirmComponent, {
+      width: '400px',
+      data: confirmData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.loading = true;
+        
+        this.personalTransferService.deletePersonalTransfer(transfer.id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (response) => {
+              this.loading = false;
+              if (response.success) {
+                this.toastService.success('Éxito', 'Transferencia eliminada correctamente');
+                this.loadTransfers();
+              } else {
+                this.toastService.error('Error', response.message || 'Error al eliminar transferencia');
+              }
+            },
+            error: (error) => {
+              this.loading = false;
+              console.error('Error deleting transfer:', error);
+              this.toastService.error('Error', 'Error al eliminar la transferencia');
             }
-          },
-          error: (error) => {
-            console.error('Error deleting transfer:', error);
-            this.toastService.error('Error', 'Error al eliminar la transferencia');
-          }
-        });
-    }
+          });
+      }
+    });
+  }
+
+  /**
+   * Aprobar transferencia
+   */
+  approveTransfer(transfer: PersonalTransferDto): void {
+    const confirmData: ModalConfirmData = {
+      tipo: 'info',
+      titulo: 'Confirmar Aprobación',
+      mensaje: `¿Estás seguro de aprobar la transferencia de ${transfer.fullName} desde ${transfer.branchDescription} hacia su nueva ubicación?`,
+      confirmacion: true,
+      textoConfirmar: 'Aprobar Transferencia'
+    };
+
+    const dialogRef = this.dialog.open(ModalConfirmComponent, {
+      width: '400px',
+      data: confirmData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.loading = true;
+        
+        const updateData: UpdatePersonalTransferDto = {
+          branchId: transfer.branchId,
+          branchDescription: transfer.branchDescription,
+          areaId: transfer.areaId,
+          areaDescription: transfer.areaDescription,
+          costCenterId: transfer.costCenterId,
+          costCenterDescription: transfer.costCenterDescription,
+          startDate: transfer.startDate,
+          endDate: transfer.endDate,
+          observation: transfer.observation || '',
+          approvalStatus: 'A',
+          approvedBy: this.userLogin,
+          approvedAt: new Date(),
+          updatedBy: this.userLogin
+        };
+
+        console.log('📤 Datos que se envían para aprobación:', updateData);
+
+        this.personalTransferService.updatePersonalTransfer(transfer.id, updateData)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (response) => {
+              this.loading = false;
+              if (response.success) {
+                this.toastService.success('Éxito', 'Transferencia aprobada correctamente');
+                this.loadTransfers(); // Recargar la lista
+              } else {
+                this.toastService.error('Error', response.message || 'Error al aprobar la transferencia');
+              }
+            },
+            error: (error) => {
+              this.loading = false;
+              console.error('Error approving transfer:', error);
+              this.toastService.error('Error', 'Error al aprobar la transferencia');
+            }
+          });
+      }
+    });
   }
   
   // === FILTROS ===
@@ -432,7 +536,7 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
   
   onColumnsReset(): void {
     // Restaurar configuración por defecto
-    const defaultVisibleColumns = ['select', 'personalId', 'fullName', 'branchDescription', 'areaDescription', 'startDate', 'endDate', 'actions'];
+    const defaultVisibleColumns = ['select', 'personalId', 'fullName', 'branchDescription', 'areaDescription', 'startDate', 'endDate', 'approvalStatus', 'actions'];
     
     this.tableColumns.forEach(col => {
       col.visible = defaultVisibleColumns.includes(col.key);
@@ -632,6 +736,46 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
         }
       },
       {
+        field: 'approvalStatus',
+        headerName: 'Estado',
+        minWidth: 120,
+        maxWidth: 150,
+        cellRenderer: (params: any) => {
+          const status = params.value || 'P';
+          let statusText = '';
+          let statusClass = '';
+          let bgClass = '';
+          
+          switch (status) {
+            case 'P':
+              statusText = 'Pendiente';
+              statusClass = 'text-yellow-700';
+              bgClass = 'bg-yellow-100';
+              break;
+            case 'A':
+              statusText = 'Aprobado';
+              statusClass = 'text-green-700';
+              bgClass = 'bg-green-100';
+              break;
+            case 'R':
+              statusText = 'Rechazado';
+              statusClass = 'text-red-700';
+              bgClass = 'bg-red-100';
+              break;
+            default:
+              statusText = 'Desconocido';
+              statusClass = 'text-gray-700';
+              bgClass = 'bg-gray-100';
+          }
+          
+          return `<div class="flex items-center justify-center h-full">
+            <span class="px-2 py-1 text-xs font-medium rounded-full ${statusClass} ${bgClass}">
+              ${statusText}
+            </span>
+          </div>`;
+        }
+      },
+      {
         field: 'actions',
         headerName: 'Acciones',
         minWidth: 120,
@@ -640,7 +784,15 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
         lockPosition: true,
         resizable: false,
         cellRenderer: (params: any) => {
+          const isPending = params.data.approvalStatus === 'P';
+          const approveButton = isPending ? `<button class="approve-btn p-2 text-green-600 hover:bg-green-100 rounded transition-colors" title="Aprobar" >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </button>` : '';
+            
           return `<div class="flex items-center justify-center space-x-1 h-full">
+            ${approveButton}
             <button class="edit-btn p-2 text-fiori-primary hover:bg-fiori-primary/10 rounded transition-colors" title="Editar" >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -665,10 +817,11 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
       'areaDescription': 5,   // Área - importante
       'startDate': 6,        // Fecha inicio - moderadamente importante
       'endDate': 7,          // Fecha fin - moderadamente importante
-      'costCenterDescription': 8, // Centro de costo - menos importante
-      'observation': 9,      // Observación - menos importante
-      'createdBy': 10,       // Creado por - poco importante
-      'createdAt': 11,       // Fecha creación - poco importante
+      'approvalStatus': 8,   // Estado aprobación - importante
+      'costCenterDescription': 9, // Centro de costo - menos importante
+      'observation': 10,     // Observación - menos importante
+      'createdBy': 11,       // Creado por - poco importante
+      'createdAt': 12,       // Fecha creación - poco importante
       'actions': 1           // Siempre visible (acciones)
     };
 
@@ -729,6 +882,15 @@ export class PersonalTransferComponent implements OnInit, OnDestroy {
             const rowData = this.gridApi.getDisplayedRowAtIndex(rowIndex)?.data;
             if (rowData) {
               this.deleteTransfer(rowData);
+            }
+          }
+        } else if (button && button.classList.contains('approve-btn')) {
+          const cell = button.closest('.ag-cell');
+          if (cell) {
+            const rowIndex = parseInt(cell.closest('.ag-row')?.getAttribute('row-index') || '0');
+            const rowData = this.gridApi.getDisplayedRowAtIndex(rowIndex)?.data;
+            if (rowData) {
+              this.approveTransfer(rowData);
             }
           }
         }

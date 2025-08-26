@@ -106,6 +106,7 @@ import { MassiveTransferModalComponent } from './components/personal/transferenc
 import { AgGridModule } from 'ag-grid-angular';
 import { ModuleRegistry, AllCommunityModule, GridOptions } from 'ag-grid-community';
 import { AG_GRID_LOCALE_ES } from './ag-grid-locale.es';
+import { ReportePersonalTurnosComponent } from './components/asistencia/reportes/reporte-personal-turnos/reporte-personal-turnos.component';
 
 // Registrar módulos de AG-Grid globalmente
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -171,7 +172,7 @@ registerLocaleData(localeEs);
         PersonalTransferComponent,
         TransferModalComponent,
         MassiveTransferModalComponent,
-
+        ReportePersonalTurnosComponent
 
     ],
     exports: [

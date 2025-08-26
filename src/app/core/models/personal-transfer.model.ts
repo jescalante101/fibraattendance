@@ -18,6 +18,11 @@ export interface PersonalTransferDto {
   updatedAt?: string | null; // ISO datetime string
   companyId: string | null;
 
+  createdById?: number;
+  approvalStatus: string; // Será 'P', 'A', 'R', etc.
+  approvedBy?: string;
+  approvedAt?: Date;
+
 }
 
 export interface CreatePersonalTransferDto {
@@ -34,7 +39,7 @@ export interface CreatePersonalTransferDto {
   observation?: string | null;
   createdBy: string;
   companyId: string | null;
-
+  approvalStatus: string;
 }
 
 export interface UpdatePersonalTransferDto {
@@ -48,6 +53,10 @@ export interface UpdatePersonalTransferDto {
   endDate?: string | null; // ISO date string
   observation?: string | null;
   updatedBy: string;
+
+  approvalStatus: string;
+  approvedBy?: string;
+  approvedAt?: Date;
 }
 
 export interface ApiResponsePersonalTransfer<T> {

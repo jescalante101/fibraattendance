@@ -1,0 +1,279 @@
+/* Estilos específicos para el reporte de personal y turnos */
+
+/* Estados de carga mejorados */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* Estilos para badges de estado */
+.status-badge {
+  @apply px-2 py-1 text-xs font-medium rounded-full;
+}
+
+.status-sin-turno {
+  @apply bg-red-100 text-red-700 border border-red-200;
+}
+
+.status-con-turno {
+  @apply bg-green-100 text-green-700 border border-green-200;
+}
+
+/* AG-Grid customizations específicas */
+::ng-deep .ag-theme-quartz .ag-header {
+  background-color: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+  font-weight: 600;
+}
+
+::ng-deep .ag-theme-quartz .ag-header-cell {
+  border-right: 1px solid #e2e8f0;
+  color: #374151;
+}
+
+::ng-deep .ag-theme-quartz .ag-cell {
+  border-right: 1px solid #f1f5f9;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+}
+
+::ng-deep .ag-theme-quartz .ag-row:hover {
+  background-color: #fef3c7 !important;
+}
+
+/* Estilos específicos para sección sin turno */
+.seccion-sin-turno ::ng-deep .ag-theme-quartz .ag-header {
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
+.seccion-sin-turno ::ng-deep .ag-theme-quartz .ag-row:hover {
+  background-color: #fee2e2 !important;
+}
+
+/* Estilos específicos para sección con turno */
+.seccion-con-turno ::ng-deep .ag-theme-quartz .ag-header {
+  background-color: #f0fdf4;
+  color: #16a34a;
+}
+
+.seccion-con-turno ::ng-deep .ag-theme-quartz .ag-row:hover {
+  background-color: #dcfce7 !important;
+}
+
+/* Animaciones para carga */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Estilos para dropdowns */
+.dropdown-container {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 50;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.25rem;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:hover {
+  background-color: #f8fafc;
+}
+
+/* Estilos para filtros compactos */
+.filter-card {
+  @apply bg-white rounded-lg border border-slate-200 p-3 shadow-sm hover:shadow-md transition-shadow;
+}
+
+.filter-card-header {
+  @apply flex items-center space-x-2 mb-2;
+}
+
+.filter-icon {
+  @apply w-5 h-5 rounded flex items-center justify-center;
+}
+
+/* Estados responsive */
+@media (max-width: 1280px) {
+  .grid-dos-columnas {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .ag-theme-quartz {
+    font-size: 11px;
+  }
+  
+  ::ng-deep .ag-theme-quartz .ag-cell {
+    font-size: 11px;
+  }
+  
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Estilos para botones de exportación */
+.export-button {
+  @apply inline-flex items-center gap-2 px-4 py-2 text-sm border rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.export-excel {
+  @apply bg-green-50 text-green-700 border-green-200 hover:bg-green-100;
+}
+
+.export-pdf {
+  @apply bg-red-50 text-red-700 border-red-200 hover:bg-red-100;
+}
+
+/* Estilos para estados vacíos */
+.empty-state {
+  @apply text-center py-12;
+}
+
+.empty-state-icon {
+  @apply w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4;
+}
+
+.empty-state-sin-turno .empty-state-icon {
+  @apply bg-green-100;
+}
+
+.empty-state-con-turno .empty-state-icon {
+  @apply bg-red-100;
+}
+
+/* Mejoras visuales para badges */
+.badge-count {
+  @apply px-2 py-1 text-sm rounded-full font-medium;
+}
+
+.badge-sin-turno {
+  @apply bg-red-200 text-red-800;
+}
+
+.badge-con-turno {
+  @apply bg-green-200 text-green-800;
+}
+
+/* Indicador de solo con turno */
+.solo-con-turno-badge {
+  @apply px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full font-medium;
+}
+
+/* Estilos para tooltips de información */
+.info-tooltip {
+  @apply text-xs text-slate-600 bg-white px-3 py-2 rounded-lg border border-slate-200;
+}
+
+/* Transiciones suaves */
+.transition-smooth {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Estilos para el header principal */
+.main-header {
+  @apply mb-6 flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border;
+}
+
+.header-info {
+  @apply flex items-center gap-3;
+}
+
+.header-stripe {
+  @apply w-1 h-8 rounded-full;
+}
+
+.header-stripe-info {
+  @apply bg-blue-500;
+}
+
+.header-titles h6 {
+  @apply text-xl font-semibold text-gray-900;
+}
+
+.header-titles p {
+  @apply text-sm text-gray-500;
+}
+
+/* Contador en tiempo real */
+.live-counter {
+  @apply ml-4 flex items-center gap-4 text-sm text-gray-500;
+}
+
+.counter-item {
+  @apply flex items-center gap-1;
+}
+
+.counter-icon-con-turno {
+  @apply w-4 h-4 text-green-600;
+}
+
+.counter-icon-sin-turno {
+  @apply w-4 h-4 text-red-600;
+}
+
+/* Gradientes mejorados para las secciones */
+.section-sin-turno {
+  background: linear-gradient(135deg, #fef2f2 0%, #fed7aa 100%);
+}
+
+.section-con-turno {
+  background: linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%);
+}
+
+/* Bordes con gradientes */
+.border-gradient-red {
+  border-image: linear-gradient(135deg, #fca5a5, #f87171) 1;
+}
+
+.border-gradient-green {
+  border-image: linear-gradient(135deg, #86efac, #4ade80) 1;
+}
+
+/* Efectos de hover mejorados */
+.hover-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}

@@ -20,14 +20,31 @@
   color: #004085 !important;
 }
 
+/* Horas extras 25% - Color naranja */
+::ng-deep .hours-extra25 {
+  background-color: #fed7aa !important;
+  color: #ea580c !important;
+  font-weight: 500;
+}
+
+/* Horas extras 35% - Color rojo */
+::ng-deep .hours-extra35 {
+  background-color: #fecaca !important;
+  color: #dc2626 !important;
+  font-weight: 500;
+}
+
+/* Para mantener compatibilidad temporal con clases antiguas */
 ::ng-deep .hours-extra1 {
-  background-color: #ffe6cc !important;
-  color: #cc5500 !important;
+  background-color: #fed7aa !important;
+  color: #ea580c !important;
+  font-weight: 500;
 }
 
 ::ng-deep .hours-extra2 {
-  background-color: #ffb3d9 !important;
-  color: #99004d !important;
+  background-color: #fecaca !important;
+  color: #dc2626 !important;
+  font-weight: 500;
 }
 
 /* AG-Grid customizations */
@@ -60,9 +77,35 @@
   background-color: #fef3c7 !important;
 }
 
+/* Columnas fijadas a la izquierda */
 ::ng-deep .ag-theme-quartz .ag-pinned-left-cols-container {
   border-right: 2px solid #d1d5db;
   background-color: #f9fafb;
+}
+
+/* Columnas totales fijadas a la derecha */
+::ng-deep .ag-theme-quartz .ag-pinned-right-cols-container {
+  border-left: 2px solid #d1d5db;
+  background-color: #f9fafb;
+}
+
+/* Estilos para columnas de totales */
+::ng-deep .ag-theme-quartz .ag-pinned-right-cols-container .ag-cell {
+  font-weight: 700;
+  border-left: 1px solid #e5e7eb;
+}
+
+/* Fondo específico para cada tipo de total */
+::ng-deep .ag-theme-quartz .bg-blue-50 {
+  background-color: #eff6ff !important;
+}
+
+::ng-deep .ag-theme-quartz .bg-orange-50 {
+  background-color: #fff7ed !important;
+}
+
+::ng-deep .ag-theme-quartz .bg-red-50 {
+  background-color: #fef2f2 !important;
 }
 
 /* Responsive para pantallas pequeñas */

@@ -1099,8 +1099,8 @@ export class MassiveTransferModalComponent implements OnInit, OnDestroy {
       endDate: this.transferConfig.endDate,
       observation: this.transferConfig.observations || null,
       createdBy: this.userLogin,
-      companyId: this.headerConfig?.selectedEmpresa?.companiaId || ''
-
+      companyId: this.headerConfig?.selectedEmpresa?.companiaId || '',
+      approvalStatus: 'P'
     }));
 
     // Llamar al servicio para crear las transferencias masivas

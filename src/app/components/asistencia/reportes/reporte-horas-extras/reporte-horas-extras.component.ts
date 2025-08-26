@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, GridOptions, GridApi } from 'ag-grid-community';
 import { createFioriGridOptions } from 'src/app/shared/ag-grid-theme-fiori';
@@ -8,14 +8,14 @@ import { Subject, takeUntil, finalize } from 'rxjs';
 import { ExtraHoursReportService } from 'src/app/core/services/report/extra-hours-report.service';
 import { HeaderConfigService } from 'src/app/core/services/header-config.service';
 import { ToastService } from 'src/app/shared/services/toast.service';
+import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
+import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
+import { DateRange } from 'src/app/shared/components/date-range-picker/date-range-picker.component';
 import { 
   ReportFiltersHE,
   ExtraHoursReportResult,
   ReporteAsistenciaSemanalDto,
   ProcessedEmployeeData,
-  ProcessedDayData,
-  AreaOption,
-  SedeOption,
   SummaryResponse
 } from 'src/app/core/models/report/extra-hours-report.model';
 
@@ -29,6 +29,7 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
 
   // Form y filtros
   filterForm!: FormGroup;
+  dateRangeControl = new FormControl<DateRange | null>(null, Validators.required);
   isLoading = false;
   isExporting = false;
 
@@ -43,16 +44,18 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
   gridOptions: GridOptions = createFioriGridOptions();
   private gridApi!: GridApi;
 
-  // Filtros auxiliares
-  allAreas: AreaOption[] = [];
-  filteredAreas: AreaOption[] = [];
+  // Filtros auxiliares usando servicios existentes
+  allAreas: RhArea[] = [];
+  filteredAreas: RhArea[] = [];
   showAreaDropdown = false;
-  selectedArea: AreaOption | null = null;
+  selectedArea: RhArea | null = null;
+  areaFilterTerm = '';
 
-  allSedes: SedeOption[] = [];
-  filteredSedes: SedeOption[] = [];
+  allSedes: CategoriaAuxiliar[] = [];
+  filteredSedes: CategoriaAuxiliar[] = [];
   showSedeDropdown = false;
-  selectedSede: SedeOption | null = null;
+  selectedSede: CategoriaAuxiliar | null = null;
+  sedeFilterTerm = '';
 
   // Fechas del reporte
   reportDates: string[] = [];
@@ -63,7 +66,9 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private extraHoursService: ExtraHoursReportService,
     private headerConfigService: HeaderConfigService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private rhAreaService: RhAreaService,
+    private categoriaAuxiliarService: CategoriaAuxiliarService
   ) {
     this.initializeForm();
     this.setupGridOptions();
@@ -84,13 +89,16 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
     const lastWeek = new Date(today);
     lastWeek.setDate(today.getDate() - 7);
 
+    // Configurar date range picker con fechas por defecto
+    const defaultDateRange: DateRange = {
+      start: lastWeek.toISOString().split('T')[0],
+      end: today.toISOString().split('T')[0]
+    };
+    
+    this.dateRangeControl.setValue(defaultDateRange);
+
     this.filterForm = this.fb.group({
-      fechaInicio: [lastWeek.toISOString().split('T')[0], Validators.required],
-      fechaFin: [today.toISOString().split('T')[0], Validators.required],
-      areaFilter: [''],
-      sedeFilter: [''],
-      areaId: [''],
-      sedeId: ['']
+      // Los filtros ahora son manejados por las variables individuales
     });
   }
 
@@ -109,7 +117,7 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
   }
 
   private loadAreas(companyId: string) {
-    this.extraHoursService.getAreas(companyId)
+    this.rhAreaService.getAreas(companyId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (areas) => {
@@ -125,7 +133,7 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
   }
 
   private loadSedes(companyId: string) {
-    this.extraHoursService.getSites(companyId)
+    this.categoriaAuxiliarService.getCategoriasAuxiliar()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (sedes) => {
@@ -154,8 +162,8 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
 
   // Generar reporte
   onSearch() {
-    if (this.filterForm.invalid) {
-      this.markFormGroupTouched();
+    if (!this.dateRangeControl.valid) {
+      this.toastService.error('Validación', 'Por favor selecciona un rango de fechas válido');
       return;
     }
 
@@ -239,16 +247,16 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
   }
 
   private prepareFilters(): ReportFiltersHE {
-    const formValue = this.filterForm.value;
+    const dateRange = this.dateRangeControl.value;
     const headerConfig = this.headerConfigService.getCurrentHeaderConfig();
     const companyId = headerConfig?.selectedEmpresa?.companiaId || '';
 
     const filters = {
-      startDate: formValue.fechaInicio,
-      endDate: formValue.fechaFin,
+      startDate: dateRange?.start || '',
+      endDate: dateRange?.end || '',
       companyId: companyId,
-      areaId: this.selectedArea?.id || '',
-      sedeId: this.selectedSede?.id || ''
+      areaId: this.selectedArea?.areaId || '',
+      sedeId: this.selectedSede?.categoriaAuxiliarId || ''
     };
 
     console.log('🎯 Prepared Filters:', filters);
@@ -306,8 +314,14 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
   }
 
   private generateReportDates() {
-    const startDate = new Date(this.filterForm.value.fechaInicio);
-    const endDate = new Date(this.filterForm.value.fechaFin);
+    const dateRange = this.dateRangeControl.value;
+    if (!dateRange?.start || !dateRange?.end) {
+      this.reportDates = [];
+      return;
+    }
+    
+    const startDate = new Date(dateRange.start);
+    const endDate = new Date(dateRange.end);
     this.reportDates = [];
 
     for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
@@ -393,8 +407,8 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
       // Columnas fijas de empleado
       { headerName: 'N° Doc', field: 'nroDoc', pinned: 'left', width: 100, cellClass: 'text-center' },
       { headerName: 'Colaborador', field: 'nombre', pinned: 'left', width: 200, cellClass: 'font-medium' },
-      { headerName: 'Área', field: 'area', pinned: 'left', width: 120 },
-      { headerName: 'Sede', field: 'sede', pinned: 'left', width: 100 },
+      { headerName: 'Área', field: 'area',  width: 120 },
+      { headerName: 'Sede', field: 'sede',  width: 100 },
       { headerName: 'Cargo', field: 'cargo', width: 150 },
     ];
 
@@ -429,17 +443,17 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
             cellRenderer: (params: any) => this.formatHoursCell(params.value)
           },
           {
-            headerName: 'H.E.1',
+            headerName: 'H.E.25%',
             field: `horasExtras1_${fecha}`,
-            width: 70,
-            cellClass: 'text-center hours-extra1',
+            width: 80,
+            cellClass: 'text-center hours-extra25',
             cellRenderer: (params: any) => this.formatHoursCell(params.value)
           },
           {
-            headerName: 'H.E.2',
+            headerName: 'H.E.35%',
             field: `horasExtras2_${fecha}`,
-            width: 70,
-            cellClass: 'text-center hours-extra2',
+            width: 80,
+            cellClass: 'text-center hours-extra35',
             cellRenderer: (params: any) => this.formatHoursCell(params.value)
           }
         ]
@@ -448,11 +462,35 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
       this.columnDefs.push(headerGroup as ColDef);
     });
 
-    // Columnas de totales
+    // Columnas de totales (sticky a la derecha)
     this.columnDefs.push(
-      { headerName: 'Total H.N.', field: 'totalHorasNormales', width: 100, cellClass: 'text-center font-bold hours-normal', cellRenderer: (params: any) => this.formatHoursCell(params.value) },
-      { headerName: 'Total H.E.1', field: 'totalHorasExtras1', width: 100, cellClass: 'text-center font-bold hours-extra1', cellRenderer: (params: any) => this.formatHoursCell(params.value) },
-      { headerName: 'Total H.E.2', field: 'totalHorasExtras2', width: 100, cellClass: 'text-center font-bold hours-extra2', cellRenderer: (params: any) => this.formatHoursCell(params.value) }
+      { 
+        headerName: 'Total H.N.', 
+        field: 'totalHorasNormales', 
+        width: 80, 
+        cellClass: 'text-center font-bold hours-normal bg-blue-50', 
+        cellRenderer: (params: any) => this.formatHoursCell(params.value),
+        pinned: 'right',
+        lockPosition: true
+      },
+      { 
+        headerName: 'Total H.E.25%', 
+        field: 'totalHorasExtras1', 
+        width: 80, 
+        cellClass: 'text-center font-bold hours-extra25 bg-orange-50', 
+        cellRenderer: (params: any) => this.formatHoursCell(params.value),
+        pinned: 'right',
+        lockPosition: true
+      },
+      { 
+        headerName: 'Total H.E.35%', 
+        field: 'totalHorasExtras2', 
+        width: 80, 
+        cellClass: 'text-center font-bold hours-extra35 bg-red-50', 
+        cellRenderer: (params: any) => this.formatHoursCell(params.value),
+        pinned: 'right',
+        lockPosition: true
+      }
     );
 
     console.log('🏗️ Column Definitions Created:', this.columnDefs.length, 'columns');
@@ -492,45 +530,92 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
     return `<span class="font-mono">${this.extraHoursService.formatHours(value)}</span>`;
   }
 
-  // Filtros auxiliares
-  onAreaFilterChange(event: any) {
-    const value = event.target.value.toLowerCase();
-    this.filteredAreas = this.allAreas.filter(area => 
-      area.descripcion.toLowerCase().includes(value)
-    );
+  // Métodos para Date Range Picker
+  onDateRangeSelected(dateRange: DateRange): void {
+    console.log('📅 Date range selected:', dateRange);
+    // El FormControl ya está actualizado automáticamente
   }
 
-  onAreaSelected(area: AreaOption | null) {
+  // Métodos para Área Autocomplete
+  getAreaFilterText(): string {
+    return this.selectedArea ? this.selectedArea.descripcion : this.areaFilterTerm;
+  }
+
+  onAreaFilterChange(event: any): void {
+    const value = event.target?.value || '';
+    this.areaFilterTerm = value;
+    this.filteredAreas = this.allAreas.filter(area => 
+      area.descripcion.toLowerCase().includes(value.toLowerCase())
+    );
+    
+    // Reset selection if typing
+    if (value !== this.selectedArea?.descripcion) {
+      this.selectedArea = null;
+    }
+  }
+
+  onAreaFocus(): void {
+    if (this.filteredAreas.length === 0) {
+      this.filteredAreas = [...this.allAreas];
+    }
+    this.showAreaDropdown = this.filteredAreas.length > 0;
+  }
+
+  onAreaSelected(area: RhArea | null): void {
     this.selectedArea = area;
-    this.filterForm.patchValue({ 
-      areaFilter: area ? area.descripcion : '',
-      areaId: area ? area.id : ''
-    });
+    this.areaFilterTerm = area ? area.descripcion : '';
     this.showAreaDropdown = false;
   }
 
-  onAreaBlur() {
-    setTimeout(() => this.showAreaDropdown = false, 200);
+  onAreaBlur(): void {
+    setTimeout(() => {
+      this.showAreaDropdown = false;
+    }, 200);
   }
 
-  onSedeFilterChange(event: any) {
-    const value = event.target.value.toLowerCase();
+  trackByAreaId(index: number, area: RhArea): string {
+    return area.areaId;
+  }
+
+  // Métodos para Sede Autocomplete
+  getSedeFilterText(): string {
+    return this.selectedSede ? this.selectedSede.descripcion : this.sedeFilterTerm;
+  }
+
+  onSedeFilterChange(event: any): void {
+    const value = event.target?.value || '';
+    this.sedeFilterTerm = value;
     this.filteredSedes = this.allSedes.filter(sede => 
-      sede.descripcion.toLowerCase().includes(value)
+      sede.descripcion.toLowerCase().includes(value.toLowerCase())
     );
+    
+    // Reset selection if typing
+    if (value !== this.selectedSede?.descripcion) {
+      this.selectedSede = null;
+    }
   }
 
-  onSedeSelected(sede: SedeOption | null) {
+  onSedeFocus(): void {
+    if (this.filteredSedes.length === 0) {
+      this.filteredSedes = [...this.allSedes];
+    }
+    this.showSedeDropdown = this.filteredSedes.length > 0;
+  }
+
+  onSedeSelected(sede: CategoriaAuxiliar | null): void {
     this.selectedSede = sede;
-    this.filterForm.patchValue({ 
-      sedeFilter: sede ? sede.descripcion : '',
-      sedeId: sede ? sede.id : ''
-    });
+    this.sedeFilterTerm = sede ? sede.descripcion : '';
     this.showSedeDropdown = false;
   }
 
-  onSedeBlur() {
-    setTimeout(() => this.showSedeDropdown = false, 200);
+  onSedeBlur(): void {
+    setTimeout(() => {
+      this.showSedeDropdown = false;
+    }, 200);
+  }
+
+  trackBySedeId(index: number, sede: CategoriaAuxiliar): string {
+    return sede.categoriaAuxiliarId;
   }
 
   // Exportar Excel
@@ -597,21 +682,26 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
     }
   }
 
-  onClearFilters() {
+  onClearFilters(): void {
+    // Limpiar filtros
     this.selectedArea = null;
     this.selectedSede = null;
-    this.filterForm.reset();
+    this.areaFilterTerm = '';
+    this.sedeFilterTerm = '';
+    this.filteredAreas = [...this.allAreas];
+    this.filteredSedes = [...this.allSedes];
     
     // Restablecer fechas por defecto
     const today = new Date();
     const lastWeek = new Date(today);
     lastWeek.setDate(today.getDate() - 7);
 
-    this.filterForm.patchValue({
-      fechaInicio: lastWeek.toISOString().split('T')[0],
-      fechaFin: today.toISOString().split('T')[0]
-    });
-
+    const defaultDateRange: DateRange = {
+      start: lastWeek.toISOString().split('T')[0],
+      end: today.toISOString().split('T')[0]
+    };
+    
+    this.dateRangeControl.setValue(defaultDateRange);
     this.resetReportData();
   }
 
@@ -624,10 +714,8 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
     this.reportDates = [];
   }
 
-  private markFormGroupTouched() {
-    Object.keys(this.filterForm.controls).forEach(key => {
-      this.filterForm.get(key)?.markAsTouched();
-    });
+  private markFormGroupTouched(): void {
+    this.dateRangeControl.markAsTouched();
   }
 
   formatHours(hours: number): string {

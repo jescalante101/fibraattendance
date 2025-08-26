@@ -55,7 +55,10 @@ export class TransferModalComponent implements OnInit, OnDestroy {
     isPermanent: false,
     
     // Observaciones
-    observations: ''
+    observations: '',
+    
+    // Approval status
+    approvalStatus: 'P' as string
   };
 
   // FormControl for date range picker
@@ -207,6 +210,7 @@ export class TransferModalComponent implements OnInit, OnDestroy {
       this.formData.endDate = transfer.endDate ? transfer.endDate.split('T')[0] : '';
       this.formData.isPermanent = !transfer.endDate;
       this.formData.observations = transfer.observation || '';
+      this.formData.approvalStatus = transfer.approvalStatus || 'P';
       
       // Los campos "Nueva Ubicación" quedan vacíos para que el usuario los llene
       this.formData.newBranchId = '';
@@ -217,6 +221,7 @@ export class TransferModalComponent implements OnInit, OnDestroy {
       this.sedeFilterTerm = '';
       this.areaFilterTerm = '';
       this.costCenterFilterTerm = '';
+      
     } else {
       // Valores por defecto para nueva transferencia
       const today = new Date().toISOString().split('T')[0];
@@ -505,7 +510,10 @@ export class TransferModalComponent implements OnInit, OnDestroy {
       startDate: this.formData.startDate,
       endDate: this.formData.isPermanent ? null : this.formData.endDate,
       observation: this.formData.observations || null,
-      updatedBy: this.currentUser?.username || 'Sistema'
+      updatedBy: this.currentUser?.username || 'Sistema',
+      approvalStatus: this.formData.approvalStatus,
+      approvedBy: this.currentUser?.username || 'Sistema',
+      approvedAt: new Date()
     };
 
     this.personalTransferService.updatePersonalTransfer(this.data.transferData.id, updateData)
@@ -555,7 +563,8 @@ export class TransferModalComponent implements OnInit, OnDestroy {
       endDate: this.formData.isPermanent ? null : this.formData.endDate,
       observation: this.formData.observations || null,
       createdBy: this.currentUser?.username || 'Sistema',
-      companyId: this.headerConfig?.selectedEmpresa?.companiaId || ''
+      companyId: this.headerConfig?.selectedEmpresa?.companiaId || '',
+      approvalStatus: 'P'
     };
 
     this.personalTransferService.createPersonalTransfer(createData)

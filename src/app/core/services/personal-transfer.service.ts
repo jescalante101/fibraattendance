@@ -116,6 +116,7 @@ export class PersonalTransferService {
    * Gets personal records with advanced pagination and sorting
    */
   getPersonalTransfersPaginatedAdvanced(
+    companyId :string,
     pageNumber: number = 1,
     pageSize: number = 10,
     searchTerm?: string,
@@ -124,14 +125,23 @@ export class PersonalTransferService {
     costCenterId?: string,
     isActive?: boolean,
     sortBy: string = 'PersonalId',
-    sortDirection: 'asc' | 'desc' = 'asc'
+    sortDirection: 'asc' | 'desc' = 'asc',
+    approvalStatus?: string,
+    createdById?: number
   ): Observable<ApiResponsePersonalTransfer<PaginatedResponsePersonalTransfer<PersonalTransferDto>>> {
+    
     let params = new HttpParams()
       .set('pageNumber', pageNumber.toString())
       .set('pageSize', pageSize.toString())
       .set('sortBy', sortBy)
-      .set('sortDirection', sortDirection);
-
+      .set('sortDirection', sortDirection)
+      .set('companyId', companyId);
+    if (approvalStatus) {
+      params = params.set('approvalStatus', approvalStatus);
+    }
+    if (createdById) {
+      params = params.set('createdById', createdById);
+    }
     if (searchTerm) {
       params = params.set('searchTerm', searchTerm);
     }
@@ -285,8 +295,8 @@ export class PersonalTransferService {
   /**
    * Deletes a personal Transfer record
    */
-  deletePersonalTransfer(personalId: string): Observable<ApiResponsePersonalTransfer<void>> {
-    return this.http.delete<void>(`${this.baseUrl}/personal/${encodeURIComponent(personalId)}`, {
+  deletePersonalTransfer(id:number): Observable<ApiResponsePersonalTransfer<void>> {
+    return this.http.delete<void>(`${this.baseUrl}/personal/${id}`, {
       headers: this.getHttpHeaders()
     }).pipe(
       map(() => ({

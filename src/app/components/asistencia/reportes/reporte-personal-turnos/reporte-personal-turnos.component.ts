@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { Subject, takeUntil, forkJoin } from 'rxjs';
 import { AgGridAngular } from 'ag-grid-angular';
@@ -28,12 +28,18 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx-js-style';
 
+// Chart.js
+import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
+
+// Registrar componentes de Chart.js
+Chart.register(...registerables);
+
 @Component({
   selector: 'app-reporte-personal-turnos',
   templateUrl: './reporte-personal-turnos.component.html',
   styleUrls: ['./reporte-personal-turnos.component.css']
 })
-export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
+export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroy$ = new Subject<void>();
   
   // ============================================================================
@@ -84,6 +90,10 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
   @ViewChild('gridConTurno', { static: false }) gridConTurno!: AgGridAngular;
   @ViewChild('gridSinTurno', { static: false }) gridSinTurno!: AgGridAngular;
   
+  // Chart.js ViewChild
+  @ViewChild('donutChart', { static: false }) donutCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('barChart', { static: false }) barCanvas!: ElementRef<HTMLCanvasElement>;
+  
   gridOptionsConTurno: GridOptions = createFioriGridOptions();
   gridOptionsSinTurno: GridOptions = createFioriGridOptions();
   
@@ -98,6 +108,14 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
   loadingConTurno = false;
   loadingSinTurno = false;
   isExporting = false;
+  
+  // ============================================================================
+  // TABS Y GRÁFICOS
+  // ============================================================================
+  
+  activeTab: 'tabular' | 'grafica' = 'tabular';
+  donutChart?: Chart;
+  barChart?: Chart;
   
   constructor(
     private employeeScheduleService: EmployeeScheduleAssignmentService,
@@ -117,8 +135,20 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
   }
   
   ngOnDestroy(): void {
+    // Destruir gráficos
+    if (this.donutChart) {
+      this.donutChart.destroy();
+    }
+    if (this.barChart) {
+      this.barChart.destroy();
+    }
+    
     this.destroy$.next();
     this.destroy$.complete();
+  }
+  
+  ngAfterViewInit(): void {
+    // Los gráficos se crearán cuando se cambie al tab gráfico
   }
   
   // ============================================================================
@@ -415,11 +445,22 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
           console.log('- response completa:', response);
           
           if (response.exito && response.data) {
-            this.personalSinTurno = (response.data.items || []).map((emp: Employee): EmployeeWithFormatted => ({
-              ...emp,
-              fullNameFormatted: this.getEmployeeFullName(emp)
-            }));
+            // ✅ FIX: Ensure fullNameFormatted exists in data for AG-Grid filtering
+            this.personalSinTurno = (response.data.items || []).map((emp: Employee): EmployeeWithFormatted => {
+              const fullNameFormatted = this.getEmployeeFullName(emp);
+              return {
+                ...emp,
+                fullNameFormatted: fullNameFormatted
+              };
+            });
             this.totalSinTurno = response.data.totalCount || 0;
+            
+            // Update AG-Grid data if grid is ready
+            setTimeout(() => {
+              if (this.gridSinTurno?.api) {
+                this.gridSinTurno.api.setGridOption('rowData', this.personalSinTurno);
+              }
+            }, 0);
           } else {
             this.personalSinTurno = [];
             this.totalSinTurno = 0;
@@ -601,11 +642,63 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
         'Turno/Horario': emp.scheduleName || 'Sin nombre',
         'Fecha Inicio': emp.startDate ? new Date(emp.startDate).toLocaleDateString('es-ES') : '',
         'Fecha Fin': emp.endDate ? new Date(emp.endDate).toLocaleDateString('es-ES') : 'Indefinido',
-        'Área': emp.areaName || '',
-        'Sede': emp.locationName || ''
+        'Sede': emp.locationName || '',
+        'Área': emp.areaName || ''
       }));
       
       const wsConTurno = XLSX.utils.json_to_sheet(dataConTurno);
+      
+      // ✨ ESTILO para Personal CON Turno (Verde)
+      const headerRowConTurno = Object.keys(dataConTurno[0] || {}).length;
+      for (let col = 0; col < headerRowConTurno; col++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+        if (!wsConTurno[cellAddress]) continue;
+        
+        wsConTurno[cellAddress].s = {
+          font: { bold: true, color: { rgb: "FFFFFF" }, sz: 12 },
+          fill: { patternType: "solid", fgColor: { rgb: "10B981" } }, // Verde
+          alignment: { horizontal: "center", vertical: "center" },
+          border: {
+            top: { style: "thin", color: { rgb: "000000" } },
+            bottom: { style: "thin", color: { rgb: "000000" } },
+            left: { style: "thin", color: { rgb: "000000" } },
+            right: { style: "thin", color: { rgb: "000000" } }
+          }
+        };
+      }
+      
+      // Auto-width para columnas CON Turno
+      const colWidthsConTurno = [
+        { wch: 12 }, // ID Personal
+        { wch: 35 }, // Nombre Completo
+        { wch: 20 }, // Turno/Horario
+        { wch: 15 }, // Fecha Inicio
+        { wch: 15 }, // Fecha Fin
+        { wch: 20 }, // Sede
+        { wch: 25 }  // Área
+      ];
+      wsConTurno['!cols'] = colWidthsConTurno;
+      
+      // Estilo para datos CON Turno
+      for (let row = 1; row <= dataConTurno.length; row++) {
+        for (let col = 0; col < headerRowConTurno; col++) {
+          const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+          if (!wsConTurno[cellAddress]) continue;
+          
+          wsConTurno[cellAddress].s = {
+            font: { sz: 10 },
+            fill: { patternType: "solid", fgColor: { rgb: row % 2 === 0 ? "F0FDF4" : "FFFFFF" } }, // Alternar verde claro
+            alignment: { horizontal: col === 0 ? "center" : "left", vertical: "center" },
+            border: {
+              top: { style: "thin", color: { rgb: "E5E7EB" } },
+              bottom: { style: "thin", color: { rgb: "E5E7EB" } },
+              left: { style: "thin", color: { rgb: "E5E7EB" } },
+              right: { style: "thin", color: { rgb: "E5E7EB" } }
+            }
+          };
+        }
+      }
+      
       XLSX.utils.book_append_sheet(workbook, wsConTurno, 'Personal Con Turno');
       
       // Hoja 2: Personal SIN Turno
@@ -618,13 +711,117 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
       }));
       
       const wsSinTurno = XLSX.utils.json_to_sheet(dataSinTurno);
+      
+      // ✨ ESTILO para Personal SIN Turno (Rojo)
+      const headerRowSinTurno = Object.keys(dataSinTurno[0] || {}).length;
+      for (let col = 0; col < headerRowSinTurno; col++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+        if (!wsSinTurno[cellAddress]) continue;
+        
+        wsSinTurno[cellAddress].s = {
+          font: { bold: true, color: { rgb: "FFFFFF" }, sz: 12 },
+          fill: { patternType: "solid", fgColor: { rgb: "EF4444" } }, // Rojo
+          alignment: { horizontal: "center", vertical: "center" },
+          border: {
+            top: { style: "thin", color: { rgb: "000000" } },
+            bottom: { style: "thin", color: { rgb: "000000" } },
+            left: { style: "thin", color: { rgb: "000000" } },
+            right: { style: "thin", color: { rgb: "000000" } }
+          }
+        };
+      }
+      
+      // Auto-width para columnas SIN Turno
+      const colWidthsSinTurno = [
+        { wch: 12 }, // ID Personal
+        { wch: 35 }, // Nombre Completo
+        { wch: 25 }, // Sede
+        { wch: 25 }, // Área
+        { wch: 30 }  // Centro de Costo
+      ];
+      wsSinTurno['!cols'] = colWidthsSinTurno;
+      
+      // Estilo para datos SIN Turno
+      for (let row = 1; row <= dataSinTurno.length; row++) {
+        for (let col = 0; col < headerRowSinTurno; col++) {
+          const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+          if (!wsSinTurno[cellAddress]) continue;
+          
+          wsSinTurno[cellAddress].s = {
+            font: { sz: 10 },
+            fill: { patternType: "solid", fgColor: { rgb: row % 2 === 0 ? "FEF2F2" : "FFFFFF" } }, // Alternar rojo claro
+            alignment: { horizontal: col === 0 ? "center" : "left", vertical: "center" },
+            border: {
+              top: { style: "thin", color: { rgb: "E5E7EB" } },
+              bottom: { style: "thin", color: { rgb: "E5E7EB" } },
+              left: { style: "thin", color: { rgb: "E5E7EB" } },
+              right: { style: "thin", color: { rgb: "E5E7EB" } }
+            }
+          };
+        }
+      }
+      
       XLSX.utils.book_append_sheet(workbook, wsSinTurno, 'Personal Sin Turno');
+      
+      // 📊 Hoja 3: Resumen Ejecutivo
+      const resumenData = [
+        ['RESUMEN EJECUTIVO'],
+        [''],
+        ['Métrica', 'Cantidad', 'Porcentaje'],
+        ['Personal Con Turno', this.totalConTurno, `${this.getPercentage(this.totalConTurno, this.totalConTurno + this.totalSinTurno)}%`],
+        ['Personal Sin Turno', this.totalSinTurno, `${this.getPercentage(this.totalSinTurno, this.totalConTurno + this.totalSinTurno)}%`],
+        ['Total Personal', this.totalConTurno + this.totalSinTurno, '100%'],
+        ['Áreas Activas', this.getUniqueAreasCount(), '-'],
+        [''],
+        [`Fecha de Generación: ${new Date().toLocaleString('es-ES')}`],
+        [`Período Consultado: ${this.dateRangeControl.value?.start || 'N/A'} - ${this.dateRangeControl.value?.end || 'N/A'}`]
+      ];
+      
+      const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
+      
+      // Estilo para hoja resumen
+      // Título principal
+      wsResumen['A1'].s = {
+        font: { bold: true, color: { rgb: "FFFFFF" }, sz: 16 },
+        fill: { patternType: "solid", fgColor: { rgb: "3B82F6" } },
+        alignment: { horizontal: "center", vertical: "center" }
+      };
+      
+      // Headers de tabla
+      ['A3', 'B3', 'C3'].forEach(cell => {
+        if (wsResumen[cell]) {
+          wsResumen[cell].s = {
+            font: { bold: true, color: { rgb: "FFFFFF" }, sz: 11 },
+            fill: { patternType: "solid", fgColor: { rgb: "6B7280" } },
+            alignment: { horizontal: "center", vertical: "center" },
+            border: {
+              top: { style: "thin", color: { rgb: "000000" } },
+              bottom: { style: "thin", color: { rgb: "000000" } },
+              left: { style: "thin", color: { rgb: "000000" } },
+              right: { style: "thin", color: { rgb: "000000" } }
+            }
+          };
+        }
+      });
+      
+      // Merge del título
+      wsResumen['!merges'] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } } // Merge A1:C1
+      ];
+      
+      wsResumen['!cols'] = [
+        { wch: 20 }, // Métrica
+        { wch: 15 }, // Cantidad  
+        { wch: 15 }  // Porcentaje
+      ];
+      
+      XLSX.utils.book_append_sheet(workbook, wsResumen, 'Resumen');
       
       // Generar archivo
       const fileName = `Reporte_Personal_Turnos_${new Date().toISOString().split('T')[0]}.xlsx`;
       XLSX.writeFile(workbook, fileName);
       
-      this.toastService.success('Éxito', 'Reporte exportado correctamente');
+      this.toastService.success('Éxito', 'Reporte Excel exportado con formato mejorado');
     } catch (error) {
       console.error('Error exporting to Excel:', error);
       this.toastService.error('Error', 'Error al exportar a Excel');
@@ -727,5 +924,222 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy {
   
   onGridReadySinTurno(params: GridReadyEvent): void {
     params.api.sizeColumnsToFit();
+  }
+  
+  // ============================================================================
+  // TABS MANAGEMENT
+  // ============================================================================
+  
+  setActiveTab(tab: 'tabular' | 'grafica'): void {
+    this.activeTab = tab;
+    
+    if (tab === 'grafica') {
+      // Crear gráficos cuando se activa el tab gráfico
+      setTimeout(() => {
+        this.createCharts();
+      }, 100);
+    }
+  }
+  
+  // ============================================================================
+  // CHART.JS METHODS
+  // ============================================================================
+  
+  private createCharts(): void {
+    if (this.donutCanvas && this.barCanvas) {
+      this.createDonutChart();
+      this.createBarChart();
+    }
+  }
+  
+  private createDonutChart(): void {
+    if (this.donutChart) {
+      this.donutChart.destroy();
+    }
+    
+    const ctx = this.donutCanvas.nativeElement.getContext('2d');
+    if (!ctx) return;
+    
+    const config: ChartConfiguration<'doughnut'> = {
+      type: 'doughnut',
+      data: {
+        labels: ['Personal Con Turno', 'Personal Sin Turno'],
+        datasets: [{
+          data: [this.totalConTurno, this.totalSinTurno],
+          backgroundColor: [
+            '#10B981', // Verde
+            '#EF4444'  // Rojo
+          ],
+          borderColor: [
+            '#059669',
+            '#DC2626'
+          ],
+          borderWidth: 2,
+          hoverOffset: 10
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              padding: 20,
+              font: {
+                size: 12,
+                family: 'Inter, system-ui, sans-serif'
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const total = this.totalConTurno + this.totalSinTurno;
+                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : '0';
+                return `${context.label}: ${context.parsed} (${percentage}%)`;
+              }
+            }
+          }
+        },
+        cutout: '60%'
+      }
+    };
+    
+    this.donutChart = new Chart(ctx, config);
+  }
+  
+  private createBarChart(): void {
+    if (this.barChart) {
+      this.barChart.destroy();
+    }
+    
+    const ctx = this.barCanvas.nativeElement.getContext('2d');
+    if (!ctx) return;
+    
+    // Procesar datos por área
+    const areaData = this.processDataByArea();
+    
+    const config: ChartConfiguration<'bar'> = {
+      type: 'bar',
+      data: {
+        labels: areaData.labels,
+        datasets: [
+          {
+            label: 'Con Turno',
+            data: areaData.conTurno,
+            backgroundColor: '#10B981',
+            borderColor: '#059669',
+            borderWidth: 1
+          },
+          {
+            label: 'Sin Turno',
+            data: areaData.sinTurno,
+            backgroundColor: '#EF4444',
+            borderColor: '#DC2626',
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              usePointStyle: true,
+              font: {
+                size: 12,
+                family: 'Inter, system-ui, sans-serif'
+              }
+            }
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false
+          }
+        },
+        scales: {
+          x: {
+            display: true,
+            title: {
+              display: true,
+              text: 'Áreas de Trabajo'
+            }
+          },
+          y: {
+            display: true,
+            title: {
+              display: true,
+              text: 'Cantidad de Personal'
+            },
+            beginAtZero: true
+          }
+        }
+      }
+    };
+    
+    this.barChart = new Chart(ctx, config);
+  }
+  
+  private processDataByArea(): { labels: string[], conTurno: number[], sinTurno: number[] } {
+    const areaMap = new Map<string, { conTurno: number, sinTurno: number }>();
+    
+    // Procesar personal CON turno
+    this.personalConTurno.forEach(emp => {
+      const area = emp.areaName || 'Sin Área';
+      if (!areaMap.has(area)) {
+        areaMap.set(area, { conTurno: 0, sinTurno: 0 });
+      }
+      areaMap.get(area)!.conTurno++;
+    });
+    
+    // Procesar personal SIN turno
+    this.personalSinTurno.forEach(emp => {
+      const area = emp.areaDescripcion || 'Sin Área';
+      if (!areaMap.has(area)) {
+        areaMap.set(area, { conTurno: 0, sinTurno: 0 });
+      }
+      areaMap.get(area)!.sinTurno++;
+    });
+    
+    // Convertir a arrays para Chart.js
+    const labels: string[] = [];
+    const conTurno: number[] = [];
+    const sinTurno: number[] = [];
+    
+    Array.from(areaMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .forEach(([area, data]) => {
+        labels.push(area);
+        conTurno.push(data.conTurno);
+        sinTurno.push(data.sinTurno);
+      });
+    
+    return { labels, conTurno, sinTurno };
+  }
+  
+  // ============================================================================
+  // UTILITY METHODS FOR CHARTS
+  // ============================================================================
+  
+  getPercentage(value: number, total: number): string {
+    return total > 0 ? (value / total * 100).toFixed(1) : '0';
+  }
+  
+  getUniqueAreasCount(): number {
+    const areas = new Set<string>();
+    
+    this.personalConTurno.forEach(emp => {
+      if (emp.areaName) areas.add(emp.areaName);
+    });
+    
+    this.personalSinTurno.forEach(emp => {
+      if (emp.areaDescripcion) areas.add(emp.areaDescripcion);
+    });
+    
+    return areas.size;
   }
 }

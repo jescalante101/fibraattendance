@@ -1,7 +1,7 @@
 <div class="p-4 max-w-full">
   
   <!-- Header -->
-  <div class="mb-6 flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border">
+  <div class="mb-4 flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border">
     <div class="flex items-center gap-3">
       <div class="w-1 h-8 bg-fiori-info rounded-full"></div>
       <div>
@@ -199,7 +199,56 @@
     </form>
   </div>
 
-  <!-- Vista dividida - Dos secciones -->
+  <!-- Tabs de navegación -->
+  <div class="mb-4">
+    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" role="tablist">
+      <li class="me-2" role="presentation">
+        <button 
+          class="inline-block p-4 border-b-2 rounded-t-lg transition-colors"
+          [class.border-fiori-primary]="activeTab === 'tabular'"
+          [class.text-fiori-primary]="activeTab === 'tabular'"
+          [class.bg-blue-50]="activeTab === 'tabular'"
+          [class.border-transparent]="activeTab !== 'tabular'"
+          [class.text-gray-500]="activeTab !== 'tabular'"
+          [class.hover:text-gray-600]="activeTab !== 'tabular'"
+          [class.hover:border-gray-300]="activeTab !== 'tabular'"
+          (click)="setActiveTab('tabular')"
+          type="button" 
+          role="tab">
+          <div class="flex items-center gap-2">
+            <lucide-icon name="table-2" size="16"></lucide-icon>
+            Vista Tabular
+          </div>
+        </button>
+      </li>
+      <li class="me-2" role="presentation">
+        <button 
+          class="inline-block p-4 border-b-2 rounded-t-lg transition-colors"
+          [class.border-fiori-primary]="activeTab === 'grafica'"
+          [class.text-fiori-primary]="activeTab === 'grafica'"
+          [class.bg-blue-50]="activeTab === 'grafica'"
+          [class.border-transparent]="activeTab !== 'grafica'"
+          [class.text-gray-500]="activeTab !== 'grafica'"
+          [class.hover:text-gray-600]="activeTab !== 'grafica'"
+          [class.hover:border-gray-300]="activeTab !== 'grafica'"
+          (click)="setActiveTab('grafica')"
+          type="button" 
+          role="tab">
+          <div class="flex items-center gap-2">
+            <lucide-icon name="bar-chart-3" size="16"></lucide-icon>
+            Vista Gráfica
+          </div>
+        </button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Contenido de los tabs -->
+  <div class="tab-content">
+    
+    <!-- Tab 1: Vista Tabular -->
+    <div *ngIf="activeTab === 'tabular'" class="fade-in">
+      <!-- Vista dividida - Dos secciones -->
   <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
     
     <!-- Sección izquierda: Personal SIN Turno -->
@@ -313,6 +362,74 @@
             (pageChange)="onPageChangeConTurno($event)">
           </app-fiori-paginator>
         </div>
+      </div>
+    </div>
+    
+  </div>
+    </div>
+    
+    <!-- Tab 2: Vista Gráfica -->
+    <div *ngIf="activeTab === 'grafica'" class="fade-in">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Gráfico de Dona: Con vs Sin Turno -->
+        <div class="bg-white p-6 rounded-lg border border-fiori-border shadow-sm">
+          <div class="mb-4 text-center">
+            <h3 class="text-lg font-semibold text-fiori-text mb-2">Distribución General</h3>
+            <p class="text-sm text-fiori-subtext">Personal con y sin turnos asignados</p>
+          </div>
+          <div class="relative h-80">
+            <canvas #donutChart></canvas>
+          </div>
+        </div>
+        
+        <!-- Gráfico de Barras: Por Área -->
+        <div class="bg-white p-6 rounded-lg border border-fiori-border shadow-sm">
+          <div class="mb-4 text-center">
+            <h3 class="text-lg font-semibold text-fiori-text mb-2">Distribución por Área</h3>
+            <p class="text-sm text-fiori-subtext">Comparativa con/sin turno por área de trabajo</p>
+          </div>
+          <div class="relative h-80">
+            <canvas #barChart></canvas>
+          </div>
+        </div>
+        
+        <!-- Métricas adicionales -->
+        <div class="lg:col-span-2 bg-gradient-to-r from-fiori-surface to-blue-50 p-6 rounded-lg border border-fiori-border">
+          <h3 class="text-lg font-semibold text-fiori-text mb-4">Resumen Ejecutivo</h3>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            
+            <div class="text-center p-4 bg-white rounded-lg">
+              <div class="text-2xl font-bold text-green-600">{{ totalConTurno }}</div>
+              <div class="text-sm text-fiori-subtext">Personal Con Turno</div>
+              <div class="text-xs text-green-600 mt-1">
+                {{ getPercentage(totalConTurno, totalConTurno + totalSinTurno) }}%
+              </div>
+            </div>
+            
+            <div class="text-center p-4 bg-white rounded-lg">
+              <div class="text-2xl font-bold text-red-600">{{ totalSinTurno }}</div>
+              <div class="text-sm text-fiori-subtext">Personal Sin Turno</div>
+              <div class="text-xs text-red-600 mt-1">
+                {{ getPercentage(totalSinTurno, totalConTurno + totalSinTurno) }}%
+              </div>
+            </div>
+            
+            <div class="text-center p-4 bg-white rounded-lg">
+              <div class="text-2xl font-bold text-fiori-primary">{{ totalConTurno + totalSinTurno }}</div>
+              <div class="text-sm text-fiori-subtext">Personal Total</div>
+              <div class="text-xs text-fiori-subtext mt-1">100%</div>
+            </div>
+            
+            <div class="text-center p-4 bg-white rounded-lg">
+              <div class="text-2xl font-bold text-purple-600">{{ getUniqueAreasCount() }}</div>
+              <div class="text-sm text-fiori-subtext">Áreas Activas</div>
+              <div class="text-xs text-fiori-subtext mt-1">Diferentes</div>
+            </div>
+            
+          </div>
+        </div>
+        
       </div>
     </div>
     

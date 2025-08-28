@@ -3,8 +3,8 @@ import { Subject, takeUntil, forkJoin } from 'rxjs';
 import { ToastService } from 'src/app/shared/services/toast.service';
 import { PermissionsService, Permission, PermissionRegister } from 'src/app/core/services/permissions.service';
 import { AuthService } from 'src/app/core/services/auth.service';
-// Importamos la configuración del sidebar para extraer permisos
-import { MenuSection } from '../../sidebar/sidebar.component';
+// Importamos la configuración compartida del menú
+import { MENU_SECTIONS, MenuSection } from '../../../shared/config/menu-config';
 
 interface PermissionComparison {
   key: string;
@@ -83,110 +83,8 @@ export class PermissionManagerComponent implements OnInit, OnDestroy {
     return new Promise((resolve) => {
       const permissions: PermissionComparison[] = [];
       
-      // Aquí definimos la misma estructura que en sidebar.component.ts
-      const menuSections: MenuSection[] = [
-        {
-          key: 'configuracion',
-          label: 'Configuración',
-          items: [
-            {
-              key: 'organizacion',
-              label: 'Definiciones',
-              icon: 'building',
-              permission: 'personal.organizacion.view',
-              submenu: [
-                { label: 'Usuario', link: '/panel/personal/organizacion/app-user', permission: 'personal.usuarios.view' },
-                { label: 'Usuario-Sede', link: '/panel/personal/organizacion/usuario-sede', permission: 'personal.usuario_sede.view' },
-                { label: 'Sede-Área-Centro de Costo', link: '/panel/personal/organizacion/sede-area-costo', permission: 'personal.sede_area_costo.view' },
-                { label: 'Sede-Centro de Costo', link: '/panel/personal/organizacion/sede-ccosto', permission: 'personal.sede_ccosto.view' },
-                { label: 'Feriados', link: '/panel/personal/organizacion/holidays', permission: 'personal.holidays.view' }
-              ]
-            },
-            {
-              key: 'horarioturno',
-              label: 'Horario-Turno',
-              icon: 'clock',
-              permission: 'asistencia.horarios.view',
-              submenu: [
-                { label: 'Descanso', link: '/panel/asistencia/descansos', permission: 'asistencia.descansos.view' },
-                { label: 'Horario', link: '/panel/asistencia/horarios', permission: 'asistencia.horarios.manage' },
-                { label: 'Turno', link: '/panel/asistencia/turno', permission: 'asistencia.turnos.manage' }
-              ]
-            }
-          ]
-        },
-        {
-          key: 'empleado',
-          label: 'Personal',
-          items: [
-            {
-              key: 'empleado',
-              label: 'Personal',
-              icon: 'id-card',
-              permission: 'personal.empleado.view',
-              submenu: [
-                { label: 'Personal', link: '/panel/personal/empleado/empleado', permission: 'personal.empleado.list' },
-                { label: 'Personal con Turnos', link: '/panel/personal/empleado/asignar-horario', permission: 'personal.empleado.horarios' },
-                { label: 'Solicitud de Traslado', link: '/panel/personal/empleado/traslado', permission: 'personal.empleado.tranfers' }
-              ]
-            }
-          ]
-        },
-        {
-          key: 'asistencia',
-          label: 'Asistencia',
-          items: [
-            {
-              key: 'aprobaciones',
-              label: 'Aprobaciones',
-              icon: 'check-square',
-              permission: 'asistencia.aprobaciones.view',
-              submenu: [
-                { label: 'Marcaciones Manuales', link: '/panel/asistencia/aprobaciones/marcacion-manual', permission: 'asistencia.marcaciones_manuales.approve' }
-              ]
-            },
-            {
-              key: 'marcaciones',
-              label: 'Marcaciones',
-              icon: 'file-text',
-              permission: 'asistencia.marcaciones.view',
-              submenu: [
-                { label: 'Análisis de Marcaciones', link: '/panel/asistencia/marcaciones/analisis', permission: 'asistencia.marcaciones.analyze' }
-              ]
-            },
-            {
-              key: 'reportes',
-              label: 'Reportes',
-              icon: 'file-spreadsheet',
-              permission: 'asistencia.reportes.view',
-              submenu: [
-                { label: 'Reporte Marcaciones', link: '/panel/asistencia/marcaciones/reporte-asistencia-excel', permission: 'asistencia.reportes.marcaciones' },
-                { label: 'Reporte Marcación Mensual', link: '/panel/asistencia/marcaciones/reportes-excel/asistencia-mensual', permission: 'asistencia.reportes.mensual' },
-                { label: 'Reporte Centro Costo', link: '/panel/asistencia/marcaciones/reportes-excel/centro-costos', permission: 'asistencia.reportes.centro_costos' },
-                { label: 'Reporte Marcación Detalle', link: '/panel/asistencia/marcaciones/reportes-excel/marcaciones-detalle', permission: 'asistencia.reportes.detalle' },
-                { label: 'Reporte Asistencia', link: '/panel/asistencia/marcaciones/reportes-excel/matrix', permission: 'asistencia.reportes.matrix' },
-                { label: 'Reporte Horas Extras', link: '/panel/asistencia/reportes/horas-extras', permission: 'asistencia.reportes.horas_extras' },
-                { label: 'Reporte Personal Turnos', link: '/panel/asistencia/reportes/personal-turnos', permission: 'asistencia.reportes.personal_turnos' }
-              ]
-            }
-          ]
-        },
-        {
-          key: 'dev-tools',
-          label: 'Dev Tools',
-          items: [
-            {
-              key: 'dev-tools',
-              label: 'Herramientas Dev',
-              icon: 'code',
-              permission: 'system.dev.tools',
-              submenu: [
-                { label: 'Permission Manager', link: '/panel/dev/permission-manager', permission: 'system.dev.permission_manager' }
-              ]
-            }
-          ]
-        }
-      ];
+      // Usar la configuración compartida del menú
+      const menuSections = MENU_SECTIONS;
 
       // Extraer todos los permisos del sidebar
       menuSections.forEach(section => {
@@ -195,7 +93,7 @@ export class PermissionManagerComponent implements OnInit, OnDestroy {
           if (item.permission) {
             permissions.push({
               key: item.permission,
-              name: `${section.label} - ${item.label}`,
+              name: `${item.label}`,
               description: `Acceso a la sección ${item.label} en ${section.label}`,
               existsInDB: false,
               location: `${section.label} > ${item.label}`
@@ -207,7 +105,7 @@ export class PermissionManagerComponent implements OnInit, OnDestroy {
             if (sub.permission) {
               permissions.push({
                 key: sub.permission,
-                name: `${section.label} - ${item.label} - ${sub.label}`,
+                name: `${sub.label}`,
                 description: `Acceso a ${sub.label} en la sección ${item.label}`,
                 existsInDB: false,
                 location: `${section.label} > ${item.label} > ${sub.label}`
@@ -265,7 +163,7 @@ export class PermissionManagerComponent implements OnInit, OnDestroy {
       permissionName: permission.name,
       description: permission.description
     };
-
+    console.log(permissionData);  
     try {
       await this.permissionsService.registerPermission(permissionData).toPromise();
       permission.existsInDB = true;

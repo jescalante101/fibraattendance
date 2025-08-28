@@ -9,27 +9,7 @@ import {
 import { initFlowbite } from 'flowbite';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
-
-export interface SubMenuItem {
-  label: string;
-  link: string | null;
-  permission?: string; // Para futura implementación de permisos
-}
-
-export interface MenuItem {
-  key: string;
-  label: string;
-  icon: string;
-  submenu: SubMenuItem[];
-  permission?: string; // Para futura implementación de permisos
-}
-
-export interface MenuSection {
-  key: string;
-  label: string;
-  items: MenuItem[];
-  permission?: string; // Para futura implementación de permisos
-}
+import { MENU_SECTIONS, MenuSection, MenuItem, SubMenuItem, getMenuSection, getMenuItem } from '../../shared/config/menu-config';
 
 @Component({
   selector: 'app-sidebar',
@@ -80,119 +60,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   // 📋 CONFIGURACIÓN COMPLETA DEL MENÚ
-  // Todo el menú ahora se maneja desde TypeScript para facilitar el manejo de permisos
-  
-  menuSections: MenuSection[] = [
-    // 👥 SECCIÓN PERSONAL
-    {
-      key: 'configuracion',
-      label: 'Configuración',
-      items: [
-        {
-          key: 'organizacion',
-          label: 'Definiciones',
-          icon: 'building',
-          permission: 'personal.organizacion.view',
-          submenu: [
-            { label: 'Usuario', link: '/panel/personal/organizacion/app-user', permission: 'personal.usuarios.view' },
-            { label: 'Usuario-Sede', link: '/panel/personal/organizacion/usuario-sede', permission: 'personal.usuario_sede.view' },
-            { label: 'Sede-Área-Centro de Costo', link: '/panel/personal/organizacion/sede-area-costo', permission: 'personal.sede_area_costo.view' },
-            { label: 'Sede-Centro de Costo', link: '/panel/personal/organizacion/sede-ccosto', permission: 'personal.sede_ccosto.view' },
-            { label: 'Feriados', link: '/panel/personal/organizacion/holidays', permission: 'personal.holidays.view' }
-          ]
-        },
-        {
-          key: 'horarioturno',
-          label: 'Horario-Turno',
-          icon: 'clock',
-          permission: 'asistencia.horarios.view',
-          submenu: [
-            { label: 'Descanso', link: '/panel/asistencia/descansos', permission: 'asistencia.descansos.view' },
-            { label: 'Horario', link: '/panel/asistencia/horarios', permission: 'asistencia.horarios.manage' },
-            { label: 'Turno', link: '/panel/asistencia/turno', permission: 'asistencia.turnos.manage' }
-          ]
-        },
-
-        
-      ]
-    },
-    {
-      key: 'empleado',
-      label: 'Personal',
-      items: [
-        {
-          key: 'empleado',
-          label: 'Personal',
-          icon: 'id-card',
-          permission: 'personal.empleado.view',
-          submenu: [
-            { label: 'Personal', link: '/panel/personal/empleado/empleado', permission: 'personal.empleado.list' },
-            { label: 'Personal con Turnos', link: '/panel/personal/empleado/asignar-horario', permission: 'personal.empleado.horarios' },
-            { label: 'Solicitud de Traslado', link: '/panel/personal/empleado/traslado', permission: 'personal.empleado.tranfers'  }
-          ]
-        }
-      ]
-    },
-    
-    // ⏰ SECCIÓN ASISTENCIA  
-    {
-      key: 'asistencia',
-      label: 'Asistencia',
-      items: [
-        
-        {
-          key: 'aprobaciones',
-          label: 'Aprobaciones',
-          icon: 'check-square',
-          permission: 'asistencia.aprobaciones.view',
-          submenu: [
-            { label: 'Marcaciones Manuales', link: '/panel/asistencia/aprobaciones/marcacion-manual', permission: 'asistencia.marcaciones_manuales.approve' }
-          ]
-        },
-        {
-          key: 'marcaciones',
-          label: 'Marcaciones',
-          icon: 'file-text',
-          permission: 'asistencia.marcaciones.view',
-          submenu: [
-            { label: 'Análisis de Marcaciones', link: '/panel/asistencia/marcaciones/analisis', permission: 'asistencia.marcaciones.analyze' }
-          ]
-        },
-        {
-          key: 'reportes',
-          label: 'Reportes',
-          icon: 'file-spreadsheet',
-          permission: 'asistencia.reportes.view',
-          submenu: [
-            { label: 'Reporte Marcaciones', link: '/panel/asistencia/marcaciones/reporte-asistencia-excel', permission: 'asistencia.reportes.marcaciones' },
-            { label: 'Reporte Marcación Mensual', link: '/panel/asistencia/marcaciones/reportes-excel/asistencia-mensual', permission: 'asistencia.reportes.mensual' },
-            { label: 'Reporte Centro Costo', link: '/panel/asistencia/marcaciones/reportes-excel/centro-costos', permission: 'asistencia.reportes.centro_costos' },
-            { label: 'Reporte Marcación Detalle', link: '/panel/asistencia/marcaciones/reportes-excel/marcaciones-detalle', permission: 'asistencia.reportes.detalle' },
-            { label: 'Reporte Asistencia', link: '/panel/asistencia/marcaciones/reportes-excel/matrix', permission: 'asistencia.reportes.matrix' },
-            { label: 'Reporte Horas Extras', link: '/panel/asistencia/reportes/horas-extras', permission: 'asistencia.reportes.horas_extras' },
-            { label: 'Reporte Personal Turnos', link: '/panel/asistencia/reportes/personal-turnos', permission: 'asistencia.reportes.personal_turnos' }
-          ]
-        }
-      ]
-    },
-    
-    // 🔧 SECCIÓN DEV TOOLS (Solo para desarrolladores)
-    {
-      key: 'dev-tools',
-      label: 'Dev Tools',
-      items: [
-        {
-          key: 'dev-tools',
-          label: 'Herramientas Dev',
-          icon: 'code',
-          permission: 'system.dev.tools',
-          submenu: [
-            { label: 'Permission Manager', link: '/panel/dev/permission-manager', permission: 'system.dev.permission_manager' }
-          ]
-        }
-      ]
-    }
-  ];
+  // Ahora usa la configuración compartida desde menu-config.ts
+  menuSections: MenuSection[] = MENU_SECTIONS;
 
   toggleSidebar() {
     this.isCollapsed = !this.isCollapsed;
@@ -236,23 +105,22 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Obtiene la sección del menú por clave
+   * Obtiene la sección del menú por clave (usa la función compartida)
    * @param sectionKey - Clave de la sección
    * @returns MenuSection o undefined
    */
   getMenuSection(sectionKey: string): MenuSection | undefined {
-    return this.menuSections.find(section => section.key === sectionKey);
+    return getMenuSection(sectionKey);
   }
 
   /**
-   * Obtiene un item del menú por clave de sección y clave de item
+   * Obtiene un item del menú por clave de sección y clave de item (usa la función compartida)
    * @param sectionKey - Clave de la sección
    * @param itemKey - Clave del item
    * @returns MenuItem o undefined
    */
   getMenuItem(sectionKey: string, itemKey: string): MenuItem | undefined {
-    const section = this.getMenuSection(sectionKey);
-    return section?.items.find(item => item.key === itemKey);
+    return getMenuItem(sectionKey, itemKey);
   }
 
   /**

@@ -1,0 +1,6 @@
+/* Estilos mínimos necesarios para el componente de días compensatorios */
+
+/* Solo personalización básica de AG-Grid si es necesaria */
+::ng-deep .ag-theme-quartz {
+  --ag-font-family: "72", "Segoe UI", Arial, sans-serif;
+}

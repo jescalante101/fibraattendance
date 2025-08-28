@@ -207,16 +207,7 @@ export class ModalRegistrarExcepcionComponent implements OnInit {
 
   onSubmit(): void {
     if (this.exceptionForm.valid) {
-      this.loading = true;
-      
-      console.log('Datos para registrar excepción:');
-      console.log('- employeeId:', this.employeeData?.employeeId);
-      console.log('- assignmentId:', this.employeeData?.assignmentId);
-      console.log('- employeeName:', this.employeeData?.employeeName);
-      console.log('- scheduleId (horario actual):', this.employeeData?.scheduleId || this.selectedHorarioShift?.id);
-      console.log('- selectedHorario (nuevo horario):', this.selectedHorario);
-      console.log('- timeIntervalId from form (nuevo):', this.exceptionForm.value.timeIntervalId);
-      
+      this.loading = true;     
       // Obtener la fecha seleccionada desde el calendario
       const selectedDate = this.selectedDateInfo?.date || new Date();
       const dayIndex = this.calculateDayIndex(selectedDate);

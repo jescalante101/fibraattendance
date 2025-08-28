@@ -222,10 +222,17 @@
                 (dateRangeChange)="onDateRangeSelected($event)">
               </app-date-range-picker>
               
-              <!-- Error message -->
-              <div *ngIf="editForm.get('dateRange')?.hasError('required') && editForm.get('dateRange')?.touched"
-                   class="text-xs text-red-500">
-                Rango de fechas es requerido
+              <!-- Error messages -->
+              <div *ngIf="editForm.get('dateRange')?.touched && editForm.get('dateRange')?.errors" class="text-xs text-red-500 mt-1">
+                <div *ngIf="editForm.get('dateRange')?.hasError('required')">
+                  Rango de fechas es requerido
+                </div>
+                <div *ngIf="editForm.get('dateRange')?.hasError('invalidDate')">
+                  Las fechas ingresadas no son válidas
+                </div>
+                <div *ngIf="editForm.get('dateRange')?.hasError('invalidRange')">
+                  La fecha de inicio debe ser menor o igual a la fecha de fin
+                </div>
               </div>
             </div>
           </div>

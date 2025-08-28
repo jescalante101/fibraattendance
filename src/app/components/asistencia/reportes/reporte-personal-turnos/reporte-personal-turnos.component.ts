@@ -406,12 +406,15 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     
     const headerConfig = this.headerConfigService.getCurrentHeaderConfig();
     const companyId = headerConfig?.selectedEmpresa?.companiaId || '';
+    // convertir a []
+    const areaIds = this.selectedArea ? [this.selectedArea.areaId] : [];
+    
     
     const params: EmployeesWithoutShift = {
       searchText: '',
       page: this.pageSinTurno,
       pagesize: this.pageSizeSinTurno,
-      areaId: this.selectedArea?.areaId || null,
+      areaId: areaIds,
       ccostoId: null,
       sede: this.selectedSede?.categoriaAuxiliarId || null,
       periodoId: headerConfig?.selectedPeriodo?.periodoId || null,

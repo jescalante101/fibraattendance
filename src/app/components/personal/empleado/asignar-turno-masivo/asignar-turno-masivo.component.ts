@@ -59,6 +59,12 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   filteredCostCentersArray: CostCenter[] = [];
   costCenterFilterTerm = '';
 
+  // Estados para autocomplete de áreas (múltiple selección)
+  showAreaDropdown = false;
+  filteredAreasArray: RhArea[] = [];
+  areaFilterTerm = '';
+  selectedArea: RhArea | null = null;
+
   // Para selección de empleados
   seleccionados = new Set<string>();
 
@@ -92,7 +98,27 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   gridOptions: GridOptions = {
     ...createFioriGridOptions(),
     rowSelection: 'multiple',
-    suppressRowClickSelection: true
+    suppressRowClickSelection: true,
+    // Add row styling for terminated and vacation employees
+    getRowStyle: (params) => {
+      if (params.data?.isTerminated) {
+        return {
+          backgroundColor: '#fef2f2', // red-50
+          opacity: '0.8'
+        };
+      }
+      if (params.data?.isOnVacation) {
+        return {
+          backgroundColor: '#fffbeb', // amber-50
+          opacity: '0.8'
+        };
+      }
+      return undefined;
+    },
+    // Disable row selection for terminated and vacation employees
+    isRowSelectable: (params) => {
+      return !params.data?.isTerminated && !params.data?.isOnVacation;
+    }
   };
   gridApi: any;
   
@@ -141,7 +167,6 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     // Mover fechas al filtroForm (Paso 1)
     this.filtroForm = this.fb.group({
       sede: [null, Validators.required],
-      area: [null, Validators.required],
       centroCosto: [null, Validators.required], // Requerido
       dateRange: [null, Validators.required] // DateRange picker
     });
@@ -181,6 +206,8 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         // Inicializar áreas vacías hasta que se seleccione una sede
         this.areas = [];
         this.areasFiltradas = [];
+        this.filteredAreasArray = [];
+        this.selectedArea = null;
         
         // Cargar centros de costo
         this.cargarCentrosCosto();
@@ -350,6 +377,49 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   /**
    * Busca personal sin horario usando el nuevo servicio
    */
+  /**
+   * Check if employee is terminated based on fechaCese
+   * Employee is terminated if fechaCese is greater than the start of current month
+   */
+  private isEmployeeTerminated(fechaCese: string | null): boolean {
+    if (!fechaCese) return false;
+    
+    try {
+      const ceaseDate = new Date(fechaCese);
+      const currentDate = new Date();
+      const startOfCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      
+      return ceaseDate > startOfCurrentMonth;
+    } catch (error) {
+      console.error('Error parsing fechaCese:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Check if employee is on vacation during the selected date range
+   */
+  private isEmployeeOnVacation(vacacionesFechaInicio: string | null, vacacionesFechaFin: string | null): boolean {
+    if (!vacacionesFechaInicio || !vacacionesFechaFin) return false;
+    
+    const dateRange = this.filtroForm.value.dateRange;
+    if (!dateRange || !dateRange.start || !dateRange.end) return false;
+    
+    try {
+      const vacationStart = new Date(vacacionesFechaInicio);
+      const vacationEnd = new Date(vacacionesFechaFin);
+      const selectedStart = new Date(dateRange.start);
+      const selectedEnd = new Date(dateRange.end);
+      
+      // Check if vacation period overlaps with selected date range
+      // Vacation overlaps if: vacation_start <= selected_end AND vacation_end >= selected_start
+      return vacationStart <= selectedEnd && vacationEnd >= selectedStart;
+    } catch (error) {
+      console.error('Error parsing vacation dates:', error);
+      return false;
+    }
+  }
+
   private buscarPersonalSinHorario(personalIdsExcluir: string[]) {
     // Obtener otros valores de localStorage o del headerConfig
     const companiaId = this.headerConfig?.selectedEmpresa?.companiaId || '01';
@@ -357,7 +427,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     const planillaId = this.headerConfig?.selectedPlanilla?.planillaId || null;
 
     const categoriaAuxiliarId = this.filtroForm.value.sede;
-    const rhAreaId = this.filtroForm.value.area;
+    const rhAreaId = this.selectedArea ? this.selectedArea.areaId : null; // ✅ Área seleccionada
     console.log("Cargando personal sin horario con filtros:", { categoriaAuxiliarId, rhAreaId, personalIdsExcluir });
     const filtro = this.searchTermPersonal.trim();
     
@@ -365,7 +435,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
       searchText: filtro,
       page: this.paginaActual,
       pagesize: this.pageSize,
-      areaId: rhAreaId || null,
+      areaId: rhAreaId ? [rhAreaId] : [], // ✅ Array con una sola área
       ccostoId: null, // NO filtrar por centro de costo en la búsqueda de empleados
       sede: categoriaAuxiliarId || null,
       periodoId: periodoId,
@@ -373,43 +443,20 @@ export class AsignarTurnoMasivoComponent implements OnInit {
       companiaId: companiaId,
       personalIds: personalIdsExcluir // IDs a excluir (los que ya tienen asignación)
     };
-    
-    console.log('=== PARÁMETROS ENVIADOS AL PERSON SERVICE ===');
-    console.log('🔍 Método:', 'getPersonalWithoutShift');
-    console.log('📋 Parámetros completos:', JSON.stringify(employeeParams, null, 2));
-    console.log('📊 Detalle de parámetros:');
-    console.log('  - searchText:', employeeParams.searchText);
-    console.log('  - page:', employeeParams.page);
-    console.log('  - pagesize:', employeeParams.pagesize);
-    console.log('  - areaId:', employeeParams.areaId);
-    console.log('  - ccostoId:', employeeParams.ccostoId);
-    console.log('  - sede:', employeeParams.sede);
-    console.log('  - periodoId:', employeeParams.periodoId);
-    console.log('  - planillaId:', employeeParams.planillaId);
-    console.log('  - companiaId:', employeeParams.companiaId);
-    console.log('  - personalIds (IDs a excluir):', employeeParams.personalIds);
-    console.log('  - personalIds length:', employeeParams.personalIds?.length || 0);
-    console.log('==============================================');
+
     
     this.personService.getPersonalWithoutShift(employeeParams).subscribe({
       next: res => {
-        console.log('=== RESPUESTA DEL PERSON SERVICE ===');
-        console.log('✅ Respuesta completa:', JSON.stringify(res, null, 2));
-        console.log('📊 Detalle de respuesta:');
-        console.log('  - exito:', res.exito);
-        console.log('  - mensaje:', res.mensaje);
-        console.log('  - data existe:', !!res.data);
-        if (res.data) {
-          console.log('  - items length:', res.data.items?.length || 0);
-          console.log('  - totalCount:', res.data.totalCount);
-          console.log('  - pageNumber:', res.data.pageNumber);
-          console.log('  - pageSize:', res.data.pageSize);
-          console.log('  - primer empleado (muestra):', res.data.items?.[0] || 'N/A');
-        }
-        console.log('====================================');
+        console.log('Respuesta de getPersonalWithoutShift:', res);
         
         if (res.exito && res.data && res.data.items) {
-          this.personalTotal = res.data.items;
+          // ✅ FIX: Add fullName field to data for AG-Grid filtering, terminated status and vacation status
+          this.personalTotal = res.data.items.map((emp: any) => ({
+            ...emp,
+            fullName: `${emp.apellidoPaterno} ${emp.apellidoMaterno}, ${emp.nombres}`.trim(),
+            isTerminated: this.isEmployeeTerminated(emp.fechaCese),
+            isOnVacation: this.isEmployeeOnVacation(emp.vacacionesFechaInicio, emp.vacacionesFechaFin)
+          }));
           this.personalFiltrado = [...this.personalTotal];
           this.totalCount = res.data.totalCount || 0;
           this.hayMasPaginas = (res.data.pageNumber * res.data.pageSize) < res.data.totalCount;
@@ -430,15 +477,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         this.loadingPersonal = false;
       },
       error: (error) => {
-        console.log('=== ERROR EN PERSON SERVICE ===');
-        console.error('❌ Error completo:', error);
-        console.error('📊 Detalles del error:');
-        console.error('  - status:', error.status);
-        console.error('  - statusText:', error.statusText);
-        console.error('  - message:', error.message);
-        console.error('  - error body:', error.error);
-        console.log('===============================');
-        
+       
         this.toastService.error('Error al cargar', 'No se pudo cargar el personal. Verifica los filtros seleccionados');
         this.personalFiltrado = [];
         this.totalCount = 0;
@@ -472,19 +511,35 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   }
 
   isAllSelected(): boolean {
-    return this.personalFiltrado.length > 0 && this.seleccionados.size === this.personalFiltrado.length;
+    const activeEmployees = this.personalFiltrado.filter(emp => !emp.isTerminated && !emp.isOnVacation);
+    return activeEmployees.length > 0 && this.seleccionados.size === activeEmployees.length;
   }
 
   isIndeterminate(): boolean {
-    return this.seleccionados.size > 0 && this.seleccionados.size < this.personalFiltrado.length;
+    const activeEmployees = this.personalFiltrado.filter(emp => !emp.isTerminated && !emp.isOnVacation);
+    return this.seleccionados.size > 0 && this.seleccionados.size < activeEmployees.length;
   }
 
   masterToggle() {
+    const activeEmployees = this.personalFiltrado.filter(emp => !emp.isTerminated && !emp.isOnVacation);
+    
     if (this.isAllSelected()) {
       this.seleccionados.clear();
     } else {
-      this.personalFiltrado.forEach(emp => this.seleccionados.add(emp.personalId));
+      // Only select active (non-terminated, non-vacation) employees
+      activeEmployees.forEach(emp => this.seleccionados.add(emp.personalId));
     }
+    
+    // Update AG-Grid selection
+    if (this.gridApi) {
+      this.gridApi.forEachNode((node: any) => {
+        if (node.data && !node.data.isTerminated && !node.data.isOnVacation) {
+          const shouldBeSelected = this.seleccionados.has(node.data.personalId);
+          node.setSelected(shouldBeSelected);
+        }
+      });
+    }
+    
     this.syncFormArray();
   }
 
@@ -493,24 +548,39 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   }
 
   toggleSelection(row: any) {
+    // Prevent selection of terminated employees
+    if (row.isTerminated) {
+      console.warn('Cannot select terminated employee:', row.fullName);
+      return;
+    }
+    
+    // Prevent selection of employees on vacation
+    if (row.isOnVacation) {
+      console.warn('Cannot select employee on vacation:', row.fullName);
+      return;
+    }
+    
     if (this.seleccionados.has(row.personalId)) {
       this.seleccionados.delete(row.personalId);
     } else {
       this.seleccionados.add(row.personalId);
     }
+    
+    // Update AG-Grid selection
+    if (this.gridApi) {
+      this.gridApi.forEachNode((node: any) => {
+        if (node.data && node.data.personalId === row.personalId) {
+          node.setSelected(this.seleccionados.has(row.personalId));
+        }
+      });
+    }
+    
     this.syncFormArray();
   }
 
   private syncFormArray() {
-    console.log('🔄 SYNC FORM ARRAY:');
-    console.log('  - Antes de limpiar FormArray length:', this.empleados.length);
-    
     const arr = this.empleados;
     arr.clear();
-    
-    console.log('  - Después de limpiar FormArray length:', arr.length);
-    console.log('  - Personal filtrado total:', this.personalFiltrado.length);
-    console.log('  - Seleccionados en Set:', this.seleccionados.size);
     
     let agregados = 0;
     this.personalFiltrado.forEach(emp => {
@@ -520,11 +590,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         console.log(`    + Agregado al FormArray: ${emp.nombres} ${emp.apellidoPaterno} (${emp.personalId})`);
       }
     });
-    
-    console.log('  - Empleados agregados al FormArray:', agregados);
-    console.log('  - FormArray final length:', arr.length);
-    console.log('  - FormArray values:', arr.value);
-    
+        
     arr.markAsDirty();
     arr.markAsTouched();
     console.log('====================');
@@ -532,32 +598,24 @@ export class AsignarTurnoMasivoComponent implements OnInit {
 
   guardarAsignacion() {
     console.log('=== INICIO GUARDAR ASIGNACIÓN ===');
+    console.log('🔍 currentStep:', this.currentStep);
     
     const filtro = this.filtroForm.value;
     const empleados = this.personalForm.value.empleados;
     const turno = this.turnoForm.value;
+   
     
-    console.log('📄 DATOS DE FORMULARIOS:');
-    console.log('  - filtroForm.value:', JSON.stringify(filtro, null, 2));
-    console.log('  - personalForm.value:', JSON.stringify(this.personalForm.value, null, 2));
-    console.log('  - turnoForm.value:', JSON.stringify(turno, null, 2));
-    
-    console.log('👥 EMPLEADOS SELECCIONADOS:');
-    console.log('  - empleados array:', empleados);
-    console.log('  - empleados length:', empleados?.length || 0);
-    console.log('  - tipo de empleados:', typeof empleados);
-    console.log('  - es array?:', Array.isArray(empleados));
-    
-    console.log('📋 ESTADO DE SELECCIÓN:');
-    console.log('  - this.seleccionados (Set):', Array.from(this.seleccionados));
-    console.log('  - this.seleccionados.size:', this.seleccionados.size);
-    console.log('  - FormArray empleados:', this.empleados.value);
-    console.log('  - FormArray length:', this.empleados.length);
-    
-    // Buscar datos de la sede y área seleccionada
+    // Buscar datos de la sede y obtener área seleccionada
     const sede = this.sedes.find(s => s.categoriaAuxiliarId === filtro.sede);
-    const area = this.areasFiltradas.find(a => a.areaId === filtro.area);
+    const area = this.selectedArea; // ✅ Usar área seleccionada directamente
     const turnoSeleccionado = this.turnos.find(t => t.id === turno.turno);
+    
+    console.log('🔍 DEBUG - guardarAsignacion:');
+    console.log('selectedArea:', this.selectedArea);
+    console.log('area:', area);
+    console.log('sede:', sede);
+    console.log('filtro:', filtro);
+    console.log('filtroForm.value completo:', this.filtroForm.value);
     
     // Obtener centro de costo seleccionado
     const centroCostoSeleccionado = this.costCenters.find(cc => cc.ccostoId === filtro.centroCosto);
@@ -566,13 +624,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     const companiaId = this.headerConfig?.selectedEmpresa?.companiaId || '01';
     
     const now = new Date().toISOString();
-  
-    console.log('🏢 DATOS ADICIONALES:');
-    console.log('  - companiaId:', companiaId);
-    console.log('  - centroCostoSeleccionado:', centroCostoSeleccionado);
-    console.log('  - sede:', sede);
-    console.log('  - area:', area);
-    console.log('  - turnoSeleccionado:', turnoSeleccionado);
+
   
     // Armar los registros para cada empleado seleccionado
     const registros: EmployeeScheduleAssignmentInsert[] = empleados.map((employeeId: string) => {
@@ -590,8 +642,8 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         fullNameEmployee: empleado ? `${empleado.apellidoPaterno} ${empleado.apellidoMaterno}, ${empleado.nombres}` : '',
         shiftDescription: turnoSeleccionado ? turnoSeleccionado.alias : '',
         nroDoc: empleado ? empleado.nroDoc : '',
-        areaId: area ? area.areaId : '',
-        areaDescription: area ? area.descripcion : '',
+        areaId:empleado.areaId,
+        areaDescription: empleado.areaDescripcion,
         locationId: sede ? sede.categoriaAuxiliarId : '',
         locationName: sede ? sede.descripcion : '',
         // Nuevos campos requeridos
@@ -599,21 +651,11 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         ccostId: centroCostoSeleccionado ? centroCostoSeleccionado.ccostoId : '',
         ccostDescription: centroCostoSeleccionado ? centroCostoSeleccionado.descripcion : ''
       };
+      
+     
     });
-    
-    if (registros.length > 0) {
-      console.log('    * employeeId:', registros[0].employeeId, '(tipo:', typeof registros[0].employeeId, ')');
-      console.log('    * shiftId:', registros[0].shiftId, '(tipo:', typeof registros[0].shiftId, ')');
-      console.log('    * startDate:', registros[0].startDate, '(tipo:', typeof registros[0].startDate, ')');
-      console.log('    * endDate:', registros[0].endDate, '(tipo:', typeof registros[0].endDate, ')');
-      console.log('    * fullNameEmployee:', registros[0].fullNameEmployee);
-      console.log('    * shiftDescription:', registros[0].shiftDescription);
-      console.log('    * locationName:', registros[0].locationName);
-      console.log('    * areaDescription:', registros[0].areaDescription);
-      console.log('  - Estructura completa del primer registro:', JSON.stringify(registros[0], null, 4));
-    }
-    console.log('  - Array completo a enviar:', JSON.stringify(registros, null, 2));
-    console.log('=======================================');
+
+    console.log('🔍 DEBUG - Todos los registros a enviar:', registros);
     
     this.employeeScheduleAssignmentService.insertEmployeeScheduleAssignment(registros).subscribe({
       next: (response) => {
@@ -648,33 +690,42 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     if (!sede) return;
     
     this.filtroForm.patchValue({
-      sede: sedeId,
-      area: null // Resetear área cuando cambia la sede
+      sede: sedeId
     });
     
-    // Filtrar áreas para la sede seleccionada
+    // Filtrar áreas para la sede seleccionada y cargar en arrays de autocomplete
     const sedeSeleccionada = this.sedesAreas.find(s => s.siteId === sedeId);
+    console.log('🔍 onSedeSelected - sedeId:', sedeId);
+    console.log('🔍 onSedeSelected - sedeSeleccionada:', sedeSeleccionada);
+    
     if (sedeSeleccionada) {
       this.areasFiltradas = sedeSeleccionada.areas.map(area => ({
         areaId: area.areaId,
         descripcion: area.areaName,
         companiaId: '1' // Valor por defecto
       }));
+      this.filteredAreasArray = [...this.areasFiltradas];
+      console.log('🔍 onSedeSelected - areasFiltradas:', this.areasFiltradas);
+      console.log('🔍 onSedeSelected - filteredAreasArray:', this.filteredAreasArray);
     } else {
+      console.error('No se encontró sede con ID:', sedeId);
       this.areasFiltradas = [];
+      this.filteredAreasArray = [];
     }
+    
+    // Limpiar selección de área cuando cambia la sede
+    this.selectedArea = null;
+    this.areaFilterTerm = '';
+    
+    // ✅ Limpiar el form control también
+    this.filtroForm.patchValue({
+      area: null
+    });
     
     // Marcar el campo como touched para validaciones
     this.filtroForm.get('sede')?.markAsTouched();
   }
 
-  onAreaSeleccionada(area: RhArea): void {
-    this.filtroForm.patchValue({
-      area: area.areaId
-    });
-    // Marcar el campo como touched para validaciones
-    this.filtroForm.get('area')?.markAsTouched();
-  }
 
   // Método para mostrar detalle del horario en tooltip
   getHorarioDetalle(turno: ShiftListDto): string {
@@ -732,10 +783,48 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     return this.seleccionados.size;
   }
 
+  // Método para obtener el rango de fechas seleccionado formateado
+  getSelectedDateRange(): string {
+    const dateRange = this.filtroForm.value.dateRange;
+    if (!dateRange || !dateRange.start || !dateRange.end) {
+      return '';
+    }
+
+    try {
+      const startDate = new Date(dateRange.start);
+      const endDate = new Date(dateRange.end);
+      
+      const formatOptions: Intl.DateTimeFormatOptions = {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      };
+      
+      const startFormatted = startDate.toLocaleDateString('es-ES', formatOptions);
+      const endFormatted = endDate.toLocaleDateString('es-ES', formatOptions);
+      
+      return `${startFormatted} - ${endFormatted}`;
+    } catch (error) {
+      console.error('Error formatting date range:', error);
+      return '';
+    }
+  }
+
   // Método para limpiar la selección
   clearSelection(): void {
     this.seleccionados.clear();
     this.empleados.clear();
+    this.selectedArea = null; // ✅ También limpiar área seleccionada
+    this.areaFilterTerm = '';
+    
+    // ✅ Limpiar el form control también
+    this.filtroForm.patchValue({
+      area: null
+    });
+    
+    // ✅ Recargar personal sin filtros de área
+    this.paginaActual = 1;
+    this.cargarPersonal();
   }
 
   // Métodos para expansión de turnos
@@ -826,6 +915,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
 
   // Step navigation methods
   nextStep(): void {
+    console.log('🔍 nextStep - selectedArea antes:', this.selectedArea);
     if (this.currentStep < 3) {
       this.currentStep++;
       if (this.currentStep === 2) {
@@ -834,6 +924,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         this.cargarTurnos();
       }
     }
+    console.log('🔍 nextStep - selectedArea después:', this.selectedArea);
   }
 
   previousStep(): void {
@@ -962,6 +1053,82 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   }
 
   // ===============================
+  // MÉTODOS DE AUTOCOMPLETE - ÁREA (MÚLTIPLE SELECCIÓN)
+  // ===============================
+  
+  getAreaFilterText(): string {
+    if (this.selectedArea) {
+      return this.selectedArea.descripcion;
+    }
+    return this.areaFilterTerm || 'Seleccionar área';
+  }
+  
+  onAreaFilterChange(event: any): void {
+    const value = event.target?.value || '';
+    this.areaFilterTerm = value;
+    this.filteredAreasArray = this.areasFiltradas.filter(area => 
+      area.descripcion.toLowerCase().includes(value.toLowerCase())
+    );
+    this.showAreaDropdown = this.filteredAreasArray.length > 0;
+  }
+  
+  onAreaFocus(): void {
+    console.log('🔍 onAreaFocus - areasFiltradas:', this.areasFiltradas);
+    if (this.filteredAreasArray.length === 0) {
+      this.filteredAreasArray = [...this.areasFiltradas];
+    }
+    this.showAreaDropdown = this.filteredAreasArray.length > 0;
+    console.log('🔍 onAreaFocus - showAreaDropdown:', this.showAreaDropdown);
+    console.log('🔍 onAreaFocus - filteredAreasArray:', this.filteredAreasArray);
+  }
+
+  onAreaBlur(): void {
+    setTimeout(() => {
+      this.showAreaDropdown = false;
+    }, 200);
+  }
+
+  trackByAreaId(index: number, area: RhArea): string {
+    return area.areaId;
+  }
+
+  onAreaSelected(area: RhArea): void {
+    console.log('🔍 onAreaSelected llamado con:', area);
+    
+    this.selectedArea = area;
+    this.areaFilterTerm = '';
+    this.showAreaDropdown = false;
+    
+    // ✅ Actualizar el form control también
+    this.filtroForm.patchValue({
+      area: area.areaId
+    });
+    
+    console.log('🔍 selectedArea después de asignar:', this.selectedArea);
+    console.log('🔍 Form value area después de patch:', this.filtroForm.value.area);
+    
+    // ✅ Aplicar filtro automáticamente
+    this.paginaActual = 1; // Reset paginación
+    this.cargarPersonal();
+  }
+
+  removeAreaSelection(): void {
+    this.selectedArea = null;
+    this.areaFilterTerm = '';
+    
+    // ✅ Limpiar el form control también
+    this.filtroForm.patchValue({
+      area: null
+    });
+    
+    console.log('🔍 Área removida');
+    
+    // ✅ Aplicar filtro automáticamente cuando se remueve un área
+    this.paginaActual = 1; // Reset paginación
+    this.cargarPersonal();
+  }
+
+  // ===============================
   // MÉTODOS PARA DATE RANGE PICKER
   // ===============================
   
@@ -1051,12 +1218,6 @@ export class AsignarTurnoMasivoComponent implements OnInit {
       end: formatDate(endDate)
     };
 
-    // Debug info
-    console.log(`📅 Preset "${preset}" calculation debug:`);
-    console.log('  Today:', today.toLocaleDateString('es-ES'));
-    console.log('  StartDate calculated:', startDate.toLocaleDateString('es-ES'));
-    console.log('  EndDate calculated:', endDate.toLocaleDateString('es-ES'));
-    console.log('  DateRange formatted:', dateRange);
 
     // Actualizar el form control del date range picker
     this.filtroForm.patchValue({ dateRange });
@@ -1121,16 +1282,85 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         headerName: 'Nombre Completo',
         flex: 1,
         cellRenderer: (params: any) => {
-          const fullName = `${params.data.apellidoPaterno} ${params.data.apellidoMaterno}, ${params.data.nombres}`;
-          return `<div class="flex items-center py-1">
-            <div class="w-8 h-8 bg-fiori-muted rounded-full flex items-center justify-center mr-3">
-              <svg class="w-4 h-4 text-fiori-subtext" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          // ✅ Use the fullName field that already exists in data for filtering
+          const fullName = params.value || params.data.fullName;
+          const isTerminated = params.data?.isTerminated;
+          const isOnVacation = params.data?.isOnVacation;
+          const fechaCese = params.data?.fechaCese;
+          const vacacionesFechaInicio = params.data?.vacacionesFechaInicio;
+          const vacacionesFechaFin = params.data?.vacacionesFechaFin;
+          
+          // Priority: terminated > vacation > normal
+          let bgColor = 'bg-fiori-muted';
+          let textColor = 'text-fiori-text';
+          let iconColor = 'text-fiori-subtext';
+          let opacity = '';
+          
+          if (isTerminated) {
+            bgColor = 'bg-red-50';
+            textColor = 'text-red-600';
+            iconColor = 'text-red-400';
+            opacity = 'opacity-75';
+          } else if (isOnVacation) {
+            bgColor = 'bg-amber-50';
+            textColor = 'text-amber-600';
+            iconColor = 'text-amber-400';
+            opacity = 'opacity-75';
+          }
+          
+          let statusBadges = '';
+          
+          // Terminated badge (highest priority)
+          if (isTerminated) {
+            const ceaseDate = fechaCese ? new Date(fechaCese).toLocaleDateString('es-ES') : '';
+            statusBadges = `
+              <div class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                Cesado ${ceaseDate}
+              </div>`;
+          } 
+          // Vacation badge (if not terminated)
+          else if (isOnVacation) {
+            const vacationStart = vacacionesFechaInicio ? new Date(vacacionesFechaInicio).toLocaleDateString('es-ES') : '';
+            const vacationEnd = vacacionesFechaFin ? new Date(vacacionesFechaFin).toLocaleDateString('es-ES') : '';
+            const vacationPeriod = vacationStart && vacationEnd ? `${vacationStart} - ${vacationEnd}` : '';
+            statusBadges = `
+              <div class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                Vacaciones ${vacationPeriod}
+              </div>`;
+          }
+          
+          return `<div class="flex items-center py-1 ${opacity}">
+            <div class="w-8 h-8 ${bgColor} rounded-full flex items-center justify-center mr-3">
+              <svg class="w-4 h-4 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
               </svg>
             </div>
-            <div>
-              <div class="text-sm font-medium text-fiori-text" title="${fullName}">${fullName}</div>
+            <div class="flex-1">
+              <div class="text-sm font-medium ${textColor}" title="${fullName}">${fullName}</div>
+              ${statusBadges}
             </div>
+          </div>`;
+        }
+      },
+      {
+        field: 'areaDescripcion',
+        headerName: 'Área',
+        width: 150,
+        cellRenderer: (params: any) => {
+          const area = params.value || '-';
+          return `<div class="flex items-center py-1">
+            <div class="w-6 h-6 bg-fiori-accent/10 rounded-lg flex items-center justify-center mr-2">
+              <svg class="w-3 h-3 text-fiori-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+            </div>
+            <div class="text-sm text-fiori-text">${area}</div>
           </div>`;
         }
       }
@@ -1220,11 +1450,24 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     try {
       const selectedRows = this.gridApi.getSelectedRows();
       
+      // Filter out terminated and vacation employees from selection
+      const validSelectedRows = selectedRows.filter((row: any) => !row.isTerminated && !row.isOnVacation);
+      
+      // If any terminated or vacation employees were selected, deselect them
+      if (selectedRows.length !== validSelectedRows.length) {
+        // Deselect terminated and vacation employees
+        this.gridApi.forEachNode((node: any) => {
+          if ((node.data?.isTerminated || node.data?.isOnVacation) && node.isSelected()) {
+            node.setSelected(false);
+          }
+        });
+      }
+      
       // Limpiar selecciones anteriores
       this.seleccionados.clear();
       
-      // Agregar nuevas selecciones
-      selectedRows.forEach((row: any) => {
+      // Agregar nuevas selecciones (solo empleados activos)
+      validSelectedRows.forEach((row: any) => {
         if (row && row.personalId) {
           this.seleccionados.add(row.personalId);
         }
@@ -1234,7 +1477,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
       this.syncFormArray();
       
       console.log('🔄 AG-GRID SELECTION CHANGED:');
-      console.log('  - Selected rows count:', selectedRows.length);
+      console.log('  - Selected rows count:', validSelectedRows.length);
       console.log('  - Selected IDs:', Array.from(this.seleccionados));
     } catch (error) {
       console.error('Error en onGridSelectionChanged:', error);

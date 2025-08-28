@@ -95,7 +95,7 @@ import { ModalVerHorarioComponent } from './components/personal/empleado/asignar
 import { CalendarViewHorarioComponent } from './components/personal/empleado/asignar-horario-empleado/calendar-view-horario/calendar-view-horario.component';
 import { ModalEditarAsignacionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-editar-asignacion/modal-editar-asignacion.component';
 import { ModalRegistrarExcepcionComponent } from './components/personal/empleado/asignar-horario-empleado/modal-registrar-excepcion/modal-registrar-excepcion.component';
-import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, ChevronUp, Layers, Menu, Info, FileSpreadsheet, Search, RefreshCw, Save, Plus, X, AlertCircle, UserPen, UserPlus, Table, Edit, Trash2, CheckCircle, XCircle, Eye, EyeOff, Play, Square, ArrowRight, Timer, Zap, Hand, BarChart3, Database, Download, Filter, CalendarRange, LogIn, LogOut as LogOutIcon, Columns, Globe, Coffee, Badge, Group, FileEdit, ClipboardList, Check, PlusCircle, Star, TrendingUp, SearchX, CalendarX, RefreshCcw, AlertTriangle, HelpCircle, RotateCw, ShieldX, Mail, Shield, UserCheck, Lock, UserCheck2, ShieldCheck, Folder, Building2, ArrowRightLeft, Target, CalendarPlus, Send, Landmark, Hash, Clock4 } from 'lucide-angular';
+import { LucideAngularModule, Building, MapPin, CalendarDays, Calendar, Users, IdCard, Clock, CheckSquare, FileText, Settings, User, LogOut, ChevronRight, ChevronDown, ChevronLeft, ChevronUp, Layers, Menu, Info, FileSpreadsheet, Search, RefreshCw, Save, Plus, X, AlertCircle, UserPen, UserPlus, Table, Edit, Trash2, CheckCircle, XCircle, Eye, EyeOff, Play, Square, ArrowRight, Timer, Zap, Hand, BarChart3, Database, Download, Filter, CalendarRange, LogIn, LogOut as LogOutIcon, Columns, Globe, Coffee, Badge, Group, FileEdit, ClipboardList, Check, PlusCircle, Star, TrendingUp, SearchX, CalendarX, RefreshCcw, AlertTriangle, HelpCircle, RotateCw, ShieldX, Mail, Shield, UserCheck, Lock, UserCheck2, ShieldCheck, Folder, Building2, ArrowRightLeft, Target, CalendarPlus, Send, Landmark, Hash, Clock4, Code, ArrowLeft, MinusCircle,  Loader2, UserPlus2 } from 'lucide-angular';
 import { ReporteAsistenciaComponent } from './components/asistencia/reportes/reporte-asistencia/reporte-asistencia.component';
 import { ReporteHorasExtrasComponent } from './components/asistencia/reportes/reporte-horas-extras/reporte-horas-extras.component';
 import { HolidaysComponent } from './components/asistencia/holidays/holidays.component';
@@ -108,6 +108,8 @@ import { ModuleRegistry, AllCommunityModule, GridOptions } from 'ag-grid-communi
 import { AG_GRID_LOCALE_ES } from './ag-grid-locale.es';
 import { ReportePersonalTurnosComponent } from './components/asistencia/reportes/reporte-personal-turnos/reporte-personal-turnos.component';
 import { PermissionManagerComponent } from './components/dev/permission-manager/permission-manager.component';
+import { CompensatoryDayComponent } from './components/asistencia/compensatory-day/compensatory-day.component';
+import { ModalCrearCompensatorioComponent } from './components/asistencia/compensatory-day/modal-crear-compensatorio/modal-crear-compensatorio.component';
 
 // Registrar módulos de AG-Grid globalmente
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -174,7 +176,9 @@ registerLocaleData(localeEs);
         TransferModalComponent,
         MassiveTransferModalComponent,
         ReportePersonalTurnosComponent,
-        PermissionManagerComponent
+        PermissionManagerComponent,
+        CompensatoryDayComponent,
+        ModalCrearCompensatorioComponent
 
     ],
     exports: [
@@ -303,7 +307,12 @@ registerLocaleData(localeEs);
             Send,
             Landmark,
             Hash,
-            Clock4
+            Clock4,
+            Code,
+            ArrowLeft,
+            MinusCircle,
+            Loader2,
+            UserPlus2
         })
     ], providers: [
         provideHttpClient(withInterceptorsFromDi()),

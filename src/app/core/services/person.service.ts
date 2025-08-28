@@ -50,10 +50,6 @@ getPersonalActivo(employeeParams:EmployeesParameters): Observable<ApiResponse<Em
 getPersonalWithoutShift(employeeParams:EmployeesWithoutShift): Observable<ApiResponse<Employee>> {
   return this.http.post<ApiResponse<Employee>>(`${this.apiUrlScire}api/Personal/searchNoHorario`,employeeParams);
 }
-
-
-
-
   
 
 }
@@ -75,7 +71,7 @@ export interface EmployeesWithoutShift {
     searchText: string;
     page:       number | 1;
     pagesize:   number | 15;
-    areaId:     string | null;
+    areaId:     string [];
     ccostoId:   string | null;
     sede:       string | null;
     periodoId:  string | null;

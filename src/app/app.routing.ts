@@ -35,6 +35,7 @@ import { NoPermissionsComponent } from "./components/no-permissions/no-permissio
 import { PersonalTransferComponent } from "./components/personal/transferencias/personal-transfer.component";
 import { ReportePersonalTurnosComponent } from "./components/asistencia/reportes/reporte-personal-turnos/reporte-personal-turnos.component";
 import { PermissionManagerComponent } from "./components/dev/permission-manager/permission-manager.component";
+import { CompensatoryDayComponent } from "./components/asistencia/compensatory-day/compensatory-day.component";
 
 
 
@@ -85,6 +86,7 @@ const appRoutes: Routes = [
         { path: 'asistencia/marcaciones/reportes-excel/matrix', component: ReporteAsistenciaComponent },
         { path: 'asistencia/reportes/horas-extras', component: ReporteHorasExtrasComponent },
         { path: 'asistencia/reportes/personal-turnos', component: ReportePersonalTurnosComponent },
+        { path: 'asistencia/compensatory-day', component: CompensatoryDayComponent },
         
         // Dev Tools routes (restricted to sistemas@dev.com)
         { path: 'dev/permission-manager', component: PermissionManagerComponent }

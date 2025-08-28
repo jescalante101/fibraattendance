@@ -24,6 +24,11 @@ export interface Employee {
   fechaIngreso: string; // ISO string format: "2024-01-15T00:00:00.000Z"
   fechaCese: string;
   
+  //vacaciones
+  vacacionesActivo: boolean,
+  vacacionesFechaInicio: string | null,
+  vacacionesFechaFin: string | null,
+    
   selected?: boolean;
 }
 

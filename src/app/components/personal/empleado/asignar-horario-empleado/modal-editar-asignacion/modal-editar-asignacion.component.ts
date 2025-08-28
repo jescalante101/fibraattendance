@@ -66,6 +66,8 @@ export class ModalEditarAsignacionComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('ngOnInit ejecutándose...');
+    console.log('Initial form state:', this.editForm.value);
+    console.log('Form valid:', this.editForm.valid);
     
     // Usar setTimeout para asegurar que los datos estén disponibles
     setTimeout(() => {
@@ -100,9 +102,13 @@ export class ModalEditarAsignacionComponent implements OnInit {
     
     // Pre-cargar datos actuales si es edición individual
     if (!this.isMultipleEdit && this.datat.currentScheduleId) {
+      // Validar y formatear fechas
+      const startDate = this.validateAndFormatDate(this.datat.currentStartDate);
+      const endDate = this.validateAndFormatDate(this.datat.currentEndDate);
+      
       const dateRange = {
-        start: this.datat.currentStartDate || '',
-        end: this.datat.currentEndDate || ''
+        start: startDate+'T12:00:00',
+        end: endDate+'T12:00:00'
       };
       
       console.log('Pre-llenando formulario con:', {
@@ -111,15 +117,23 @@ export class ModalEditarAsignacionComponent implements OnInit {
         remarks: this.datat.currentRemarks
       });
       
-      // Usar setTimeout para asegurar que el componente date-range-picker esté inicializado
+      // Pre-llenar inmediatamente el scheduleId y remarks
+      this.editForm.patchValue({
+        scheduleId: this.datat.currentScheduleId,
+        remarks: this.datat.currentRemarks
+      });
+      
+      // Usar setTimeout para el dateRange para asegurar inicialización del componente
       setTimeout(() => {
-        this.editForm.patchValue({
-          scheduleId: this.datat.currentScheduleId,
-          dateRange: dateRange,
-          remarks: this.datat.currentRemarks
-        });
+        console.log('Aplicando dateRange desde backend:', dateRange);
+        this.editForm.patchValue({ dateRange });
+        
+        // Forzar actualización de validación
+        this.editForm.get('dateRange')?.markAsTouched();
+        this.editForm.get('dateRange')?.updateValueAndValidity();
+        
         console.log('Form después de pre-llenar:', this.editForm.value);
-      }, 200);
+      }, 500);
     }
 
     this.cargarTurnos();
@@ -293,7 +307,20 @@ export class ModalEditarAsignacionComponent implements OnInit {
   }
 
   onDateRangeSelected(dateRange: {start: string, end: string}): void {
-    this.editForm.patchValue({ dateRange });
+    console.log('Rango de fechas seleccionado original:', dateRange);
+    
+    // Verificar que el rango sea válido y actualizar el FormControl
+      if (dateRange && dateRange.start && dateRange.end) {
+    
+        if (dateRange && dateRange.start && dateRange.end) {
+        // Marcar el control como touched para activar la validación
+        this.editForm.get('dateRange')?.markAsTouched();
+        this.editForm.get('dateRange')?.updateValueAndValidity();
+        console.log('✅ FormControl dateRange updated and validated');
+      }
+        
+  
+     }
   }
 
   onSubmit(): void {
@@ -378,6 +405,73 @@ export class ModalEditarAsignacionComponent implements OnInit {
 
   onCancel(): void {
     this.closeWithResult(null);
+  }
+
+  /**
+   * Validator personalizado para dateRange - simplificado
+   */
+  private dateRangeValidator(control: any) {
+    const value = control.value;
+    
+    if (!value || typeof value !== 'object') {
+      return { required: true };
+    }
+    
+    if (!value.start || !value.end) {
+      return { required: true };
+    }
+    
+    return null; // Válido
+  }
+
+  /**
+   * Valida y formatea una fecha string
+   */
+  private validateAndFormatDate(dateStr: string | null | undefined): string {
+    if (!dateStr) return '';
+    
+    try {
+      // Si ya está en formato YYYY-MM-DD, devolverla tal como está
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        return dateStr;
+      }
+      
+      // Si es un string ISO completo (con T y hora), extraer solo la parte de fecha
+      if (dateStr.includes('T')) {
+        return dateStr.split('T')[0];
+      }
+      
+      // Intentar parsear la fecha
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date string:', dateStr);
+        return '';
+      }
+      
+      // Convertir a formato YYYY-MM-DD
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      
+      return `${year}-${month}-${day}`;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return '';
+    }
+  }
+  
+  /**
+   * Verifica si una fecha string es válida
+   */
+  private isValidDate(dateStr: string): boolean {
+    if (!dateStr) return false;
+    
+    try {
+      const date = new Date(dateStr);
+      return !isNaN(date.getTime());
+    } catch {
+      return false;
+    }
   }
 
   private closeWithResult(data: any): void {

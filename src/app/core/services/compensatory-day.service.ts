@@ -14,7 +14,7 @@ import {
   providedIn: 'root'
 })
 export class CompensatoryDayService {
-  private apiUrl = `${environment.apiUrlPro}CompensatoryDay`;
+  private apiUrl = `${environment.apiUrlPro}api/CompensatoryDay`;
 
   constructor(private http: HttpClient) { }
 
@@ -54,6 +54,15 @@ export class CompensatoryDayService {
    */
   createCompensatoryDay(data: CreateCompensatoryDay): Observable<CompensatoryDay> {
     return this.http.post<CompensatoryDay>(this.apiUrl, data);
+  }
+
+  /**
+   * Crea un registro masivo de dias compensatorios para varios empleados
+   * @param data Datos para crear el día compensatorio
+   * @returns Observable con el día compensatorio creado
+   */
+  createCompensatoryDayBulk(data: CreateCompensatoryDay[]): Observable<CompensatoryDay[]> {
+    return this.http.post<CompensatoryDay[]>(`${this.apiUrl}/bulk`, data);
   }
 
   /**

@@ -1,6 +1,5 @@
 <!-- Paginador Fiori Genérico -->
-<div class="flex items-center justify-between p-4 bg-fiori-surface border-t border-fiori-border" 
-     *ngIf="totalRecords > 0 || loading">
+<div class="flex items-center justify-between p-4 bg-fiori-surface">
   
   <!-- IZQUIERDA: Información de registros -->
   <div class="flex items-center gap-3">
@@ -11,11 +10,14 @@
       <div class="text-sm font-semibold text-fiori-text" *ngIf="!loading">
         Total: {{ totalRecords | number }} registro{{ totalRecords !== 1 ? 's' : '' }}
       </div>
-      <div class="text-xs text-fiori-subtext" *ngIf="!loading && pageSize > 0">
+      <div class="text-xs text-fiori-subtext" *ngIf="!loading && pageSize > 0 && totalRecords > 0">
         Mostrando {{ startRecord | number }} - {{ endRecord | number }}
       </div>
-      <div class="text-xs text-fiori-subtext" *ngIf="!loading && pageSize === 0">
+      <div class="text-xs text-fiori-subtext" *ngIf="!loading && pageSize === 0 && totalRecords > 0">
         Mostrando todos los registros
+      </div>
+      <div class="text-xs text-fiori-subtext" *ngIf="!loading && totalRecords === 0">
+        Sin registros para mostrar
       </div>
       <!-- Loading state -->
       <div class="text-sm text-fiori-subtext" *ngIf="loading">
@@ -27,8 +29,8 @@
     </div>
   </div>
 
-  <!-- CENTRO: Navegación de páginas (siempre visible cuando hay paginación) -->
-  <div class="flex items-center gap-2" *ngIf="!loading && pageSize > 0">
+  <!-- CENTRO: Navegación de páginas (solo cuando hay registros y paginación) -->
+  <div class="flex items-center gap-2" *ngIf="!loading && pageSize > 0 && totalRecords > 0">
     
     <!-- Botón Anterior -->
     <button 
@@ -63,8 +65,8 @@
     </button>
   </div>
 
-  <!-- DERECHA: Selector de tamaño de página -->
-  <div class="relative flex items-center gap-2" *ngIf="!loading">
+  <!-- DERECHA: Selector de tamaño de página (solo cuando hay registros) -->
+  <div class="relative flex items-center gap-2" *ngIf="!loading && totalRecords > 0">
     <span class="text-sm text-fiori-subtext hidden sm:inline">Mostrar:</span>
     
     <div class="relative">

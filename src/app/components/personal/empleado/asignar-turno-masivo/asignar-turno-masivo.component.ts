@@ -702,7 +702,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
       this.areasFiltradas = sedeSeleccionada.areas.map(area => ({
         areaId: area.areaId,
         descripcion: area.areaName,
-        companiaId: '1' // Valor por defecto
+        companiaId: '01' // Valor por defecto
       }));
       this.filteredAreasArray = [...this.areasFiltradas];
       console.log('🔍 onSedeSelected - areasFiltradas:', this.areasFiltradas);

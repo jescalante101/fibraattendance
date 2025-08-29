@@ -70,18 +70,28 @@
           </select>
 
           <!-- Fecha desde -->
-          <input
-            type="date"
-            formControlName="startDate"
-            class="px-2 py-1.5 text-xs border border-gray-300 rounded-md bg-white focus:ring-1 focus:ring-fiori-primary focus:border-fiori-primary"
-          />
+          <div class="relative min-w-[120px]">
+            <input
+              mwlFlatpickr
+              (flatpickrReady)="onStartDateReady($event)"
+              [options]="flatpickrOptions"
+              formControlName="startDate"
+              placeholder="Fecha desde"
+              class="px-2 py-1.5 text-xs border border-gray-300 rounded-md bg-white focus:ring-1 focus:ring-fiori-primary focus:border-fiori-primary w-full"
+            />
+          </div>
 
           <!-- Fecha hasta -->
-          <input
-            type="date"
-            formControlName="endDate"
-            class="px-2 py-1.5 text-xs border border-gray-300 rounded-md bg-white focus:ring-1 focus:ring-fiori-primary focus:border-fiori-primary"
-          />
+          <div class="relative min-w-[120px]">
+            <input
+              mwlFlatpickr
+              (flatpickrReady)="onEndDateReady($event)"
+              [options]="flatpickrOptions"
+              formControlName="endDate"
+              placeholder="Fecha hasta"
+              class="px-2 py-1.5 text-xs border border-gray-300 rounded-md bg-white focus:ring-1 focus:ring-fiori-primary focus:border-fiori-primary w-full"
+            />
+          </div>
 
           <!-- Botones de acción -->
           <div class="flex items-center space-x-2 ml-auto">
@@ -118,7 +128,7 @@
     </div>
 
     <!-- ag-Grid Container -->
-    <div class="relative h-[70vh]">
+    <div class="relative h-[50vh]">
       <!-- ag-Grid -->
       <div class="ag-theme-quartz w-full h-full">
         <ag-grid-angular
@@ -156,16 +166,14 @@
         </div>
       </div>
     </div>
-
-    <!-- Paginador -->
-    <app-fiori-paginator
-      [totalRecords]="totalCount"
-      [pageSize]="pageSize"
-      [pageNumber]="page"
-      [pageSizeOptions]="[10, 25, 50, 100]"
-      [showAllOption]="false"
-      [loading]="loading"
-      (pageChange)="onPageChange($event)">
-    </app-fiori-paginator>
+     <app-fiori-paginator
+    [totalRecords]="totalCount"
+    [pageSize]="pageSize"
+    [pageNumber]="page"
+    [pageSizeOptions]="[10, 25, 50, 100]"
+    [showAllOption]="true"
+    [loading]="loading"
+    (pageChange)="onPageChangeCustom($event)">
+  </app-fiori-paginator>
   </div>
 </div>

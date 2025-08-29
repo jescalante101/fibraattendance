@@ -105,6 +105,7 @@ export class EmployeeScheduleAssignmentService {
       .set('areaId', areaId)
 
     return this.http.get<ApiResponse<EmployeeScheduleAssignment>>(`${this.apiUrl}api/employee-schedule-assignment/search`, { params });
+  
   }
 
   insertEmployeeScheduleAssignment(body: EmployeeScheduleAssignmentInsert[]): Observable<ApiResponse<EmployeeScheduleAssignment>> {

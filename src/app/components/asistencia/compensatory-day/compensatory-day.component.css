@@ -1,6 +1,12 @@
-/* Estilos mínimos necesarios para el componente de días compensatorios */
+/* Existing styles */
 
-/* Solo personalización básica de AG-Grid si es necesaria */
-::ng-deep .ag-theme-quartz {
-  --ag-font-family: "72", "Segoe UI", Arial, sans-serif;
-}
+/* Style for holiday dates in flatpickr */
+ .flatpickr-day .holiday-date {
+    background-color: #fee2e2 !important; /* Fondo rojo claro */
+    color: #dc2626 !important;            /* Texto rojo */
+    font-weight: bold !important;
+  }
+
+  .flatpickr-day .holiday-date:hover {
+    background-color: #fecaca !important;
+  }

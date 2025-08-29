@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ColDef, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -10,25 +10,32 @@ import {
   CompensatoryDayStatus,
   PaginatedList 
 } from '../../../core/models/compensatory-day.model';
-import { createFioriGridOptionsWithFullDynamicResize, localeTextFiori } from '../../../shared/ag-grid-theme-fiori';
+import { createFioriGridOptions, createFioriGridOptionsWithFullDynamicResize, localeTextFiori } from '../../../shared/ag-grid-theme-fiori';
 import { PaginatorEvent } from '../../../shared/fiori-paginator/fiori-paginator.component';
 import { ModalService } from '../../../shared/modal/modal.service';
 import { ModalCrearCompensatorioComponent } from './modal-crear-compensatorio/modal-crear-compensatorio.component';
-import { CompensatoryDayFormData } from './modal-crear-compensatorio/modal-crear-compensatorio-mock';
 import { ToastService } from '../../../shared/services/toast.service';
+import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
+import { MatDialog } from '@angular/material/dialog';
+import { HolidaysService } from 'src/app/core/services/holidays.service';
+import { HolidayYear } from 'src/app/core/models/holiday.model';
 
 @Component({
   selector: 'app-compensatory-day',
   templateUrl: './compensatory-day.component.html',
   styleUrls: ['./compensatory-day.component.css']
 })
-export class CompensatoryDayComponent implements OnInit {
+export class CompensatoryDayComponent implements OnInit, OnDestroy {
   @ViewChild('agGrid') agGrid!: any;
 
   // Data properties
   compensatoryDays: CompensatoryDay[] = [];
   totalCount: number = 0;
   loading: boolean = false;
+  holidays: HolidayYear = {} as HolidayYear;
+  public flatpickrOptions: any;
+  private startDateInstance: any;
+  private endDateInstance: any;
   
   // Pagination
   page: number = 1;
@@ -50,7 +57,9 @@ export class CompensatoryDayComponent implements OnInit {
     private compensatoryDayService: CompensatoryDayService,
     private fb: FormBuilder,
     private modalService: ModalService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private dialog: MatDialog,
+    private holidaysService: HolidaysService
   ) {
     // Initialize filter form
     this.filterForm = this.fb.group({
@@ -62,7 +71,7 @@ export class CompensatoryDayComponent implements OnInit {
     });
 
     // Configure AG-Grid
-    this.gridOptions = createFioriGridOptionsWithFullDynamicResize({
+    this.gridOptions = createFioriGridOptions({
       localeText: localeTextFiori,
       rowSelection: 'single',
       suppressRowClickSelection: false,
@@ -70,10 +79,162 @@ export class CompensatoryDayComponent implements OnInit {
     });
 
     this.columnDefs = this.setupColumnDefinitions();
+
+    // Initialize flatpickr with basic options
+    this.initializeFlatpickrOptions();
   }
 
   ngOnInit(): void {
     this.loadCompensatoryDays();
+    this.loadHolidays();
+  }
+
+  onStartDateReady(instance: any) {
+    this.startDateInstance = instance;
+  }
+
+  onEndDateReady(instance: any) {
+    this.endDateInstance = instance;
+  }
+
+  loadHolidays() {
+    const year = new Date().getFullYear();
+    this.holidaysService.getHolidaysByYear(year.toString()).subscribe({
+      next: (data) => {
+        console.log('🚀 Respuesta de la API:', data);
+        this.holidays = data;
+        this.initializeFlatpickrOptions();
+        // Re-initialize Flatpickr instances with new options instead of redraw
+        if (this.startDateInstance && typeof this.startDateInstance.destroy === 'function') {
+          try {
+            this.startDateInstance.destroy();
+          } catch (error) {
+            console.warn('Error destroying startDateInstance:', error);
+          }
+          this.startDateInstance = null;
+        }
+        if (this.endDateInstance && typeof this.endDateInstance.destroy === 'function') {
+          try {
+            this.endDateInstance.destroy();
+          } catch (error) {
+            console.warn('Error destroying endDateInstance:', error);
+          }
+          this.endDateInstance = null;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading holidays, using default calendar options:', error);
+        // Initialize with default options if holidays fail to load
+        this.initializeFlatpickrOptions(); 
+      }
+    });
+  }
+
+  initializeFlatpickrOptions() {
+    console.log('🗓️ Inicializando opciones de Flatpickr...');
+    console.log('🏖️ Feriados disponibles:', this.holidays);
+    console.log('🏖️ Número de feriados:', this.holidays?.hld1s?.length || 0);
+    
+    // Crear array de fechas de feriados para Flatpickr
+    const holidayDates: string[] = [];
+    if (this.holidays && this.holidays.hld1s) {
+      this.holidays.hld1s.forEach(holiday => {
+        // Convertir formato ISO a YYYY-MM-DD
+        const date = new Date(holiday.strDate);
+        const dateStr = date.getFullYear() + '-' + 
+                       String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                       String(date.getDate()).padStart(2, '0');
+        holidayDates.push(dateStr);
+        console.log('🏖️ Feriado agregado:', dateStr, holiday.rmrks);
+      });
+    }
+    
+    this.flatpickrOptions = {
+      dateFormat: 'Y-m-d',
+      locale: 'es',
+      // Usar enable para resaltar feriados (inverso de disable)
+      enable: [
+        // Habilitar todas las fechas
+        {
+          from: "1900-01-01",
+          to: "2100-12-31"
+        }
+      ],
+      // Método alternativo: usar onReady para aplicar estilos después
+      onReady: (selectedDates: Date[], dateStr: string, instance: any) => {
+        console.log('📅 Flatpickr listo, aplicando estilos de feriados...');
+        setTimeout(() => {
+          this.applyHolidayStyles(instance);
+        }, 100);
+      },
+      // También en onChange por si cambia el mes
+      onMonthChange: (selectedDates: Date[], dateStr: string, instance: any) => {
+        console.log('📅 Mes cambiado, re-aplicando estilos...');
+        setTimeout(() => {
+          this.applyHolidayStyles(instance);
+        }, 100);
+      },
+      onYearChange: (selectedDates: Date[], dateStr: string, instance: any) => {
+        console.log('📅 Año cambiado, re-aplicando estilos...');
+        setTimeout(() => {
+          this.applyHolidayStyles(instance);
+        }, 100);
+      }
+    };
+  }
+
+  // Método separado para aplicar estilos de feriados
+  private applyHolidayStyles(instance: any): void {
+    if (!this.holidays || !this.holidays.hld1s) return;
+
+    // Buscar todos los elementos de días en el calendario
+    const calendarEl = instance.calendarContainer;
+    if (!calendarEl) return;
+
+    const dayElements = calendarEl.querySelectorAll('.flatpickr-day');
+    console.log('🔍 Elementos de días encontrados:', dayElements.length);
+
+    dayElements.forEach((dayEl: HTMLElement) => {
+      // Intentar obtener la fecha del elemento
+      let dayDate: Date;
+      
+      if ((dayEl as any).dateObj) {
+        dayDate = new Date((dayEl as any).dateObj);
+      } else if (dayEl.getAttribute('aria-label')) {
+        // Backup: usar aria-label si existe
+        dayDate = new Date(dayEl.getAttribute('aria-label')!);
+      } else {
+        // Último recurso: usar el texto del elemento
+        const dayText = dayEl.textContent || dayEl.innerText;
+        if (!dayText || isNaN(parseInt(dayText))) return;
+        
+        // Construir fecha basándose en el mes/año del calendario
+        const currentDate = new Date();
+        dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), parseInt(dayText));
+      }
+      
+      if (isNaN(dayDate.getTime())) return;
+
+      // Normalizar fecha para comparación
+      const normalizedDayDate = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate());
+
+      this.holidays.hld1s.forEach(holiday => {
+        const holidayDate = new Date(holiday.strDate);
+        const normalizedHolidayDate = new Date(holidayDate.getFullYear(), holidayDate.getMonth(), holidayDate.getDate());
+
+        if (normalizedDayDate.getTime() === normalizedHolidayDate.getTime()) {
+          console.log('🎉 Aplicando estilos a feriado:', holiday.rmrks);
+          
+          // Aplicar clase y estilos
+          dayEl.classList.add('holiday-date');
+          dayEl.title = holiday.rmrks;
+          dayEl.style.setProperty('background-color', '#fee2e2', 'important');
+          dayEl.style.setProperty('color', '#dc2626', 'important');
+          dayEl.style.setProperty('font-weight', 'bold', 'important');
+          dayEl.style.setProperty('border', '2px solid #dc2626', 'important');
+        }
+      });
+    });
   }
 
   /**
@@ -84,17 +245,50 @@ export class CompensatoryDayComponent implements OnInit {
       {
         headerName: 'Empleado',
         field: 'employeeFullName',
-        minWidth: 200,
+        minWidth: 180,
         flex: 2,
         cellRenderer: (params: any) => {
           const employee = params.value || 'N/A';
-          const area = params.data?.employeeArea || '';
-          const location = params.data?.employeeLocation || '';
+          const initials = employee.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
           
           return `
-            <div class="flex flex-col py-1">
-              <div class="font-medium text-fiori-text text-sm">${employee}</div>
-              ${area ? `<div class="text-xs text-fiori-subtext">${area} - ${location}</div>` : ''}
+            <div class="flex items-center space-x-2 py-1">
+              <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <span class="text-xs font-medium text-blue-600">${initials}</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="font-medium text-fiori-text text-sm truncate">${employee}</div>
+              </div>
+            </div>
+          `;
+        }
+      },
+      {
+        headerName: 'Área',
+        field: 'employeeArea',
+        minWidth: 120,
+        flex: 1,
+        cellRenderer: (params: any) => {
+          const area = params.value || 'N/A';
+          return `
+            <div class="flex items-center py-1">
+              <div class="w-2 h-2 bg-purple-400 rounded-full mr-2 flex-shrink-0"></div>
+              <span class="text-sm text-fiori-text truncate">${area}</span>
+            </div>
+          `;
+        }
+      },
+      {
+        headerName: 'Sede',
+        field: 'employeeLocation',
+        minWidth: 120,
+        flex: 1,
+        cellRenderer: (params: any) => {
+          const location = params.value || 'N/A';
+          return `
+            <div class="flex items-center py-1">
+              <div class="w-2 h-2 bg-indigo-400 rounded-full mr-2 flex-shrink-0"></div>
+              <span class="text-sm text-fiori-text truncate">${location}</span>
             </div>
           `;
         }
@@ -202,6 +396,68 @@ export class CompensatoryDayComponent implements OnInit {
             </div>
           `;
         }
+      },
+      {
+        headerName: 'Acciones',
+        field: 'actions',
+        minWidth: 120,
+        maxWidth: 120,
+        pinned: 'right',
+        sortable: false,
+        filter: false,
+        cellRenderer: (params: any) => {
+          const compensatoryDay = params.data as CompensatoryDay;
+          const status = compensatoryDay.status;
+          
+          // Solo permitir editar/eliminar si está pendiente
+          const canEdit = status === 'P';
+          const canDelete = status === 'P';
+          
+          return `
+            <div class="flex items-center justify-center space-x-1 h-full">
+              <button 
+                class="action-btn-edit inline-flex items-center justify-center w-7 h-7 rounded-md text-xs font-medium transition-colors ${canEdit 
+                  ? 'bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200' 
+                  : 'bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200'
+                }"
+                ${canEdit ? '' : 'disabled'}
+                title="${canEdit ? 'Editar día compensatorio' : 'No se puede editar (estado: ' + this.getStatusText(status) + ')'}"
+                data-id="${compensatoryDay.id}"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+              </button>
+              <button 
+                class="action-btn-delete inline-flex items-center justify-center w-7 h-7 rounded-md text-xs font-medium transition-colors ${canDelete 
+                  ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200' 
+                  : 'bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200'
+                }"
+                ${canDelete ? '' : 'disabled'}
+                title="${canDelete ? 'Eliminar día compensatorio' : 'No se puede eliminar (estado: ' + this.getStatusText(status) + ')'}"
+                data-id="${compensatoryDay.id}"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+              </button>
+            </div>
+          `;
+        },
+        onCellClicked: (params: any) => {
+          const target = params.event.target as HTMLElement;
+          const compensatoryDay = params.data as CompensatoryDay;
+          
+          // Buscar el botón clickeado
+          const editBtn = target.closest('.action-btn-edit');
+          const deleteBtn = target.closest('.action-btn-delete');
+          
+          if (editBtn && !editBtn.hasAttribute('disabled')) {
+            this.edit(compensatoryDay);
+          } else if (deleteBtn && !deleteBtn.hasAttribute('disabled')) {
+            this.delete(compensatoryDay);
+          }
+        }
       }
     ];
   }
@@ -220,8 +476,11 @@ export class CompensatoryDayComponent implements OnInit {
 
     this.compensatoryDayService.getCompensatoryDays(params).subscribe({
       next: (response: PaginatedList<CompensatoryDay>) => {
+      
         this.compensatoryDays = response.items;
-        this.totalCount = response.totalRecords;
+        this.totalCount = response.totalCount;
+        this.page=response.pageNumber;
+        this.pageSize=response.pageSize;
         this.loading = false;
       },
       error: (error) => {
@@ -241,9 +500,10 @@ export class CompensatoryDayComponent implements OnInit {
   /**
    * Handle pagination change
    */
-  onPageChange(event: PaginatorEvent): void {
+  onPageChangeCustom(event: PaginatorEvent) {
     this.page = event.pageNumber;
     this.pageSize = event.pageSize;
+    this.totalCount = event.totalRecords;
     this.loadCompensatoryDays();
   }
 
@@ -293,39 +553,76 @@ export class CompensatoryDayComponent implements OnInit {
    * Create new compensatory day
    */
   async createNew(): Promise<void> {
+    console.log('🚀 Abriendo modal para crear días compensatorios...');
+    
     try {
       const result = await this.modalService.open({
         title: 'Registrar Días Compensatorios',
         componentType: ModalCrearCompensatorioComponent,
         componentData: {},
         width: '1200px',
-        
       });
 
-      if (result) {
-        const formData = result as CompensatoryDayFormData;
-        console.log('Datos del modal:', formData);
-        
-        this.toastService.success(
-          'Éxito', 
-          `Se registraron ${formData.selectedEmployees.length} día(s) compensatorio(s) para el área ${formData.areaName}`
-        );
-        
+      console.log('📨 Resultado del modal:', result);
+
+      if (result && result.selectedEmployees && result.selectedEmployees.length > 0) {
+       
         // Recargar datos después del registro exitoso
         this.loadCompensatoryDays();
+      } else if (result === null) {
+        console.log('ℹ️ Modal cancelado por el usuario');
+      } else {
+        console.log('⚠️ Modal cerrado sin datos válidos');
       }
     } catch (error) {
-      console.error('Error al abrir modal de creación:', error);
-      this.toastService.error('Error', 'No se pudo abrir el formulario de registro');
+      console.error('❌ Error al abrir el modal:', error);
+      this.toastService.error('Error', 'No se pudo abrir el modal de registro');
     }
   }
 
   /**
    * Edit compensatory day
    */
-  edit(compensatoryDay: CompensatoryDay): void {
-    // TODO: Open edit modal
-    console.log('Edit compensatory day:', compensatoryDay);
+  async edit(compensatoryDay: CompensatoryDay): Promise<void> {
+    this.toastService.info('info', 'Aún no esta en funcionamiento esta opción');
+    // console.log('✏️ Editando día compensatorio:', compensatoryDay);
+    
+    // if (compensatoryDay.status !== 'P') {
+    //   this.toastService.warning(
+    //     'Advertencia', 
+    //     'Solo se pueden editar días compensatorios en estado Pendiente'
+    //   );
+    //   return;
+    // }
+
+    // try {
+    //   const result = await this.modalService.open({
+    //     title: 'Editar Día Compensatorio',
+    //     componentType: ModalCrearCompensatorioComponent,
+    //     componentData: {
+    //       mode: 'edit',
+    //       compensatoryDay: compensatoryDay
+    //     },
+    //     width: '1200px',
+    //   });
+
+    //   console.log('📨 Resultado de edición:', result);
+
+    //   if (result && result.selectedEmployees && result.selectedEmployees.length > 0) {
+    //     console.log('✅ Día compensatorio editado exitosamente, recargando datos...');
+        
+    //     this.toastService.success(
+    //       'Éxito', 
+    //       'Día compensatorio actualizado correctamente'
+    //     );
+        
+    //     // Recargar datos después de la edición exitosa
+    //     this.loadCompensatoryDays();
+    //   }
+    // } catch (error) {
+    //   console.error('❌ Error al abrir el modal de edición:', error);
+    //   this.toastService.error('Error', 'No se pudo abrir el modal de edición');
+    // }
   }
 
   /**
@@ -347,9 +644,72 @@ export class CompensatoryDayComponent implements OnInit {
   /**
    * Delete compensatory day
    */
-  delete(compensatoryDay: CompensatoryDay): void {
-    // TODO: Implement delete logic with confirmation
-    console.log('Delete compensatory day:', compensatoryDay);
+  async delete(compensatoryDay: CompensatoryDay): Promise<void> {
+    console.log('🗑️ Eliminando día compensatorio:', compensatoryDay);
+    
+    if (compensatoryDay.status !== 'P') {
+      this.toastService.warning(
+        'Advertencia', 
+        'Solo se pueden eliminar días compensatorios en estado Pendiente'
+      );
+      return;
+    }
+
+     const dialogRef = this.dialog.open(ModalConfirmComponent, {
+      width: '350px',
+      data: {
+        tipo: 'danger',
+        titulo: 'Eliminar usuario',
+        mensaje: `¿Seguro que deseas eliminar el usuario "${compensatoryDay.employeeFullName}"?`,
+        confirmacion: true,
+        textoConfirmar: 'Eliminar'
+      }
+    });
+
+   dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+         try {
+      console.log('🔄 Eliminando día compensatorio con ID:', compensatoryDay.id);
+      
+      // Mostrar loading
+      this.loading = true;
+      
+      // Llamar al servicio para eliminar
+      this.compensatoryDayService.deleteCompensatoryDay(compensatoryDay.id).subscribe({
+        next: () => {
+          console.log('✅ Día compensatorio eliminado exitosamente');
+          
+          this.toastService.success(
+            'Éxito', 
+            `Día compensatorio de ${compensatoryDay.employeeFullName} eliminado correctamente`
+          );
+          
+          // Recargar datos después de la eliminación exitosa
+          this.loadCompensatoryDays();
+        },
+        error: (error) => {
+          console.error('❌ Error al eliminar día compensatorio:', error);
+          
+          let errorMessage = 'No se pudo eliminar el día compensatorio';
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message;
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+          
+          this.toastService.error('Error', errorMessage);
+          this.loading = false;
+        }
+      });
+    } catch (error) {
+      console.error('❌ Error inesperado al eliminar:', error);
+      this.toastService.error('Error', 'Ocurrió un error inesperado al eliminar');
+      this.loading = false;
+    }
+  }
+    });
+
+   
   }
 
   /**
@@ -373,6 +733,28 @@ export class CompensatoryDayComponent implements OnInit {
       case 'A': return 'Aprobado';
       case 'R': return 'Rechazado';
       default: return 'Desconocido';
+    }
+  }
+
+  /**
+   * Clean up component resources
+   */
+  ngOnDestroy(): void {
+    // Clean up Flatpickr instances
+    if (this.startDateInstance && typeof this.startDateInstance.destroy === 'function') {
+      try {
+        this.startDateInstance.destroy();
+      } catch (error) {
+        console.warn('Error destroying startDateInstance on destroy:', error);
+      }
+    }
+    
+    if (this.endDateInstance && typeof this.endDateInstance.destroy === 'function') {
+      try {
+        this.endDateInstance.destroy();
+      } catch (error) {
+        console.warn('Error destroying endDateInstance on destroy:', error);
+      }
     }
   }
 }

@@ -1,7 +1,7 @@
 // Interfaz para la respuesta paginada
 export interface PaginatedList<T> {
   items: T[];
-  totalRecords: number;
+  totalCount: number;
   pageNumber: number;
   pageSize: number;
   totalPages: number;

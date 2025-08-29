@@ -11,6 +11,8 @@ import { ToastService } from 'src/app/shared/services/toast.service';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { ModalRegistrarExcepcionComponent } from '../modal-registrar-excepcion/modal-registrar-excepcion.component';
 import { ShiftsService } from 'src/app/core/services/shifts.service';
+import { HolidaysService } from 'src/app/core/services/holidays.service';
+import { HolidayYear, Holiday } from 'src/app/core/models/holiday.model';
 
 // Se mantiene la interfaz por si se usa en otro lado, pero el componente priorizará ScheduleResponseDto
 export interface HorarioCalendarData {
@@ -37,6 +39,7 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
   isLoading = true; // Para mostrar un spinner de carga
   scheduleData: ScheduleResponseDto | null = null;
   private employeeId: string | null = null;
+  private holidays: Holiday[] = [];
   
   // Referencia al modal padre y datos (si se usan con un servicio de modal)
   modalRef: any;
@@ -81,8 +84,8 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
     private scheduleService: ScheduleService, // Inyectamos el servicio para hacer peticiones
     private toastService: ToastService,
     private modalService: ModalService,
-    private shiftService: ShiftsService
-
+    private shiftService: ShiftsService,
+    private holidaysService: HolidaysService
 
   ) {}
 
@@ -92,6 +95,7 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
       this.componentData = this.data;
     }
     this.processIncomingData();
+    this.loadHolidays();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -142,17 +146,22 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
       .subscribe({
         next: (response) => {
           if (response && response.schedule) {
-            const events = this.transformScheduleToEvents(response.schedule);
-            successCallback(events);
+            const scheduleEvents = this.transformScheduleToEvents(response.schedule);
+            const holidayEvents = this.transformHolidaysToEvents(startDate, endDate);
+            const allEvents = [...scheduleEvents, ...holidayEvents];
+            successCallback(allEvents);
           } else {
+            const holidayEvents = this.transformHolidaysToEvents(startDate, endDate);
             this.toastService.info('Horario', 'No se encontraron horarios para este período.');
-            successCallback([]);
+            successCallback(holidayEvents);
           }
         },
         error: (err) => {
+          const holidayEvents = this.transformHolidaysToEvents(startDate, endDate);
           this.toastService.error('Horario', 'Error al cargar los horarios.');
           console.error('Error fetching schedule:', err);
-          failureCallback(err);
+          // Aún mostramos los feriados aunque falle la carga de horarios
+          successCallback(holidayEvents);
         }
       });
   }
@@ -325,7 +334,13 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
 
   handleEventDidMount(mountInfo: any): void {
     const { event } = mountInfo;
-    mountInfo.el.title = this.getTooltipText(event.extendedProps.scheduleDay, event.extendedProps.fecha);
+    
+    // Verificar si es un evento de feriado
+    if (event.extendedProps.isHoliday) {
+      mountInfo.el.title = this.getHolidayTooltipText(event.extendedProps.holidayData);
+    } else if (event.extendedProps.scheduleDay) {
+      mountInfo.el.title = this.getTooltipText(event.extendedProps.scheduleDay, event.extendedProps.fecha);
+    }
   }
   
   handleDayCellDidMount(mountInfo: any): void {
@@ -366,6 +381,23 @@ Duración: ${duracion}`;
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${hours}h ${mins}m`;
+  }
+
+  private getHolidayTooltipText(holiday: Holiday): string {
+    const startDate = new Date(holiday.strDate);
+    const endDate = new Date(holiday.endDate);
+    const isMultiDay = startDate.getTime() !== endDate.getTime();
+    
+    if (isMultiDay) {
+      return `🎉 FERIADO
+${holiday.rmrks}
+Desde: ${startDate.toLocaleDateString('es-ES')}
+Hasta: ${endDate.toLocaleDateString('es-ES')}`;
+    } else {
+      return `🎉 FERIADO
+${holiday.rmrks}
+Fecha: ${startDate.toLocaleDateString('es-ES')}`;
+    }
   }
 
 
@@ -554,5 +586,84 @@ ${schedule.alias ? 'Alias: ' + schedule.alias : ''}
     if (this.showContextMenu) {
       this.closeContextMenu();
     }
+  }
+
+  // --- MÉTODOS PARA FERIADOS ---
+
+  /**
+   * Carga los feriados desde el servicio
+   */
+  private loadHolidays(): void {
+    this.holidaysService.getHolidays().subscribe({
+      next: (holidayYears: HolidayYear[]) => {
+        // Extraer todos los feriados de todos los años
+        this.holidays = holidayYears.flatMap(year => year.hld1s);
+        console.log('Feriados cargados:', this.holidays.length);
+        
+        // Refrescar eventos del calendario si ya está renderizado
+        if (this.calendarComponent?.getApi()) {
+          this.calendarComponent.getApi().refetchEvents();
+        }
+      },
+      error: (error) => {
+        console.error('Error cargando feriados:', error);
+        this.holidays = [];
+      }
+    });
+  }
+
+  /**
+   * Transforma los feriados en eventos de fondo para FullCalendar
+   */
+  private transformHolidaysToEvents(startDate: Date, endDate: Date): EventInput[] {
+    if (!this.holidays || this.holidays.length === 0) {
+      return [];
+    }
+
+    return this.holidays
+      .filter(holiday => {
+        const holidayDate = new Date(holiday.strDate);
+        const holidayEndDate = new Date(holiday.endDate);
+        
+        // Verificar si el feriado está dentro del rango visible del calendario
+        return (holidayDate >= startDate && holidayDate <= endDate) ||
+               (holidayEndDate >= startDate && holidayEndDate <= endDate) ||
+               (holidayDate <= startDate && holidayEndDate >= endDate);
+      })
+      .map(holiday => {
+        const startHoliday = new Date(holiday.strDate);
+        const endHoliday = new Date(holiday.endDate);
+        
+        // Calcular si es un feriado de múltiples días
+        const isMultiDay = startHoliday.getTime() !== endHoliday.getTime();
+        
+        return {
+          id: `holiday-${holiday.hldCode}-${startHoliday.getTime()}`,
+          title: `🎉 ${holiday.rmrks}`,
+          start: this.formatDateForCalendar(startHoliday),
+          end: isMultiDay ? this.formatDateForCalendar(new Date(endHoliday.getTime() + 24 * 60 * 60 * 1000)) : undefined,
+          allDay: true,
+          display: 'background', // Esto hace que sea un evento de fondo
+          backgroundColor: '#fef3c7', // Amarillo suave para feriados
+          borderColor: '#f59e0b',
+          textColor: '#92400e',
+          classNames: ['holiday-event'],
+          extendedProps: {
+            isHoliday: true,
+            holidayData: holiday,
+            description: holiday.rmrks
+          }
+        } as EventInput;
+      });
+  }
+
+  /**
+   * Formatea una fecha para FullCalendar (YYYY-MM-DD)
+   */
+  private formatDateForCalendar(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 }

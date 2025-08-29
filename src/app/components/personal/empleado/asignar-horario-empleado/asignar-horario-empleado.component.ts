@@ -601,6 +601,8 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       {
         field: 'ccostDescription',
         headerName: 'Centro de Costo',
+        width: 500,
+        maxWidth: 500,
         
         cellRenderer: (params: any) => {
           if (!params.value) return '<span class="text-fiori-subtext">Sin asignar</span>';

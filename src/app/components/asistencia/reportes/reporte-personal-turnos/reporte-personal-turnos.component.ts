@@ -75,12 +75,12 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   
   // Personal CON turno
   pageConTurno = 1;
-  pageSizeConTurno = 50;
+  pageSizeConTurno = 500;
   totalConTurno = 0;
   
   // Personal SIN turno
   pageSinTurno = 1;
-  pageSizeSinTurno = 50;
+  pageSizeSinTurno = 500;
   totalSinTurno = 0;
   
   // ============================================================================
@@ -350,6 +350,8 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   loadData(): void {
     this.loading = true;
     this.loadPersonalConTurno();
+    this.loadPersonalSinTurno();
+    this.createCharts();
   }
   
   private loadPersonalConTurno(): void {
@@ -361,6 +363,14 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     
     // Preparar filtros adicionales
     const locationIds = this.selectedSede ? [this.selectedSede.categoriaAuxiliarId] : [];
+    const areaIds = this.selectedArea?.areaId  || '';
+    
+   // fechas 
+   console.log('startDate', startDate);
+   console.log('endDate', endDate);
+   console.log('locationIds', locationIds);
+   console.log('areaIds', areaIds);
+   
     
     this.employeeScheduleService.getEmployeeScheduleAssignments(
       this.pageConTurno,
@@ -380,7 +390,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
           this.totalConTurno = response.data.totalCount || 0;
           
           // Ahora cargar personal SIN turno (excluyendo los que ya tienen)
-          this.loadPersonalSinTurno();
+         // this.loadPersonalSinTurno();
         } else {
           this.personalConTurno = [];
           this.totalConTurno = 0;
@@ -402,89 +412,106 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     this.loadingSinTurno = true;
     
     // Mapear IDs de empleados que YA tienen turno
-    const empleadosConTurnoIds = this.personalConTurno.map(emp => emp.employeeId);
-    
-    const headerConfig = this.headerConfigService.getCurrentHeaderConfig();
-    const companyId = headerConfig?.selectedEmpresa?.companiaId || '';
-    // convertir a []
-    const areaIds = this.selectedArea ? [this.selectedArea.areaId] : [];
-    
-    
-    const params: EmployeesWithoutShift = {
-      searchText: '',
-      page: this.pageSinTurno,
-      pagesize: this.pageSizeSinTurno,
-      areaId: areaIds,
-      ccostoId: null,
-      sede: this.selectedSede?.categoriaAuxiliarId || null,
-      periodoId: headerConfig?.selectedPeriodo?.periodoId || null,
-      planillaId: headerConfig?.selectedPlanilla?.planillaId || null,
-      companiaId: companyId,
-      personalIds: empleadosConTurnoIds // ← EXCLUIR estos IDs
-    };
-    
-    // 🐛 DEBUG: Verificar parámetros enviados
-    console.log('🔍 DEBUG - loadPersonalSinTurno:');
-    console.log('- empleadosConTurnoIds:', empleadosConTurnoIds);
-    console.log('- empleadosConTurnoIds.length:', empleadosConTurnoIds.length);
-    console.log('- companyId:', companyId);
-    console.log('- selectedArea:', this.selectedArea);
-    console.log('- selectedSede:', this.selectedSede);
-    console.log('- params completos:', params);
-    
-    this.personService.getPersonalWithoutShift(params)
+   // const empleadosConTurnoIds = this.personalConTurno.map(emp => emp.employeeId);
+
+
+    /**
+     * recuperamos el el id  de todo el personal sin turno
+     */
+    const dateRange = this.dateRangeControl.value;
+    const startDate = dateRange?.start || '';
+    const endDate = dateRange?.end || '';
+
+    this.employeeScheduleService.getEmployeeIdsByDateRange(startDate, endDate)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          this.loadingSinTurno = false;
-          this.loading = false;
           
-          // 🐛 DEBUG: Verificar respuesta del servicio
-          console.log('📥 DEBUG - Respuesta getPersonalWithoutShift:');
-          console.log('- response.exito:', response.exito);
-          console.log('- response.mensaje:', response.mensaje);
-          console.log('- response.data?.items?.length:', response.data?.items?.length);
-          console.log('- response.data?.totalCount:', response.data?.totalCount);
-          console.log('- response completa:', response);
-          
-          if (response.exito && response.data) {
-            // ✅ FIX: Ensure fullNameFormatted exists in data for AG-Grid filtering
-            this.personalSinTurno = (response.data.items || []).map((emp: Employee): EmployeeWithFormatted => {
-              const fullNameFormatted = this.getEmployeeFullName(emp);
-              return {
-                ...emp,
-                fullNameFormatted: fullNameFormatted
-              };
-            });
-            this.totalSinTurno = response.data.totalCount || 0;
-            
-            // Update AG-Grid data if grid is ready
-            setTimeout(() => {
-              if (this.gridSinTurno?.api) {
-                this.gridSinTurno.api.setGridOption('rowData', this.personalSinTurno);
-              }
-            }, 0);
-          } else {
-            this.personalSinTurno = [];
-            this.totalSinTurno = 0;
+          console.log("Api response", response);
+        
+          if(response.length<=0){
+            this.loadingSinTurno = false;
+            this.loading = false;
+            return;
           }
+
+          const headerConfig = this.headerConfigService.getCurrentHeaderConfig();
+          const companyId = headerConfig?.selectedEmpresa?.companiaId || '';
+          // convertir a []
+          const areaIds = this.selectedArea ? [this.selectedArea.areaId] : [];
+
+          const params: EmployeesWithoutShift = {
+            searchText: '',
+            page: this.pageSinTurno,
+            pagesize: this.pageSizeSinTurno,
+            areaId: areaIds,
+            ccostoId: null,
+            sede: this.selectedSede?.categoriaAuxiliarId || null,
+            periodoId: headerConfig?.selectedPeriodo?.periodoId || null,
+            planillaId: headerConfig?.selectedPlanilla?.planillaId || null,
+            companiaId: companyId,
+            personalIds: response || [] // ← EXCLUIR estos IDs
+          };
+          
+
+          console.log('params', params);
+          
+
+          this.personService.getPersonalWithoutShift(params)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (response) => {
+                this.loadingSinTurno = false;
+                this.loading = false;
+
+                if (response.exito && response.data) {
+                  // ✅ FIX: Ensure fullNameFormatted exists in data for AG-Grid filtering
+                  this.personalSinTurno = (response.data.items || []).map((emp: Employee): EmployeeWithFormatted => {
+                    const fullNameFormatted = this.getEmployeeFullName(emp);
+                    return {
+                      ...emp,
+                      fullNameFormatted: fullNameFormatted
+                    };
+                  });
+                  this.totalSinTurno = response.data.totalCount || 0;
+                  
+                  // Update AG-Grid data if grid is ready
+                  setTimeout(() => {
+                    if (this.gridSinTurno?.api) {
+                      this.gridSinTurno.api.setGridOption('rowData', this.personalSinTurno);
+                    }
+                  }, 0);
+                } else {
+                  this.personalSinTurno = [];
+                  this.totalSinTurno = 0;
+                }
+              },
+              error: (error) => {
+                this.loadingSinTurno = false;
+                this.loading = false;
+                
+                // 🐛 DEBUG: Error en el servicio
+                console.log('❌ DEBUG - Error getPersonalWithoutShift:');
+                console.log('- error completo:', error);
+                console.log('- error.status:', error.status);
+                console.log('- error.message:', error.message);
+                
+                console.error('Error loading personal sin turno:', error);
+                this.toastService.error('Error', 'Error al cargar personal sin turno');
+                this.personalSinTurno = [];
+                this.totalSinTurno = 0;
+              }
+            });
         },
         error: (error) => {
-          this.loadingSinTurno = false;
-          this.loading = false;
-          
-          // 🐛 DEBUG: Error en el servicio
-          console.log('❌ DEBUG - Error getPersonalWithoutShift:');
-          console.log('- error completo:', error);
-          console.log('- error.status:', error.status);
-          console.log('- error.message:', error.message);
-          
-          console.error('Error loading personal sin turno:', error);
-          this.toastService.error('Error', 'Error al cargar personal sin turno');
-          this.personalSinTurno = [];
-          this.totalSinTurno = 0;
+          console.error('Error loading employee IDs:', error);
+          this.toastService.error('Error', 'Error al cargar IDs de empleados');
         }
       });
+
+
+    
+    
   }
   
   // ============================================================================

@@ -233,6 +233,11 @@ export class CalendarViewHorarioComponent implements OnInit, OnChanges {
     
     const extendedProps = clickInfo.event.extendedProps;
     
+    // Si es un evento de feriado, no mostrar menú contextual
+    if (extendedProps.isHoliday) {
+      return;
+    }
+    
     // Configurar información de la fecha seleccionada
     this.selectedDateInfo = {
       dateStr: clickInfo.event.startStr,
@@ -390,14 +395,14 @@ Duración: ${duracion}`;
     
     if (isMultiDay) {
       return `🎉 FERIADO
-${holiday.rmrks}
-Desde: ${startDate.toLocaleDateString('es-ES')}
-Hasta: ${endDate.toLocaleDateString('es-ES')}`;
-    } else {
-      return `🎉 FERIADO
-${holiday.rmrks}
-Fecha: ${startDate.toLocaleDateString('es-ES')}`;
-    }
+    ${holiday.rmrks}
+    Desde: ${startDate.toLocaleDateString('es-ES')}
+    Hasta: ${endDate.toLocaleDateString('es-ES')}`;
+        } else {
+          return `🎉 FERIADO
+    ${holiday.rmrks}
+    Fecha: ${startDate.toLocaleDateString('es-ES')}`;
+        }
   }
 
 
@@ -476,15 +481,15 @@ Fecha: ${startDate.toLocaleDateString('es-ES')}`;
     
     const schedule = this.selectedDateInfo.scheduleDay;
     const details = `
-Fecha: ${this.selectedDateInfo.date.toLocaleDateString('es-ES')}
-Día: ${schedule.dayName}
-Horario: ${schedule.inTime} - ${schedule.outTime}
-Duración trabajo: ${this.formatDuracion(schedule.workTimeDurationMinutes)}
-Duración total: ${this.formatDuracion(schedule.duration)}
-${schedule.isException ? '⚠️ Excepción activa' : ''}
-${schedule.alias ? 'Alias: ' + schedule.alias : ''}
-    `.trim();
-    
+    Fecha: ${this.selectedDateInfo.date.toLocaleDateString('es-ES')}
+    Día: ${schedule.dayName}
+    Horario: ${schedule.inTime} - ${schedule.outTime}
+    Duración trabajo: ${this.formatDuracion(schedule.workTimeDurationMinutes)}
+    Duración total: ${this.formatDuracion(schedule.duration)}
+    ${schedule.isException ? '⚠️ Excepción activa' : ''}
+    ${schedule.alias ? 'Alias: ' + schedule.alias : ''}
+        `.trim();
+        
     this.toastService.info('Detalles del Horario', details);
     this.closeContextMenu();
   }

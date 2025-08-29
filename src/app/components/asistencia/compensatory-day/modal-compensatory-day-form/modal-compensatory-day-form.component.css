@@ -1,0 +1,179 @@
+/* Estilos para el Modal de Día Compensatorio Individual */
+
+/* Animaciones suaves */
+.transition-all {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Estilos para inputs en estado de error */
+.border-red-300 {
+  border-color: #fca5a5;
+}
+
+.bg-red-50 {
+  background-color: #fef2f2;
+}
+
+/* Estilos para el avatar de iniciales */
+.employee-avatar {
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para badges de estado */
+.status-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.status-pending {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-approved {
+  @apply bg-green-100 text-green-800;
+}
+
+.status-rejected {
+  @apply bg-red-100 text-red-800;
+}
+
+/* Estilos para inputs de fecha */
+.flatpickr-input {
+  cursor: pointer !important;
+}
+
+.flatpickr-input:focus {
+  outline: none !important;
+}
+
+/* Hover effects para botones */
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Estilos para textarea */
+textarea:focus {
+  outline: none;
+}
+
+textarea::placeholder {
+  color: #9ca3af;
+}
+
+/* Estilos para labels */
+label {
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Estilos para texto de ayuda */
+.help-text {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+/* Estilos para iconos */
+lucide-icon {
+  flex-shrink: 0;
+}
+
+/* Gradientes personalizados */
+.gradient-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.gradient-employee {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+}
+
+/* Estilos para campos obligatorios */
+label::after {
+  content: '';
+}
+
+label:has(+ .required)::after,
+label.required::after {
+  content: ' *';
+  color: #ef4444;
+}
+
+/* Animación de loading */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Estilos responsive */
+@media (max-width: 768px) {
+  .grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .employee-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .modal-actions button {
+    width: 100%;
+  }
+}
+
+/* Estilos para estados de validación */
+.field-error {
+  border-color: #f87171 !important;
+  background-color: #fef2f2 !important;
+}
+
+.field-error:focus {
+  ring-color: #f87171 !important;
+  border-color: #f87171 !important;
+}
+
+/* Mejorar la visibilidad de placeholders */
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
+/* Estilos para información adicional */
+.info-card {
+  border-left: 4px solid #f59e0b;
+}
+
+/* Counter para textarea */
+.textarea-container {
+  position: relative;
+}
+
+.char-counter {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.75rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+}

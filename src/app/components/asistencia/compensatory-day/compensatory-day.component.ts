@@ -14,6 +14,7 @@ import { createFioriGridOptions, createFioriGridOptionsWithFullDynamicResize, lo
 import { PaginatorEvent } from '../../../shared/fiori-paginator/fiori-paginator.component';
 import { ModalService } from '../../../shared/modal/modal.service';
 import { ModalCrearCompensatorioComponent } from './modal-crear-compensatorio/modal-crear-compensatorio.component';
+import { ModalCompensatoryDayFormComponent, CompensatoryDayModalData, CompensatoryDayFormResult } from './modal-compensatory-day-form/modal-compensatory-day-form.component';
 import { ToastService } from '../../../shared/services/toast.service';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -581,48 +582,91 @@ export class CompensatoryDayComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Create individual compensatory day for specific employee
+   */
+  async createIndividual(employeeData: CompensatoryDayModalData['employee']): Promise<void> {
+    console.log('🚀 Abriendo modal para crear día compensatorio individual:', employeeData);
+    
+    try {
+      const modalData: CompensatoryDayModalData = {
+        mode: 'create',
+        employee: employeeData
+      };
+      
+      const result = await this.modalService.open({
+        title: 'Nuevo Día Compensatorio',
+        componentType: ModalCompensatoryDayFormComponent,
+        componentData: modalData,
+        width: '800px',
+        height: 'auto'
+      });
+      
+      console.log('📨 Resultado del modal individual:', result);
+      
+      if (result && result.success) {
+        console.log('✅ Día compensatorio individual creado exitosamente, recargando datos...');
+        this.loadCompensatoryDays();
+      }
+      
+    } catch (error) {
+      console.error('❌ Error al abrir el modal individual:', error);
+      this.toastService.error('Error', 'No se pudo abrir el modal de registro individual');
+    }
+  }
+
+  /**
    * Edit compensatory day
    */
   async edit(compensatoryDay: CompensatoryDay): Promise<void> {
-    this.toastService.info('info', 'Aún no esta en funcionamiento esta opción');
-    // console.log('✏️ Editando día compensatorio:', compensatoryDay);
+    console.log('✏️ Editando día compensatorio:', compensatoryDay);
     
-    // if (compensatoryDay.status !== 'P') {
-    //   this.toastService.warning(
-    //     'Advertencia', 
-    //     'Solo se pueden editar días compensatorios en estado Pendiente'
-    //   );
-    //   return;
-    // }
-
-    // try {
-    //   const result = await this.modalService.open({
-    //     title: 'Editar Día Compensatorio',
-    //     componentType: ModalCrearCompensatorioComponent,
-    //     componentData: {
-    //       mode: 'edit',
-    //       compensatoryDay: compensatoryDay
-    //     },
-    //     width: '1200px',
-    //   });
-
-    //   console.log('📨 Resultado de edición:', result);
-
-    //   if (result && result.selectedEmployees && result.selectedEmployees.length > 0) {
-    //     console.log('✅ Día compensatorio editado exitosamente, recargando datos...');
-        
-    //     this.toastService.success(
-    //       'Éxito', 
-    //       'Día compensatorio actualizado correctamente'
-    //     );
-        
-    //     // Recargar datos después de la edición exitosa
-    //     this.loadCompensatoryDays();
-    //   }
-    // } catch (error) {
-    //   console.error('❌ Error al abrir el modal de edición:', error);
-    //   this.toastService.error('Error', 'No se pudo abrir el modal de edición');
-    // }
+    if (compensatoryDay.status !== 'P') {
+      this.toastService.warning(
+        'Advertencia', 
+        'Solo se pueden editar días compensatorios en estado Pendiente'
+      );
+      return;
+    }
+    
+    try {
+      // Preparar datos para el modal individual
+      const modalData: CompensatoryDayModalData = {
+        mode: 'edit',
+        employee: {
+          employeeId: compensatoryDay.employeeId,
+          assignmentId: compensatoryDay.assignmentId || 0,
+          fullName: compensatoryDay.employeeFullName || '',
+          employeeArea: compensatoryDay.employeeArea || 'N/A',
+          employeeLocation: compensatoryDay.employeeLocation || 'N/A',
+        },
+        compensatoryDay: {
+          id: compensatoryDay.id,
+          holidayWorkedDate: compensatoryDay.holidayWorkedDate,
+          compensatoryDayOffDate: compensatoryDay.compensatoryDayOffDate,
+          reason: compensatoryDay.remarks || '',
+          status: compensatoryDay.status || 'P',
+        }
+      };
+      
+      const result = await this.modalService.open({
+        title: 'Editar Día Compensatorio',
+        componentType: ModalCompensatoryDayFormComponent,
+        componentData: modalData,
+        width: '800px',
+        height: 'auto'
+      });
+      
+      console.log('📨 Resultado de edición:', result);
+      
+      if (result && result.success) {
+        console.log('✅ Día compensatorio editado exitosamente, recargando datos...');
+        this.loadCompensatoryDays();
+      }
+      
+    } catch (error) {
+      console.error('❌ Error al abrir el modal de edición:', error);
+      this.toastService.error('Error', 'No se pudo abrir el modal de edición');
+    }
   }
 
   /**

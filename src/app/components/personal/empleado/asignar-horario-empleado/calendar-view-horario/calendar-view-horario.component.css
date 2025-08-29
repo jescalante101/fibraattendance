@@ -380,6 +380,8 @@
   background-color: #fef3c7 !important; /* Amarillo suave */
   border-color: #f59e0b !important;
   opacity: 0.8 !important;
+  pointer-events: none !important; /* Evitar que interfieran con clics en celdas */
+  cursor: default !important;
 }
 
 /* Título de eventos de feriado */
@@ -400,6 +402,7 @@
   right: 0 !important;
   bottom: 0 !important;
   z-index: 1 !important;
+  pointer-events: none !important;
 }
 
 /* Efecto hover para días con feriados */

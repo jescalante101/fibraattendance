@@ -110,6 +110,7 @@ import { ReportePersonalTurnosComponent } from './components/asistencia/reportes
 import { PermissionManagerComponent } from './components/dev/permission-manager/permission-manager.component';
 import { CompensatoryDayComponent } from './components/asistencia/compensatory-day/compensatory-day.component';
 import { ModalCrearCompensatorioComponent } from './components/asistencia/compensatory-day/modal-crear-compensatorio/modal-crear-compensatorio.component';
+import { ModalCompensatoryDayFormComponent } from './components/asistencia/compensatory-day/modal-compensatory-day-form/modal-compensatory-day-form.component';
 
 // Registrar módulos de AG-Grid globalmente
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -178,7 +179,8 @@ registerLocaleData(localeEs);
         ReportePersonalTurnosComponent,
         PermissionManagerComponent,
         CompensatoryDayComponent,
-        ModalCrearCompensatorioComponent
+        ModalCrearCompensatorioComponent,
+        ModalCompensatoryDayFormComponent
 
     ],
     exports: [

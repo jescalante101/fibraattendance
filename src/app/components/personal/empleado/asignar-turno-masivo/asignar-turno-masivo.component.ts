@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnInit, Optional } from '@angular/core';
+import { Component, ErrorHandler, Inject, Input, OnInit, Optional } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { RhArea } from 'src/app/core/services/rh-area.service';
@@ -18,6 +18,7 @@ import { ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { createFioriGridOptions } from 'src/app/shared/ag-grid-theme-fiori';
 import { DateRange } from 'src/app/shared/components/date-range-picker/date-range-picker.component';
 import { ShiftListDto } from 'src/app/core/models/shift.model';
+import { ErrorHandlerService } from 'src/app/shared/services/error-handler.service';
 
 @Component({
   selector: 'app-asignar-turno-masivo',
@@ -143,8 +144,8 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     private toastService: ToastService,
     private headerConfigService: HeaderConfigService,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
-    private authService: AuthService
-    
+    private authService: AuthService,
+    private errorHandlerService: ErrorHandlerService
   ) {}
 
   ngOnInit(): void {
@@ -221,8 +222,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
       },
 
       error: err => {
-        console.error('Error al cargar sedes y áreas:', err);
-        this.toastService.error('Error al cargar', 'No se pudieron cargar las sedes y áreas disponibles');
+        this.errorHandlerService.handleLoadError(err,'sedes y áreas');
         this.sedesAreas = [];
         this.sedes = [];
         this.filteredSedesArray = [];
@@ -246,7 +246,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         console.log('Centros de costo cargados:', centrosCosto);
       },
       error: (error) => {
-        console.error('Error cargando centros de costo:', error);
+        this.errorHandlerService.handleLoadError(error,'centros de costo');
         this.costCenters = [];
         this.filteredCostCentersArray = [];
       }
@@ -263,8 +263,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         this.loadingTurnos = false;
       },
       error: (error) => {
-        console.error('Error al cargar turnos:', error);
-        this.toastService.error('Error al cargar', 'No se pudieron cargar los turnos disponibles');
+        this.errorHandlerService.handleLoadError(error,'turnos');
         this.turnos = [];
         this.turnosFiltrados = [];
         this.loadingTurnos = false;
@@ -361,14 +360,12 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     // 1. Primero obtenemos los IDs de empleados que ya tienen asignación en el rango de fechas
     this.employeeScheduleAssignmentService.getEmployeeIdsByDateRange(fechaInicio, fechaFin || fechaInicio).subscribe({
       next: (employeeIds) => {
-        console.log('IDs con asignación:', employeeIds);
-        
+       
         // 2. Ahora buscamos personal sin horario usando los IDs obtenidos
         this.buscarPersonalSinHorario(employeeIds || []);
       },
       error: (error) => {
-        console.error('Error obteniendo IDs por fechas:', error);
-        // En caso de error, continuamos con array vacío para no bloquear el flujo
+        this.errorHandlerService.handleLoadError(error,'empleados');
         this.buscarPersonalSinHorario([]);
       }
     });
@@ -447,7 +444,6 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     
     this.personService.getPersonalWithoutShift(employeeParams).subscribe({
       next: res => {
-        console.log('Respuesta de getPersonalWithoutShift:', res);
         
         if (res.exito && res.data && res.data.items) {
           // ✅ FIX: Add fullName field to data for AG-Grid filtering, terminated status and vacation status
@@ -478,7 +474,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
       },
       error: (error) => {
        
-        this.toastService.error('Error al cargar', 'No se pudo cargar el personal. Verifica los filtros seleccionados');
+        this.errorHandlerService.handleLoadError(error,'empleados sin horario');
         this.personalFiltrado = [];
         this.totalCount = 0;
         this.hayMasPaginas = false;
@@ -609,14 +605,6 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     const sede = this.sedes.find(s => s.categoriaAuxiliarId === filtro.sede);
     const area = this.selectedArea; // ✅ Usar área seleccionada directamente
     const turnoSeleccionado = this.turnos.find(t => t.id === turno.turno);
-    
-    console.log('🔍 DEBUG - guardarAsignacion:');
-    console.log('selectedArea:', this.selectedArea);
-    console.log('area:', area);
-    console.log('sede:', sede);
-    console.log('filtro:', filtro);
-    console.log('filtroForm.value completo:', this.filtroForm.value);
-    
     // Obtener centro de costo seleccionado
     const centroCostoSeleccionado = this.costCenters.find(cc => cc.ccostoId === filtro.centroCosto);
     
@@ -674,8 +662,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Error al registrar asignaciones:', error);
-        this.toastService.error('Error al asignar', 'No se pudieron crear las asignaciones de turno. Intenta nuevamente');
+        this.errorHandlerService.handleSaveError(error,'asignar turnos');
       }
     });
   }

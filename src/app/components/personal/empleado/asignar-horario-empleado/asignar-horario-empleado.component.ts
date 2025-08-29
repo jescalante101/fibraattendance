@@ -23,6 +23,7 @@ import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confir
 import { AuthService, User } from 'src/app/core/services/auth.service';
 import { AppUserService, SedeArea } from 'src/app/core/services/app-user.services';
 import { ModalCompensatoryDayFormComponent } from 'src/app/components/asistencia/compensatory-day/modal-compensatory-day-form/modal-compensatory-day-form.component';
+import { ErrorHandlerService } from 'src/app/shared/services/error-handler.service';
 
 @Component({
   selector: 'app-asignar-horario-empleado',
@@ -40,7 +41,8 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
     private toastService:ToastService,
     private scheduleService: ScheduleService,
     private appUserService: AppUserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private errorHandlerService: ErrorHandlerService
   ) { }
 
   filtro = '';
@@ -192,7 +194,7 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
           }
         },
         error: (err) => {
-          console.error('Error cargando asignaciones:', err);
+          this.errorHandlerService.handleLoadError(err,'asignaciones');
           this.employees = [];
           this.totalCount = 0;
           
@@ -207,7 +209,7 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.toastService.info('Error cargando sedes:', err);
+        this.errorHandlerService.handleLoadError(err,'asignaciones');
         this.employees = [];
         this.totalCount = 0;
         if (this.gridApi) {
@@ -257,22 +259,11 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
           
 
           } else {
-            this.snackBar.open('No se pudo obtener la información del horario.', 'Cerrar', {
-              duration: 4000,
-              verticalPosition: 'top',
-              horizontalPosition: 'end',
-              panelClass: ['snackbar-error']
-            });
+           this.toastService.info('Horarios','No se pudo obtener la información del horario.');
           }
         },
         error: (err) => {
-          console.error('Error obteniendo horario:', err);
-          this.snackBar.open('Error al obtener el horario del empleado.', 'Cerrar', {
-            duration: 4000,
-            verticalPosition: 'top',
-            horizontalPosition: 'end',
-            panelClass: ['snackbar-error']
-          });
+          this.errorHandlerService.handleLoadError(err,'horario');
         }
       });
   }
@@ -283,10 +274,7 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
     // Calcular rango de fechas para el calendario (mes actual + siguiente)
     const startDate = empleado.startDate ? new Date(empleado.startDate) : new Date();
     const endDate = empleado.endDate ? new Date(empleado.endDate) : this.getDefaultEndDate();
-    
-    console.log('Obteniendo calendario para:', empleado.fullNameEmployee);
-    console.log('Rango de fechas:', startDate, 'a', endDate);
-    
+ 
     this.scheduleService.getScheduleByDateRange(empleado.employeeId, startDate, endDate)
       .pipe(finalize(() => this.loading = false))
       .subscribe({
@@ -317,22 +305,12 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
             });
 
           } else {
-            this.snackBar.open('No se pudo obtener la información del horario.', 'Cerrar', {
-              duration: 4000,
-              verticalPosition: 'top',
-              horizontalPosition: 'end',
-              panelClass: ['snackbar-error']
-            });
+           
+            this.toastService.info('Horarios','No se pudo obtener la información del horario.');
           }
         },
         error: (err) => {
-          console.error('Error obteniendo horario para calendario:', err);
-          this.snackBar.open('Error al obtener el horario del empleado.', 'Cerrar', {
-            duration: 4000,
-            verticalPosition: 'top',
-            horizontalPosition: 'end',
-            panelClass: ['snackbar-error']
-          });
+          this.errorHandlerService.handleLoadError(err,'calendario');
         }
       });
   }
@@ -452,7 +430,7 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
             this.cargarAsignaciones();
           },
           error: (err) => {
-            this.toastService.error('Error al eliminar la asignación','Error al eliminar la asignación');
+            this.errorHandlerService.handleLoadError(err,'eliminar');
           }
         });
       }

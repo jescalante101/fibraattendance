@@ -12,6 +12,9 @@ import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/services/categoria-auxiliar.service';
 import { HeaderConfigService } from 'src/app/core/services/header-config.service';
 import { ToastService } from 'src/app/shared/services/toast.service';
+import { ErrorHandlerService } from 'src/app/shared/services/error-handler.service';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { AppUserService, SedeArea } from 'src/app/core/services/app-user.services';
 import { Employee } from 'src/app/components/personal/empleado/empleado/model/employeeDto';
 
 // Extender Employee para incluir campos calculados
@@ -66,15 +69,15 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   
   dateRangeControl = new FormControl<DateRange | null>(null, Validators.required);
   
-  allSedes: CategoriaAuxiliar[] = [];
-  filteredSedes: CategoriaAuxiliar[] = [];
-  selectedSede: CategoriaAuxiliar | null = null;
+  // Sedes y áreas específicas del usuario
+  allSedesAreas: SedeArea[] = [];
+  filteredSedes: any[] = [];
+  selectedSede: any | null = null;
   sedeFilterTerm = '';
   showSedeDropdown = false;
   
-  allAreas: RhArea[] = [];
-  filteredAreas: RhArea[] = [];
-  selectedArea: RhArea | null = null;
+  filteredAreas: any[] = [];
+  selectedArea: any | null = null;
   areaFilterTerm = '';
   showAreaDropdown = false;
   
@@ -165,7 +168,10 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     private rhAreaService: RhAreaService,
     private categoriaAuxiliarService: CategoriaAuxiliarService,
     private headerConfigService: HeaderConfigService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private errorHandlerService: ErrorHandlerService,
+    private authService: AuthService,
+    private appUserService: AppUserService
   ) {
     this.setupGridColumns();
     this.initializeDateRange();
@@ -345,31 +351,47 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   // ============================================================================
   
   private loadAutocompleteData(): void {
-    const headerConfig = this.headerConfigService.getCurrentHeaderConfig();
-    const companyId = headerConfig?.selectedEmpresa?.companiaId || '';
-    
-    if (!companyId) {
-      this.toastService.warning('Configuración', 'No hay empresa seleccionada');
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser?.id) {
+      this.toastService.warning('Configuración', 'No hay usuario autenticado');
       return;
     }
-    
-    forkJoin({
-      sedes: this.categoriaAuxiliarService.getCategoriasAuxiliar(),
-      areas: this.rhAreaService.getAreas(companyId)
-    }).pipe(takeUntil(this.destroy$))
-    .subscribe({
-      next: ({ sedes, areas }) => {
-        this.allSedes = sedes || [];
-        this.filteredSedes = [...this.allSedes];
-        
-        this.allAreas = areas || [];
-        this.filteredAreas = [...this.allAreas];
-      },
-      error: (error) => {
-        console.error('Error loading autocomplete data:', error);
-        this.toastService.error('Error', 'Error al cargar datos de filtros');
-      }
-    });
+
+    this.appUserService.getSedesAreas(currentUser.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (sedesAreas) => {
+          this.allSedesAreas = sedesAreas || [];
+          
+          // Extraer todas las sedes únicas
+          this.filteredSedes = this.allSedesAreas.map(sa => ({
+            siteId: sa.siteId,
+            siteName: sa.siteName,
+            descripcion: sa.siteName // Para compatibilidad con el template
+          }));
+          
+          // Extraer todas las áreas de todas las sedes
+          const allAreas = this.allSedesAreas.flatMap(sa => 
+            sa.areas.map(area => ({
+              areaId: area.areaId,
+              areaName: area.areaName,
+              descripcion: area.areaName, // Para compatibilidad con el template
+              siteId: sa.siteId // Agregar referencia a la sede
+            }))
+          );
+          
+          this.filteredAreas = allAreas;
+          
+          console.log('📊 Datos de usuario cargados:', {
+            sedesAreas: this.allSedesAreas.length,
+            sedes: this.filteredSedes.length,
+            areas: this.filteredAreas.length
+          });
+        },
+        error: (error) => {
+          this.errorHandlerService.handleLoadError(error, 'datos de filtros del usuario');
+        }
+      });
   }
   
   loadData(): void {
@@ -395,7 +417,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     const dateRange = this.dateRangeControl.value;
     const startDate = dateRange?.start || '';
     const endDate = dateRange?.end || '';
-    const locationIds = this.selectedSede ? [this.selectedSede.categoriaAuxiliarId] : [];
+    const locationIds = this.selectedSede ? [this.selectedSede.siteId] : [];
     
     return this.employeeScheduleService.getEmployeeScheduleAssignments(
       this.pageConTurno,
@@ -424,8 +446,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
             },
             error: (error) => {
                 this.loadingConTurno = false;
-                console.error('Error loading personal con turno:', error);
-                this.toastService.error('Error', 'Error al cargar personal con turno');
+                this.errorHandlerService.handleLoadError(error, 'personal con turno');
                 this.personalConTurno = [];
                 this.totalConTurno = 0;
             }
@@ -451,7 +472,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
             pagesize: this.pageSizeSinTurno,
             areaId: areaIds,
             ccostoId: null,
-            sede: this.selectedSede?.categoriaAuxiliarId || null,
+            sede: this.selectedSede?.siteId || null,
             periodoId: headerConfig?.selectedPeriodo?.periodoId || null,
             planillaId: headerConfig?.selectedPlanilla?.planillaId || null,
             companiaId: companyId,
@@ -495,8 +516,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
             },
             error: (error) => {
                 this.loadingSinTurno = false;
-                console.error('Error loading personal sin turno:', error);
-                this.toastService.error('Error', 'Error al cargar personal sin turno');
+                this.errorHandlerService.handleLoadError(error, 'personal sin turno');
                 this.personalSinTurno = [];
                 this.totalSinTurno = 0;
             }
@@ -528,8 +548,22 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     this.selectedSede = null;
     this.areaFilterTerm = '';
     this.sedeFilterTerm = '';
-    this.filteredAreas = [...this.allAreas];
-    this.filteredSedes = [...this.allSedes];
+    
+    // Restablecer las opciones filtradas
+    this.filteredSedes = this.allSedesAreas.map(sa => ({
+      siteId: sa.siteId,
+      siteName: sa.siteName,
+      descripcion: sa.siteName
+    }));
+    
+    this.filteredAreas = this.allSedesAreas.flatMap(sa => 
+      sa.areas.map(area => ({
+        areaId: area.areaId,
+        areaName: area.areaName,
+        descripcion: area.areaName,
+        siteId: sa.siteId
+      }))
+    );
     
     this.initializeDateRange();
     
@@ -549,7 +583,11 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   onSedeFilterChange(event: any): void {
     const value = event.target?.value || '';
     this.sedeFilterTerm = value;
-    this.filteredSedes = this.allSedes.filter(sede => 
+    this.filteredSedes = this.allSedesAreas.map(sa => ({
+      siteId: sa.siteId,
+      siteName: sa.siteName,
+      descripcion: sa.siteName
+    })).filter(sede => 
       sede.descripcion.toLowerCase().includes(value.toLowerCase())
     );
     
@@ -560,12 +598,16 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   
   onSedeFocus(): void {
     if (this.filteredSedes.length === 0) {
-      this.filteredSedes = [...this.allSedes];
+      this.filteredSedes = this.allSedesAreas.map(sa => ({
+        siteId: sa.siteId,
+        siteName: sa.siteName,
+        descripcion: sa.siteName
+      }));
     }
     this.showSedeDropdown = this.filteredSedes.length > 0;
   }
   
-  onSedeSelected(sede: CategoriaAuxiliar | null): void {
+  onSedeSelected(sede: any | null): void {
     this.selectedSede = sede;
     this.sedeFilterTerm = sede ? sede.descripcion : '';
     this.showSedeDropdown = false;
@@ -577,8 +619,8 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     }, 200);
   }
   
-  trackBySedeId(index: number, sede: CategoriaAuxiliar): string {
-    return sede.categoriaAuxiliarId;
+  trackBySedeId(index: number, sede: any): string {
+    return sede.siteId;
   }
   
   getAreaFilterText(): string {
@@ -588,7 +630,29 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   onAreaFilterChange(event: any): void {
     const value = event.target?.value || '';
     this.areaFilterTerm = value;
-    this.filteredAreas = this.allAreas.filter(area => 
+    // Filtrar áreas según sede seleccionada y término de búsqueda
+    let availableAreas = this.filteredAreas;
+    if (this.selectedSede) {
+      availableAreas = this.allSedesAreas
+        .filter(sa => sa.siteId === this.selectedSede.siteId)
+        .flatMap(sa => sa.areas.map(area => ({
+          areaId: area.areaId,
+          areaName: area.areaName,
+          descripcion: area.areaName,
+          siteId: sa.siteId
+        })));
+    } else {
+      availableAreas = this.allSedesAreas.flatMap(sa => 
+        sa.areas.map(area => ({
+          areaId: area.areaId,
+          areaName: area.areaName,
+          descripcion: area.areaName,
+          siteId: sa.siteId
+        }))
+      );
+    }
+    
+    this.filteredAreas = availableAreas.filter(area => 
       area.descripcion.toLowerCase().includes(value.toLowerCase())
     );
     
@@ -599,12 +663,31 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   
   onAreaFocus(): void {
     if (this.filteredAreas.length === 0) {
-      this.filteredAreas = [...this.allAreas];
+      // Mostrar áreas según sede seleccionada
+      if (this.selectedSede) {
+        this.filteredAreas = this.allSedesAreas
+          .filter(sa => sa.siteId === this.selectedSede.siteId)
+          .flatMap(sa => sa.areas.map(area => ({
+            areaId: area.areaId,
+            areaName: area.areaName,
+            descripcion: area.areaName,
+            siteId: sa.siteId
+          })));
+      } else {
+        this.filteredAreas = this.allSedesAreas.flatMap(sa => 
+          sa.areas.map(area => ({
+            areaId: area.areaId,
+            areaName: area.areaName,
+            descripcion: area.areaName,
+            siteId: sa.siteId
+          }))
+        );
+      }
     }
     this.showAreaDropdown = this.filteredAreas.length > 0;
   }
   
-  onAreaSelected(area: RhArea | null): void {
+  onAreaSelected(area: any | null): void {
     this.selectedArea = area;
     this.areaFilterTerm = area ? area.descripcion : '';
     this.showAreaDropdown = false;
@@ -616,7 +699,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     }, 200);
   }
   
-  trackByAreaId(index: number, area: RhArea): string {
+  trackByAreaId(index: number, area: any): string {
     return area.areaId;
   }
   

@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, Optional, In
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { ToastService } from 'src/app/shared/services/toast.service';
+import { ErrorHandlerService } from 'src/app/shared/services/error-handler.service';
 import { CompensatoryDayService } from 'src/app/core/services/compensatory-day.service';
 import { CreateCompensatoryDay, UpdateCompensatoryDay, CompensatoryDay } from 'src/app/core/models/compensatory-day.model';
 import { HeaderConfig, HeaderConfigService } from 'src/app/core/services/header-config.service';
@@ -70,6 +71,7 @@ export class ModalCompensatoryDayFormComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private headerConfigService: HeaderConfigService,
     private toastService: ToastService,
+    private errorHandlerService: ErrorHandlerService,
     private compensatoryDayService: CompensatoryDayService,
     @Optional() @Inject(MAT_DIALOG_DATA) public componentData: any,
   ) {}
@@ -256,8 +258,8 @@ export class ModalCompensatoryDayFormComponent implements OnInit, OnDestroy {
             }
           },
           error: (error) => {
-            console.error('❌ Error al actualizar día compensatorio:', error);
-            this.handleSaveError(error);
+            this.errorHandlerService.handleSaveError(error, 'día compensatorio');
+            this.saving = false;
           }
         });
     } else {
@@ -292,27 +294,14 @@ export class ModalCompensatoryDayFormComponent implements OnInit, OnDestroy {
             }
           },
           error: (error) => {
-            console.error('❌ Error al crear día compensatorio:', error);
-            this.handleSaveError(error);
+            this.errorHandlerService.handleSaveError(error, 'día compensatorio');
+            this.saving = false;
           }
         });
     }
   }
 
-  private handleSaveError(error: any): void {
-    let errorMessage = this.isEditMode 
-      ? 'No se pudo actualizar el día compensatorio'
-      : 'No se pudo crear el día compensatorio';
-      
-    if (error.error && error.error.message) {
-      errorMessage = error.error.message;
-    } else if (error.message) {
-      errorMessage = error.message;
-    }
-    
-    this.toastService.error('Error', errorMessage);
-    this.saving = false;
-  }
+  // Método eliminado - ahora usa ErrorHandlerService
 
   onCancel(): void {
     this.closeEvent.emit(null);

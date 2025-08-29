@@ -13,6 +13,7 @@ import { ModalRegistrarExcepcionComponent } from '../modal-registrar-excepcion/m
 import { ShiftsService } from 'src/app/core/services/shifts.service';
 import { HolidaysService } from 'src/app/core/services/holidays.service';
 import { HolidayYear, Holiday } from 'src/app/core/models/holiday.model';
+import { ModalCompensatoryDayFormComponent } from 'src/app/components/asistencia/compensatory-day/modal-compensatory-day-form/modal-compensatory-day-form.component';
 
 // Se mantiene la interfaz por si se usa en otro lado, pero el componente priorizará ScheduleResponseDto
 export interface HorarioCalendarData {
@@ -570,6 +571,60 @@ Duración: ${duracion}`;
   }
 
   /**
+   * Registrar día compensatorio desde el calendario
+   */
+  registrarDiaCompensatorio(): void {
+    if (!this.selectedDateInfo) return;
+
+    // Obtener datos del empleado desde componentData extendido
+    const employeeData = (this.componentData as any)?.employeeData || 
+                        (this.data as any)?.employeeData;
+    
+    if (!employeeData) {
+      this.toastService.error('Error', 'No se pudieron obtener los datos del empleado');
+      return;
+    }
+
+    const modalData = {
+      mode: 'create' as const,
+      employee: {
+        employeeId: employeeData.employeeId,
+        assignmentId: employeeData.assignmentId,
+        fullName: employeeData.fullName,
+        employeeArea: employeeData.employeeArea,
+        employeeLocation: employeeData.employeeLocation,
+        nroDoc: employeeData.nroDoc
+      },
+      // Pre-llenar la fecha del feriado trabajado con la fecha seleccionada
+      compensatoryDay: {
+        holidayWorkedDate: this.selectedDateInfo.dateStr
+      }
+    };
+
+    console.log('Registrando día compensatorio para fecha:', this.selectedDateInfo.dateStr);
+    console.log('Datos del modal:', modalData);
+
+    this.modalService.open({
+      title: `Registrar Día Compensatorio - ${employeeData.fullName}`,
+      componentType: ModalCompensatoryDayFormComponent,
+      componentData: modalData,
+      width: '600px'
+    }).then(result => {
+      if (result && result.success) {
+        this.toastService.success(
+          'Éxito', 
+          `Día compensatorio ${result.mode === 'create' ? 'creado' : 'actualizado'} correctamente`
+        );
+      }
+      
+      this.closeContextMenu();
+    }).catch(error => {
+      console.error('Error en modal de día compensatorio:', error);
+      this.closeContextMenu();
+    });
+  }
+
+  /**
    * Listener global para cerrar menú al hacer clic fuera
    */
   @HostListener('document:click', ['$event'])
@@ -670,5 +725,28 @@ Duración: ${duracion}`;
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  /**
+   * Verifica si una fecha es un día feriado
+   */
+  isHolidayDate(dateStr: string): boolean {
+    if (!this.holidays || this.holidays.length === 0) {
+      return false;
+    }
+
+    const targetDate = new Date(dateStr + 'T00:00:00');
+    targetDate.setHours(0, 0, 0, 0);
+    
+    return this.holidays.some(holiday => {
+      const holidayStart = new Date(holiday.strDate);
+      const holidayEnd = new Date(holiday.endDate);
+      
+      holidayStart.setHours(0, 0, 0, 0);
+      holidayEnd.setHours(0, 0, 0, 0);
+      
+      // Verificar si la fecha está dentro del rango del feriado
+      return targetDate >= holidayStart && targetDate <= holidayEnd;
+    });
   }
 }

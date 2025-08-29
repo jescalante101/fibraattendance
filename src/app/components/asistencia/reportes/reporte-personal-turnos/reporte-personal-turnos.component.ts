@@ -21,6 +21,15 @@ interface EmployeeWithFormatted extends Employee {
   isOnVacation?: boolean;
 }
 
+// Extender EmployeeScheduleAssignment para incluir estado del empleado
+interface EmployeeScheduleAssignmentWithStatus extends EmployeeScheduleAssignment {
+  isTerminated?: boolean;
+  isOnVacation?: boolean;
+  employeeDateCease?: string;
+  employeeVacationStart?: string;
+  employeeVacationEnd?: string;
+}
+
 // Shared Components
 import { DateRange } from 'src/app/shared/components/date-range-picker/date-range-picker.component';
 import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.component';
@@ -48,7 +57,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   // DATOS PRINCIPALES
   // ============================================================================
   
-  personalConTurno: EmployeeScheduleAssignment[] = [];
+  personalConTurno: EmployeeScheduleAssignmentWithStatus[] = [];
   personalSinTurno: EmployeeWithFormatted[] = [];
   
   // ============================================================================
@@ -96,7 +105,18 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   @ViewChild('donutChart', { static: false }) donutCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('barChart', { static: false }) barCanvas!: ElementRef<HTMLCanvasElement>;
   
-  gridOptionsConTurno: GridOptions = createFioriGridOptions();
+  gridOptionsConTurno: GridOptions = {
+    ...createFioriGridOptions(),
+    getRowStyle: (params) => {
+      if (params.data?.isTerminated) {
+        return { backgroundColor: '#fef2f2', opacity: 0.8 }; // red-50
+      }
+      if (params.data?.isOnVacation) {
+        return { backgroundColor: '#fffbeb', opacity: 0.8 }; // amber-50
+      }
+      return undefined;
+    },
+  };
   gridOptionsSinTurno: GridOptions = {
     ...createFioriGridOptions(),
     getRowStyle: (params) => {
@@ -121,6 +141,15 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   loadingConTurno = false;
   loadingSinTurno = false;
   isExporting = false;
+  
+  // Estado de datos para controlar botones de exportación
+  get hasDataToExport(): boolean {
+    return this.personalConTurno.length > 0 || this.personalSinTurno.length > 0;
+  }
+  
+  get isDataLoading(): boolean {
+    return this.loading || this.loadingConTurno || this.loadingSinTurno;
+  }
   
   // ============================================================================
   // TABS Y GRÁFICOS
@@ -199,7 +228,20 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
         field: 'fullNameEmployee',
         minWidth: 250,
         maxWidth: 300,
-        cellRenderer: (params: any) => `<div class="font-medium text-fiori-text">${params.value || '-'}</div>`
+        cellRenderer: (params: any) => {
+          const fullName = params.value || '-';
+          const isTerminated = params.data?.isTerminated;
+          const isOnVacation = params.data?.isOnVacation;
+
+          let statusBadge = '';
+          if (isTerminated) {
+            statusBadge = `<span class="ml-2 px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Cesado</span>`;
+          } else if (isOnVacation) {
+            statusBadge = `<span class="ml-2 px-2 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">Vacaciones</span>`;
+          }
+
+          return `<div class="font-medium text-fiori-text flex items-center">${fullName}${statusBadge}</div>`;
+        }
       },
       {
         headerName: 'Turno/Horario',
@@ -257,8 +299,8 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       {
         headerName: 'Empleado',
         field: 'fullNameFormatted',
-        minWidth: 250,
-        maxWidth: 300,
+        minWidth: 350,
+        maxWidth: 500,
         cellRenderer: (params: any) => {
           const fullName = params.value;
           const isTerminated = params.data?.isTerminated;
@@ -277,22 +319,22 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       {
         headerName: 'Sede',
         field: 'categoriaAuxiliarDescripcion',
-        minWidth: 120,
+        minWidth: 140,
         maxWidth: 180,
         cellRenderer: (params: any) => `<div class="text-sm text-fiori-text">${params.value || '-'}</div>`
       },
       {
         headerName: 'Área',
         field: 'areaDescripcion',
-        minWidth: 150,
-        maxWidth: 200,
+        minWidth: 300,
+        maxWidth: 450,
         cellRenderer: (params: any) => `<div class="text-sm text-fiori-text">${params.value || '-'}</div>`
       },
       {
         headerName: 'Centro de Costo',
         field: 'ccostoDescripcion',
         minWidth: 160,
-        maxWidth: 220,
+        maxWidth: 350,
         cellRenderer: (params: any) => `<div class="text-sm text-fiori-text">${params.value || '-'}</div>`
       }
     ];
@@ -368,7 +410,12 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
             next: (response) => {
                 this.loadingConTurno = false;
                 if (response.exito && response.data) {
-                    this.personalConTurno = response.data.items || [];
+                    // Aplicar detección de estado a empleados CON turno
+                    this.personalConTurno = (response.data.items || []).map((emp: any): EmployeeScheduleAssignmentWithStatus => ({
+                        ...emp,
+                        isTerminated: this.isEmployeeTerminated(emp.employeeDateCease),
+                        isOnVacation: this.isEmployeeOnVacation(emp.employeeVacationStart, emp.employeeVacationEnd)
+                    }));
                     this.totalConTurno = response.data.totalCount || 0;
                 } else {
                     this.personalConTurno = [];
@@ -593,48 +640,36 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   // EXPORTACIÓN
   // ============================================================================
   
-  private fetchAllDataForExport(): Observable<{ conTurno: EmployeeScheduleAssignment[], sinTurno: EmployeeWithFormatted[] }> {
-    this.isExporting = true;
-    const dateRange = this.dateRangeControl.value;
-    const startDate = dateRange?.start || '';
-    const endDate = dateRange?.end || '';
-    const locationIds = this.selectedSede ? [this.selectedSede.categoriaAuxiliarId] : [];
-    const headerConfig = this.headerConfigService.getCurrentHeaderConfig();
-    const companyId = headerConfig?.selectedEmpresa?.companiaId || '';
-    const areaIds = this.selectedArea ? [this.selectedArea.areaId] : [];
-
-    const conTurno$ = this.employeeScheduleService.getEmployeeScheduleAssignments(1, 99999, '', startDate, endDate, locationIds, this.selectedArea?.areaId || '').pipe(map(res => res.data?.items || []));
+  private getDataForExport(): { conTurno: EmployeeScheduleAssignmentWithStatus[], sinTurno: EmployeeWithFormatted[] } {
+    // Usar los datos ya cargados en memoria
+    console.log('🔍 EXPORTACIÓN - Usando datos cargados:', {
+      personalConTurnoLength: this.personalConTurno.length,
+      personalSinTurnoLength: this.personalSinTurno.length,
+      totalConTurno: this.totalConTurno,
+      totalSinTurno: this.totalSinTurno
+    });
     
-    const sinTurno$ = this.employeeScheduleService.getEmployeeIdsByDateRange(startDate, endDate).pipe(
-      switchMap(ids => {
-        const params: EmployeesWithoutShift = {
-            searchText: '', page: 1, pagesize: 99999, areaId: areaIds, ccostoId: null,
-            sede: this.selectedSede?.categoriaAuxiliarId || null,
-            periodoId: headerConfig?.selectedPeriodo?.periodoId || null,
-            planillaId: headerConfig?.selectedPlanilla?.planillaId || null,
-            companiaId: companyId, personalIds: ids || []
-        };
-        return this.personService.getPersonalWithoutShift(params);
-      }),
-      map(res => (res.data?.items || []).map((emp: any): EmployeeWithFormatted => ({
-        ...emp,
-        fullNameFormatted: this.getEmployeeFullName(emp),
-        isTerminated: this.isEmployeeTerminated(emp.fechaCese),
-        isOnVacation: this.isEmployeeOnVacation(emp.vacacionesFechaInicio, emp.vacacionesFechaFin)
-      })))
-    );
-
-    return forkJoin({ conTurno: conTurno$, sinTurno: sinTurno$ });
+    return {
+      conTurno: [...this.personalConTurno], // Copia para evitar mutaciones
+      sinTurno: [...this.personalSinTurno]  // Copia para evitar mutaciones
+    };
   }
 
   exportToExcel(): void {
-    this.fetchAllDataForExport().subscribe(({ conTurno, sinTurno }) => {
+    if (!this.hasDataToExport) {
+      this.toastService.warning('Sin datos', 'No hay datos para exportar. Realiza primero una búsqueda.');
+      return;
+    }
+    
+    this.isExporting = true;
+    const { conTurno, sinTurno } = this.getDataForExport();
       const workbook = XLSX.utils.book_new();
       
       // Hoja 1: Personal CON Turno
       const dataConTurno = conTurno.map(emp => ({
         'ID Personal': emp.employeeId,
         'Nombre Completo': emp.fullNameEmployee || '',
+        'Estado': emp.isTerminated ? 'Cesado' : emp.isOnVacation ? 'Vacaciones' : 'Activo',
         'Turno/Horario': emp.scheduleName || 'Sin nombre',
         'Fecha Inicio': emp.startDate ? new Date(emp.startDate).toLocaleDateString('es-ES') : '',
         'Fecha Fin': emp.endDate ? new Date(emp.endDate).toLocaleDateString('es-ES') : 'Indefinido',
@@ -643,18 +678,36 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       }));
       const wsConTurno = XLSX.utils.json_to_sheet(dataConTurno);
       const headerRowConTurno = Object.keys(dataConTurno[0] || {}).length;
+      
+      // Estilo de encabezados
       for (let col = 0; col < headerRowConTurno; col++) {
         const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
         if (!wsConTurno[cellAddress]) continue;
         wsConTurno[cellAddress].s = { font: { bold: true, color: { rgb: "FFFFFF" }, sz: 12 }, fill: { patternType: "solid", fgColor: { rgb: "10B981" } } };
       }
-      wsConTurno['!cols'] = [ { wch: 12 }, { wch: 35 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 25 } ];
+      
+      // Aplicar colores a filas según estado del empleado
+      conTurno.forEach((emp, index) => {
+        const row = index + 1;
+        let rowColor = "FFFFFF";
+        if (emp.isTerminated) rowColor = "fde2e2"; // Light Red
+        else if (emp.isOnVacation) rowColor = "fef3c7"; // Light Amber
+
+        for (let col = 0; col < headerRowConTurno; col++) {
+            const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+            if (!wsConTurno[cellAddress]) wsConTurno[cellAddress] = {v: ''};
+            wsConTurno[cellAddress].s = { fill: { patternType: "solid", fgColor: { rgb: rowColor } } };
+        }
+      });
+      
+      wsConTurno['!cols'] = [ { wch: 12 }, { wch: 35 }, { wch: 12 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 25 } ];
       XLSX.utils.book_append_sheet(workbook, wsConTurno, 'Personal Con Turno');
       
       // Hoja 2: Personal SIN Turno
       const dataSinTurno = sinTurno.map(emp => ({
         'ID Personal': emp.personalId,
         'Nombre Completo': emp.fullNameFormatted || '',
+        'Estado': emp.isTerminated ? 'Cesado' : emp.isOnVacation ? 'Vacaciones' : 'Activo',
         'Sede': emp.categoriaAuxiliarDescripcion || '',
         'Área': emp.areaDescripcion || '',
         'Centro de Costo': emp.ccostoDescripcion || ''
@@ -680,35 +733,105 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
         }
       });
 
-      wsSinTurno['!cols'] = [ { wch: 12 }, { wch: 35 }, { wch: 25 }, { wch: 25 }, { wch: 30 } ];
+      wsSinTurno['!cols'] = [ { wch: 12 }, { wch: 35 }, { wch: 12 }, { wch: 25 }, { wch: 25 }, { wch: 30 } ];
       XLSX.utils.book_append_sheet(workbook, wsSinTurno, 'Personal Sin Turno');
       
       const fileName = `Reporte_Personal_Turnos_${new Date().toISOString().split('T')[0]}.xlsx`;
       XLSX.writeFile(workbook, fileName);
-      this.toastService.success('Éxito', 'Reporte Excel exportado');
+      this.toastService.success('Éxito', `Reporte Excel exportado con ${conTurno.length + sinTurno.length} registros`);
       this.isExporting = false;
-    });
   }
   
   exportToPDF(): void {
-    this.fetchAllDataForExport().subscribe(({ conTurno, sinTurno }) => {
+    if (!this.hasDataToExport) {
+      this.toastService.warning('Sin datos', 'No hay datos para exportar. Realiza primero una búsqueda.');
+      return;
+    }
+    
+    this.isExporting = true;
+    const { conTurno, sinTurno } = this.getDataForExport();
       const doc = new jsPDF('landscape');
       doc.setFontSize(16);
       doc.text('REPORTE: CONTROL DE ASIGNACIÓN DE TURNOS', 15, 15);
       
-      const dataConTurno = conTurno.map(emp => [ emp.employeeId, emp.fullNameEmployee || '', emp.scheduleName || 'Sin nombre', emp.startDate ? new Date(emp.startDate).toLocaleDateString('es-ES') : '', emp.endDate ? new Date(emp.endDate).toLocaleDateString('es-ES') : 'Indefinido', emp.areaName || '' ]);
-      autoTable(doc, { startY: 45, head: [['ID Personal', 'Nombre Completo', 'Turno/Horario', 'Fecha Inicio', 'Fecha Fin', 'Área']], body: dataConTurno, styles: { fontSize: 8 }, headStyles: { fillColor: [34, 197, 94] } });
+      // Agregar información de resumen
+      const totalConTurno = conTurno.length;
+      const totalSinTurno = sinTurno.length;
+      const cesadosConTurno = conTurno.filter(emp => emp.isTerminated).length;
+      const vacacionesConTurno = conTurno.filter(emp => emp.isOnVacation).length;
+      const cesadosSinTurno = sinTurno.filter(emp => emp.isTerminated).length;
+      const vacacionesSinTurno = sinTurno.filter(emp => emp.isOnVacation).length;
+      
+      doc.setFontSize(10);
+      doc.text(`Resumen: Total Con Turno: ${totalConTurno} | Total Sin Turno: ${totalSinTurno} | Cesados: ${cesadosConTurno + cesadosSinTurno} | Vacaciones: ${vacacionesConTurno + vacacionesSinTurno}`, 15, 25);
+      
+      // Personal CON Turno
+      doc.setFontSize(12);
+      doc.text(`Personal CON Turno (${totalConTurno})`, 15, 35);
+      const dataConTurno = conTurno.map(emp => [
+        emp.employeeId,
+        emp.fullNameEmployee || '',
+        emp.isTerminated ? 'Cesado' : emp.isOnVacation ? 'Vacaciones' : 'Activo',
+        emp.scheduleName || 'Sin nombre',
+        emp.startDate ? new Date(emp.startDate).toLocaleDateString('es-ES') : '',
+        emp.endDate ? new Date(emp.endDate).toLocaleDateString('es-ES') : 'Indefinido',
+        emp.areaName || ''
+      ]);
+      
+      autoTable(doc, {
+        startY: 40,
+        head: [['ID', 'Nombre Completo', 'Estado', 'Turno/Horario', 'Fecha Inicio', 'Fecha Fin', 'Área']],
+        body: dataConTurno,
+        styles: { fontSize: 7 },
+        headStyles: { fillColor: [34, 197, 94] },
+        didParseCell: function(data) {
+          // Aplicar colores según el estado del empleado
+          if (data.row.index >= 0) {
+            const emp = conTurno[data.row.index];
+            if (emp?.isTerminated) {
+              data.cell.styles.fillColor = [254, 226, 226]; // Light red
+            } else if (emp?.isOnVacation) {
+              data.cell.styles.fillColor = [254, 243, 199]; // Light amber
+            }
+          }
+        }
+      });
       
       const finalY = (doc as any).lastAutoTable.finalY + 20;
-      doc.text(`Personal SIN Turno (${sinTurno.length})`, 15, finalY);
-      const dataSinTurno = sinTurno.map(emp => [ emp.personalId, emp.fullNameFormatted || '', emp.categoriaAuxiliarDescripcion || '', emp.areaDescripcion || '', emp.ccostoDescripcion || '' ]);
-      autoTable(doc, { startY: finalY + 5, head: [['ID Personal', 'Nombre Completo', 'Sede', 'Área', 'Centro de Costo']], body: dataSinTurno, styles: { fontSize: 8 }, headStyles: { fillColor: [239, 68, 68] } });
+      doc.setFontSize(12);
+      doc.text(`Personal SIN Turno (${totalSinTurno})`, 15, finalY);
+      const dataSinTurno = sinTurno.map(emp => [
+        emp.personalId,
+        emp.fullNameFormatted || '',
+        emp.isTerminated ? 'Cesado' : emp.isOnVacation ? 'Vacaciones' : 'Activo',
+        emp.categoriaAuxiliarDescripcion || '',
+        emp.areaDescripcion || '',
+        emp.ccostoDescripcion || ''
+      ]);
+      
+      autoTable(doc, {
+        startY: finalY + 5,
+        head: [['ID', 'Nombre Completo', 'Estado', 'Sede', 'Área', 'Centro de Costo']],
+        body: dataSinTurno,
+        styles: { fontSize: 7 },
+        headStyles: { fillColor: [239, 68, 68] },
+        didParseCell: function(data) {
+          // Aplicar colores según el estado del empleado
+          if (data.row.index >= 0) {
+            const emp = sinTurno[data.row.index];
+            if (emp?.isTerminated) {
+              data.cell.styles.fillColor = [254, 226, 226]; // Light red
+            } else if (emp?.isOnVacation) {
+              data.cell.styles.fillColor = [254, 243, 199]; // Light amber
+            }
+          }
+        }
+      });
       
       const fileName = `Reporte_Personal_Turnos_${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(fileName);
-      this.toastService.success('Éxito', 'Reporte PDF generado');
+      this.toastService.success('Éxito', `Reporte PDF generado con ${conTurno.length + sinTurno.length} registros`);
       this.isExporting = false;
-    });
   }
   
   // ============================================================================

@@ -22,6 +22,7 @@ import { ToastService } from 'src/app/shared/services/toast.service';
 import { ModalConfirmComponent } from 'src/app/shared/modal-confirm/modal-confirm.component';
 import { AuthService, User } from 'src/app/core/services/auth.service';
 import { AppUserService, SedeArea } from 'src/app/core/services/app-user.services';
+import { ModalCompensatoryDayFormComponent } from 'src/app/components/asistencia/compensatory-day/modal-compensatory-day-form/modal-compensatory-day-form.component';
 
 @Component({
   selector: 'app-asignar-horario-empleado',
@@ -96,6 +97,10 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
 
   // Exponer Math para usar en el template
   Math = Math;
+  
+  // Control del menú flotante de acciones
+  activeMenuRow: number | null = null;
+  menuPosition = { x: 0, y: 0 };
 
   // Configuración del filtro genérico
   filterConfig: GenericFilterConfig = {
@@ -289,10 +294,24 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
           if (scheduleResponse && scheduleResponse.schedule) {
             console.log('Schedule data received:', scheduleResponse);
 
+            // Extender scheduleResponse con datos del empleado para día compensatorio
+            const extendedScheduleData = {
+              ...scheduleResponse,
+              // Datos adicionales del empleado para funcionalidades como días compensatorios
+              employeeData: {
+                employeeId: empleado.employeeId,
+                assignmentId: empleado.assignmentId,
+                fullName: empleado.fullNameEmployee,
+                employeeArea: empleado.areaName || 'Sin área',
+                employeeLocation: empleado.locationName || 'Sin ubicación',
+                nroDoc: empleado.nroDoc
+              }
+            };
+
             this.modalService.open({
               title: `Calendario de Horarios - ${empleado.fullNameEmployee}`,
               componentType: CalendarViewHorarioComponent,
-              componentData: scheduleResponse, // Pasar directamente ScheduleResponseDto
+              componentData: extendedScheduleData,
               width: '95vw',
               height: '95vh'
             });
@@ -649,27 +668,20 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
       {
         field: 'acciones',
         headerName: 'Acciones',
-        width: 400,
-        maxWidth: 400,
+        width: 80,
+        maxWidth: 80,
         pinned: 'right',
         lockPosition: true,
         resizable: false,
         cellRenderer: (params: any) => {
-          return `<div class="flex items-center justify-center space-x-1 h-full">
-          
-            <button class="calendar-btn inline-flex items-center px-2 py-1 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors" title="Ver Calendario">
+          const rowIndex = params.node.rowIndex;
+          return `<div class="flex items-center justify-center h-full relative">
+            <button 
+              class="action-menu-btn inline-flex items-center px-2 py-1 text-xs bg-fiori-surface border border-fiori-border text-fiori-text rounded-md hover:bg-fiori-muted transition-colors"
+              data-row-index="${rowIndex}"
+              title="Acciones">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5a2.25 2.25 0 0 1 21 9v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"></path>
-              </svg>
-            </button>
-            <button class="edit-btn p-2 text-fiori-primary hover:bg-fiori-primary/10 rounded transition-colors" title="Editar">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-              </svg>
-            </button>
-            <button class="delete-btn p-2 text-fiori-error hover:bg-fiori-error/10 rounded transition-colors" title="Eliminar">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
               </svg>
             </button>
           </div>`;
@@ -693,49 +705,25 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
   }
   
   private setupActionHandlers(): void {
-    // Use event delegation to handle action button clicks
+    // Use event delegation to handle action menu clicks
     const gridElement = document.querySelector('.ag-theme-quartz');
     if (gridElement) {
       gridElement.addEventListener('click', (event: Event) => {
         const target = event.target as HTMLElement;
         const button = target.closest('button');
         
-        if (button && button.classList.contains('horario-btn')) {
-          const cell = button.closest('.ag-cell');
-          if (cell) {
-            const rowIndex = parseInt(cell.closest('.ag-row')?.getAttribute('row-index') || '0');
-            const rowData = this.gridApi.getDisplayedRowAtIndex(rowIndex)?.data;
-            if (rowData) {
-              this.getHorario(rowData);
-            }
-          }
-        } else if (button && button.classList.contains('calendar-btn')) {
-          const cell = button.closest('.ag-cell');
-          if (cell) {
-            const rowIndex = parseInt(cell.closest('.ag-row')?.getAttribute('row-index') || '0');
-            const rowData = this.gridApi.getDisplayedRowAtIndex(rowIndex)?.data;
-            if (rowData) {
-              this.verCalendario(rowData);
-            }
-          }
-        } else if (button && button.classList.contains('edit-btn')) {
-          const cell = button.closest('.ag-cell');
-          if (cell) {
-            const rowIndex = parseInt(cell.closest('.ag-row')?.getAttribute('row-index') || '0');
-            const rowData = this.gridApi.getDisplayedRowAtIndex(rowIndex)?.data;
-            if (rowData) {
-              this.editar(rowData);
-            }
-          }
-        } else if (button && button.classList.contains('delete-btn')) {
-          const cell = button.closest('.ag-cell');
-          if (cell) {
-            const rowIndex = parseInt(cell.closest('.ag-row')?.getAttribute('row-index') || '0');
-            const rowData = this.gridApi.getDisplayedRowAtIndex(rowIndex)?.data;
-            if (rowData) {
-              this.eliminar(rowData);
-            }
-          }
+        if (button && button.classList.contains('action-menu-btn')) {
+          event.stopPropagation();
+          const rowIndex = parseInt(button.getAttribute('data-row-index') || '0');
+          this.toggleActionMenu(rowIndex, event as MouseEvent);
+        }
+      });
+      
+      // Close menu when clicking outside
+      document.addEventListener('click', (event: Event) => {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.action-menu-btn') && !target.closest('.action-menu')) {
+          this.activeMenuRow = null;
         }
       });
     }
@@ -807,6 +795,84 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
     }
     
     console.log('Columns reset to default');
+  }
+  
+  // === MÉTODOS PARA MENÚ FLOTANTE ===
+  
+  toggleActionMenu(rowIndex: number, event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (this.activeMenuRow === rowIndex) {
+      // Si el menú ya está abierto para esta fila, cerrarlo
+      this.activeMenuRow = null;
+    } else {
+      // Abrir menú para esta fila
+      this.activeMenuRow = rowIndex;
+      
+      // Calcular posición del menú (desplegado hacia la izquierda)
+      const rect = (event.target as HTMLElement).getBoundingClientRect();
+      const menuWidth = 200; // Ancho estimado del menú
+      
+      this.menuPosition = {
+        x: rect.right - menuWidth, // Alinear el borde derecho del menú con el borde derecho del botón
+        y: rect.bottom + 5
+      };
+    }
+  }
+  
+  onMenuAction(action: string, rowIndex: number): void {
+    const rowData = this.gridApi.getDisplayedRowAtIndex(rowIndex)?.data;
+    if (!rowData) return;
+    
+    // Cerrar el menú
+    this.activeMenuRow = null;
+    
+    // Ejecutar acción
+    switch (action) {
+      case 'calendar':
+        this.verCalendario(rowData);
+        break;
+      case 'edit':
+        this.editar(rowData);
+        break;
+      case 'compensatory':
+        this.registrarDiaCompensatorio(rowData);
+        break;
+      case 'delete':
+        this.eliminar(rowData);
+        break;
+    }
+  }
+  
+  registrarDiaCompensatorio(empleado: EmployeeScheduleAssignment): void {
+    const modalData = {
+      mode: 'create' as const,
+      employee: {
+        employeeId: empleado.employeeId,
+        assignmentId: empleado.assignmentId,
+        fullName: empleado.fullNameEmployee,
+        employeeArea: empleado.areaName || 'Sin área',
+        employeeLocation: empleado.locationName || 'Sin ubicación',
+        nroDoc: empleado.nroDoc
+      }
+    };
+    
+    this.modalService.open({
+      title: `Registrar Día Compensatorio - ${empleado.fullNameEmployee}`,
+      componentType: ModalCompensatoryDayFormComponent,
+      componentData: modalData,
+      width: '600px'
+    }).then(result => {
+      if (result && result.success) {
+        this.toastService.success(
+          'Éxito', 
+          `Día compensatorio ${result.mode === 'create' ? 'creado' : 'actualizado'} correctamente`
+        );
+        // Opcional: recargar datos si es necesario
+        // this.cargarAsignaciones();
+      }
+    });
   }
 
 }

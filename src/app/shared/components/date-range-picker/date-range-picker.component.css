@@ -1,117 +1,20 @@
 /* Date Range Picker Component Styles */
 
-/* Material DatePicker theme customizations */
-:host ::ng-deep .mat-datepicker-popup {
-  @apply shadow-lg border-gray-200;
-}
-
-:host ::ng-deep .mat-calendar-body-cell-content {
-  @apply text-gray-700;
-}
-
-:host ::ng-deep .mat-calendar-body-selected {
-  @apply bg-blue-500 text-white;
-}
-
-:host ::ng-deep .mat-calendar-body-in-range {
-  @apply bg-blue-100 text-blue-800;
-}
-
-:host ::ng-deep .mat-calendar-body-cell:hover .mat-calendar-body-cell-content:not(.mat-calendar-body-selected) {
-  @apply bg-gray-100;
-}
-
-/* Holiday days styling using the custom class from holidayClass function */
-:host ::ng-deep .mat-calendar-body-cell.holiday-cell .mat-calendar-body-cell-content {
-  background-color: #fef2f2 !important; /* red-50 */
-  color: #dc2626 !important; /* red-600 */
-  font-weight: bold !important;
-  border: 2px solid #f87171 !important; /* red-400 */
-  border-radius: 4px !important;
-  position: relative;
-}
-
-/* Alternate selector - try different specificity */
-:host ::ng-deep .holiday-cell .mat-calendar-body-cell-content {
-  background-color: #fef2f2 !important; /* red-50 */
-  color: #dc2626 !important; /* red-600 */
-  font-weight: bold !important;
-  border: 2px solid #f87171 !important; /* red-400 */
-  border-radius: 4px !important;
-}
-
-/* Even more specific selector */
-:host ::ng-deep .mat-calendar-table .mat-calendar-body-cell.holiday-cell {
-  background-color: #fef2f2 !important; /* red-50 */
-  color: #dc2626 !important; /* red-600 */
-  font-weight: bold !important;
-  border: 2px solid #f87171 !important; /* red-400 */
-  border-radius: 4px !important;
-}
-
-/* Direct styling on the cell itself */
+/* Simple holiday styling - like the Angular Material example */
 :host ::ng-deep .holiday-cell {
-  background-color: #fef2f2 !important; /* red-50 */
+  background: #fef2f2 !important; /* red-50 */
   color: #dc2626 !important; /* red-600 */
   font-weight: bold !important;
-  border: 2px solid #f87171 !important; /* red-400 */
-  border-radius: 4px !important;
+  border-radius: 100% !important;
 }
 
-:host ::ng-deep .mat-calendar-body-cell.holiday-cell .mat-calendar-body-cell-content:hover {
-  background-color: #fecaca !important; /* red-100 */
-  color: #b91c1c !important; /* red-700 */
-  border-color: #ef4444 !important; /* red-500 */
+:host ::ng-deep .holiday-cell:hover {
+  background: #fecaca !important; /* red-200 */
 }
 
-/* Holiday days when selected */
-:host ::ng-deep .mat-calendar-body-cell.holiday-cell.mat-calendar-body-selected .mat-calendar-body-cell-content {
-  background-color: #dc2626 !important; /* red-600 */
-  color: white !important;
-  border-color: #dc2626 !important;
-}
-
-/* Holiday days in range */
-:host ::ng-deep .mat-calendar-body-cell.holiday-cell.mat-calendar-body-in-range .mat-calendar-body-cell-content {
-  background-color: #fecaca !important; /* red-200 */
-  color: #991b1b !important; /* red-800 */
-  border-color: #f87171 !important; /* red-400 */
-}
-
-/* Material DatePicker header styling */
-:host ::ng-deep .mat-calendar-header {
-  @apply text-gray-700;
-}
-
-:host ::ng-deep .mat-calendar-table-header th {
-  @apply text-gray-600 font-medium;
-}
-
-/* Fiori theme variant */
-:host.fiori ::ng-deep .mat-calendar-body-selected {
-  @apply bg-fiori-primary text-white;
-}
-
-:host.fiori ::ng-deep .mat-calendar-body-in-range {
-  @apply bg-fiori-accent/20 text-fiori-primary;
-}
-
-/* Input styling - matching the original Tailwind classes */
-:host ::ng-deep .mat-form-field {
-  width: 100%;
-}
-
-:host ::ng-deep .mat-form-field-wrapper {
-  padding-bottom: 0;
-}
-
-:host ::ng-deep .mat-form-field-underline {
-  display: none;
-}
-
-:host ::ng-deep .mat-form-field-infix {
-  padding: 0;
-  border-top: none;
+/* Material DatePicker basic theming */
+:host ::ng-deep .mat-datepicker-popup {
+  @apply shadow-lg;
 }
 
 /* Disabled state */
@@ -146,24 +49,9 @@
   /* Large size styles already defined in component */
 }
 
-/* Animation for error indicator */
-.error-indicator {
-  @apply transition-opacity duration-200;
-}
-
 /* Responsive adjustments */
 @media (max-width: 640px) {
   :host ::ng-deep .mat-datepicker-popup {
     @apply w-full;
   }
-}
-
-/* Custom styles for the date range layout */
-.date-separator {
-  @apply text-gray-400 mx-2;
-}
-
-/* Ensure proper flex layout for date inputs */
-:host .flex-1 {
-  min-width: 0; /* Prevent flex items from overflowing */
 }

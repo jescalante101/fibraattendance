@@ -9,7 +9,7 @@ import {
   OnDestroy
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { MatCalendarCellCssClasses } from '@angular/material/datepicker';
+import { MatCalendarCellClassFunction } from '@angular/material/datepicker';
 import { HolidaysService } from 'src/app/core/services/holidays.service';
 import { HolidayYear } from 'src/app/core/models/holiday.model';
 
@@ -43,7 +43,7 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
   @Input() errorClass = 'border-red-500';
   @Input() size: 'sm' | 'md' | 'lg' = 'sm';
   @Input() theme: 'default' | 'fiori' = 'default';
-  @Input() disableHolidays = true; // TEMP: Para testing
+  @Input() disableHolidays = true;
   @Input() startDatePlaceholder = 'Fecha inicio';
   @Input() endDatePlaceholder = 'Fecha fin';
   
@@ -59,6 +59,7 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
   currentValue: DateRange = { start: '', end: '' };
   private holidays: Date[] = [];
   private holidayStrings: string[] = [];
+  private holidayNames: Map<string, string> = new Map(); // Mapeo fecha -> nombre del feriado
   
   // ControlValueAccessor callbacks
   private onChange = (value: DateRange) => {};
@@ -106,8 +107,13 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
           
           for (let time = startTime; time <= endTime; time += oneDay) {
             const currentDate = new Date(time);
+            const dateStr = this.formatDate(currentDate);
+            
             holidayDates.push(new Date(currentDate));
-            holidayStrings.push(this.formatDate(currentDate));
+            holidayStrings.push(dateStr);
+            
+            // Almacenar el nombre del feriado para el tooltip
+            this.holidayNames.set(dateStr, holiday.rmrks);
           }
         });
         
@@ -118,7 +124,7 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
         // Force change detection to update the calendar
         this.cdr.detectChanges();
         
-        // Setup MutationObserver as fallback for holiday styling
+        // Setup MutationObserver for holiday styling (dateClass is not working reliably)
         this.setupHolidayObserver();
       },
       error: (error) => {
@@ -147,17 +153,23 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
   /**
    * Holiday CSS class function for Material DatePicker
    */
-  holidayClass = (cellDate: Date, view: 'month' | 'year' | 'multi-year'): MatCalendarCellCssClasses => {
-    console.log(`🔍 holidayClass called - date: ${this.formatDate(cellDate)}, view: ${view}, disableHolidays: ${this.disableHolidays}, holidaysLength: ${this.holidayStrings.length}`);
-    
+  dateClass: MatCalendarCellClassFunction<Date> = (cellDate, view) => {
     if (view === 'month' && this.disableHolidays && this.holidayStrings.length > 0) {
       const dateStr = this.formatDate(cellDate);
       const isHoliday = this.holidayStrings.includes(dateStr);
       
-      console.log(`🎄 Checking date ${dateStr} - isHoliday: ${isHoliday}`);
-      
       if (isHoliday) {
         console.log(`🎄 Applying holiday class to: ${dateStr}`);
+        
+        // Add tooltip using setTimeout to ensure DOM is ready
+        setTimeout(() => {
+          const holidayName = this.holidayNames.get(dateStr) || 'Día Feriado';
+          const cellElement = document.querySelector(`[aria-label*="${cellDate.getDate()}"]`);
+          if (cellElement) {
+            (cellElement as HTMLElement).title = `🎄 ${holidayName} (${dateStr})`;
+          }
+        }, 0);
+        
         return 'holiday-cell';
       }
     }
@@ -506,7 +518,24 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
           
           if (isHoliday) {
             console.log(`🎄 MutationObserver styling Material holiday: ${dateStr}`);
-            this.applyMaterialHolidayStyle(htmlDayElem, cellContent as HTMLElement, dateStr);
+            
+            // Apply class
+            htmlDayElem.classList.add('holiday-cell');
+            
+            // Apply styles directly - simple and direct
+            if (cellContent) {
+              const contentElem = cellContent as HTMLElement;
+              contentElem.style.backgroundColor = '#fef2f2'; // red-50
+              contentElem.style.color = '#dc2626'; // red-600
+              contentElem.style.fontWeight = 'bold';
+              contentElem.style.borderRadius = '100%';
+            }
+            
+            // Add tooltip with holiday name
+            const holidayName = this.holidayNames.get(dateStr) || 'Día Feriado';
+            htmlDayElem.title = `🎄 ${holidayName} (${dateStr})`;
+            
+            console.log(`✅ Applied styles and tooltip to ${dateStr}: ${holidayName}`);
           }
         }
       }
@@ -527,8 +556,9 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
     contentElem.style.setProperty('border', '2px solid #f87171', 'important'); // red-400
     contentElem.style.setProperty('border-radius', '4px', 'important');
     
-    // Add tooltip
-    cellElem.title = `🎄 Día Feriado: ${dateStr} - Seleccionable`;
+    // Add tooltip with holiday name
+    const holidayName = this.holidayNames.get(dateStr) || 'Día Feriado';
+    cellElem.title = `🎄 ${holidayName} (${dateStr}) - Seleccionable`;
     
     console.log(`✅ Applied Material holiday styles to ${dateStr}`);
   }

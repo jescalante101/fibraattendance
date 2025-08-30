@@ -107,8 +107,8 @@ export class ModalEditarAsignacionComponent implements OnInit {
       const endDate = this.validateAndFormatDate(this.datat.currentEndDate);
       
       const dateRange = {
-        start: startDate+'T12:00:00',
-        end: endDate+'T12:00:00'
+        start: startDate,
+        end: endDate
       };
       
       console.log('Pre-llenando formulario con:', {

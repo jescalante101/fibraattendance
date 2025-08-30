@@ -11,6 +11,8 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FlatpickrDefaultsInterface } from 'angularx-flatpickr';
 import { Spanish } from 'flatpickr/dist/l10n/es.js';
+import { HolidaysService } from 'src/app/core/services/holidays.service';
+import { HolidayYear } from 'src/app/core/models/holiday.model';
 
 export interface DateRange {
   start: string;
@@ -44,6 +46,7 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
   @Input() errorClass = 'border-red-500';
   @Input() size: 'sm' | 'md' | 'lg' = 'sm';
   @Input() theme: 'default' | 'fiori' = 'default';
+  @Input() disableHolidays = false;
   
   // Output events
   @Output() dateRangeChange = new EventEmitter<DateRange>();
@@ -54,6 +57,7 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
   // Internal state
   selectedDateRange: Date[] = [];
   currentValue: DateRange = { start: '', end: '' };
+  private holidays: string[] = [];
   
   // ControlValueAccessor callbacks
   private onChange = (value: DateRange) => {};
@@ -64,20 +68,60 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
   // Flatpickr configuration
   flatpickrDefaults: FlatpickrDefaultsInterface = {};
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef, private holidaysService: HolidaysService) {}
 
   ngOnInit(): void {
-    this.initializeFlatpickrConfig();
+    if (this.disableHolidays) {
+      this.loadHolidays();
+    } else {
+      this.initializeFlatpickrConfig();
+    }
   }
 
   ngOnDestroy(): void {
     // Cleanup if needed
   }
 
+  private loadHolidays(): void {
+    this.holidaysService.getHolidays().subscribe((holidayYears: HolidayYear[]) => {
+      const holidayDates: string[] = [];
+      holidayYears.forEach(year => {
+        year.hld1s.forEach(holiday => {
+          // Fix timezone parsing: Force local date interpretation
+          const start = this.parseLocalDate(holiday.strDate);
+          const end = this.parseLocalDate(holiday.endDate);
+          
+          // Fix date mutation bug: Use milliseconds instead of mutating original date
+          const startTime = start.getTime();
+          const endTime = end.getTime();
+          const oneDay = 24 * 60 * 60 * 1000; // milliseconds in one day
+          
+          for (let time = startTime; time <= endTime; time += oneDay) {
+            const currentDate = new Date(time);
+            holidayDates.push(this.formatDate(currentDate));
+          }
+        });
+      });
+      this.holidays = holidayDates;
+      this.initializeFlatpickrConfig();
+    });
+  }
+
   /**
    * Initialize Flatpickr configuration based on inputs
    */
   private initializeFlatpickrConfig(): void {
+    const disableFunctions = [];
+    if (this.disabled) {
+      disableFunctions.push(() => true);
+    }
+    if (this.disableHolidays && this.holidays.length > 0) {
+      disableFunctions.push((date: Date) => {
+        const dateStr = this.formatDate(date);
+        return this.holidays.includes(dateStr);
+      });
+    }
+
     this.flatpickrDefaults = {
       mode: 'range',
       dateFormat: this.dateFormat,
@@ -88,7 +132,7 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
       altFormat: this.altFormat,
       minDate: this.minDate,
       maxDate: this.maxDate,
-      disable: this.disabled ? [() => true] : undefined,
+      disable: disableFunctions,
       // Configuración para navegación de meses mejorada
       showMonths: 1, // Mostrar un mes
       enableTime: false, // Sin selector de tiempo
@@ -184,6 +228,29 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
     
     console.log('🔄 Dates reset');
     this.cdr.detectChanges();
+  }
+
+  /**
+   * Parse date string as local date (prevents timezone issues)
+   * Converts "2025-08-12" to local date instead of UTC
+   */
+  private parseLocalDate(dateInput: string | Date): Date {
+    if (dateInput instanceof Date) {
+      return dateInput;
+    }
+    
+    // If it's already a complete date string with time, use it as is
+    if (dateInput.includes('T') || dateInput.includes(' ')) {
+      return new Date(dateInput);
+    }
+    
+    // For date-only strings (YYYY-MM-DD), force local interpretation
+    // by adding midday time to avoid timezone edge cases
+    const dateString = dateInput.toString();
+    const [year, month, day] = dateString.split('-').map(num => parseInt(num, 10));
+    
+    // Create date in local timezone (month is 0-indexed in Date constructor)
+    return new Date(year, month - 1, day, 12, 0, 0);
   }
 
   /**
@@ -343,9 +410,9 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
     if (value && value.start && value.end) {
       this.currentValue = value;
       
-      // Convert string dates to Date objects for Flatpickr
-      const startDate = new Date(value.start);
-      const endDate = new Date(value.end);
+      // Use parseLocalDate to handle timezone issues consistently
+      const startDate = this.parseLocalDate(value.start);
+      const endDate = this.parseLocalDate(value.end);
       
       if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
         this.selectedDateRange = [startDate, endDate];

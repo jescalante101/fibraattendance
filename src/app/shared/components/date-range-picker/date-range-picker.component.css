@@ -1,57 +1,30 @@
-/* Date Range Picker Component Styles */
+/*
+  NOTA: Estos estilos funcionan porque `encapsulation: ViewEncapsulation.None` está
+  definido en el decorador del componente.
 
-/* Simple holiday styling - like the Angular Material example */
-:host ::ng-deep .holiday-cell {
-  background: #fef2f2 !important; /* red-50 */
-  color: #dc2626 !important; /* red-600 */
+  Simplificamos al máximo, usando un selector directo y potente
+  para asegurar que los estilos de los feriados se apliquen.
+*/
+
+/* Estilo único y directo para el contenido de una celda de feriado.
+  Usamos !important para darle la máxima prioridad sobre cualquier
+  estilo por defecto de Angular Material.
+*/
+.holiday-cell .mat-calendar-body-cell-content {
+  background-color: #fef2f2 !important; /* Tailwind: red-50 */
+  color: #dc2626 !important;          /* Tailwind: red-600 */
   font-weight: bold !important;
-  border-radius: 100% !important;
+  border-radius: 50% !important;
+  border: 1px solid #fca5a5 !important; /* Tailwind: red-300 */
 }
 
-:host ::ng-deep .holiday-cell:hover {
-  background: #fecaca !important; /* red-200 */
+.date-range-picker-wrapper .mat-mdc-form-field-flex {
+  height: auto !important;
 }
 
-/* Material DatePicker basic theming */
-:host ::ng-deep .mat-datepicker-popup {
-  @apply shadow-lg;
-}
-
-/* Disabled state */
-:host ::ng-deep input[disabled] {
-  @apply bg-gray-100 cursor-not-allowed opacity-60;
-}
-
-/* Focus states */
-:host ::ng-deep input:focus {
-  @apply outline-none ring-2 ring-blue-500 ring-opacity-50;
-}
-
-:host.fiori ::ng-deep input:focus {
-  @apply ring-fiori-primary;
-}
-
-/* Error state */
-:host ::ng-deep input.border-red-500 {
-  @apply ring-red-500 ring-opacity-50;
-}
-
-/* Size variants */
-.size-sm {
-  /* Small size styles already defined in component */
-}
-
-.size-md {
-  /* Medium size styles already defined in component */
-}
-
-.size-lg {
-  /* Large size styles already defined in component */
-}
-
-/* Responsive adjustments */
-@media (max-width: 640px) {
-  :host ::ng-deep .mat-datepicker-popup {
-    @apply w-full;
-  }
+/* Reducimos el padding vertical del área donde va el texto del input.
+   Estos valores (8px) son los que controlan la altura final. */
+.date-range-picker-wrapper .mat-mdc-form-field-infix {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
 }

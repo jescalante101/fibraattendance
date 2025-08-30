@@ -1,19 +1,22 @@
-<!-- Date Range Picker Component using Angular Material native range picker -->
-<div class="relative">
-  <mat-form-field [appearance]="'outline'" [class]="getInputClasses()">
-    <mat-label>{{ placeholder }}</mat-label>
-    
+<!-- Date Range Picker Component using Angular Material with custom icons -->
+<div class="date-range-picker-wrapper">
+  <mat-form-field class="w-full " appearance="outline">
+   
+
     <!-- Date Range Input -->
     <mat-date-range-input 
-      [rangePicker]="rangePicker" 
+      [rangePicker]="rangePicker"
       [min]="minDate"
       [max]="maxDate"
       [dateFilter]="holidayFilter"
       [disabled]="disabled"
+      [required]="required"
     >
       <input 
+      class=""
         matStartDate 
         [placeholder]="startDatePlaceholder"
+        [value]="startDate"
         (dateChange)="onStartDateChange($event.value)"
         (focus)="onInputFocus()"
         (blur)="onInputBlur()"
@@ -21,43 +24,43 @@
       <input 
         matEndDate 
         [placeholder]="endDatePlaceholder"
+        [value]="endDate"
         (dateChange)="onEndDateChange($event.value)"
         (focus)="onInputFocus()"
         (blur)="onInputBlur()"
       />
     </mat-date-range-input>
-    
-    <!-- Calendar Toggle Button -->
+
+    <!-- Calendar Toggle Button with Custom Icon -->
     <mat-datepicker-toggle 
       matIconSuffix 
       [for]="rangePicker"
       [disabled]="disabled"
     >
-      <!-- Custom Icon -->
+      <!-- Assumes you have a component like 'lucide-icon' for icons -->
       <lucide-icon 
         *ngIf="showIcon"
         [name]="iconName" 
-        [class]="getIconSize() + ' text-gray-400'"
+        [class]="getIconSize() + ' text-gray-500'"
         matDatepickerToggleIcon
       ></lucide-icon>
     </mat-datepicker-toggle>
-    
-    <!-- Error state indicator -->
+
+    <!-- Error message with icon -->
     <mat-error *ngIf="hasError()">
-      <lucide-icon 
-        name="alert-circle" 
-        [class]="getIconSize() + ' text-red-500 mr-1'"
-      ></lucide-icon>
-      Campo requerido
+      <div class="flex items-center">
+        <lucide-icon name="alert-circle" class="w-4 h-4 mr-1"></lucide-icon>
+        <span>Es necesario seleccionar un rango de fechas.</span>
+      </div>
     </mat-error>
   </mat-form-field>
-  
-  <!-- Date Range Picker -->
+
+  <!-- Date Range Picker Panel -->
   <mat-date-range-picker 
     #rangePicker
     [dateClass]="dateClass"
-    (opened)="pickerOpen.emit()"
-    (closed)="pickerClose.emit()"
+    (monthSelected)="onMonthSelected($event)"
+    (opened)="onPickerOpened()"
   >
   </mat-date-range-picker>
 </div>

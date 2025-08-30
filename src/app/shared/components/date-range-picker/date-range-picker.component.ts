@@ -1,15 +1,17 @@
-import { 
-  Component, 
-  Input, 
-  Output, 
-  EventEmitter, 
-  forwardRef, 
+import {
+  ApplicationRef,
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  forwardRef,
   ChangeDetectorRef,
   OnInit,
-  OnDestroy
+  ViewEncapsulation,
+  ViewChild
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { MatCalendarCellClassFunction } from '@angular/material/datepicker';
+import { MatCalendarCellClassFunction, MatDateRangePicker } from '@angular/material/datepicker';
 import { HolidaysService } from 'src/app/core/services/holidays.service';
 import { HolidayYear } from 'src/app/core/models/holiday.model';
 
@@ -28,11 +30,14 @@ export interface DateRange {
       useExisting: forwardRef(() => DateRangePickerComponent),
       multi: true
     }
-  ]
+  ],
+  encapsulation: ViewEncapsulation.None,
 })
-export class DateRangePickerComponent implements ControlValueAccessor, OnInit, OnDestroy {
-  
-  // Input properties para configuración
+export class DateRangePickerComponent implements ControlValueAccessor, OnInit {
+
+  @ViewChild('rangePicker') rangePicker!: MatDateRangePicker<Date>;
+
+  // ... (Input, Output, y otras propiedades se mantienen igual)
   @Input() placeholder = 'Seleccionar rango de fechas...';
   @Input() required = false;
   @Input() disabled = false;
@@ -46,520 +51,212 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
   @Input() disableHolidays = true;
   @Input() startDatePlaceholder = 'Fecha inicio';
   @Input() endDatePlaceholder = 'Fecha fin';
-  
-  // Output events
+
   @Output() dateRangeChange = new EventEmitter<DateRange>();
   @Output() dateSelected = new EventEmitter<Date[]>();
   @Output() pickerOpen = new EventEmitter<void>();
   @Output() pickerClose = new EventEmitter<void>();
-  
-  // Internal state
+
   startDate: Date | null = null;
   endDate: Date | null = null;
   currentValue: DateRange = { start: '', end: '' };
-  private holidays: Date[] = [];
-  private holidayStrings: string[] = [];
-  private holidayNames: Map<string, string> = new Map(); // Mapeo fecha -> nombre del feriado
   
-  // ControlValueAccessor callbacks
-  private onChange = (value: DateRange) => {};
-  private onTouched = () => {
-    this.wasTouched = true;
-  };
+  private holidayTimeStamps = new Set<number>();
+  private holidayNames = new Map<number, string>();
+  private loadedYears = new Set<number>();
 
-  constructor(private cdr: ChangeDetectorRef, private holidaysService: HolidaysService) {}
+  private onChange = (value: DateRange) => {};
+  private onTouched = () => { this.wasTouched = true; };
+  private wasTouched = false;
+
+  constructor(
+    private cdr: ChangeDetectorRef, 
+    private holidaysService: HolidaysService,
+    private appRef: ApplicationRef
+  ) {}
 
   ngOnInit(): void {
     if (this.disableHolidays) {
-      this.loadHolidays();
-    }
-  }
-
-  ngOnDestroy(): void {
-    // Cleanup MutationObserver
-    if (this.mutationObserver) {
-      this.mutationObserver.disconnect();
+      this.loadHolidaysForYear(new Date().getFullYear());
     }
   }
   
-  private mutationObserver?: MutationObserver;
+  private getNormalizedTimestamp(d: Date | null): number | null {
+    if (!d || isNaN(d.getTime())) return null;
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  }
 
-  private loadHolidays(): void {
-    const currentYear = new Date().getFullYear().toString();
-    console.log('🎄 Loading holidays for current year:', currentYear);
-    
-    this.holidaysService.getHolidaysByYear(currentYear).subscribe({
+  private loadHolidaysForYear(year: number): void {
+    if (this.loadedYears.has(year)) return;
+
+    this.holidaysService.getHolidaysByYear(year.toString()).subscribe({
       next: (holidayYear: HolidayYear) => {
-        console.log(`🎄 Processing holidays for year ${currentYear}:`, holidayYear.hld1s.length);
-        
-        const holidayDates: Date[] = [];
-        const holidayStrings: string[] = [];
-        
+        this.loadedYears.add(year);
         holidayYear.hld1s.forEach(holiday => {
-          // Fix timezone parsing: Force local date interpretation
           const start = this.parseLocalDate(holiday.strDate);
           const end = this.parseLocalDate(holiday.endDate);
-          
-          // Fix date mutation bug: Use milliseconds instead of mutating original date
-          const startTime = start.getTime();
-          const endTime = end.getTime();
-          const oneDay = 24 * 60 * 60 * 1000; // milliseconds in one day
-          
-          for (let time = startTime; time <= endTime; time += oneDay) {
-            const currentDate = new Date(time);
-            const dateStr = this.formatDate(currentDate);
-            
-            holidayDates.push(new Date(currentDate));
-            holidayStrings.push(dateStr);
-            
-            // Almacenar el nombre del feriado para el tooltip
-            this.holidayNames.set(dateStr, holiday.rmrks);
+          if (!start || !end) return;
+
+          const oneDay = 24 * 60 * 60 * 1000;
+          for (let time = start.getTime(); time <= end.getTime(); time += oneDay) {
+            const date = new Date(time);
+            const normalizedTimestamp = this.getNormalizedTimestamp(date);
+            if (normalizedTimestamp) {
+              this.holidayTimeStamps.add(normalizedTimestamp);
+              this.holidayNames.set(normalizedTimestamp, holiday.rmrks);
+            }
           }
         });
         
-        this.holidays = holidayDates;
-        this.holidayStrings = holidayStrings;
-        console.log('🎄 Current year holidays loaded:', this.holidayStrings);
-        
-        // Force change detection to update the calendar
-        this.cdr.detectChanges();
-        
-        // Setup MutationObserver for holiday styling (dateClass is not working reliably)
-        this.setupHolidayObserver();
+        console.log(`🎄 Holiday data loaded for ${year}.`);
       },
       error: (error) => {
-        console.warn(`⚠️ Failed to load holidays for year ${currentYear}:`, error);
-        // Fallback: usar array vacío
-        this.holidays = [];
-        this.holidayStrings = [];
+        console.warn(`⚠️ Failed to load holidays for year ${year}:`, error);
+        this.loadedYears.add(year);
       }
     });
   }
-
-  /**
-   * Holiday date filter function for Material DatePicker
-   */
-  holidayFilter = (date: Date | null): boolean => {
-    if (!date || !this.disableHolidays) return true;
-    
-    const dateStr = this.formatDate(date);
-    const isHoliday = this.holidayStrings.includes(dateStr);
-    
-    // Return false to disable holidays, true to enable them
-    // Since we want holidays to be selectable but visually styled, we return true
-    return true;
+  
+  onPickerOpened(): void {
+    this.pickerOpen.emit();
+    console.log('🗓️ Picker opened. Applying tooltips.');
+    this.appRef.tick();
+    this.applyTooltipsToVisibleHolidays();
   }
 
-  /**
-   * Holiday CSS class function for Material DatePicker
-   */
-  dateClass: MatCalendarCellClassFunction<Date> = (cellDate, view) => {
-    if (view === 'month' && this.disableHolidays && this.holidayStrings.length > 0) {
-      const dateStr = this.formatDate(cellDate);
-      const isHoliday = this.holidayStrings.includes(dateStr);
+  private applyTooltipsToVisibleHolidays(): void {
+    // Usamos requestAnimationFrame para esperar al próximo ciclo de pintado del navegador.
+    // Esto garantiza que el DOM esté completamente actualizado antes de que lo manipulemos.
+    requestAnimationFrame(() => {
+        const holidayCells = document.querySelectorAll('td.mat-calendar-body-cell.holiday-cell');
+        
+        if (holidayCells.length > 0) {
+            console.log(`[SUCCESS] Found ${holidayCells.length} holiday cells. Applying tooltips.`);
+        } else {
+            // Este reintento es una salvaguarda final por si la animación del calendario tarda un poco más.
+            setTimeout(() => this.applyTooltipsToVisibleHolidays(), 100);
+            return;
+        }
+
+        holidayCells.forEach(cell => {
+            const cellElement = cell as HTMLElement;
+            // Solo añadimos el tooltip si no lo tiene ya, para evitar trabajo innecesario.
+            if (!cellElement.hasAttribute('title')) {
+                const ariaLabel = cellElement.getAttribute('aria-label');
+                if (ariaLabel) {
+                    const date = this.parseAriaLabel(ariaLabel);
+                    const timestamp = this.getNormalizedTimestamp(date);
+                    if (timestamp && this.holidayNames.has(timestamp)) {
+                        const holidayName = this.holidayNames.get(timestamp);
+                        cellElement.setAttribute('title', `🎉 ${holidayName}`);
+                    }
+                }
+            }
+        });
+    });
+  }
+
+  private parseAriaLabel(ariaLabel: string): Date | null {
+      const months: { [key: string]: number } = {
+          'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
+          'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
+      };
       
-      if (isHoliday) {
-        console.log(`🎄 Applying holiday class to: ${dateStr}`);
-        
-        // Add tooltip using setTimeout to ensure DOM is ready
-        setTimeout(() => {
-          const holidayName = this.holidayNames.get(dateStr) || 'Día Feriado';
-          const cellElement = document.querySelector(`[aria-label*="${cellDate.getDate()}"]`);
-          if (cellElement) {
-            (cellElement as HTMLElement).title = `🎄 ${holidayName} (${dateStr})`;
+      const parts = ariaLabel.toLowerCase().replace(/,/g, '').split(' ');
+      
+      if (parts.length === 5 && parts[1] === 'de' && parts[3] === 'de') {
+          const day = parseInt(parts[0], 10);
+          const month = months[parts[2]];
+          const year = parseInt(parts[4], 10);
+          if (!isNaN(day) && month !== undefined && !isNaN(year)) {
+              return new Date(year, month, day);
           }
-        }, 0);
-        
+      }
+      const fallbackDate = new Date(ariaLabel);
+      if (!isNaN(fallbackDate.getTime())) {
+          return fallbackDate;
+      }
+      return null;
+  }
+
+  onMonthSelected(selectedDate: Date): void {
+    if (this.disableHolidays) {
+      this.loadHolidaysForYear(selectedDate.getFullYear());
+    }
+    // También aplicamos los tooltips cuando el usuario cambia de mes.
+    this.applyTooltipsToVisibleHolidays();
+  }
+
+  holidayFilter = (date: Date | null): boolean => true;
+
+  dateClass: MatCalendarCellClassFunction<Date> = (cellDate, view) => {
+    if (view === 'month') {
+      const cellTimestamp = this.getNormalizedTimestamp(cellDate);
+      if (cellTimestamp && this.holidayTimeStamps.has(cellTimestamp)) {
         return 'holiday-cell';
       }
     }
-    
     return '';
+  };
+  
+  private parseLocalDate(dateInput: string | Date): Date | null {
+    if (dateInput instanceof Date) return dateInput;
+    if (!dateInput) return null;
+    const parts = dateInput.toString().split('T')[0].split('-').map(Number);
+    if (parts.length !== 3 || parts.some(isNaN)) return null;
+    const [year, month, day] = parts;
+    return new Date(year, month - 1, day);
   }
 
-  /**
-   * Handle start date selection change
-   */
-  onStartDateChange(date: Date | null): void {
-    console.log('📅 Start date changed:', date);
-    this.startDate = date;
-    this.updateDateRange();
-  }
-
-  /**
-   * Handle end date selection change
-   */
-  onEndDateChange(date: Date | null): void {
-    console.log('📅 End date changed:', date);
-    this.endDate = date;
-    this.updateDateRange();
-  }
-
-  /**
-   * Update the internal date range and emit events
-   */
-  private updateDateRange(): void {
-    const startDateStr = this.startDate ? this.formatDate(this.startDate) : '';
-    const endDateStr = this.endDate ? this.formatDate(this.endDate) : '';
-
-    this.currentValue = {
-      start: startDateStr,
-      end: endDateStr
-    };
-
-    console.log('📅 Date range updated:', this.currentValue);
-
-    // Emit events
-    this.dateRangeChange.emit(this.currentValue);
-    
-    const selectedDates = [this.startDate, this.endDate].filter(Boolean) as Date[];
-    this.dateSelected.emit(selectedDates);
-    
-    this.onChange(this.currentValue);
-    this.onTouched();
-
-    // Force change detection
-    this.cdr.detectChanges();
-  }
-
-  /**
-   * Reset dates to empty state
-   */
-  private resetDates(): void {
-    this.startDate = null;
-    this.endDate = null;
-    this.currentValue = { start: '', end: '' };
-    
-    this.dateRangeChange.emit(this.currentValue);
-    this.onChange(this.currentValue);
-    // Don't call onTouched() here to avoid marking as touched during reset
-    
-    console.log('🔄 Dates reset');
-    this.cdr.detectChanges();
-  }
-
-  /**
-   * Parse date string as local date (prevents timezone issues)
-   * Converts "2025-08-12" to local date instead of UTC
-   */
-  private parseLocalDate(dateInput: string | Date): Date {
-    if (dateInput instanceof Date) {
-      return dateInput;
-    }
-    
-    // If it's already a complete date string with time, use it as is
-    if (dateInput.includes('T') || dateInput.includes(' ')) {
-      return new Date(dateInput);
-    }
-    
-    // For date-only strings (YYYY-MM-DD), force local interpretation
-    // by adding midday time to avoid timezone edge cases
-    const dateString = dateInput.toString();
-    const [year, month, day] = dateString.split('-').map(num => parseInt(num, 10));
-    
-    // Create date in local timezone (month is 0-indexed in Date constructor)
-    return new Date(year, month - 1, day, 12, 0, 0);
-  }
-
-  /**
-   * Format date to string
-   */
   private formatDate(date: Date): string {
-    if (!date || !(date instanceof Date)) {
-      console.log('❌ formatDate: Invalid date, returning empty string');
-      return '';
-    }
-    
+    if (!date || isNaN(date.getTime())) return '';
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    
-    const formatted = `${year}-${month}-${day}`;
-    console.log('✅ formatDate result:', formatted);
-    
-    return formatted;
+    return `${year}-${month}-${day}`;
   }
 
-  /**
-   * Check if the current selection is valid (both dates selected)
-   */
-  isValid(): boolean {
-    return !!(this.currentValue.start && this.currentValue.end);
-  }
-
-  /**
-   * Check if the component should show error state
-   */
-  hasError(): boolean {
-    // Show error only if:
-    // 1. Component is required
-    // 2. Component is invalid (no proper date range)
-    // 3. User has interacted with it (touched) but hasn't provided valid input
-    
-    if (!this.required) {
-      return false;
-    }
-    
-    const isInvalid = !this.isValid();
-    const hasBeenTouched = this.wasTouched;
-    
-    // Don't show error if we have valid dates
-    if (this.currentValue.start && this.currentValue.end) {
-      return false;
-    }
-    
-    // Show error only if touched and invalid
-    return isInvalid && hasBeenTouched;
-  }
-
-  // Track if the component has been touched
-  private wasTouched = false;
-
-  /**
-   * Get CSS classes for the input
-   */
-  getInputClasses(): string {
-    const baseClasses = this.getBaseClasses();
-    const sizeClasses = this.getSizeClasses();
-    const themeClasses = this.getThemeClasses();
-    const errorClasses = this.hasError() ? this.errorClass : '';
-    
-    return `${baseClasses} ${sizeClasses} ${themeClasses} ${errorClasses}`.trim();
-  }
-
-  /**
-   * Get base CSS classes
-   */
-  private getBaseClasses(): string {
-    return 'w-full border rounded-md bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500';
-  }
-
-  /**
-   * Get size-specific CSS classes
-   */
-  private getSizeClasses(): string {
-    switch (this.size) {
-      case 'sm':
-        return 'px-2 py-1.5 text-sm';
-      case 'md':
-        return 'px-3 py-2 text-base';
-      case 'lg':
-        return 'px-4 py-3 text-lg';
-      default:
-        return 'px-2 py-1.5 text-sm';
-    }
-  }
-
-  /**
-   * Get theme-specific CSS classes
-   */
-  private getThemeClasses(): string {
-    switch (this.theme) {
-      case 'fiori':
-        return 'border-gray-300 focus:ring-fiori-primary focus:border-fiori-primary';
-      case 'default':
-      default:
-        return 'border-gray-300';
-    }
-  }
-
-  /**
-   * Get icon size based on input size
-   */
-  getIconSize(): string {
-    switch (this.size) {
-      case 'sm':
-        return 'w-3.5 h-3.5';
-      case 'md':
-        return 'w-4 h-4';
-      case 'lg':
-        return 'w-5 h-5';
-      default:
-        return 'w-3.5 h-3.5';
-    }
-  }
-
-  /**
-   * Get padding for input when icon is shown
-   */
-  getInputPadding(): string {
-    if (!this.showIcon) return '';
-    
-    switch (this.size) {
-      case 'sm':
-        return 'pl-7';
-      case 'md':
-        return 'pl-10';
-      case 'lg':
-        return 'pl-12';
-      default:
-        return 'pl-7';
-    }
-  }
-
-  /**
-   * Handle input focus
-   */
-  onInputFocus(): void {
-    this.wasTouched = true;
-    this.pickerOpen.emit();
-  }
-
-  /**
-   * Handle input blur
-   */
-  onInputBlur(): void {
+  onStartDateChange(date: Date | null): void { this.startDate = date; this.updateDateRange(); }
+  onEndDateChange(date: Date | null): void { this.endDate = date; this.updateDateRange(); }
+  
+  private updateDateRange(): void {
+    this.currentValue = { 
+      start: this.startDate ? this.formatDate(this.startDate) : '', 
+      end: this.endDate ? this.formatDate(this.endDate) : '' 
+    };
+    this.dateRangeChange.emit(this.currentValue);
+    this.onChange(this.currentValue);
     this.onTouched();
-    this.pickerClose.emit();
+    this.cdr.markForCheck();
   }
 
-  // ControlValueAccessor implementation
   writeValue(value: DateRange | null): void {
     if (value && value.start && value.end) {
-      this.currentValue = value;
-      
-      // Use parseLocalDate to handle timezone issues consistently
-      const startDate = this.parseLocalDate(value.start);
-      const endDate = this.parseLocalDate(value.end);
-      
-      if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
-        this.startDate = startDate;
-        this.endDate = endDate;
-        console.log('📅 writeValue: Updated with preset dates:', value);
-        
-        // Don't mark as touched when programmatically setting value (e.g., via preset buttons)
-        // This ensures we don't show error state immediately
-        
-        // Force change detection to update UI
-        this.cdr.detectChanges();
-      }
+      this.startDate = this.parseLocalDate(value.start);
+      this.endDate = this.parseLocalDate(value.end);
     } else {
-      this.resetDates();
+      this.startDate = null; this.endDate = null;
     }
+    this.updateDateRange();
+    this.cdr.markForCheck();
   }
 
-  registerOnChange(fn: (value: DateRange) => void): void {
-    this.onChange = fn;
+  registerOnChange(fn: any): void { this.onChange = fn; }
+  registerOnTouched(fn: any): void { this.onTouched = fn; }
+  setDisabledState(isDisabled: boolean): void { 
+    this.disabled = isDisabled; 
+    this.cdr.markForCheck();
   }
-
-  registerOnTouched(fn: () => void): void {
-    this.onTouched = fn;
-  }
-
-  setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
-    this.cdr.detectChanges();
-  }
-
-  /**
-   * Setup MutationObserver to watch for Material calendar DOM changes
-   */
-  private setupHolidayObserver(): void {
-    // Disconnect previous observer if exists
-    if (this.mutationObserver) {
-      this.mutationObserver.disconnect();
+  hasError(): boolean { return this.required && !(this.currentValue.start && this.currentValue.end) && this.wasTouched; }
+  onInputFocus(): void { this.wasTouched = true; }
+  onInputBlur(): void { this.onTouched(); }
+  getIconSize(): string {
+    switch (this.size) {
+      case 'sm': return 'w-4 h-4';
+      case 'md': return 'w-5 h-5';
+      case 'lg': return 'w-6 h-6';
+      default: return 'w-4 h-4';
     }
-
-    this.mutationObserver = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-          mutation.addedNodes.forEach((node) => {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-              const element = node as HTMLElement;
-              
-              // Look for Material calendar cells
-              const dayElements = element.querySelectorAll('.mat-calendar-body-cell');
-              if (dayElements.length > 0) {
-                console.log(`🎄 MutationObserver detected ${dayElements.length} Material calendar cells`);
-                this.styleMaterialHolidayElements(dayElements);
-              }
-              
-              // Check if the node itself is a calendar cell
-              if (element.classList && element.classList.contains('mat-calendar-body-cell')) {
-                console.log('🎄 MutationObserver detected single Material calendar cell');
-                this.styleMaterialHolidayElements([element]);
-              }
-            }
-          });
-        }
-      });
-    });
-
-    // Observe changes in the document body
-    this.mutationObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-
-    console.log('🎄 MutationObserver setup for Material DatePicker');
-  }
-
-  /**
-   * Style Material calendar holiday elements
-   */
-  private styleMaterialHolidayElements(dayElements: NodeListOf<Element> | Element[]): void {
-    dayElements.forEach((dayElem: Element) => {
-      const htmlDayElem = dayElem as HTMLElement;
-      
-      // Material calendar stores date info differently
-      const cellContent = htmlDayElem.querySelector('.mat-calendar-body-cell-content');
-      if (cellContent && cellContent.textContent) {
-        const dayText = cellContent.textContent.trim();
-        const dayNumber = parseInt(dayText);
-        
-        if (dayNumber > 0 && dayNumber <= 31) {
-          // For Material calendar, we need to get the current month/year from context
-          const currentYear = new Date().getFullYear();
-          const currentMonth = new Date().getMonth();
-          
-          const date = new Date(currentYear, currentMonth, dayNumber);
-          const dateStr = this.formatDate(date);
-          const isHoliday = this.holidayStrings.includes(dateStr);
-          
-          if (isHoliday) {
-            console.log(`🎄 MutationObserver styling Material holiday: ${dateStr}`);
-            
-            // Apply class
-            htmlDayElem.classList.add('holiday-cell');
-            
-            // Apply styles directly - simple and direct
-            if (cellContent) {
-              const contentElem = cellContent as HTMLElement;
-              contentElem.style.backgroundColor = '#fef2f2'; // red-50
-              contentElem.style.color = '#dc2626'; // red-600
-              contentElem.style.fontWeight = 'bold';
-              contentElem.style.borderRadius = '100%';
-            }
-            
-            // Add tooltip with holiday name
-            const holidayName = this.holidayNames.get(dateStr) || 'Día Feriado';
-            htmlDayElem.title = `🎄 ${holidayName} (${dateStr})`;
-            
-            console.log(`✅ Applied styles and tooltip to ${dateStr}: ${holidayName}`);
-          }
-        }
-      }
-    });
-  }
-
-  /**
-   * Apply holiday styling to Material calendar elements
-   */
-  private applyMaterialHolidayStyle(cellElem: HTMLElement, contentElem: HTMLElement, dateStr: string): void {
-    // Add class to the cell
-    cellElem.classList.add('holiday-cell');
-    
-    // Apply styles directly to the content element with maximum priority
-    contentElem.style.setProperty('background-color', '#fef2f2', 'important'); // red-50
-    contentElem.style.setProperty('color', '#dc2626', 'important'); // red-600
-    contentElem.style.setProperty('font-weight', 'bold', 'important');
-    contentElem.style.setProperty('border', '2px solid #f87171', 'important'); // red-400
-    contentElem.style.setProperty('border-radius', '4px', 'important');
-    
-    // Add tooltip with holiday name
-    const holidayName = this.holidayNames.get(dateStr) || 'Día Feriado';
-    cellElem.title = `🎄 ${holidayName} (${dateStr}) - Seleccionable`;
-    
-    console.log(`✅ Applied Material holiday styles to ${dateStr}`);
   }
 }
+

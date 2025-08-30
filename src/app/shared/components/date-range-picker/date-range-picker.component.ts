@@ -9,8 +9,7 @@ import {
   OnDestroy
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { FlatpickrDefaultsInterface } from 'angularx-flatpickr';
-import { Spanish } from 'flatpickr/dist/l10n/es.js';
+import { MatCalendarCellCssClasses } from '@angular/material/datepicker';
 import { HolidaysService } from 'src/app/core/services/holidays.service';
 import { HolidayYear } from 'src/app/core/models/holiday.model';
 
@@ -39,14 +38,14 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
   @Input() disabled = false;
   @Input() minDate?: Date;
   @Input() maxDate?: Date;
-  @Input() dateFormat = 'Y-m-d';
-  @Input() altFormat = 'd/m/Y';
   @Input() showIcon = true;
   @Input() iconName = 'calendar';
   @Input() errorClass = 'border-red-500';
   @Input() size: 'sm' | 'md' | 'lg' = 'sm';
   @Input() theme: 'default' | 'fiori' = 'default';
-  @Input() disableHolidays = false;
+  @Input() disableHolidays = true; // TEMP: Para testing
+  @Input() startDatePlaceholder = 'Fecha inicio';
+  @Input() endDatePlaceholder = 'Fecha fin';
   
   // Output events
   @Output() dateRangeChange = new EventEmitter<DateRange>();
@@ -55,38 +54,47 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
   @Output() pickerClose = new EventEmitter<void>();
   
   // Internal state
-  selectedDateRange: Date[] = [];
+  startDate: Date | null = null;
+  endDate: Date | null = null;
   currentValue: DateRange = { start: '', end: '' };
-  private holidays: string[] = [];
+  private holidays: Date[] = [];
+  private holidayStrings: string[] = [];
   
   // ControlValueAccessor callbacks
   private onChange = (value: DateRange) => {};
   private onTouched = () => {
     this.wasTouched = true;
   };
-  
-  // Flatpickr configuration
-  flatpickrDefaults: FlatpickrDefaultsInterface = {};
 
   constructor(private cdr: ChangeDetectorRef, private holidaysService: HolidaysService) {}
 
   ngOnInit(): void {
     if (this.disableHolidays) {
       this.loadHolidays();
-    } else {
-      this.initializeFlatpickrConfig();
     }
   }
 
   ngOnDestroy(): void {
-    // Cleanup if needed
+    // Cleanup MutationObserver
+    if (this.mutationObserver) {
+      this.mutationObserver.disconnect();
+    }
   }
+  
+  private mutationObserver?: MutationObserver;
 
   private loadHolidays(): void {
-    this.holidaysService.getHolidays().subscribe((holidayYears: HolidayYear[]) => {
-      const holidayDates: string[] = [];
-      holidayYears.forEach(year => {
-        year.hld1s.forEach(holiday => {
+    const currentYear = new Date().getFullYear().toString();
+    console.log('🎄 Loading holidays for current year:', currentYear);
+    
+    this.holidaysService.getHolidaysByYear(currentYear).subscribe({
+      next: (holidayYear: HolidayYear) => {
+        console.log(`🎄 Processing holidays for year ${currentYear}:`, holidayYear.hld1s.length);
+        
+        const holidayDates: Date[] = [];
+        const holidayStrings: string[] = [];
+        
+        holidayYear.hld1s.forEach(holiday => {
           // Fix timezone parsing: Force local date interpretation
           const start = this.parseLocalDate(holiday.strDate);
           const end = this.parseLocalDate(holiday.endDate);
@@ -98,128 +106,116 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
           
           for (let time = startTime; time <= endTime; time += oneDay) {
             const currentDate = new Date(time);
-            holidayDates.push(this.formatDate(currentDate));
+            holidayDates.push(new Date(currentDate));
+            holidayStrings.push(this.formatDate(currentDate));
           }
         });
-      });
-      this.holidays = holidayDates;
-      this.initializeFlatpickrConfig();
+        
+        this.holidays = holidayDates;
+        this.holidayStrings = holidayStrings;
+        console.log('🎄 Current year holidays loaded:', this.holidayStrings);
+        
+        // Force change detection to update the calendar
+        this.cdr.detectChanges();
+        
+        // Setup MutationObserver as fallback for holiday styling
+        this.setupHolidayObserver();
+      },
+      error: (error) => {
+        console.warn(`⚠️ Failed to load holidays for year ${currentYear}:`, error);
+        // Fallback: usar array vacío
+        this.holidays = [];
+        this.holidayStrings = [];
+      }
     });
   }
 
   /**
-   * Initialize Flatpickr configuration based on inputs
+   * Holiday date filter function for Material DatePicker
    */
-  private initializeFlatpickrConfig(): void {
-    const disableFunctions = [];
-    if (this.disabled) {
-      disableFunctions.push(() => true);
-    }
-    if (this.disableHolidays && this.holidays.length > 0) {
-      disableFunctions.push((date: Date) => {
-        const dateStr = this.formatDate(date);
-        return this.holidays.includes(dateStr);
-      });
-    }
-
-    this.flatpickrDefaults = {
-      mode: 'range',
-      dateFormat: this.dateFormat,
-      locale: Spanish,
-      allowInput: true,
-      clickOpens: true,
-      altInput: true,
-      altFormat: this.altFormat,
-      minDate: this.minDate,
-      maxDate: this.maxDate,
-      disable: disableFunctions,
-      // Configuración para navegación de meses mejorada
-      showMonths: 1, // Mostrar un mes
-      enableTime: false, // Sin selector de tiempo
-      nextArrow: '<svg class="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="m2.1 0 3.5 3.5-3.5 3.5-.7-.7 2.8-2.8L.7.7 2.1 0z"/></svg>',
-      prevArrow: '<svg class="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M5.6 0l.7.7-2.8 2.8 2.8 2.8-.7.7L2.1 3.5 5.6 0z"/></svg>',
-      // Permitir navegación libre por meses/años
-      disableMobile: true // Evitar el picker nativo en móviles
-    };
+  holidayFilter = (date: Date | null): boolean => {
+    if (!date || !this.disableHolidays) return true;
+    
+    const dateStr = this.formatDate(date);
+    const isHoliday = this.holidayStrings.includes(dateStr);
+    
+    // Return false to disable holidays, true to enable them
+    // Since we want holidays to be selectable but visually styled, we return true
+    return true;
   }
 
   /**
-   * Handle date changes from Flatpickr
+   * Holiday CSS class function for Material DatePicker
    */
-  handleDateChange(event: any): void {
-    console.log('📅 DateRangePicker: handleDateChange called with:', event);
+  holidayClass = (cellDate: Date, view: 'month' | 'year' | 'multi-year'): MatCalendarCellCssClasses => {
+    console.log(`🔍 holidayClass called - date: ${this.formatDate(cellDate)}, view: ${view}, disableHolidays: ${this.disableHolidays}, holidaysLength: ${this.holidayStrings.length}`);
     
-    let selectedDates: Date[] = [];
-    
-    // Extract dates based on event format
-    if (Array.isArray(event)) {
-      selectedDates = event;
-      console.log('📅 Array directo detectado');
-    } else if (event && event.selectedDates && Array.isArray(event.selectedDates)) {
-      selectedDates = event.selectedDates;
-      console.log('📅 Objeto angularx-flatpickr detectado');
-      console.log('📝 dateString:', event.dateString);
-    } else {
-      console.log('⚠️ Formato no reconocido, reseteando fechas');
-      this.resetDates();
-      return;
+    if (view === 'month' && this.disableHolidays && this.holidayStrings.length > 0) {
+      const dateStr = this.formatDate(cellDate);
+      const isHoliday = this.holidayStrings.includes(dateStr);
+      
+      console.log(`🎄 Checking date ${dateStr} - isHoliday: ${isHoliday}`);
+      
+      if (isHoliday) {
+        console.log(`🎄 Applying holiday class to: ${dateStr}`);
+        return 'holiday-cell';
+      }
     }
     
-    console.log('📅 Fechas extraídas:', selectedDates);
+    return '';
+  }
+
+  /**
+   * Handle start date selection change
+   */
+  onStartDateChange(date: Date | null): void {
+    console.log('📅 Start date changed:', date);
+    this.startDate = date;
+    this.updateDateRange();
+  }
+
+  /**
+   * Handle end date selection change
+   */
+  onEndDateChange(date: Date | null): void {
+    console.log('📅 End date changed:', date);
+    this.endDate = date;
+    this.updateDateRange();
+  }
+
+  /**
+   * Update the internal date range and emit events
+   */
+  private updateDateRange(): void {
+    const startDateStr = this.startDate ? this.formatDate(this.startDate) : '';
+    const endDateStr = this.endDate ? this.formatDate(this.endDate) : '';
+
+    this.currentValue = {
+      start: startDateStr,
+      end: endDateStr
+    };
+
+    console.log('📅 Date range updated:', this.currentValue);
+
+    // Emit events
+    this.dateRangeChange.emit(this.currentValue);
     
-    // Process extracted dates
-    if (selectedDates.length >= 2) {
-      // Complete range selected
-      this.selectedDateRange = selectedDates;
-      const startDate = this.formatDate(selectedDates[0]);
-      const endDate = this.formatDate(selectedDates[1]);
-      
-      this.currentValue = {
-        start: startDate,
-        end: endDate
-      };
-      
-      console.log('✅ Full range selected:', this.currentValue);
-      
-      // Emit events
-      this.dateRangeChange.emit(this.currentValue);
-      this.dateSelected.emit(selectedDates);
-      this.onChange(this.currentValue);
-      this.onTouched();
-      
-      // Force change detection
-      this.cdr.detectChanges();
-      
-    } else if (selectedDates.length === 1) {
-      // Only start date selected (incomplete range)
-      this.selectedDateRange = selectedDates;
-      const startDate = this.formatDate(selectedDates[0]);
-      
-      this.currentValue = {
-        start: startDate,
-        end: ''
-      };
-      
-      console.log('⚠️ Only start date selected:', this.currentValue);
-      
-      // Emit partial selection
-      this.dateRangeChange.emit(this.currentValue);
-      this.dateSelected.emit(selectedDates);
-      this.onChange(this.currentValue);
-      this.onTouched();
-      
-      this.cdr.detectChanges();
-    } else {
-      // Empty selection
-      this.resetDates();
-    }
+    const selectedDates = [this.startDate, this.endDate].filter(Boolean) as Date[];
+    this.dateSelected.emit(selectedDates);
+    
+    this.onChange(this.currentValue);
+    this.onTouched();
+
+    // Force change detection
+    this.cdr.detectChanges();
   }
 
   /**
    * Reset dates to empty state
    */
   private resetDates(): void {
-    this.selectedDateRange = [];
+    this.startDate = null;
+    this.endDate = null;
     this.currentValue = { start: '', end: '' };
     
     this.dateRangeChange.emit(this.currentValue);
@@ -415,7 +411,8 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
       const endDate = this.parseLocalDate(value.end);
       
       if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
-        this.selectedDateRange = [startDate, endDate];
+        this.startDate = startDate;
+        this.endDate = endDate;
         console.log('📅 writeValue: Updated with preset dates:', value);
         
         // Don't mark as touched when programmatically setting value (e.g., via preset buttons)
@@ -439,6 +436,100 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
 
   setDisabledState(isDisabled: boolean): void {
     this.disabled = isDisabled;
-    this.initializeFlatpickrConfig();
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Setup MutationObserver to watch for Material calendar DOM changes
+   */
+  private setupHolidayObserver(): void {
+    // Disconnect previous observer if exists
+    if (this.mutationObserver) {
+      this.mutationObserver.disconnect();
+    }
+
+    this.mutationObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const element = node as HTMLElement;
+              
+              // Look for Material calendar cells
+              const dayElements = element.querySelectorAll('.mat-calendar-body-cell');
+              if (dayElements.length > 0) {
+                console.log(`🎄 MutationObserver detected ${dayElements.length} Material calendar cells`);
+                this.styleMaterialHolidayElements(dayElements);
+              }
+              
+              // Check if the node itself is a calendar cell
+              if (element.classList && element.classList.contains('mat-calendar-body-cell')) {
+                console.log('🎄 MutationObserver detected single Material calendar cell');
+                this.styleMaterialHolidayElements([element]);
+              }
+            }
+          });
+        }
+      });
+    });
+
+    // Observe changes in the document body
+    this.mutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    console.log('🎄 MutationObserver setup for Material DatePicker');
+  }
+
+  /**
+   * Style Material calendar holiday elements
+   */
+  private styleMaterialHolidayElements(dayElements: NodeListOf<Element> | Element[]): void {
+    dayElements.forEach((dayElem: Element) => {
+      const htmlDayElem = dayElem as HTMLElement;
+      
+      // Material calendar stores date info differently
+      const cellContent = htmlDayElem.querySelector('.mat-calendar-body-cell-content');
+      if (cellContent && cellContent.textContent) {
+        const dayText = cellContent.textContent.trim();
+        const dayNumber = parseInt(dayText);
+        
+        if (dayNumber > 0 && dayNumber <= 31) {
+          // For Material calendar, we need to get the current month/year from context
+          const currentYear = new Date().getFullYear();
+          const currentMonth = new Date().getMonth();
+          
+          const date = new Date(currentYear, currentMonth, dayNumber);
+          const dateStr = this.formatDate(date);
+          const isHoliday = this.holidayStrings.includes(dateStr);
+          
+          if (isHoliday) {
+            console.log(`🎄 MutationObserver styling Material holiday: ${dateStr}`);
+            this.applyMaterialHolidayStyle(htmlDayElem, cellContent as HTMLElement, dateStr);
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Apply holiday styling to Material calendar elements
+   */
+  private applyMaterialHolidayStyle(cellElem: HTMLElement, contentElem: HTMLElement, dateStr: string): void {
+    // Add class to the cell
+    cellElem.classList.add('holiday-cell');
+    
+    // Apply styles directly to the content element with maximum priority
+    contentElem.style.setProperty('background-color', '#fef2f2', 'important'); // red-50
+    contentElem.style.setProperty('color', '#dc2626', 'important'); // red-600
+    contentElem.style.setProperty('font-weight', 'bold', 'important');
+    contentElem.style.setProperty('border', '2px solid #f87171', 'important'); // red-400
+    contentElem.style.setProperty('border-radius', '4px', 'important');
+    
+    // Add tooltip
+    cellElem.title = `🎄 Día Feriado: ${dateStr} - Seleccionable`;
+    
+    console.log(`✅ Applied Material holiday styles to ${dateStr}`);
   }
 }

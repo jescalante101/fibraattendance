@@ -16,6 +16,10 @@ import { GenericFilterComponent } from './generic-filter/generic-filter.componen
 import { ColumnManagerComponent } from './column-manager/column-manager.component';
 import { DateRangePickerComponent } from './components/date-range-picker/date-range-picker.component';
 import { TimePickerComponent } from './components/time-picker/time-picker.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @NgModule({
   declarations: [
@@ -36,6 +40,10 @@ import { TimePickerComponent } from './components/time-picker/time-picker.compon
     MatCardModule,
     MatAutocompleteModule,
     LucideAngularModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatNativeDateModule,
     FlatpickrModule.forRoot()
   ],
   exports: [
@@ -44,6 +52,10 @@ import { TimePickerComponent } from './components/time-picker/time-picker.compon
     ModalLoadingComponent,
     MatCardModule,
     MatAutocompleteModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatNativeDateModule,
     FioriPaginatorComponent,
     GenericFilterComponent,
     ColumnManagerComponent,

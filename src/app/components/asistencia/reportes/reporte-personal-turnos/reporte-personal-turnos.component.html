@@ -455,53 +455,66 @@
           </div>
         </div>
         
-        <!-- Métricas adicionales -->
-        <div class="lg:col-span-2 bg-gradient-to-r from-fiori-surface to-blue-50 p-6 rounded-lg border border-fiori-border">
-          <h3 class="text-lg font-semibold text-fiori-text mb-4">Resumen Ejecutivo</h3>
-          <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+        <!-- Resumen Ejecutivo distribuido como los gráficos -->
+        <!-- Primera columna: Distribución General con Porcentajes (como el gráfico de dona) -->
+        <div class="bg-gradient-to-r from-fiori-surface to-blue-50 p-6 rounded-lg border border-fiori-border">
+          <h3 class="text-lg font-semibold text-fiori-text mb-4 text-center">Distribución General</h3>
+          <p class="text-sm text-fiori-subtext text-center mb-4">Porcentajes del personal total</p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             
-            <div class="text-center p-4 bg-white rounded-lg">
-              <div class="text-2xl font-bold text-green-600">{{ totalConTurno }}</div>
-              <div class="text-sm text-fiori-subtext">Personal Con Turno</div>
-              <div class="text-xs text-green-600 mt-1">
+            <div class="text-center p-3 bg-white rounded-lg border">
+              <div class="text-xl font-bold text-green-600">{{ totalConTurno }}</div>
+              <div class="text-xs text-fiori-subtext">Personal Con Turno</div>
+              <div class="text-xs text-green-600 mt-1 font-medium">
                 {{ getPercentage(totalConTurno, totalConTurno + totalSinTurno) }}%
               </div>
             </div>
             
-            <div class="text-center p-4 bg-white rounded-lg">
-              <div class="text-2xl font-bold text-blue-600">{{ totalSinTurnoActivo }}</div>
-              <div class="text-sm text-fiori-subtext">Sin Turno (Activo)</div>
-              <div class="text-xs text-blue-600 mt-1">
+            <div class="text-center p-3 bg-white rounded-lg border">
+              <div class="text-xl font-bold text-blue-600">{{ totalSinTurnoActivo }}</div>
+              <div class="text-xs text-fiori-subtext">Sin Turno (Activo)</div>
+              <div class="text-xs text-blue-600 mt-1 font-medium">
                 {{ getPercentage(totalSinTurnoActivo, totalConTurno + totalSinTurno) }}%
               </div>
             </div>
 
-            <div class="text-center p-4 bg-white rounded-lg">
-              <div class="text-2xl font-bold text-red-600">{{ totalCesados }}</div>
-              <div class="text-sm text-fiori-subtext">Cesados</div>
-              <div class="text-xs text-red-600 mt-1">
+            <div class="text-center p-3 bg-white rounded-lg border">
+              <div class="text-xl font-bold text-red-600">{{ totalCesados }}</div>
+              <div class="text-xs text-fiori-subtext">Cesados</div>
+              <div class="text-xs text-red-600 mt-1 font-medium">
                 {{ getPercentage(totalCesados, totalConTurno + totalSinTurno) }}%
               </div>
             </div>
 
-            <div class="text-center p-4 bg-white rounded-lg">
-              <div class="text-2xl font-bold text-amber-600">{{ totalVacaciones }}</div>
-              <div class="text-sm text-fiori-subtext">De Vacaciones</div>
-              <div class="text-xs text-amber-600 mt-1">
+            <div class="text-center p-3 bg-white rounded-lg border">
+              <div class="text-xl font-bold text-amber-600">{{ totalVacaciones }}</div>
+              <div class="text-xs text-fiori-subtext">De Vacaciones</div>
+              <div class="text-xs text-amber-600 mt-1 font-medium">
                 {{ getPercentage(totalVacaciones, totalConTurno + totalSinTurno) }}%
               </div>
             </div>
             
-            <div class="text-center p-4 bg-white rounded-lg">
+          </div>
+        </div>
+        
+        <!-- Segunda columna: Métricas Generales (como el gráfico de barras) -->
+        <div class="bg-gradient-to-r from-fiori-surface to-purple-50 p-6 rounded-lg border border-fiori-border">
+          <h3 class="text-lg font-semibold text-fiori-text mb-4 text-center">Métricas Generales</h3>
+          <p class="text-sm text-fiori-subtext text-center mb-4">Información contextual</p>
+          
+          <div class="grid grid-cols-1 gap-4">
+            
+            <div class="text-center p-4 bg-white rounded-lg border">
               <div class="text-2xl font-bold text-fiori-primary">{{ totalConTurno + totalSinTurno }}</div>
               <div class="text-sm text-fiori-subtext">Personal Total</div>
-              <div class="text-xs text-fiori-subtext mt-1">100%</div>
+              <div class="text-xs text-fiori-subtext mt-1">Empleados registrados</div>
             </div>
             
-            <div class="text-center p-4 bg-white rounded-lg">
+            <div class="text-center p-4 bg-white rounded-lg border">
               <div class="text-2xl font-bold text-purple-600">{{ getUniqueAreasCount() }}</div>
               <div class="text-sm text-fiori-subtext">Áreas Activas</div>
-              <div class="text-xs text-fiori-subtext mt-1">Departamentos</div>
+              <div class="text-xs text-fiori-subtext mt-1">Departamentos involucrados</div>
             </div>
             
           </div>

@@ -232,8 +232,8 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       {
         headerName: 'Empleado',
         field: 'fullNameEmployee',
-        minWidth: 200,
-        maxWidth: 250,
+        minWidth: 350,
+        maxWidth: 400,
         cellRenderer: (params: any) => {
           const fullName = params.value || '-';
           const isTerminated = params.data?.isTerminated;
@@ -288,16 +288,33 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       {
         headerName: 'Área',
         field: 'areaName',
-        minWidth: 120,
-        maxWidth: 160,
+        minWidth: 200,
+        maxWidth: 250,
         cellRenderer: (params: any) => `<div class="text-sm text-fiori-text">${params.value || '-'}</div>`
       },
       {
         headerName: 'Centro de Costo',
         field: 'ccostDescription',
-        minWidth: 140,
+        minWidth: 180,
         maxWidth: 200,
         cellRenderer: (params: any) => `<div class="text-sm text-fiori-text">${params.value || '-'}</div>`
+      },
+      {
+        headerName: 'Creado Por',
+        field: 'createdBy',
+        minWidth: 150,
+        maxWidth: 180,
+        cellRenderer: (params: any) => {
+          const createdBy = params.value || 'Sistema';
+          return `<div class="flex items-center">
+            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+              <svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+            </div>
+            <span class="text-sm text-fiori-text">${createdBy}</span>
+          </div>`;
+        }
       }
     ];
     

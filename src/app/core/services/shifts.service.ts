@@ -141,7 +141,7 @@ export class ShiftsService{
 
     //get shift by assignedId weekly
     getShiftByAssignedIdWeekly(assignedId: number,shiftId:number): Observable<ShiftAssignment[]> {
-        return this.http.get<ShiftAssignment[]>(`${this.apiUrl}api/Shift/shiftWeekCurrent/${shiftId}?assignmentId=${assignedId}`);
+        return this.http.get<ShiftAssignment[]>(`${this.apiUrl}api/Shift/shiftWeekCurrent/${shiftId}@${assignedId}`);
     }
 
 

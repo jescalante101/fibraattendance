@@ -359,6 +359,17 @@
             Cargando...
           </div>
         </div>
+        
+        <!-- Leyenda de áreas para personal con turno -->
+        <div *ngIf="personalConTurno.length > 0 && areasConTurno.size > 0" class="mt-2">
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            <span class="text-green-700 font-medium mr-1">Por área:</span>
+            <div *ngFor="let area of areasConTurno | keyvalue" class="flex items-center gap-1 bg-green-50 px-2 py-1 rounded">
+              <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span class="text-green-700">{{ area.key }} ({{ area.value }})</span>
+            </div>
+          </div>
+        </div>
       </div>
       
       <!-- Contenido de la tabla -->

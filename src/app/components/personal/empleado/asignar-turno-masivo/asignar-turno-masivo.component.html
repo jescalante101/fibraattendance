@@ -266,15 +266,19 @@
                 
                 <!-- Leyenda y información adicional -->
                 <div class="flex items-center justify-between gap-4 py-2 px-3 bg-gray-50 rounded-lg text-xs">
-                  <!-- Leyenda de colores -->
+                  <!-- Leyenda de colores con contadores -->
                   <div class="flex items-center gap-4">
                     <div class="flex items-center gap-1.5">
-                      <div class="w-3 h-3 bg-red-100 rounded-full border border-red-200"></div>
-                      <span class="text-red-600 font-medium">Cesados</span>
+                      <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span class="text-green-600 font-medium">Activos ({{ getActivosCount() }})</span>
                     </div>
                     <div class="flex items-center gap-1.5">
-                      <div class="w-3 h-3 bg-amber-100 rounded-full border border-amber-200"></div>
-                      <span class="text-amber-600 font-medium">Vacaciones</span>
+                      <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <span class="text-red-600 font-medium">Cesados ({{ getCesadosCount() }})</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                      <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
+                      <span class="text-amber-600 font-medium">Vacaciones ({{ getVacacionesCount() }})</span>
                     </div>
                   </div>
                   

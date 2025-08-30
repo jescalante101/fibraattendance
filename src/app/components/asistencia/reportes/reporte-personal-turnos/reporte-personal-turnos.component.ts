@@ -16,6 +16,9 @@ import { ErrorHandlerService } from 'src/app/shared/services/error-handler.servi
 import { AuthService } from 'src/app/core/services/auth.service';
 import { AppUserService, SedeArea } from 'src/app/core/services/app-user.services';
 import { Employee } from 'src/app/components/personal/empleado/empleado/model/employeeDto';
+import { ModalService } from 'src/app/shared/modal/modal.service';
+import { ModalEmpleadoDetalleComponent } from './modal-empleado-detalle/modal-empleado-detalle.component';
+import { ModalEmpleadoSinTurnoDetalleComponent } from './modal-empleado-sin-turno-detalle/modal-empleado-sin-turno-detalle.component';
 
 // Extender Employee para incluir campos calculados
 interface EmployeeWithFormatted extends Employee {
@@ -98,6 +101,9 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   totalCesados = 0;
   totalVacaciones = 0;
   
+  // Conteos por área para personal con turno
+  areasConTurno: Map<string, number> = new Map();
+  
   // ============================================================================
   // AG-GRID CONFIGURACIÓN
   // ============================================================================
@@ -174,7 +180,8 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     private toastService: ToastService,
     private errorHandlerService: ErrorHandlerService,
     private authService: AuthService,
-    private appUserService: AppUserService
+    private appUserService: AppUserService,
+    private modalService: ModalService
   ) {
     this.setupGridColumns();
     this.initializeDateRange();
@@ -215,15 +222,18 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       {
         headerName: 'ID Personal',
         field: 'employeeId',
-        minWidth: 120,
-        maxWidth: 150,
-        cellRenderer: (params: any) => `<div class="flex items-center"><div class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">#${params.value}</div></div>`
+        minWidth: 100,
+        maxWidth: 120,
+        cellRenderer: (params: any) => `<div class="flex items-center"><div class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium cursor-pointer hover:bg-green-200 transition-colors" title="Click para ver detalles">#${params.value}</div></div>`,
+        onCellClicked: (params: any) => {
+          this.openEmployeeDetailModal(params.data);
+        }
       },
       {
         headerName: 'Empleado',
         field: 'fullNameEmployee',
-        minWidth: 250,
-        maxWidth: 300,
+        minWidth: 200,
+        maxWidth: 250,
         cellRenderer: (params: any) => {
           const fullName = params.value || '-';
           const isTerminated = params.data?.isTerminated;
@@ -242,15 +252,15 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       {
         headerName: 'Turno/Horario',
         field: 'scheduleName',
-        minWidth: 150,
-        maxWidth: 200,
+        minWidth: 130,
+        maxWidth: 170,
         cellRenderer: (params: any) => `<div class="flex items-center"><div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div><span class="font-medium text-blue-700">${params.value || 'Sin nombre'}</span></div>`
       },
       {
         headerName: 'Fecha Inicio',
         field: 'startDate',
-        minWidth: 120,
-        maxWidth: 150,
+        minWidth: 100,
+        maxWidth: 120,
         cellRenderer: (params: any) => {
           if (!params.value) return '-';
           const date = new Date(params.value);
@@ -260,8 +270,8 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       {
         headerName: 'Fecha Fin',
         field: 'endDate',
-        minWidth: 120,
-        maxWidth: 150,
+        minWidth: 100,
+        maxWidth: 120,
         cellRenderer: (params: any) => {
           if (!params.value) return '<span class="text-fiori-info font-medium">Indefinido</span>';
           const date = new Date(params.value);
@@ -271,14 +281,21 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       {
         headerName: 'Sede',
         field: 'locationName',
-        minWidth: 120,
-        maxWidth: 180,
+        minWidth: 100,
+        maxWidth: 140,
         cellRenderer: (params: any) => `<div class="text-sm text-fiori-text">${params.value || '-'}</div>`
       },
       {
         headerName: 'Área',
         field: 'areaName',
-        minWidth: 150,
+        minWidth: 120,
+        maxWidth: 160,
+        cellRenderer: (params: any) => `<div class="text-sm text-fiori-text">${params.value || '-'}</div>`
+      },
+      {
+        headerName: 'Centro de Costo',
+        field: 'ccostDescription',
+        minWidth: 140,
         maxWidth: 200,
         cellRenderer: (params: any) => `<div class="text-sm text-fiori-text">${params.value || '-'}</div>`
       }
@@ -290,7 +307,10 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
         field: 'personalId',
         minWidth: 120,
         maxWidth: 150,
-        cellRenderer: (params: any) => `<div class="flex items-center"><div class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">#${params.value}</div></div>`
+        cellRenderer: (params: any) => `<div class="flex items-center"><div class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium cursor-pointer hover:bg-red-200 transition-colors" title="Click para ver detalles">#${params.value}</div></div>`,
+        onCellClicked: (params: any) => {
+          this.openEmployeeSinTurnoDetailModal(params.data);
+        }
       },
       {
         headerName: 'Estado',
@@ -447,9 +467,17 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
                         isOnVacation: this.isEmployeeOnVacation(emp.employeeVacationStart, emp.employeeVacationEnd)
                     }));
                     this.totalConTurno = response.data.totalCount || 0;
+                    
+                    // Calcular conteos por área para personal con turno
+                    this.areasConTurno.clear();
+                    this.personalConTurno.forEach(emp => {
+                        const area = emp.areaName || 'Sin Área';
+                        this.areasConTurno.set(area, (this.areasConTurno.get(area) || 0) + 1);
+                    });
                 } else {
                     this.personalConTurno = [];
                     this.totalConTurno = 0;
+                    this.areasConTurno.clear();
                 }
             },
             error: (error) => {
@@ -457,6 +485,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
                 this.errorHandlerService.handleLoadError(error, 'personal con turno');
                 this.personalConTurno = [];
                 this.totalConTurno = 0;
+                this.areasConTurno.clear();
             }
         })
     );
@@ -584,6 +613,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     this.totalSinTurnoActivo = 0;
     this.totalCesados = 0;
     this.totalVacaciones = 0;
+    this.areasConTurno.clear();
     this.hasSearched = false;
     
     this.pageConTurno = 1;
@@ -804,11 +834,11 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       wsConTurno['!cols'] = [ { wch: 12 }, { wch: 35 }, { wch: 12 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 25 } ];
       XLSX.utils.book_append_sheet(workbook, wsConTurno, 'Personal Con Turno');
       
-      // Hoja 2: Personal SIN Turno
+      // Hoja 2: Personal Pendiente de Asignación
       const dataSinTurno = sinTurno.map(emp => ({
         'ID Personal': emp.personalId,
         'Nombre Completo': emp.fullNameFormatted || '',
-        'Estado': emp.isTerminated ? 'Cesado' : emp.isOnVacation ? 'Vacaciones' : 'Activo',
+        'Estado': emp.isTerminated ? 'Cesado' : emp.isOnVacation ? 'Vacaciones' : 'Pendiente Asignación',
         'Sede': emp.categoriaAuxiliarDescripcion || '',
         'Área': emp.areaDescripcion || '',
         'Centro de Costo': emp.ccostoDescripcion || ''
@@ -834,8 +864,8 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
         }
       });
 
-      wsSinTurno['!cols'] = [ { wch: 12 }, { wch: 35 }, { wch: 12 }, { wch: 25 }, { wch: 25 }, { wch: 30 } ];
-      XLSX.utils.book_append_sheet(workbook, wsSinTurno, 'Personal Sin Turno');
+      wsSinTurno['!cols'] = [ { wch: 12 }, { wch: 35 }, { wch: 18 }, { wch: 25 }, { wch: 25 }, { wch: 30 } ];
+      XLSX.utils.book_append_sheet(workbook, wsSinTurno, 'Personal Pendiente Asignación');
       
       const fileName = `Reporte_Personal_Turnos_${new Date().toISOString().split('T')[0]}.xlsx`;
       XLSX.writeFile(workbook, fileName);
@@ -900,11 +930,11 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       
       const finalY = (doc as any).lastAutoTable.finalY + 20;
       doc.setFontSize(12);
-      doc.text(`Personal SIN Turno (${totalSinTurno})`, 15, finalY);
+      doc.text(`Personal Pendiente de Asignación (${totalSinTurno})`, 15, finalY);
       const dataSinTurno = sinTurno.map(emp => [
         emp.personalId,
         emp.fullNameFormatted || '',
-        emp.isTerminated ? 'Cesado' : emp.isOnVacation ? 'Vacaciones' : 'Activo',
+        emp.isTerminated ? 'Cesado' : emp.isOnVacation ? 'Vacaciones' : 'Pendiente Asignación',
         emp.categoriaAuxiliarDescripcion || '',
         emp.areaDescripcion || '',
         emp.ccostoDescripcion || ''
@@ -915,7 +945,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
         head: [['ID', 'Nombre Completo', 'Estado', 'Sede', 'Área', 'Centro de Costo']],
         body: dataSinTurno,
         styles: { fontSize: 7 },
-        headStyles: { fillColor: [239, 68, 68] },
+        headStyles: { fillColor: [71, 85, 105] },
         didParseCell: function(data) {
           // Aplicar colores según el estado del empleado
           if (data.row.index >= 0) {
@@ -943,6 +973,12 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     if (!fechaCese) return false;
     try {
       const ceaseDate = new Date(fechaCese);
+      
+      // Verificar si la fecha es 1/1/1900 (fecha por defecto del sistema que indica que NO está cesado)
+      if (ceaseDate.getFullYear() === 1900 && ceaseDate.getMonth() === 0 && ceaseDate.getDate() === 1) {
+        return false;
+      }
+      
       const currentDate = new Date();
       const startOfCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
       return ceaseDate > startOfCurrentMonth;
@@ -1149,5 +1185,51 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     this.personalConTurno.forEach(emp => { if (emp.areaName) areas.add(emp.areaName); });
     this.personalSinTurno.forEach(emp => { if (emp.areaDescripcion) areas.add(emp.areaDescripcion); });
     return areas.size;
+  }
+
+  // ============================================================================
+  // MODAL EMPLOYEE DETAILS
+  // ============================================================================
+
+  openEmployeeDetailModal(employee: EmployeeScheduleAssignmentWithStatus): void {
+    console.log('🔍 Abriendo modal de detalles para empleado con turno:', employee);
+    
+    this.modalService.open({
+      title: `Detalles de ${employee.fullNameEmployee || 'Empleado'}`,
+      componentType: ModalEmpleadoDetalleComponent,
+      componentData: {
+        employeeData: employee
+      },
+      width: '1000px',
+      height: 'auto'
+    }).then((result) => {
+      console.log('Modal cerrado con resultado:', result);
+    }).catch((error) => {
+      console.error('Error al abrir modal:', error);
+      this.errorHandlerService.handleGenericError(error, 'Error al abrir detalles del empleado');
+    });
+  }
+
+  openEmployeeSinTurnoDetailModal(employee: EmployeeWithFormatted): void {
+    console.log('🔍 Abriendo modal de detalles para empleado sin turno:', employee);
+    
+    const fullName = employee.fullNameFormatted || 
+                    `${employee.apellidoPaterno || ''} ${employee.apellidoMaterno || ''}, ${employee.nombres || ''}`.replace(/,\s*$/, '').replace(/^\s*,/, '').trim() ||
+                    'Empleado';
+    
+    this.modalService.open({
+      title: `Detalles de ${fullName}`,
+      componentType: ModalEmpleadoSinTurnoDetalleComponent,
+      componentData: {
+        employeeData: employee
+      },
+      width: '1000px',
+      height: 'auto'
+    }).then((result) => {
+      console.log('Modal sin turno cerrado con resultado:', result);
+    }).catch((error) => {
+      console.error('Error al abrir modal sin turno:', error);
+      this.errorHandlerService.handleGenericError(error, 'Error al abrir detalles del empleado');
+    });
   }
 }

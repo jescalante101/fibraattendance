@@ -1,0 +1,97 @@
+/* Estilos específicos para el modal de detalle del empleado */
+
+/* Animaciones suaves para los tabs */
+.tab-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilo para las tarjetas de horarios */
+.schedule-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.schedule-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Indicadores de estado personalizados */
+.status-indicator {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.status-indicator::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.status-indicator.active::before {
+  background-color: #10b981;
+}
+
+.status-indicator.vacation::before {
+  background-color: #f59e0b;
+}
+
+.status-indicator.terminated::before {
+  background-color: #ef4444;
+}
+
+/* Estilos para información destacada */
+.highlight-info {
+  background: linear-gradient(135deg, #f0f9f4 0%, #e6fffa 100%);
+  border-left: 4px solid #10b981;
+}
+
+.info-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.info-card:hover {
+  border-color: #cbd5e1;
+}
+
+/* Responsividad mejorada */
+@media (max-width: 768px) {
+  .tab-content {
+    padding: 1rem;
+  }
+  
+  .grid-cols-1.md\\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Estilos para loading states */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

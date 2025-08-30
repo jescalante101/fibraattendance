@@ -383,6 +383,12 @@ export class AsignarTurnoMasivoComponent implements OnInit {
     
     try {
       const ceaseDate = new Date(fechaCese);
+      
+      // Verificar si la fecha es 1/1/1900 (fecha por defecto del sistema que indica que NO está cesado)
+      if (ceaseDate.getFullYear() === 1900 && ceaseDate.getMonth() === 0 && ceaseDate.getDate() === 1) {
+        return false;
+      }
+      
       const currentDate = new Date();
       const startOfCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
       
@@ -768,6 +774,23 @@ export class AsignarTurnoMasivoComponent implements OnInit {
   // Método para obtener el número de seleccionados
   getSelectedCount(): number {
     return this.seleccionados.size;
+  }
+
+  // Métodos para contar estados de empleados
+  getActivosCount(): number {
+    return this.personalFiltrado.filter(emp => !emp.isTerminated && !emp.isOnVacation).length;
+  }
+
+  getCesadosCount(): number {
+    return this.personalFiltrado.filter(emp => emp.isTerminated).length;
+  }
+
+  getVacacionesCount(): number {
+    return this.personalFiltrado.filter(emp => emp.isOnVacation && !emp.isTerminated).length;
+  }
+
+  getTotalCount(): number {
+    return this.personalFiltrado.length;
   }
 
   // Método para obtener el rango de fechas seleccionado formateado
@@ -1252,6 +1275,24 @@ export class AsignarTurnoMasivoComponent implements OnInit {
         }
       },
       {
+        field: 'status',
+        headerName: 'Estado',
+        width: 100,
+        pinned: 'left',
+        cellRenderer: (params: any) => {
+          const isTerminated = params.data?.isTerminated;
+          const isOnVacation = params.data?.isOnVacation;
+
+          if (isTerminated) {
+            return `<div class="flex items-center justify-center"><div class="w-4 h-4 bg-red-500 rounded-full" title="Cesado"></div></div>`;
+          } else if (isOnVacation) {
+            return `<div class="flex items-center justify-center"><div class="w-4 h-4 bg-amber-500 rounded-full" title="De Vacaciones"></div></div>`;
+          } else {
+            return `<div class="flex items-center justify-center"><div class="w-4 h-4 bg-green-500 rounded-full" title="Activo"></div></div>`;
+          }
+        }
+      },
+      {
         field: 'nroDoc',
         headerName: 'Documento',
         width: 120,
@@ -1295,31 +1336,17 @@ export class AsignarTurnoMasivoComponent implements OnInit {
             opacity = 'opacity-75';
           }
           
-          let statusBadges = '';
+          // Crear tooltip con información de estado
+          let tooltipText = fullName;
           
-          // Terminated badge (highest priority)
           if (isTerminated) {
             const ceaseDate = fechaCese ? new Date(fechaCese).toLocaleDateString('es-ES') : '';
-            statusBadges = `
-              <div class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                </svg>
-                Cesado ${ceaseDate}
-              </div>`;
-          } 
-          // Vacation badge (if not terminated)
-          else if (isOnVacation) {
+            tooltipText = `${fullName} - CESADO ${ceaseDate ? `(${ceaseDate})` : ''}`;
+          } else if (isOnVacation) {
             const vacationStart = vacacionesFechaInicio ? new Date(vacacionesFechaInicio).toLocaleDateString('es-ES') : '';
             const vacationEnd = vacacionesFechaFin ? new Date(vacacionesFechaFin).toLocaleDateString('es-ES') : '';
             const vacationPeriod = vacationStart && vacationEnd ? `${vacationStart} - ${vacationEnd}` : '';
-            statusBadges = `
-              <div class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-                </svg>
-                Vacaciones ${vacationPeriod}
-              </div>`;
+            tooltipText = `${fullName} - DE VACACIONES ${vacationPeriod ? `(${vacationPeriod})` : ''}`;
           }
           
           return `<div class="flex items-center py-1 ${opacity}">
@@ -1329,8 +1356,7 @@ export class AsignarTurnoMasivoComponent implements OnInit {
               </svg>
             </div>
             <div class="flex-1">
-              <div class="text-sm font-medium ${textColor}" title="${fullName}">${fullName}</div>
-              ${statusBadges}
+              <div class="text-sm font-medium ${textColor}" title="${tooltipText}">${fullName}</div>
             </div>
           </div>`;
         }

@@ -77,8 +77,20 @@ export class ModalEmpleadoDetalleComponent implements OnInit {
       return;
     }
 
-    // Cargar la semana actual
-    this.loadCurrentWeek();
+    // Usar las fechas de la asignación del empleado
+    const startDate = this.employee.startDate ? new Date(this.employee.startDate) : new Date();
+    const endDate = this.employee.endDate ? new Date(this.employee.endDate) : new Date(startDate.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 días después si no hay fecha fin
+    
+    console.log('📅 Usando fechas de asignación del empleado:', {
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+      employeeData: {
+        startDate: this.employee.startDate,
+        endDate: this.employee.endDate
+      }
+    });
+
+    this.loadScheduleForRange(startDate, endDate);
   }
 
   private getStartOfWeek(date: Date): Date {
@@ -165,6 +177,16 @@ export class ModalEmpleadoDetalleComponent implements OnInit {
       '#84cc16'  // lima
     ];
 
+    // Encontrar las fechas mínima y máxima para centrar el calendario
+    const dates = this.weeklySchedule.schedule.map(day => new Date(day.date));
+    const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
+    const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
+    
+    console.log('📅 Rango de fechas del calendario:', {
+      minDate: minDate.toISOString().split('T')[0],
+      maxDate: maxDate.toISOString().split('T')[0]
+    });
+
     this.weeklySchedule.schedule.forEach((day: ScheduleDayDto, index: number) => {
       // Color especial para excepciones
       const backgroundColor = day.isException ? '#ef4444' : colors[index % colors.length];
@@ -195,10 +217,28 @@ export class ModalEmpleadoDetalleComponent implements OnInit {
 
     console.log('📅 Eventos generados para el calendario:', events);
 
+    // Actualizar opciones del calendario con la fecha inicial centrada y el rango visible
     this.calendarOptions = {
       ...this.calendarOptions,
-      events: events
+      events: events,
+      initialDate: minDate.toISOString().split('T')[0], // Centrar en la primera fecha
+      validRange: {
+        start: minDate.toISOString().split('T')[0],
+        end: new Date(maxDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] // +1 día para incluir la última fecha
+      },
+      // Ajustar vista según el rango de días
+      initialView: this.getOptimalView(minDate, maxDate)
     };
+  }
+
+  private getOptimalView(startDate: Date, endDate: Date): string {
+    const diffInDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    
+    console.log('📊 Diferencia en días:', diffInDays);
+    
+    // Si es menos de 8 días, mostrar vista semanal
+    // Si es más, mostrar vista mensual
+    return diffInDays <= 7 ? 'dayGridWeek' : 'dayGridMonth';
   }
 
   private buildEventDescription(day: ScheduleDayDto): string {
@@ -322,7 +362,7 @@ export class ModalEmpleadoDetalleComponent implements OnInit {
       error: (error) => {
         this.loadingSchedule = false;
         console.error('❌ Error cargando horario:', error);
-        this.errorHandlerService.handleGenericError(error, 'No se pudo cargar el horario para el rango de fechas especificado');
+        this.errorHandlerService.handleLoadError(error, 'Lectura de horario');
       }
     });
   }

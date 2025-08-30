@@ -167,7 +167,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   // TABS Y GRÁFICOS
   // ============================================================================
   
-  activeTab: 'tabular' | 'grafica' = 'tabular';
+  activeTab: 'sin-turno' | 'con-turno' | 'grafica' = 'sin-turno';
   donutChart?: Chart;
   barChart?: Chart;
   
@@ -1049,7 +1049,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   // TABS MANAGEMENT
   // ============================================================================
   
-  setActiveTab(tab: 'tabular' | 'grafica'): void {
+  setActiveTab(tab: 'sin-turno' | 'con-turno' | 'grafica'): void {
     this.activeTab = tab;
     if (tab === 'grafica') {
       setTimeout(() => { this.createCharts(); }, 100);
@@ -1223,7 +1223,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       console.log('Modal cerrado con resultado:', result);
     }).catch((error) => {
       console.error('Error al abrir modal:', error);
-      this.errorHandlerService.handleGenericError(error, 'Error al abrir detalles del empleado');
+      //this.errorHandlerService.handleGenericError(error, 'Error al abrir detalles del empleado');
     });
   }
 
@@ -1246,7 +1246,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       console.log('Modal sin turno cerrado con resultado:', result);
     }).catch((error) => {
       console.error('Error al abrir modal sin turno:', error);
-      this.errorHandlerService.handleGenericError(error, 'Error al abrir detalles del empleado');
+      ///this.errorHandlerService.handleGenericError(error, 'Error al abrir detalles del empleado');
     });
   }
 }

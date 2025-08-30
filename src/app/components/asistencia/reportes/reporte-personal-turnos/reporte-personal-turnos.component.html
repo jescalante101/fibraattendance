@@ -205,19 +205,44 @@
       <li class="me-2" role="presentation">
         <button 
           class="inline-block p-4 border-b-2 rounded-t-lg transition-colors"
-          [class.border-fiori-primary]="activeTab === 'tabular'"
-          [class.text-fiori-primary]="activeTab === 'tabular'"
-          [class.bg-blue-50]="activeTab === 'tabular'"
-          [class.border-transparent]="activeTab !== 'tabular'"
-          [class.text-gray-500]="activeTab !== 'tabular'"
-          [class.hover:text-gray-600]="activeTab !== 'tabular'"
-          [class.hover:border-gray-300]="activeTab !== 'tabular'"
-          (click)="setActiveTab('tabular')"
+          [class.border-red-500]="activeTab === 'sin-turno'"
+          [class.text-red-600]="activeTab === 'sin-turno'"
+          [class.bg-red-50]="activeTab === 'sin-turno'"
+          [class.border-transparent]="activeTab !== 'sin-turno'"
+          [class.text-gray-500]="activeTab !== 'sin-turno'"
+          [class.hover:text-gray-600]="activeTab !== 'sin-turno'"
+          [class.hover:border-gray-300]="activeTab !== 'sin-turno'"
+          (click)="setActiveTab('sin-turno')"
           type="button" 
           role="tab">
           <div class="flex items-center gap-2">
-            <lucide-icon name="table-2" size="16"></lucide-icon>
-            Vista Tabular
+            <lucide-icon name="user-x" size="16"></lucide-icon>
+            Personal Sin Turno
+            <span class="ml-1 px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">
+              {{ totalSinTurno }}
+            </span>
+          </div>
+        </button>
+      </li>
+      <li class="me-2" role="presentation">
+        <button 
+          class="inline-block p-4 border-b-2 rounded-t-lg transition-colors"
+          [class.border-green-500]="activeTab === 'con-turno'"
+          [class.text-green-600]="activeTab === 'con-turno'"
+          [class.bg-green-50]="activeTab === 'con-turno'"
+          [class.border-transparent]="activeTab !== 'con-turno'"
+          [class.text-gray-500]="activeTab !== 'con-turno'"
+          [class.hover:text-gray-600]="activeTab !== 'con-turno'"
+          [class.hover:border-gray-300]="activeTab !== 'con-turno'"
+          (click)="setActiveTab('con-turno')"
+          type="button" 
+          role="tab">
+          <div class="flex items-center gap-2">
+            <lucide-icon name="user-check" size="16"></lucide-icon>
+            Personal Con Turno
+            <span class="ml-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+              {{ totalConTurno }}
+            </span>
           </div>
         </button>
       </li>
@@ -246,190 +271,186 @@
   <!-- Contenido de los tabs -->
   <div class="tab-content">
     
-    <!-- Tab 1: Vista Tabular -->
-    <div *ngIf="activeTab === 'tabular'" class="fade-in">
-      <!-- Vista dividida - Dos secciones -->
-  <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-    
-    <!-- Sección izquierda: Personal Pendiente de Asignación -->
-    <div class="bg-gradient-to-br from-slate-50 to-blue-50 border border-slate-200 rounded-lg overflow-hidden shadow-sm">
-      <!-- Header de la sección -->
-      <div class="px-4 py-3 bg-gradient-to-r from-slate-100 to-blue-100 border-b border-slate-200">
-        <div class="flex items-center justify-between">
-          <h3 class="flex items-center text-lg font-semibold text-slate-800">
-            <lucide-icon name="users" class="w-5 h-5 mr-2"></lucide-icon>
-            Personal Pendiente de Asignación
-            <span class="ml-2 px-2 py-1 bg-slate-200 text-slate-800 text-sm rounded-full">
-              {{ totalSinTurno }}
-            </span>
-          </h3>
+    <!-- Tab 1: Personal Sin Turno -->
+    <div *ngIf="activeTab === 'sin-turno'" class="fade-in">
+      <div class="bg-gradient-to-br from-red-50 to-orange-50 border border-red-200 rounded-lg overflow-hidden shadow-sm">
+        <!-- Header de la sección -->
+        <div class="px-6 py-4 bg-gradient-to-r from-red-100 to-orange-100 border-b border-red-200">
+          <div class="flex items-center justify-between">
+            <h3 class="flex items-center text-xl font-semibold text-red-800">
+              <lucide-icon name="user-x" class="w-6 h-6 mr-3"></lucide-icon>
+              Personal Pendiente de Asignación
+              <span class="ml-3 px-3 py-1 bg-red-200 text-red-800 text-sm rounded-full">
+                {{ totalSinTurno }}
+              </span>
+            </h3>
+            
+            <div *ngIf="loadingSinTurno" class="flex items-center text-sm text-red-600">
+              <lucide-icon name="loader-2" class="w-5 h-5 mr-2 animate-spin"></lucide-icon>
+              Cargando...
+            </div>
+          </div>
           
-          <div *ngIf="loadingSinTurno" class="flex items-center text-sm text-slate-600">
-            <lucide-icon name="loader-2" class="w-4 h-4 mr-1 animate-spin"></lucide-icon>
-            Cargando...
+          <!-- Leyenda de estados -->
+          <div *ngIf="personalSinTurno.length > 0" class="mt-3 flex items-center gap-6 text-sm">
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-4 bg-blue-500 rounded-full"></div>
+              <span class="text-red-700 font-medium">Pendiente ({{ totalSinTurnoActivo }})</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-4 bg-red-500 rounded-full"></div>
+              <span class="text-red-700 font-medium">Cesados ({{ totalCesados }})</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-4 bg-amber-500 rounded-full"></div>
+              <span class="text-red-700 font-medium">Vacaciones ({{ totalVacaciones }})</span>
+            </div>
           </div>
         </div>
         
-        <!-- Leyenda de estados -->
-        <div *ngIf="personalSinTurno.length > 0" class="mt-2 flex items-center gap-4 text-xs">
-          <div class="flex items-center gap-1">
-            <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-            <span class="text-slate-700">Pendiente ({{ totalSinTurnoActivo }})</span>
+        <!-- Contenido de la tabla -->
+        <div class="p-6">
+          <!-- AG-Grid para personal SIN turno -->
+          <div *ngIf="personalSinTurno.length > 0" class="ag-theme-quartz h-[500px] mb-6">
+            <ag-grid-angular
+              #gridSinTurno
+              [columnDefs]="columnsSinTurno"
+              [rowData]="personalSinTurno"
+              [gridOptions]="gridOptionsSinTurno"
+              (gridReady)="onGridReadySinTurno($event)"
+              class="w-full h-full">
+            </ag-grid-angular>
           </div>
-          <div class="flex items-center gap-1">
-            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span class="text-slate-700">Cesados ({{ totalCesados }})</span>
+          
+          <!-- Estado vacío -->
+          <div *ngIf="!loadingSinTurno && personalSinTurno.length === 0" 
+               class="text-center py-16">
+            <!-- Mensaje inicial: No se ha buscado aún -->
+            <div *ngIf="!hasSearched">
+              <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <lucide-icon name="filter" class="w-10 h-10 text-blue-400"></lucide-icon>
+              </div>
+              <h4 class="text-xl font-medium text-gray-800 mb-3">Selecciona Filtros</h4>
+              <p class="text-sm text-gray-600 mb-6">Para generar el reporte, debes seleccionar un rango de fechas</p>
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mx-8 text-sm text-blue-700">
+                <div class="flex items-center justify-center gap-2">
+                  <lucide-icon name="info" class="w-5 h-5"></lucide-icon>
+                  <span>El rango de fechas es obligatorio para consultar los datos</span>
+                </div>
+              </div>
+            </div>
+            <!-- Mensaje después de buscar: Sin datos -->
+            <div *ngIf="hasSearched">
+              <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <lucide-icon name="user-check" class="w-10 h-10 text-green-400"></lucide-icon>
+              </div>
+              <h4 class="text-xl font-medium text-green-800 mb-3">¡Excelente!</h4>
+              <p class="text-sm text-green-600 mb-6">Todo el personal tiene turnos asignados</p>
+            </div>
           </div>
-          <div class="flex items-center gap-1">
-            <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
-            <span class="text-slate-700">Vacaciones ({{ totalVacaciones }})</span>
+          
+          <!-- Paginador para personal SIN turno -->
+          <div *ngIf="personalSinTurno.length > 0">
+            <app-fiori-paginator
+              [totalRecords]="totalSinTurno"
+              [pageSize]="pageSizeSinTurno"
+              [pageNumber]="pageSinTurno"
+              [loading]="loadingSinTurno"
+              (pageChange)="onPageChangeSinTurno($event)">
+            </app-fiori-paginator>
           </div>
         </div>
       </div>
-      
-      <!-- Contenido de la tabla -->
-      <div class="p-4">
-        <!-- AG-Grid para personal SIN turno -->
-        <div *ngIf="personalSinTurno.length > 0" class="ag-theme-quartz h-96 mb-4">
-          <ag-grid-angular
-            #gridSinTurno
-            [columnDefs]="columnsSinTurno"
-            [rowData]="personalSinTurno"
-            [gridOptions]="gridOptionsSinTurno"
-            (gridReady)="onGridReadySinTurno($event)"
-            class="w-full h-full">
-          </ag-grid-angular>
-        </div>
-        
-        <!-- Estado vacío -->
-        <div *ngIf="!loadingSinTurno && personalSinTurno.length === 0" 
-             class="text-center py-12">
-          <!-- Mensaje inicial: No se ha buscado aún -->
-          <div *ngIf="!hasSearched">
-            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <lucide-icon name="filter" class="w-8 h-8 text-blue-400"></lucide-icon>
+    </div>
+
+    <!-- Tab 2: Personal Con Turno -->
+    <div *ngIf="activeTab === 'con-turno'" class="fade-in">
+      <div class="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg overflow-hidden shadow-sm">
+        <!-- Header de la sección -->
+        <div class="px-6 py-4 bg-gradient-to-r from-green-100 to-emerald-100 border-b border-green-200">
+          <div class="flex items-center justify-between">
+            <h3 class="flex items-center text-xl font-semibold text-green-800">
+              <lucide-icon name="user-check" class="w-6 h-6 mr-3"></lucide-icon>
+              Personal Con Turno
+              <span class="ml-3 px-3 py-1 bg-green-200 text-green-800 text-sm rounded-full">
+                {{ totalConTurno }}
+              </span>
+            </h3>
+            
+            <div *ngIf="loadingConTurno" class="flex items-center text-sm text-green-600">
+              <lucide-icon name="loader-2" class="w-5 h-5 mr-2 animate-spin"></lucide-icon>
+              Cargando...
             </div>
-            <h4 class="text-lg font-medium text-gray-800 mb-2">Selecciona Filtros</h4>
-            <p class="text-sm text-gray-600 mb-4">Para generar el reporte, debes seleccionar un rango de fechas</p>
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mx-4 text-sm text-blue-700">
-              <div class="flex items-center justify-center gap-2">
-                <lucide-icon name="info" class="w-4 h-4"></lucide-icon>
-                <span>El rango de fechas es obligatorio para consultar los datos</span>
+          </div>
+          
+          <!-- Leyenda de áreas para personal con turno -->
+          <div *ngIf="personalConTurno.length > 0 && areasConTurno.size > 0" class="mt-3">
+            <div class="flex flex-wrap items-center gap-3 text-sm">
+              <span class="text-green-700 font-semibold mr-2">Por área:</span>
+              <div *ngFor="let area of areasConTurno | keyvalue" class="flex items-center gap-2 bg-green-50 px-3 py-1 rounded-full">
+                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span class="text-green-700 font-medium">{{ area.key }} ({{ area.value }})</span>
               </div>
             </div>
           </div>
-          <!-- Mensaje después de buscar: Sin datos -->
-          <div *ngIf="hasSearched">
-            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <lucide-icon name="user-check" class="w-8 h-8 text-red-400"></lucide-icon>
-            </div>
-            <h4 class="text-lg font-medium text-red-800 mb-2">¡Excelente!</h4>
-            <p class="text-sm text-red-600 mb-4">Todo el personal tiene turnos asignados</p>
-          </div>
         </div>
         
-        <!-- Paginador para personal SIN turno -->
-        <div *ngIf="personalSinTurno.length > 0">
-          <app-fiori-paginator
-            [totalRecords]="totalSinTurno"
-            [pageSize]="pageSizeSinTurno"
-            [pageNumber]="pageSinTurno"
-            [loading]="loadingSinTurno"
-            (pageChange)="onPageChangeSinTurno($event)">
-          </app-fiori-paginator>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Sección derecha: Personal CON Turno -->
-    <div class="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg overflow-hidden shadow-sm">
-      <!-- Header de la sección -->
-      <div class="px-4 py-3 bg-gradient-to-r from-green-100 to-emerald-100 border-b border-green-200">
-        <div class="flex items-center justify-between">
-          <h3 class="flex items-center text-lg font-semibold text-green-800">
-            <lucide-icon name="user-check" class="w-5 h-5 mr-2"></lucide-icon>
-            Personal Con Turno
-            <span class="ml-2 px-2 py-1 bg-green-200 text-green-800 text-sm rounded-full">
-              {{ totalConTurno }}
-            </span>
-          </h3>
+        <!-- Contenido de la tabla -->
+        <div class="p-6">
+          <!-- AG-Grid para personal CON turno -->
+          <div *ngIf="personalConTurno.length > 0" class="ag-theme-quartz h-[500px] mb-6">
+            <ag-grid-angular
+              #gridConTurno
+              [columnDefs]="columnsConTurno"
+              [rowData]="personalConTurno"
+              [gridOptions]="gridOptionsConTurno"
+              (gridReady)="onGridReadyConTurno($event)"
+              class="w-full h-full">
+            </ag-grid-angular>
+          </div>
           
-          <div *ngIf="loadingConTurno" class="flex items-center text-sm text-green-600">
-            <lucide-icon name="loader-2" class="w-4 h-4 mr-1 animate-spin"></lucide-icon>
-            Cargando...
-          </div>
-        </div>
-        
-        <!-- Leyenda de áreas para personal con turno -->
-        <div *ngIf="personalConTurno.length > 0 && areasConTurno.size > 0" class="mt-2">
-          <div class="flex flex-wrap items-center gap-2 text-xs">
-            <span class="text-green-700 font-medium mr-1">Por área:</span>
-            <div *ngFor="let area of areasConTurno | keyvalue" class="flex items-center gap-1 bg-green-50 px-2 py-1 rounded">
-              <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span class="text-green-700">{{ area.key }} ({{ area.value }})</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Contenido de la tabla -->
-      <div class="p-4">
-        <!-- AG-Grid para personal CON turno -->
-        <div *ngIf="personalConTurno.length > 0" class="ag-theme-quartz h-96 mb-4">
-          <ag-grid-angular
-            #gridConTurno
-            [columnDefs]="columnsConTurno"
-            [rowData]="personalConTurno"
-            [gridOptions]="gridOptionsConTurno"
-            (gridReady)="onGridReadyConTurno($event)"
-            class="w-full h-full">
-          </ag-grid-angular>
-        </div>
-        
-        <!-- Estado vacío -->
-        <div *ngIf="!loadingConTurno && personalConTurno.length === 0" 
-             class="text-center py-12">
-          <!-- Mensaje inicial: No se ha buscado aún -->
-          <div *ngIf="!hasSearched">
-            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <lucide-icon name="filter" class="w-8 h-8 text-blue-400"></lucide-icon>
-            </div>
-            <h4 class="text-lg font-medium text-gray-800 mb-2">Selecciona Filtros</h4>
-            <p class="text-sm text-gray-600 mb-4">Para generar el reporte, debes seleccionar un rango de fechas</p>
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mx-4 text-sm text-blue-700">
-              <div class="flex items-center justify-center gap-2">
-                <lucide-icon name="info" class="w-4 h-4"></lucide-icon>
-                <span>El rango de fechas es obligatorio para consultar los datos</span>
+          <!-- Estado vacío -->
+          <div *ngIf="!loadingConTurno && personalConTurno.length === 0" 
+               class="text-center py-16">
+            <!-- Mensaje inicial: No se ha buscado aún -->
+            <div *ngIf="!hasSearched">
+              <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <lucide-icon name="filter" class="w-10 h-10 text-blue-400"></lucide-icon>
+              </div>
+              <h4 class="text-xl font-medium text-gray-800 mb-3">Selecciona Filtros</h4>
+              <p class="text-sm text-gray-600 mb-6">Para generar el reporte, debes seleccionar un rango de fechas</p>
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mx-8 text-sm text-blue-700">
+                <div class="flex items-center justify-center gap-2">
+                  <lucide-icon name="info" class="w-5 h-5"></lucide-icon>
+                  <span>El rango de fechas es obligatorio para consultar los datos</span>
+                </div>
               </div>
             </div>
-          </div>
-          <!-- Mensaje después de buscar: Sin datos -->
-          <div *ngIf="hasSearched">
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <lucide-icon name="user-x" class="w-8 h-8 text-green-400"></lucide-icon>
+            <!-- Mensaje después de buscar: Sin datos -->
+            <div *ngIf="hasSearched">
+              <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <lucide-icon name="user-x" class="w-10 h-10 text-green-400"></lucide-icon>
+              </div>
+              <h4 class="text-xl font-medium text-green-800 mb-3">Sin registros</h4>
+              <p class="text-sm text-green-600 mb-6">No hay personal con turnos en el período seleccionado</p>
             </div>
-            <h4 class="text-lg font-medium text-green-800 mb-2">Sin registros</h4>
-            <p class="text-sm text-green-600 mb-4">No hay personal con turnos en el período seleccionado</p>
           </div>
-        </div>
-        
-        <!-- Paginador para personal CON turno -->
-        <div *ngIf="personalConTurno.length > 0">
-          <app-fiori-paginator
-            [totalRecords]="totalConTurno"
-            [pageSize]="pageSizeConTurno"
-            [pageNumber]="pageConTurno"
-            [loading]="loadingConTurno"
-            (pageChange)="onPageChangeConTurno($event)">
-          </app-fiori-paginator>
+          
+          <!-- Paginador para personal CON turno -->
+          <div *ngIf="personalConTurno.length > 0">
+            <app-fiori-paginator
+              [totalRecords]="totalConTurno"
+              [pageSize]="pageSizeConTurno"
+              [pageNumber]="pageConTurno"
+              [loading]="loadingConTurno"
+              (pageChange)="onPageChangeConTurno($event)">
+            </app-fiori-paginator>
+          </div>
         </div>
       </div>
     </div>
     
-  </div>
-    </div>
-    
-    <!-- Tab 2: Vista Gráfica -->
+    <!-- Tab 3: Vista Gráfica -->
     <div *ngIf="activeTab === 'grafica'" class="fade-in">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         

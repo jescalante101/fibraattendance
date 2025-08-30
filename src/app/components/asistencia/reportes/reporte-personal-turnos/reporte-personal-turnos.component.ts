@@ -154,6 +154,9 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     return this.loading || this.loadingConTurno || this.loadingSinTurno;
   }
   
+  // Estado para saber si se ha ejecutado al menos una búsqueda
+  hasSearched = false;
+  
   // ============================================================================
   // TABS Y GRÁFICOS
   // ============================================================================
@@ -179,7 +182,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   
   ngOnInit(): void {
     this.loadAutocompleteData();
-    this.loadData();
+    // No cargar datos por defecto - el usuario debe seleccionar filtros
   }
   
   ngOnDestroy(): void {
@@ -203,21 +206,8 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   // ============================================================================
   
   private initializeDateRange(): void {
-    const today = new Date();
-    const currentWeekStart = new Date(today);
-    const dayOfWeek = today.getDay();
-    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-    currentWeekStart.setDate(today.getDate() - daysFromMonday);
-    
-    const currentWeekEnd = new Date(currentWeekStart);
-    currentWeekEnd.setDate(currentWeekStart.getDate() + 6);
-    
-    const defaultDateRange: DateRange = {
-      start: currentWeekStart.toISOString().split('T')[0],
-      end: currentWeekEnd.toISOString().split('T')[0]
-    };
-    
-    this.dateRangeControl.setValue(defaultDateRange);
+    // No establecer valores por defecto - el usuario debe seleccionar las fechas
+    this.dateRangeControl.setValue(null);
   }
   
   private setupGridColumns(): void {
@@ -303,10 +293,28 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
         cellRenderer: (params: any) => `<div class="flex items-center"><div class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">#${params.value}</div></div>`
       },
       {
+        headerName: 'Estado',
+        field: 'status',
+        minWidth: 100,
+        maxWidth: 120,
+        cellRenderer: (params: any) => {
+          const isTerminated = params.data?.isTerminated;
+          const isOnVacation = params.data?.isOnVacation;
+
+          if (isTerminated) {
+            return `<div class="flex items-center justify-center"><div class="w-4 h-4 bg-red-500 rounded-full" title="Cesado"></div></div>`;
+          } else if (isOnVacation) {
+            return `<div class="flex items-center justify-center"><div class="w-4 h-4 bg-amber-500 rounded-full" title="De Vacaciones"></div></div>`;
+          } else {
+            return `<div class="flex items-center justify-center"><div class="w-4 h-4 bg-blue-500 rounded-full" title="Pendiente Asignación"></div></div>`;
+          }
+        }
+      },
+      {
         headerName: 'Empleado',
         field: 'fullNameFormatted',
-        minWidth: 350,
-        maxWidth: 500,
+        minWidth: 300,
+        maxWidth: 400,
         cellRenderer: (params: any) => {
           const fullName = params.value;
           const isTerminated = params.data?.isTerminated;
@@ -325,22 +333,22 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       {
         headerName: 'Sede',
         field: 'categoriaAuxiliarDescripcion',
-        minWidth: 140,
-        maxWidth: 180,
+        minWidth: 120,
+        maxWidth: 160,
         cellRenderer: (params: any) => `<div class="text-sm text-fiori-text">${params.value || '-'}</div>`
       },
       {
         headerName: 'Área',
         field: 'areaDescripcion',
-        minWidth: 300,
-        maxWidth: 450,
+        minWidth: 250,
+        maxWidth: 350,
         cellRenderer: (params: any) => `<div class="text-sm text-fiori-text">${params.value || '-'}</div>`
       },
       {
         headerName: 'Centro de Costo',
         field: 'ccostoDescripcion',
-        minWidth: 160,
-        maxWidth: 350,
+        minWidth: 140,
+        maxWidth: 280,
         cellRenderer: (params: any) => `<div class="text-sm text-fiori-text">${params.value || '-'}</div>`
       }
     ];
@@ -533,11 +541,12 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
   }
   
   onSearch(): void {
-    if (!this.dateRangeControl.valid) {
-      this.toastService.warning('Validación', 'Por favor selecciona un rango de fechas válido');
+    if (!this.dateRangeControl.valid || !this.dateRangeControl.value) {
+      this.toastService.warning('Filtros requeridos', 'Por favor selecciona un rango de fechas para generar el reporte');
       return;
     }
     
+    this.hasSearched = true;
     this.pageConTurno = 1;
     this.pageSinTurno = 1;
     this.loadData();
@@ -567,9 +576,18 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     
     this.initializeDateRange();
     
+    // Limpiar datos cuando se limpian los filtros
+    this.personalConTurno = [];
+    this.personalSinTurno = [];
+    this.totalConTurno = 0;
+    this.totalSinTurno = 0;
+    this.totalSinTurnoActivo = 0;
+    this.totalCesados = 0;
+    this.totalVacaciones = 0;
+    this.hasSearched = false;
+    
     this.pageConTurno = 1;
     this.pageSinTurno = 1;
-    this.loadData();
   }
   
   // ============================================================================

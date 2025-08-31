@@ -40,6 +40,11 @@ export class DatePickerComponent implements ControlValueAccessor, OnInit, OnChan
     return this.compact && this.size === 'sm' && this.theme === 'fiori';
   }
 
+  @HostBinding('class.medium-filter')
+  get isMedium(): boolean {
+    return this.size === 'md' && this.theme === 'fiori';
+  }
+
   // Inputs y Outputs
   @Input() placeholder = 'Seleccionar fecha...';
   @Input() required = false;

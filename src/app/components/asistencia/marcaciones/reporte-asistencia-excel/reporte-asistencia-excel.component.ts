@@ -10,6 +10,7 @@ import { GridOptions, ColDef } from 'ag-grid-community';
 import { CategoriaAuxiliarService, CategoriaAuxiliar } from '../../../../core/services/categoria-auxiliar.service';
 import { RhAreaService, RhArea } from '../../../../core/services/rh-area.service';
 import { AG_GRID_LOCALE_ES } from 'src/app/ag-grid-locale.es';
+import { DateRange } from '../../../../shared/components/date-range-picker/date-range-picker.component';
 
 @Component({
   selector: 'app-reporte-asistencia-excel',
@@ -79,9 +80,13 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
     
+    const initialDateRange: DateRange = {
+      start: firstDay.toISOString().split('T')[0],
+      end: today.toISOString().split('T')[0]
+    };
+    
     this.filterForm = this.fb.group({
-      fechaInicio: [firstDay.toISOString().split('T')[0], Validators.required],
-      fechaFin: [today.toISOString().split('T')[0], Validators.required],
+      dateRange: [initialDateRange, Validators.required],
       employeeId: [''],
       areaId: [''],
       areaFilter: [''],
@@ -100,8 +105,15 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
 
     this.loading = true;
     
+    const formValues = this.filterForm.value;
+    const dateRange = formValues.dateRange as DateRange;
+    const fechaInicio = dateRange?.start || '';
+    const fechaFin = dateRange?.end || '';
+    
     const params: ReportMatrixParams = {
-      ...this.filterForm.value,
+      ...formValues,
+      fechaInicio,
+      fechaFin,
       companiaId: this.headerConfig.selectedEmpresa?.companiaId || '',
       planillaId: this.headerConfig.selectedPlanilla?.planillaId || '',
       areaId: this.filterForm.value.areaId || '',
@@ -314,9 +326,13 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
     
+    const initialDateRange: DateRange = {
+      start: firstDay.toISOString().split('T')[0],
+      end: today.toISOString().split('T')[0]
+    };
+    
     this.filterForm.reset({
-      fechaInicio: firstDay.toISOString().split('T')[0],
-      fechaFin: today.toISOString().split('T')[0],
+      dateRange: initialDateRange,
       employeeId: '',
       areaId: '',
       areaFilter: '',

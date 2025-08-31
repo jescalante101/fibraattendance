@@ -11,6 +11,7 @@ import { CategoriaAuxiliarService, CategoriaAuxiliar } from 'src/app/core/servic
 import { RhAreaService, RhArea } from 'src/app/core/services/rh-area.service';
 import { AG_GRID_LOCALE_ES } from 'src/app/ag-grid-locale.es';
 import { createFioriGridOptions, localeTextFiori } from 'src/app/shared/ag-grid-theme-fiori';
+import { DateRange } from 'src/app/shared/components/date-range-picker/date-range-picker.component';
 
 
 @Component({
@@ -91,9 +92,13 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1); // Primer día del mes
     const today = new Date(); // Fecha actual (hoy)
 
+    const initialDateRange: DateRange = {
+      start: this.formatDate(firstDay),
+      end: this.formatDate(today)
+    };
+
     this.filterForm = this.fb.group({
-      fechaInicio: [this.formatDate(firstDay), Validators.required],
-      fechaFin: [this.formatDate(today), Validators.required],
+      dateRange: [initialDateRange, Validators.required],
       areaId: [''],
       areaFilter: [''],
       companiaId: [{ value: '', disabled: true }],
@@ -134,9 +139,15 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
       return;
     }
     
+    const formValues = this.filterForm.value;
+    const dateRange = formValues.dateRange as DateRange;
+    const fechaInicio = dateRange?.start || '';
+    const fechaFin = dateRange?.end || '';
+    
     const params: ReportMatrixParams = {
-      ...this.filterForm.value,
-      
+      ...formValues,
+      fechaInicio,
+      fechaFin,
       pageNumber: 1,
       pageSize: 10000
     };
@@ -162,9 +173,14 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
   onClearFilters(): void {
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    const initialDateRange: DateRange = {
+      start: this.formatDate(firstDay),
+      end: this.formatDate(now)
+    };
+
     this.filterForm.reset({
-      fechaInicio: this.formatDate(firstDay),
-      fechaFin: this.formatDate(now),
+      dateRange: initialDateRange,
       employeeId: { value: '', disabled: true },
       areaId: { value: '', disabled: true },
       companiaId: { value: this.headerConfig?.selectedEmpresa?.companiaId || '', disabled: true },
@@ -535,8 +551,15 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
   exportToExcel(): void {
     if (this.isExporting || this.filterForm.invalid) return;
 
+    const formValues = this.filterForm.value;
+    const dateRange = formValues.dateRange as DateRange;
+    const fechaInicio = dateRange?.start || '';
+    const fechaFin = dateRange?.end || '';
+
     const params: ReportMatrixParams = {
-      ...this.filterForm.value,
+      ...formValues,
+      fechaInicio,
+      fechaFin,
       pageNumber: 1,
       pageSize: 10000 // O un número grande para exportar todo
     };
@@ -545,7 +568,7 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
     
     this.attendanceMatrixService.downloadExportWeeklyAttendanceReport(params).subscribe({
       next: (blob) => {
-        this.downloadFile(blob, `Asistencia_Semanal_${params.fechaInicio}_${params.fechaFin}.xlsx`);
+        this.downloadFile(blob, `Asistencia_Semanal_${fechaInicio}_${fechaFin}.xlsx`);
         this.isExporting = false;
       },
       error: (error) => {

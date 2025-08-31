@@ -118,7 +118,7 @@
 :host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-date-range-input input {
   height: 26px !important;
   line-height: 26px !important;
-  font-size: 12px !important;
+  font-size: 0.75rem !important; /* text-xs */
   padding: 0 !important;
   margin: 0 !important;
 }
@@ -136,19 +136,100 @@
 
 /* Toggle button compacto */
 :host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-datepicker-toggle {
-  width: 26px !important;
-  height: 26px !important;
+  width: 20px !important;
+  height: 20px !important;
 }
 
 :host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-datepicker-toggle .mat-mdc-icon-button {
-  width: 26px !important;
-  height: 26px !important;
-  padding: 2px !important;
+  width: 20px !important;
+  height: 20px !important;
+  padding: 0px !important;
 }
 
 :host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-datepicker-toggle lucide-icon {
-  width: 16px !important;
-  height: 16px !important;
+  width: 12px !important;
+  height: 12px !important;
+}
+
+/* =========================
+   MODO MEDIUM (MD) - 42px de altura
+   ========================= */
+
+/* Aplicar cuando tiene la clase medium-filter */
+:host(.medium-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field {
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+}
+
+:host(.medium-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-flex {
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+  align-items: center !important;
+}
+
+:host(.medium-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-infix {
+  padding: 4px 0 !important;
+  min-height: 34px !important;
+  height: 34px !important;
+  max-height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+:host(.medium-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-outline {
+  height: 42px !important;
+}
+
+:host(.medium-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-notched-outline__leading,
+:host(.medium-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-notched-outline__trailing,
+:host(.medium-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-notched-outline__notch {
+  height: 42px !important;
+  border-color: rgb(203 213 225 / var(--tw-border-opacity, 1)) !important;
+}
+
+/* Inputs medium */
+:host(.medium-filter) ::ng-deep .date-range-picker-wrapper .mat-date-range-input {
+  height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+:host(.medium-filter) ::ng-deep .date-range-picker-wrapper .mat-date-range-input input {
+  height: 34px !important;
+  line-height: 34px !important;
+  font-size: 14px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Label medium */
+:host(.medium-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-label {
+  font-size: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+:host(.medium-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-label.mdc-floating-label--float-above {
+  transform: translateY(-130%) scale(0.75) !important;
+}
+
+/* Toggle button medium */
+:host(.medium-filter) ::ng-deep .date-range-picker-wrapper .mat-datepicker-toggle {
+  width: 34px !important;
+  height: 34px !important;
+}
+
+:host(.medium-filter) ::ng-deep .date-range-picker-wrapper .mat-datepicker-toggle .mat-mdc-icon-button {
+  width: 34px !important;
+  height: 34px !important;
+  padding: 4px !important;
+}
+
+:host(.medium-filter) ::ng-deep .date-range-picker-wrapper .mat-datepicker-toggle lucide-icon {
+  width: 18px !important;
+  height: 18px !important;
 }
 
 /* =========================
@@ -157,18 +238,39 @@
 
 /* Si los estilos anteriores no funcionan, estos deberían funcionar */
 app-date-range-picker.compact-filter .date-range-picker-wrapper .mat-mdc-form-field {
-  height: 28px !important;
-  min-height: 28px !important;
+  height: 30px !important;
+  min-height: 30px !important;
 }
 
 app-date-range-picker.compact-filter .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-flex {
-  height: 28px !important;
-  min-height: 28px !important;
+  height: 30px !important;
+  min-height: 30px !important;
   align-items: center !important;
 }
 
 app-date-range-picker.compact-filter .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-infix {
-  padding: 1px 0 !important;
-  min-height: 24px !important;
-  height: 24px !important;
+  padding: 2px 0 !important;
+  min-height: 26px !important;
+  height: 26px !important;
+}
+
+/* Estilos de máxima especificidad para MEDIUM */
+app-date-range-picker.medium-filter .date-range-picker-wrapper .mat-mdc-form-field {
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+}
+
+app-date-range-picker.medium-filter .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-flex {
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+  align-items: center !important;
+}
+
+app-date-range-picker.medium-filter .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-infix {
+  padding: 4px 0 !important;
+  min-height: 34px !important;
+  height: 34px !important;
+  max-height: 34px !important;
 }

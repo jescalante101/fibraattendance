@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { DateRange } from 'src/app/shared/components/date-range-picker/date-range-picker.component';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AttendanceMatrixReportService } from 'src/app/core/services/report/attendance-matrix-report.service';
 import { ReportMatrixParams } from 'src/app/core/models/report/report-matrix-params.model';
@@ -80,9 +81,14 @@ export class ReporteMarcacionesDetalleComponent implements OnInit, OnDestroy {
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1); // Día 1 del mes actual
     const today = new Date(); // Fecha actual
 
+    // Crear rango de fechas inicial
+    const initialDateRange: DateRange = {
+      start: this.formatDate(firstDayOfMonth),
+      end: this.formatDate(today)
+    };
+
     this.filterForm = this.fb.group({
-      fechaInicio: [this.formatDate(firstDayOfMonth), Validators.required],
-      fechaFin: [this.formatDate(today), Validators.required],
+      dateRange: [initialDateRange, Validators.required],
       employeeId: [''],
       areaId: [''],
       areaFilter: [''],
@@ -127,8 +133,16 @@ export class ReporteMarcacionesDetalleComponent implements OnInit, OnDestroy {
       return;
     }
     
+    // Extraer fechas del dateRange
+    const formValues = this.filterForm.value;
+    const dateRange = formValues.dateRange as DateRange;
+    const fechaInicio = dateRange?.start || '';
+    const fechaFin = dateRange?.end || '';
+    
     const params: ReportMatrixParams = {
-      ...this.filterForm.value,
+      ...formValues,
+      fechaInicio,
+      fechaFin,
       pageNumber: 1,
       pageSize: 10000
     };
@@ -153,9 +167,13 @@ export class ReporteMarcacionesDetalleComponent implements OnInit, OnDestroy {
     const now = new Date();
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     
+    const initialDateRange: DateRange = {
+      start: this.formatDate(firstDayOfMonth),
+      end: this.formatDate(now)
+    };
+
     this.filterForm.reset({
-      fechaInicio: this.formatDate(firstDayOfMonth),
-      fechaFin: this.formatDate(now),
+      dateRange: initialDateRange,
       employeeId: '',
       areaId: '',
       areaFilter: '',
@@ -171,8 +189,16 @@ export class ReporteMarcacionesDetalleComponent implements OnInit, OnDestroy {
   exportToExcel(): void {
     if (this.isExporting || this.filterForm.invalid) return;
 
+    // Extraer fechas del dateRange para export
+    const formValues = this.filterForm.value;
+    const dateRange = formValues.dateRange as DateRange;
+    const fechaInicio = dateRange?.start || '';
+    const fechaFin = dateRange?.end || '';
+    
     const params: ReportMatrixParams = {
-      ...this.filterForm.value,
+      ...formValues,
+      fechaInicio,
+      fechaFin,
       pageNumber: 1,
       pageSize: 10000
     };

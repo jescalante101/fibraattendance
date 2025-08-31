@@ -1,11 +1,13 @@
 <!-- Contenedor principal con tema Fiori -->
-<div class="bg-fiori-muted/30 pb-8">
-  <div class="mx-auto">
+<div class="h-full flex flex-col bg-fiori-muted/30">
+  <!-- Contenido principal con scroll -->
+  <div class="flex-1 overflow-y-auto">
+    <div class="mx-auto">
     
-    <!-- Header principal -->
-    <div class="bg-gradient-to-r from-fiori-surface to-fiori-surface/80 rounded-2xl shadow-xl border border-fiori-border/30 overflow-hidden backdrop-blur-sm">
+    <!-- Header principal compacto -->
+    <div class="bg-gradient-to-r from-fiori-surface to-fiori-surface/80 rounded-xl shadow-lg border border-fiori-border/50 overflow-hidden backdrop-blur-sm mb-4">
       <!-- Indicador de pasos elegante -->
-      <div class="px-8 py-6">
+      <div class="px-6 py-4">
         <div class="flex items-center justify-center">
           <!-- Paso 1 -->
           <div class="flex items-center">
@@ -60,20 +62,20 @@
     <!-- Paso 1: Selección de empleados -->
     <div *ngIf="currentStep === 1" class="space-y-6">
       
-      <!-- Filtros de búsqueda -->
+      <!-- Filtros de búsqueda compactos -->
       <div class="bg-fiori-surface rounded-xl shadow-lg border border-fiori-border/50" style="overflow: visible;">
-        <div class="px-6 py-5">
-          <div class="flex items-center gap-2 mb-4">
-            <div class="w-8 h-8 bg-gradient-to-br from-fiori-primary to-fiori-secondary rounded-lg flex items-center justify-center">
-              <lucide-icon name="filter" class="w-4 h-4 text-white"></lucide-icon>
+        <div class="px-4 py-3">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-6 h-6 bg-gradient-to-br from-fiori-primary to-fiori-secondary rounded-lg flex items-center justify-center">
+              <lucide-icon name="filter" class="w-3 h-3 text-white"></lucide-icon>
             </div>
-            <h3 class="text-base font-semibold text-fiori-text">Filtros de búsqueda</h3>
+            <h3 class="text-sm font-semibold text-fiori-text">Filtros de búsqueda</h3>
           </div>
           
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Departamento Autocomplete (copiado exacto de empleado.component.html) -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Departamento Autocomplete compacto -->
             <div class="relative">
-              <label class="block text-sm font-medium text-fiori-subtext mb-2">Departamento</label>
+              <label class="block text-xs font-medium text-fiori-subtext mb-1">Departamento</label>
               <div class="relative">
                 <input type="text"
                        [(ngModel)]="departamentoSearchTerm"
@@ -143,7 +145,7 @@
             
             <!-- Búsqueda de empleado -->
             <div class="relative">
-              <label class="block text-sm font-medium text-fiori-subtext mb-2">Buscar empleado</label>
+              <label class="block text-xs font-medium text-fiori-subtext mb-1">Buscar empleado</label>
               <div class="relative flex gap-2">
                 <div class="relative flex-1">
                   <input type="text" 
@@ -359,71 +361,68 @@
     </div>
 
     <!-- Paso 2: Formulario de marcación -->
-    <div *ngIf="currentStep === 2" class="space-y-6">
+    <div *ngIf="currentStep === 2" class="space-y-4">
       
-      <!-- Formulario de marcación elegante -->
-      <div class="bg-gradient-to-br from-fiori-surface to-fiori-surface/80 rounded-2xl shadow-xl border border-fiori-border/50 overflow-hidden backdrop-blur-sm">
+      <!-- Formulario de marcación compacto -->
+      <div class="bg-fiori-surface rounded-xl shadow-lg border border-fiori-border/50 overflow-hidden">
         
-        <form [formGroup]="marcacionForm" class="p-6">
+        <form [formGroup]="marcacionForm" class="p-4">
           
-          <!-- Header elegante con empleados seleccionados -->
-          <div class="flex items-center justify-between mb-6 pb-4 border-b border-fiori-border/30">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-gradient-to-br from-fiori-warning to-fiori-warning/80 rounded-xl flex items-center justify-center shadow-lg">
-                <lucide-icon name="clock" class="w-5 h-5 text-white"></lucide-icon>
+          <!-- Header compacto con empleados seleccionados -->
+          <div class="flex items-center justify-between mb-4 pb-2 border-b border-fiori-border/30">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 bg-gradient-to-br from-fiori-warning to-fiori-warning/80 rounded-lg flex items-center justify-center">
+                <lucide-icon name="clock" class="w-3 h-3 text-white"></lucide-icon>
               </div>
               <div>
-                <h2 class="text-lg font-semibold text-fiori-text">Detalles de marcación</h2>
-                <p class="text-sm text-fiori-subtext">Complete la información de la marcación manual</p>
+                <h2 class="text-sm font-semibold text-fiori-text">Detalles de marcación</h2>
               </div>
             </div>
-            <div class="flex items-center gap-3 bg-fiori-primary/10 px-4 py-2 rounded-xl border border-fiori-primary/20">
-              <div class="w-8 h-8 bg-fiori-primary rounded-lg flex items-center justify-center">
-                <lucide-icon name="users" class="w-4 h-4 text-white"></lucide-icon>
+            <div class="flex items-center gap-2 bg-fiori-primary/10 px-2 py-1 rounded border border-fiori-primary/20">
+              <div class="w-4 h-4 bg-fiori-primary rounded flex items-center justify-center">
+                <lucide-icon name="users" class="w-2.5 h-2.5 text-white"></lucide-icon>
               </div>
-              <div>
-                <span class="text-sm text-fiori-primary font-semibold">{{ empleadosSeleccionados.length }} empleado{{ empleadosSeleccionados.length !== 1 ? 's' : '' }}</span>
-                <div class="text-xs text-fiori-primary/70">Seleccionados</div>
-              </div>
+              <span class="text-xs text-fiori-primary font-semibold">{{ empleadosSeleccionados.length }} empleado{{ empleadosSeleccionados.length !== 1 ? 's' : '' }}</span>
             </div>
           </div>
           
-          <!-- Campos del formulario elegantes -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <!-- Campos del formulario compactos -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             
             <!-- Fecha -->
-            <div class="space-y-2">
-              <label class="block text-sm font-semibold text-fiori-subtext">Fecha de marcación</label>
-              <div class="relative group">
-                <input type="date" 
-                       formControlName="fechaMarcacion"
-                       class="w-full pl-12 pr-4 py-3 border border-fiori-border rounded-xl bg-fiori-surface/50 focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary text-sm transition-all duration-200 hover:border-fiori-primary/50 group-hover:shadow-lg">
-                <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
-                  <div class="w-6 h-6 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
-                    <lucide-icon name="calendar" class="w-3.5 h-3.5 text-fiori-primary"></lucide-icon>
-                  </div>
-                </div>
-              </div>
+            <div class="space-y-1">
+              <label class="block text-xs font-medium text-fiori-subtext">Fecha de marcación *</label>
+              <app-date-picker
+                placeholder="Seleccionar fecha..."
+                [formControl]="marcacionForm.get('fechaMarcacion')"
+                size="sm"
+                theme="fiori"
+                iconName="calendar"
+                [required]="true"
+                [compact]="true"
+                datePlaceholder="dd/mm/aaaa"
+                [disableHolidays]="true">
+              </app-date-picker>
             </div>
             
             <!-- Hora -->
-            <div class="space-y-2">
-              <label class="block text-sm font-semibold text-fiori-subtext">Hora de marcación</label>
-              <div class="relative group">
-                <input type="time" 
-                       formControlName="horaMarcacion"
-                       class="w-full pl-12 pr-4 py-3 border border-fiori-border rounded-xl bg-fiori-surface/50 focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary text-sm transition-all duration-200 hover:border-fiori-primary/50 group-hover:shadow-lg">
-                <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
-                  <div class="w-6 h-6 bg-fiori-warning/10 rounded-lg flex items-center justify-center">
-                    <lucide-icon name="clock" class="w-3.5 h-3.5 text-fiori-warning"></lucide-icon>
-                  </div>
-                </div>
-              </div>
+            <div class="space-y-1">
+              <label class="block text-xs font-medium text-fiori-subtext">Hora de marcación *</label>
+              <app-time-picker
+                placeholder="Seleccionar hora..."
+                [formControl]="marcacionForm.get('horaMarcacion')"
+                size="sm"
+                theme="fiori"
+                iconName="clock"
+                [required]="true"
+                [time24hr]="true"
+                [enableSeconds]="false">
+              </app-time-picker>
             </div>
 
             <!-- Tipo de marcación -->
-            <div class="space-y-2">
-              <label class="block text-sm font-semibold text-fiori-subtext">Tipo de marcación</label>
+            <div class="space-y-1">
+              <label class="block text-xs font-medium text-fiori-subtext">Tipo de marcación *</label>
               <div class="relative group">
                 <select formControlName="estadoMarcacion"
                         class="w-full pl-12 pr-10 py-3 border border-fiori-border rounded-xl bg-fiori-surface/50 focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary text-sm appearance-none transition-all duration-200 hover:border-fiori-primary/50 group-hover:shadow-lg">
@@ -443,12 +442,12 @@
             </div>
           </div>
 
-          <!-- Motivo e incidencias elegantes -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Motivo e incidencias compactas -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             
             <!-- Motivo -->
-            <div class="space-y-2">
-              <label class="block text-sm font-semibold text-fiori-subtext">Motivo de marcación <span class="text-fiori-error">*</span></label>
+            <div class="space-y-1">
+              <label class="block text-xs font-medium text-fiori-subtext">Motivo de marcación <span class="text-fiori-error">*</span></label>
               <div class="relative group">
                 <textarea formControlName="motivo"
                           rows="3"
@@ -464,8 +463,8 @@
             </div>
 
             <!-- Incidencias -->
-            <div class="space-y-2">
-              <label class="block text-sm font-semibold text-fiori-subtext">Incidencias adicionales</label>
+            <div class="space-y-1">
+              <label class="block text-xs font-medium text-fiori-subtext">Incidencias adicionales</label>
               <div class="relative group">
                 <textarea formControlName="incidencias"
                           rows="3"
@@ -481,13 +480,13 @@
             </div>
           </div>
           
-          <!-- Lista elegante de empleados seleccionados -->
-          <div class="mt-6 pt-4 border-t border-fiori-border/30">
-            <div class="flex items-center gap-2 mb-3">
-              <div class="w-6 h-6 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
-                <lucide-icon name="users" class="w-3.5 h-3.5 text-fiori-primary"></lucide-icon>
+          <!-- Lista compacta de empleados seleccionados -->
+          <div class="mt-4 pt-2 border-t border-fiori-border/30">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-4 h-4 bg-fiori-primary/10 rounded flex items-center justify-center">
+                <lucide-icon name="users" class="w-2.5 h-2.5 text-fiori-primary"></lucide-icon>
               </div>
-              <span class="text-sm font-semibold text-fiori-subtext">Empleados que recibirán la marcación:</span>
+              <span class="text-xs font-medium text-fiori-subtext">Empleados que recibirán la marcación:</span>
             </div>
             <div class="flex flex-wrap gap-2">
               <div *ngFor="let emp of empleadosSeleccionados | slice:0:5" 
@@ -512,9 +511,11 @@
     </div>
 
   </div>
+  
+  </div>
 
-  <!-- Barra de acciones flotante en el footer del modal -->
-  <div class="bg-fiori-surface border-t border-fiori-border p-4 rounded-b-lg">
+  <!-- Footer del Modal con botones fijos -->
+  <div class="bg-fiori-surface border-t border-fiori-border p-4 flex-shrink-0">
     
     <!-- Paso 1: Botón continuar -->
     <div *ngIf="currentStep === 1" class="flex items-center justify-between">

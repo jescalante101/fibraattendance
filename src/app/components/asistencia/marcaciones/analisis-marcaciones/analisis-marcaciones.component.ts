@@ -15,6 +15,7 @@ import { PaginatorEvent } from 'src/app/shared/fiori-paginator/fiori-paginator.c
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { ModalRegistrarMarcacionComponent } from './modal-registrar-marcacion/modal-registrar-marcacion.component';
 import { AttendanceReportService } from 'src/app/core/services/report/attendance-report.service';
+import { DateRange } from 'src/app/shared/components/date-range-picker/date-range-picker.component';
 
 // Interfaz para datos agrupados por empleado y fecha
 interface GroupedAttendanceRecord {
@@ -254,9 +255,16 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
 
   // ===== INITIALIZATION =====
   private initializeForm() {
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    
+    const initialDateRange: DateRange = {
+      start: firstDay.toISOString().split('T')[0],
+      end: today.toISOString().split('T')[0]
+    };
+
     this.filterForm = this.fb.group({
-      fechaInicio: [''],
-      fechaFin: [''],
+      dateRange: [initialDateRange],
       filter: [''],
       areaId: [''],
       areaFilter: [''],
@@ -304,11 +312,12 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
    getData() {
     this.loading = true;
     const formValues = this.filterForm.value;
+    const dateRange = formValues.dateRange as DateRange;
     
     // Construir parámetros para la nueva API
     const params: ParamsReport = {
-      fechaInicio: formValues.fechaInicio ? new Date(formValues.fechaInicio) : new Date(),
-      fechaFin: formValues.fechaFin ? new Date(formValues.fechaFin) : new Date(),
+      fechaInicio: dateRange?.start ? new Date(dateRange.start) : new Date(),
+      fechaFin: dateRange?.end ? new Date(dateRange.end) : new Date(),
       employeeId: formValues.filter || null,
       areaId: formValues.areaId || null,
       locationId: formValues.locationId || null,
@@ -664,31 +673,34 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
     
     const today = new Date();
     
+    let dateRange: DateRange;
+
     switch (type) {
       case 'today':
         const todayStr = today.toISOString().split('T')[0];
-        this.filterForm.patchValue({
-          fechaInicio: todayStr,
-          fechaFin: todayStr
-        });
+        dateRange = { start: todayStr, end: todayStr };
         break;
       case 'week':
         const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
         const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 6));
-        this.filterForm.patchValue({
-          fechaInicio: startOfWeek.toISOString().split('T')[0],
-          fechaFin: endOfWeek.toISOString().split('T')[0]
-        });
+        dateRange = {
+          start: startOfWeek.toISOString().split('T')[0],
+          end: endOfWeek.toISOString().split('T')[0]
+        };
         break;
       case 'month':
         const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
         const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-        this.filterForm.patchValue({
-          fechaInicio: firstDay.toISOString().split('T')[0],
-          fechaFin: lastDay.toISOString().split('T')[0]
-        });
+        dateRange = {
+          start: firstDay.toISOString().split('T')[0],
+          end: lastDay.toISOString().split('T')[0]
+        };
         break;
+      default:
+        return;
     }
+
+    this.filterForm.patchValue({ dateRange });
     this.onFilter();
   }
 
@@ -698,7 +710,22 @@ export class AnalisisMarcacionesComponent implements OnInit, OnDestroy, AfterVie
   }
 
   clearAllFilters() {
-    this.filterForm.reset();
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    
+    const initialDateRange: DateRange = {
+      start: firstDay.toISOString().split('T')[0],
+      end: today.toISOString().split('T')[0]
+    };
+
+    this.filterForm.reset({
+      dateRange: initialDateRange,
+      filter: '',
+      areaId: '',
+      areaFilter: '',
+      locationId: '',
+      sedeFilter: ''
+    });
     this.currentQuickFilter = null;
     this.clearQuickStatsFilter();
     this.onFilter();

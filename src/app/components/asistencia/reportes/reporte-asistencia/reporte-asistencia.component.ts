@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, type OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { DateRange } from 'src/app/shared/components/date-range-picker/date-range-picker.component';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AttendanceMatrixReportService } from 'src/app/core/services/report/attendance-matrix-report.service';
 import { ReportMatrixParams } from 'src/app/core/models/report/report-matrix-params.model';
@@ -132,9 +133,14 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1); // Primer día del mes
     const today = new Date(); // Fecha actual (hoy)
 
+    // Crear rango de fechas inicial
+    const initialDateRange: DateRange = {
+      start: this.formatDate(firstDay),
+      end: this.formatDate(today)
+    };
+
     this.filterForm = this.fb.group({
-      fechaInicio: [this.formatDate(firstDay), Validators.required],
-      fechaFin: [this.formatDate(today), Validators.required],
+      dateRange: [initialDateRange, Validators.required],
       employeeId: [''],
       companiaId: [''],
       planillaId: [''],
@@ -195,10 +201,9 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
   }
 
   private setDefaultDateRange(): void {
-    const fechaInicio = this.filterForm.get('fechaInicio')?.value;
-    const fechaFin = this.filterForm.get('fechaFin')?.value;
+    const dateRange = this.filterForm.get('dateRange')?.value as DateRange;
 
-    if (fechaInicio && fechaFin) {
+    if (dateRange && dateRange.start && dateRange.end) {
       // generateDateRange ya no es necesario - dateRange viene del backend
     }
   }
@@ -223,8 +228,15 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
 
     // Asegurarse de que los filtros del header están aplicados
     const formValues = this.filterForm.value;
+    // Extraer fechas del dateRange
+    const dateRange = formValues.dateRange as DateRange;
+    const fechaInicio = dateRange?.start || '';
+    const fechaFin = dateRange?.end || '';
+
     const params: ReportMatrixParams = {
       ...formValues,
+      fechaInicio,
+      fechaFin,
       // Sobrescribir con valores del header (más importante que form)
       companiaId: this.headerConfig?.selectedEmpresa?.companiaId || formValues.companiaId || '',
       planillaId: this.headerConfig?.selectedPlanilla?.planillaId || formValues.planillaId || ''
@@ -581,8 +593,15 @@ export class ReporteAsistenciaComponent implements OnInit, OnDestroy {
     
     // Usar la misma lógica de parámetros que loadReportData
     const formValues = this.filterForm.value;
+    // Extraer fechas del dateRange para export
+    const dateRange = formValues.dateRange as DateRange;
+    const fechaInicio = dateRange?.start || '';
+    const fechaFin = dateRange?.end || '';
+
     const params: ReportMatrixParams = {
       ...formValues,
+      fechaInicio,
+      fechaFin,
       companiaId: this.headerConfig?.selectedEmpresa?.companiaId || formValues.companiaId || '',
       planillaId: this.headerConfig?.selectedPlanilla?.planillaId || formValues.planillaId || ''
     };

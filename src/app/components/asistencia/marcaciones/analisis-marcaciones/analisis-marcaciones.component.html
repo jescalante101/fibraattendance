@@ -84,25 +84,19 @@
     <div *ngIf="showFilters" class="p-4 fade-in">
       <form [formGroup]="filterForm" (ngSubmit)="onFilter()">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div>
+          <!-- Rango de Fechas -->
+          <div class="sm:col-span-2">
             <label class="block text-sm font-medium text-fiori-text mb-2">
-              <lucide-icon name="calendar-days" class="w-4 h-4 mr-1 inline"></lucide-icon>
-              Fecha Inicio
+              <lucide-icon name="calendar-range" class="w-4 h-4 mr-1 inline"></lucide-icon>
+              Rango de Fechas
             </label>
-            <input 
-              type="date" 
-              formControlName="fechaInicio"
-              class="w-full px-3 py-2 text-sm border border-fiori-border rounded-lg bg-fiori-surface focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-fiori-text mb-2">
-              <lucide-icon name="calendar-days" class="w-4 h-4 mr-1 inline"></lucide-icon>
-              Fecha Fin
-            </label>
-            <input 
-              type="date" 
-              formControlName="fechaFin"
-              class="w-full px-3 py-2 text-sm border border-fiori-border rounded-lg bg-fiori-surface focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
+            <app-date-range-picker
+              formControlName="dateRange"
+              placeholder="Seleccionar rango de fechas"
+              size="md"
+              theme="fiori"
+              [disableHolidays]="true">
+            </app-date-range-picker>
           </div>
           <div>
             <label class="block text-sm font-medium text-fiori-text mb-2">

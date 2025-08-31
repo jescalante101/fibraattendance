@@ -5,32 +5,24 @@
     <!-- Filtros principales -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
       
-      <!-- Fecha Inicio -->
-      <div>
+      <!-- Rango de Fechas -->
+      <div class="md:col-span-2">
         <label class="block text-sm font-medium text-fiori-text mb-1">
-          <mat-icon class="text-sm mr-1">event</mat-icon>
-          Fecha Inicio <span class="text-fiori-error">*</span>
+          <mat-icon class="text-sm mr-1">date_range</mat-icon>
+          Rango de Fechas <span class="text-fiori-error">*</span>
         </label>
-        <input 
-          type="date" 
-          formControlName="fechaInicio"
-          required
-          class="w-full px-3 py-2 border border-fiori-border rounded-md text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all"
-          [class.border-fiori-error]="filterForm.get('fechaInicio')?.hasError('required') && filterForm.get('fechaInicio')?.touched">
-      </div>
-
-      <!-- Fecha Fin -->
-      <div>
-        <label class="block text-sm font-medium text-fiori-text mb-1">
-          <mat-icon class="text-sm mr-1">event</mat-icon>
-          Fecha Fin <span class="text-fiori-error">*</span>
-        </label>
-        <input 
-          type="date" 
-          formControlName="fechaFin"
-          required
-          class="w-full px-3 py-2 border border-fiori-border rounded-md text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all"
-          [class.border-fiori-error]="filterForm.get('fechaFin')?.hasError('required') && filterForm.get('fechaFin')?.touched">
+        <app-date-range-picker
+          formControlName="dateRange"
+          placeholder="Seleccionar rango de fechas"
+          size="md"
+          theme="fiori"
+          [disableHolidays]="true">
+        </app-date-range-picker>
+        <p *ngIf="filterForm.get('dateRange')?.hasError('required') && filterForm.get('dateRange')?.touched" 
+           class="text-xs text-fiori-error mt-1">
+          <mat-icon class="text-xs mr-1">error</mat-icon>
+          Requerido
+        </p>
       </div>
 
       <!-- Área -->

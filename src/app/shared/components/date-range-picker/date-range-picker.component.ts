@@ -45,6 +45,11 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
     return this.compact && this.size === 'sm' && this.theme === 'fiori';
   }
 
+  @HostBinding('class.medium-filter')
+  get isMedium(): boolean {
+    return this.size === 'md' && this.theme === 'fiori';
+  }
+
   // ... (Input, Output, y otras propiedades se mantienen igual)
   @Input() placeholder = 'Seleccionar rango de fechas...';
   @Input() required = false;

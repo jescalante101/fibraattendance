@@ -2,8 +2,7 @@
   NOTA: Estos estilos funcionan porque `encapsulation: ViewEncapsulation.None` está
   definido en el decorador del componente.
 
-  Simplificamos al máximo, usando un selector directo y potente
-  para asegurar que los estilos de los feriados se apliquen.
+  Basado en el date-range-picker pero adaptado para fecha única.
 */
 
 /* Estilo único y directo para el contenido de una celda de feriado.
@@ -23,20 +22,20 @@
    ========================= */
 
 /* Altura consistente con otros form fields */
-:host ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field.mat-form-field {
+:host ::ng-deep .date-picker-wrapper .mat-mdc-form-field.mat-form-field {
   height: 56px !important;
   max-height: 56px !important;
 }
 
-:host ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-flex {
+:host ::ng-deep .date-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-flex {
   height: 56px !important;
   max-height: 56px !important;
   align-items: center !important;
   box-sizing: border-box !important;
 }
 
-/* Controlar el infix que contiene los inputs */
-:host ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-infix {
+/* Controlar el infix que contiene el input */
+:host ::ng-deep .date-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-infix {
   padding-top: 8px !important;
   padding-bottom: 8px !important;
   min-height: 40px !important;
@@ -45,8 +44,8 @@
   align-items: center !important;
 }
 
-/* Inputs específicos del date range */
-:host ::ng-deep .date-range-picker-wrapper .mat-date-range-input input {
+/* Input específico del date picker */
+:host ::ng-deep .date-picker-wrapper input[matInput] {
   height: 28px !important;
   line-height: 28px !important;
   font-size: 14px !important;
@@ -60,20 +59,20 @@
    ========================= */
 
 /* Aplicar solo cuando tiene la clase compact-filter */
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field {
+:host(.compact-filter) ::ng-deep .date-picker-wrapper .mat-mdc-form-field {
   height: 30px !important;
   min-height: 30px !important;
   max-height: 30px !important;
 }
 
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-flex {
+:host(.compact-filter) ::ng-deep .date-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-flex {
   height: 30px !important;
   min-height: 30px !important;
   max-height: 30px !important;
   align-items: center !important;
 }
 
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-infix {
+:host(.compact-filter) ::ng-deep .date-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-infix {
   padding: 2px 0 !important;
   min-height: 26px !important;
   height: 26px !important;
@@ -82,40 +81,34 @@
   align-items: center !important;
 }
 
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-outline {
+:host(.compact-filter) ::ng-deep .date-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-outline {
   height: 30px !important;
 }
 
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-notched-outline__leading,
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-notched-outline__trailing,
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-notched-outline__notch {
+:host(.compact-filter) ::ng-deep .date-picker-wrapper .mat-mdc-form-field .mat-mdc-notched-outline__leading,
+:host(.compact-filter) ::ng-deep .date-picker-wrapper .mat-mdc-form-field .mat-mdc-notched-outline__trailing,
+:host(.compact-filter) ::ng-deep .date-picker-wrapper .mat-mdc-form-field .mat-mdc-notched-outline__notch {
   height: 30px !important;
   border-color: rgb(203 213 225 / var(--tw-border-opacity, 1)) !important;
 }
 
 /* Borde específico para el outline principal */
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-notched-outline .mat-mdc-notched-outline__leading {
+:host(.compact-filter) ::ng-deep .date-picker-wrapper .mat-mdc-form-field .mat-mdc-notched-outline .mat-mdc-notched-outline__leading {
   border-color: rgb(203 213 225 / var(--tw-border-opacity, 1)) !important;
   border-right: none !important;
 }
 
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-notched-outline .mat-mdc-notched-outline__trailing {
+:host(.compact-filter) ::ng-deep .date-picker-wrapper .mat-mdc-form-field .mat-mdc-notched-outline .mat-mdc-notched-outline__trailing {
   border-color: rgb(203 213 225 / var(--tw-border-opacity, 1)) !important;
   border-left: none !important;
 }
 
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-notched-outline .mat-mdc-notched-outline__notch {
+:host(.compact-filter) ::ng-deep .date-picker-wrapper .mat-mdc-form-field .mat-mdc-notched-outline .mat-mdc-notched-outline__notch {
   border-color: rgb(203 213 225 / var(--tw-border-opacity, 1)) !important;
 }
 
-/* Inputs ultra compactos */
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-date-range-input {
-  height: 26px !important;
-  display: flex !important;
-  align-items: center !important;
-}
-
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-date-range-input input {
+/* Input ultra compacto */
+:host(.compact-filter) ::ng-deep .date-picker-wrapper input[matInput] {
   height: 26px !important;
   line-height: 26px !important;
   font-size: 12px !important;
@@ -124,29 +117,29 @@
 }
 
 /* Label ultra compacto */
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-label {
+:host(.compact-filter) ::ng-deep .date-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-label {
   font-size: 11px !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
 }
 
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-label.mdc-floating-label--float-above {
+:host(.compact-filter) ::ng-deep .date-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-label.mdc-floating-label--float-above {
   transform: translateY(-130%) scale(0.65) !important;
 }
 
 /* Toggle button compacto */
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-datepicker-toggle {
+:host(.compact-filter) ::ng-deep .date-picker-wrapper .mat-datepicker-toggle {
   width: 26px !important;
   height: 26px !important;
 }
 
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-datepicker-toggle .mat-mdc-icon-button {
+:host(.compact-filter) ::ng-deep .date-picker-wrapper .mat-datepicker-toggle .mat-mdc-icon-button {
   width: 26px !important;
   height: 26px !important;
   padding: 2px !important;
 }
 
-:host(.compact-filter) ::ng-deep .date-range-picker-wrapper .mat-datepicker-toggle lucide-icon {
+:host(.compact-filter) ::ng-deep .date-picker-wrapper .mat-datepicker-toggle lucide-icon {
   width: 16px !important;
   height: 16px !important;
 }
@@ -156,19 +149,19 @@
    ========================= */
 
 /* Si los estilos anteriores no funcionan, estos deberían funcionar */
-app-date-range-picker.compact-filter .date-range-picker-wrapper .mat-mdc-form-field {
-  height: 28px !important;
-  min-height: 28px !important;
+app-date-picker.compact-filter .date-picker-wrapper .mat-mdc-form-field {
+  height: 30px !important;
+  min-height: 30px !important;
 }
 
-app-date-range-picker.compact-filter .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-flex {
-  height: 28px !important;
-  min-height: 28px !important;
+app-date-picker.compact-filter .date-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-flex {
+  height: 30px !important;
+  min-height: 30px !important;
   align-items: center !important;
 }
 
-app-date-range-picker.compact-filter .date-range-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-infix {
-  padding: 1px 0 !important;
-  min-height: 24px !important;
-  height: 24px !important;
+app-date-picker.compact-filter .date-picker-wrapper .mat-mdc-form-field .mat-mdc-form-field-infix {
+  padding: 2px 0 !important;
+  min-height: 26px !important;
+  height: 26px !important;
 }

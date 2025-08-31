@@ -68,24 +68,16 @@
             <label class="block text-sm font-medium text-slate-700">
               Fecha Feriado Trabajado *
             </label>
-            <div class="relative">
-              <input 
-                mwlFlatpickr
-                formControlName="holidayWorkedDate"
-                [locale]="'es'"
-                [dateFormat]="'Y-m-d'"
-                [altInput]="true"
-                [altFormat]="'d/m/Y'"
-                [allowInput]="true"
-                placeholder="dd/mm/aaaa"
-                class="w-full pl-10 pr-4 py-3 text-sm border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                [class.border-red-300]="getFieldError('holidayWorkedDate')"
-                [class.bg-red-50]="getFieldError('holidayWorkedDate')"
-              />
-              <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
-                <lucide-icon name="calendar" class="w-4 h-4 text-slate-400"></lucide-icon>
-              </div>
-            </div>
+            <app-date-picker
+              placeholder="Seleccionar fecha feriado trabajado..."
+              [formControl]="compensatoryForm.get('holidayWorkedDate')"
+              size="md"
+              theme="default"
+              iconName="calendar"
+              [required]="true"
+              datePlaceholder="dd/mm/aaaa"
+            >
+            </app-date-picker>
             <div *ngIf="getFieldError('holidayWorkedDate')" class="text-sm text-red-600">
               {{ getFieldError('holidayWorkedDate') }}
             </div>
@@ -99,24 +91,16 @@
             <label class="block text-sm font-medium text-slate-700">
               Fecha Día Compensatorio *
             </label>
-            <div class="relative">
-              <input 
-                mwlFlatpickr
-                formControlName="compensatoryDayOffDate"
-                [locale]="'es'"
-                [dateFormat]="'Y-m-d'"
-                [altInput]="true"
-                [altFormat]="'d/m/Y'"
-                [allowInput]="true"
-                placeholder="dd/mm/aaaa"
-                class="w-full pl-10 pr-4 py-3 text-sm border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                [class.border-red-300]="getFieldError('compensatoryDayOffDate')"
-                [class.bg-red-50]="getFieldError('compensatoryDayOffDate')"
-              />
-              <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
-                <lucide-icon name="calendar-days" class="w-4 h-4 text-slate-400"></lucide-icon>
-              </div>
-            </div>
+            <app-date-picker
+              placeholder="Seleccionar fecha día compensatorio..."
+              [formControl]="compensatoryForm.get('compensatoryDayOffDate')"
+              size="md"
+              theme="default"
+              iconName="calendar-days"
+              [required]="true"
+              datePlaceholder="dd/mm/aaaa"
+            >
+            </app-date-picker>
             <div *ngIf="getFieldError('compensatoryDayOffDate')" class="text-sm text-red-600">
               {{ getFieldError('compensatoryDayOffDate') }}
             </div>

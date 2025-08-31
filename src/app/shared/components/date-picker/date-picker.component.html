@@ -1,0 +1,53 @@
+<!-- Single Date Picker Component using Angular Material with custom icons -->
+<div class="date-picker-wrapper">
+  <mat-form-field class="w-full compact-field" appearance="outline">
+
+    <!-- Single Date Input -->
+    <input 
+      matInput
+      [matDatepicker]="datePicker"
+      [matDatepickerFilter]="holidayFilter"
+      [placeholder]="datePlaceholder"
+      [value]="selectedDate"
+      [min]="minDate"
+      [max]="maxDate"
+      [disabled]="disabled"
+      [required]="required"
+      (dateChange)="onDateChange($event.value)"
+      (focus)="onInputFocus()"
+      (blur)="onInputBlur()"
+      (click)="openCalendar()"
+    />
+
+    <!-- Calendar Toggle Button with Custom Icon -->
+    <mat-datepicker-toggle 
+      matIconSuffix 
+      [for]="datePicker"
+      [disabled]="disabled"
+    >
+      <lucide-icon 
+        *ngIf="showIcon"
+        [name]="iconName" 
+        [class]="getIconSize() + ' text-gray-500'"
+        matDatepickerToggleIcon
+      ></lucide-icon>
+    </mat-datepicker-toggle>
+
+    <!-- Error message with icon -->
+    <mat-error *ngIf="hasError()">
+      <div class="flex items-center">
+        <lucide-icon name="alert-circle" class="w-4 h-4 mr-1"></lucide-icon>
+        <span>Es necesario seleccionar una fecha.</span>
+      </div>
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Date Picker Panel -->
+  <mat-datepicker 
+    #datePicker
+    [dateClass]="dateClass"
+    (monthSelected)="onMonthSelected($event)"
+    (opened)="onPickerOpened()"
+  >
+  </mat-datepicker>
+</div>

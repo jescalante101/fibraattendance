@@ -14,39 +14,34 @@ import {
   SimpleChanges
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { MatCalendarCellClassFunction, MatDateRangePicker } from '@angular/material/datepicker';
+import { MatCalendarCellClassFunction, MatDatepicker } from '@angular/material/datepicker';
 import { HolidaysService } from 'src/app/core/services/holidays.service';
 import { HolidayYear } from 'src/app/core/models/holiday.model';
 
-export interface DateRange {
-  start: string;
-  end: string;
-}
-
 @Component({
-  selector: 'app-date-range-picker',
-  templateUrl: './date-range-picker.component.html',
-  styleUrls: ['./date-range-picker.component.css'],
+  selector: 'app-date-picker',
+  templateUrl: './date-picker.component.html',
+  styleUrls: ['./date-picker.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => DateRangePickerComponent),
+      useExisting: forwardRef(() => DatePickerComponent),
       multi: true
     }
   ],
   encapsulation: ViewEncapsulation.None,
 })
-export class DateRangePickerComponent implements ControlValueAccessor, OnInit, OnChanges {
+export class DatePickerComponent implements ControlValueAccessor, OnInit, OnChanges {
 
-  @ViewChild('rangePicker') rangePicker!: MatDateRangePicker<Date>;
+  @ViewChild('datePicker') datePicker!: MatDatepicker<Date>;
 
   @HostBinding('class.compact-filter')
   get isCompact(): boolean {
     return this.compact && this.size === 'sm' && this.theme === 'fiori';
   }
 
-  // ... (Input, Output, y otras propiedades se mantienen igual)
-  @Input() placeholder = 'Seleccionar rango de fechas...';
+  // Inputs y Outputs
+  @Input() placeholder = 'Seleccionar fecha...';
   @Input() required = false;
   @Input() disabled = false;
   @Input() minDate?: Date;
@@ -58,23 +53,21 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
   @Input() theme: 'default' | 'fiori' = 'default';
   @Input() disableHolidays = true;
   @Input() compact = false;
-  @Input() startDatePlaceholder = 'Fecha inicio';
-  @Input() endDatePlaceholder = 'Fecha fin';
+  @Input() datePlaceholder = 'Fecha';
 
-  @Output() dateRangeChange = new EventEmitter<DateRange>();
-  @Output() dateSelected = new EventEmitter<Date[]>();
+  @Output() dateChange = new EventEmitter<string>();
+  @Output() dateSelected = new EventEmitter<Date>();
   @Output() pickerOpen = new EventEmitter<void>();
   @Output() pickerClose = new EventEmitter<void>();
 
-  startDate: Date | null = null;
-  endDate: Date | null = null;
-  currentValue: DateRange = { start: '', end: '' };
+  selectedDate: Date | null = null;
+  currentValue: string = '';
   
   private holidayTimeStamps = new Set<number>();
   private holidayNames = new Map<number, string>();
   private loadedYears = new Set<number>();
 
-  private onChange = (value: DateRange) => {};
+  private onChange = (value: string) => {};
   private onTouched = () => { this.wasTouched = true; };
   private wasTouched = false;
 
@@ -141,22 +134,18 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
   }
 
   private applyTooltipsToVisibleHolidays(): void {
-    // Usamos requestAnimationFrame para esperar al próximo ciclo de pintado del navegador.
-    // Esto garantiza que el DOM esté completamente actualizado antes de que lo manipulemos.
     requestAnimationFrame(() => {
         const holidayCells = document.querySelectorAll('td.mat-calendar-body-cell.holiday-cell');
         
         if (holidayCells.length > 0) {
             console.log(`[SUCCESS] Found ${holidayCells.length} holiday cells. Applying tooltips.`);
         } else {
-            // Este reintento es una salvaguarda final por si la animación del calendario tarda un poco más.
             setTimeout(() => this.applyTooltipsToVisibleHolidays(), 100);
             return;
         }
 
         holidayCells.forEach(cell => {
             const cellElement = cell as HTMLElement;
-            // Solo añadimos el tooltip si no lo tiene ya, para evitar trabajo innecesario.
             if (!cellElement.hasAttribute('title')) {
                 const ariaLabel = cellElement.getAttribute('aria-label');
                 if (ariaLabel) {
@@ -199,7 +188,6 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
     if (this.disableHolidays) {
       this.loadHolidaysForYear(selectedDate.getFullYear());
     }
-    // También aplicamos los tooltips cuando el usuario cambia de mes.
     this.applyTooltipsToVisibleHolidays();
   }
 
@@ -220,7 +208,21 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
     if (!dateInput) return null;
     const parts = dateInput.toString().split('T')[0].split('-').map(Number);
     if (parts.length !== 3 || parts.some(isNaN)) return null;
-    const [year, month, day] = parts;
+    
+    let year: number, month: number, day: number;
+    
+    // Detect format based on the first part
+    if (parts[0] > 1900) {
+      // YYYY-MM-DD format
+      [year, month, day] = parts;
+    } else {
+      // DD-MM-YYYY format 
+      [day, month, year] = parts;
+    }
+    
+    console.log(`📅 Parsing date: "${dateInput}" as ${day}/${month}/${year}`);
+    
+    // Create date in local timezone (month is 0-indexed in Date constructor)
     return new Date(year, month - 1, day);
   }
 
@@ -232,34 +234,44 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
     return `${year}-${month}-${day}`;
   }
 
-  onStartDateChange(date: Date | null): void { this.startDate = date; this.updateDateRange(); }
-  onEndDateChange(date: Date | null): void { this.endDate = date; this.updateDateRange(); }
+  onDateChange(date: Date | null): void {
+    console.log('📅 Date changed:', date);
+    this.selectedDate = date;
+    this.updateDate();
+  }
   
   openCalendar(): void {
-    if (!this.disabled && this.rangePicker && !this.rangePicker.opened) {
-      this.rangePicker.open();
+    if (!this.disabled && this.datePicker && !this.datePicker.opened) {
+      this.datePicker.open();
     }
   }
   
-  private updateDateRange(): void {
-    this.currentValue = { 
-      start: this.startDate ? this.formatDate(this.startDate) : '', 
-      end: this.endDate ? this.formatDate(this.endDate) : '' 
-    };
-    this.dateRangeChange.emit(this.currentValue);
+  private updateDate(): void {
+    this.currentValue = this.selectedDate ? this.formatDate(this.selectedDate) : '';
+    console.log('📅 Date updated:', this.currentValue);
+
+    // Emit events
+    this.dateChange.emit(this.currentValue);
+    
+    if (this.selectedDate) {
+      this.dateSelected.emit(this.selectedDate);
+    }
+    
     this.onChange(this.currentValue);
     this.onTouched();
-    this.cdr.markForCheck();
+
+    // Force change detection
+    this.cdr.detectChanges();
   }
 
-  writeValue(value: DateRange | null): void {
-    if (value && value.start && value.end) {
-      this.startDate = this.parseLocalDate(value.start);
-      this.endDate = this.parseLocalDate(value.end);
+  writeValue(value: string | null): void {
+    if (value) {
+      this.selectedDate = this.parseLocalDate(value);
+      this.currentValue = value;
     } else {
-      this.startDate = null; this.endDate = null;
+      this.selectedDate = null;
+      this.currentValue = '';
     }
-    this.updateDateRange();
     this.cdr.markForCheck();
   }
 
@@ -269,12 +281,18 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
     this.disabled = isDisabled; 
     this.cdr.markForCheck();
   }
-  hasError(): boolean { return this.required && !(this.currentValue.start && this.currentValue.end) && this.wasTouched; }
+
+  hasError(): boolean { 
+    return this.required && !this.currentValue && this.wasTouched; 
+  }
+
   onInputFocus(): void { 
     this.wasTouched = true; 
     this.openCalendar();
   }
+
   onInputBlur(): void { this.onTouched(); }
+
   getIconSize(): string {
     switch (this.size) {
       case 'sm': return 'w-4 h-4';
@@ -284,4 +302,3 @@ export class DateRangePickerComponent implements ControlValueAccessor, OnInit, O
     }
   }
 }
-

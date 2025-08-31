@@ -1,6 +1,6 @@
 <!-- Date Range Picker Component using Angular Material with custom icons -->
 <div class="date-range-picker-wrapper">
-  <mat-form-field class="w-full " appearance="outline">
+  <mat-form-field class="w-full compact-field" appearance="outline">
    
 
     <!-- Date Range Input -->
@@ -20,6 +20,7 @@
         (dateChange)="onStartDateChange($event.value)"
         (focus)="onInputFocus()"
         (blur)="onInputBlur()"
+        (click)="openCalendar()"
       />
       <input 
         matEndDate 
@@ -28,6 +29,7 @@
         (dateChange)="onEndDateChange($event.value)"
         (focus)="onInputFocus()"
         (blur)="onInputBlur()"
+        (click)="openCalendar()"
       />
     </mat-date-range-input>
 

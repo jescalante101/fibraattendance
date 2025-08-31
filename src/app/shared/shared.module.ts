@@ -15,6 +15,7 @@ import { FioriPaginatorComponent } from './fiori-paginator/fiori-paginator.compo
 import { GenericFilterComponent } from './generic-filter/generic-filter.component';
 import { ColumnManagerComponent } from './column-manager/column-manager.component';
 import { DateRangePickerComponent } from './components/date-range-picker/date-range-picker.component';
+import { DatePickerComponent } from './components/date-picker/date-picker.component';
 import { TimePickerComponent } from './components/time-picker/time-picker.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -31,6 +32,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     GenericFilterComponent,
     ColumnManagerComponent,
     DateRangePickerComponent,
+    DatePickerComponent,
     TimePickerComponent
   ],
   imports: [
@@ -62,6 +64,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     GenericFilterComponent,
     ColumnManagerComponent,
     DateRangePickerComponent,
+    DatePickerComponent,
     TimePickerComponent
   ]
 })

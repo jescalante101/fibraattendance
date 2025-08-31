@@ -480,20 +480,23 @@ export class ModalCrearCompensatorioComponent implements OnInit, OnDestroy {
    */
   private getCurrentWeekDates(): { startDate: string, endDate: string } {
     const now = new Date();
-    const dayOfWeek = now.getDay(); // 0 = domingo, 1 = lunes, etc.
+    const dayOfWeek = now.getDay(); // 0 = domingo, 1 = lunes, 2 = martes, 3 = miércoles, 4 = jueves, 5 = viernes, 6 = sábado
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
     
     // Calcular lunes de la semana actual
-    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
     const monday = new Date(now);
-    monday.setDate(now.getDate() + mondayOffset);
+    monday.setDate(now.getDate() - daysFromMonday);
     
-    // Calcular domingo de la semana actual
+    // Calcular domingo de la semana actual (6 días después del lunes)
     const sunday = new Date(monday);
     sunday.setDate(monday.getDate() + 6);
     
     // Formatear fechas como YYYY-MM-DD
     const startDate = monday.toISOString().split('T')[0];
     const endDate = sunday.toISOString().split('T')[0];
+    
+    console.log(`📅 Semana actual: ${startDate} (lunes) a ${endDate} (domingo)`);
+    console.log(`🗓️ Hoy es: ${now.toISOString().split('T')[0]} (día ${dayOfWeek} = ${['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][dayOfWeek]})`);
     
     return { startDate, endDate };
   }
@@ -550,10 +553,25 @@ export class ModalCrearCompensatorioComponent implements OnInit, OnDestroy {
         console.log('📨 Respuesta completa del servicio:', response);
         console.log('📊 response.exito:', response.exito);
         console.log('📊 response.data:', response.data);
+        console.log('📊 response.data.items:', response.data?.items);
         
         if (response.exito && response.data) {
-          this.availableEmployees = response.data.items || [];
-          this.totalEmployees = response.data.totalCount || 0;
+          // Check multiple possible data structures
+          let employees: EmployeeScheduleAssignment[] = [];
+          
+          if (response.data.items && Array.isArray(response.data.items)) {
+            employees = response.data.items;
+          } else if (Array.isArray(response.data)) {
+            // Sometimes the data itself might be the array
+            employees = response.data;
+          } else {
+            // Check for other possible property names
+            console.log('🔍 Estructura de data completa:', JSON.stringify(response.data, null, 2));
+            employees = [];
+          }
+          
+          this.availableEmployees = employees;
+          this.totalEmployees = response.data.totalCount || employees.length;
         } else {
           this.availableEmployees = [];
           this.totalEmployees = 0;

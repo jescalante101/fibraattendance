@@ -13,9 +13,7 @@ export interface AsistenciaDiaReporteDto {
   horasNormales: number;    // 8.5
   horasExtras1: number;     // 2.5 (H.E 25%)
   horasExtras2: number;     // 1.0 (H.E 35%)
-  horasExtras100: number;   // 1.5 (H.E 100%)
-  estado: string;           // "PRESENTE", "FALTA", "VACACIONES", "PERMISO"
-  tipoTurno: string;        // "MAÑANA", "TARDE", "NOCHE"
+  estado: string;           // "PRESENTE", "FALTA", "VACACIONES"
 }
 
 export interface ReporteAsistenciaSemanalDto {
@@ -29,10 +27,6 @@ export interface ReporteAsistenciaSemanalDto {
   totalHorasNormales: number;
   totalHorasExtras1: number;
   totalHorasExtras2: number;
-  totalHorasExtras100: number;
-  totalVacaciones: number;
-  totalFaltas: number;
-  totalPermisos: number;
 }
 
 export interface ExtraHoursReportResult {
@@ -48,7 +42,6 @@ export interface SummaryResponse {
     totalHorasNormales: number;
     totalHorasExtras25: number;
     totalHorasExtras35: number;
-    totalHorasExtras100: number;
     fechaGeneracion: string;
     periodoReporte: {
       fechaInicio: string;
@@ -85,16 +78,11 @@ export interface ProcessedEmployeeData {
   sede: string;
   cargo: string;
   fechaIngreso?: string;
-  tipoTurno: string;
   days: { [fecha: string]: ProcessedDayData };
   totales: {
     horasNormales: number;
     horasExtras1: number;
     horasExtras2: number;
-    horasExtras100: number;
-    vacaciones: number;
-    faltas: number;
-    permisos: number;
   };
 }
 
@@ -104,8 +92,6 @@ export interface ProcessedDayData {
   horasNormales: number;
   horasExtras1: number;
   horasExtras2: number;
-  horasExtras100: number;
   estado: string;
-  tipoTurno: string;
   cssClass: string;
 }

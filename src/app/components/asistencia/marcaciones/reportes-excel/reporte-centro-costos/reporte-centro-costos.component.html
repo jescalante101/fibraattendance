@@ -49,6 +49,43 @@
         </p>
       </div>
 
+        <!-- Sede con Autocomplete -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            <mat-icon class="text-sm mr-1">location_on</mat-icon>
+            Sede
+          </label>
+          <div class="relative">
+            <input 
+              type="text" 
+              formControlName="sedeFilter"
+              (input)="onSedeFilterChange($event)"
+              (focus)="showSedeDropdown = true"
+              (blur)="onSedeBlur()"
+              placeholder="Buscar sede..."
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all text-sm">
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">location_on</mat-icon>
+            
+            <!-- Dropdown -->
+            <div *ngIf="showSedeDropdown" 
+                 class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+              <div 
+                (mousedown)="onSedeSelected(null)"
+                class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-2 border-b border-gray-200 sticky top-0 bg-white">
+                <mat-icon class="text-sm text-orange-600">public</mat-icon>
+                <span class="text-gray-700 font-medium">Todas las sedes</span>
+              </div>
+              <div *ngFor="let sede of filteredSedes" 
+                   (mousedown)="onSedeSelected(sede)"
+                   class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-2">
+                <mat-icon class="text-sm text-gray-400">location_on</mat-icon>
+                <span class="text-gray-700">{{ sede.descripcion }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+
       <!-- Área -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -85,41 +122,6 @@
         </div>
       </div>
 
-        <!-- Sede con Autocomplete -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            <mat-icon class="text-sm mr-1">location_on</mat-icon>
-            Sede
-          </label>
-          <div class="relative">
-            <input 
-              type="text" 
-              formControlName="sedeFilter"
-              (input)="onSedeFilterChange($event)"
-              (focus)="showSedeDropdown = true"
-              (blur)="onSedeBlur()"
-              placeholder="Buscar sede..."
-              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all text-sm">
-            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">location_on</mat-icon>
-            
-            <!-- Dropdown -->
-            <div *ngIf="showSedeDropdown" 
-                 class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
-              <div 
-                (mousedown)="onSedeSelected(null)"
-                class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-2 border-b border-gray-200 sticky top-0 bg-white">
-                <mat-icon class="text-sm text-orange-600">public</mat-icon>
-                <span class="text-gray-700 font-medium">Todas las sedes</span>
-              </div>
-              <div *ngFor="let sede of filteredSedes" 
-                   (mousedown)="onSedeSelected(sede)"
-                   class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-2">
-                <mat-icon class="text-sm text-gray-400">location_on</mat-icon>
-                <span class="text-gray-700">{{ sede.descripcion }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
       
     </div>
 

@@ -113,41 +113,7 @@
               <lucide-icon name="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-fiori-subtext w-4 h-4"></lucide-icon>
             </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-fiori-text mb-2">
-              <lucide-icon name="building" class="w-4 h-4 mr-1 inline"></lucide-icon>
-              Área
-            </label>
-            <div class="relative">
-              <input 
-                type="text" 
-                id="areaFilter"
-                formControlName="areaFilter"
-                (input)="onAreaFilterChange($event)"
-                (focus)="showAreaDropdown = true"
-                (blur)="onAreaBlur()"
-                placeholder="Buscar área..."
-                class="w-full pl-10 pr-3 py-2 text-sm border border-fiori-border rounded-lg bg-fiori-surface focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
-              <lucide-icon name="building" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-fiori-subtext w-4 h-4"></lucide-icon>
-              
-              <!-- Dropdown completo con scroll -->
-              <div *ngIf="showAreaDropdown" 
-                   class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                <div 
-                  (mousedown)="onAreaSelected(null)"
-                  class="px-3 py-2 text-sm cursor-pointer hover:bg-fiori-hover transition-colors flex items-center gap-2 border-b border-fiori-border sticky top-0 bg-fiori-surface">
-                  <lucide-icon name="globe" class="w-4 h-4 text-fiori-primary"></lucide-icon>
-                  <span class="text-fiori-text font-medium">Todas las áreas</span>
-                </div>
-                <div *ngFor="let area of filteredAreas" 
-                     (mousedown)="onAreaSelected(area)"
-                     class="px-3 py-2 text-sm cursor-pointer hover:bg-fiori-hover transition-colors flex items-center gap-2">
-                  <lucide-icon name="building" class="w-4 h-4 text-fiori-subtext"></lucide-icon>
-                  <span class="text-fiori-text">{{ area.descripcion }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+
           <div>
             <label class="block text-sm font-medium text-fiori-text mb-2">
               <lucide-icon name="map-pin" class="w-4 h-4 mr-1 inline"></lucide-icon>
@@ -183,6 +149,45 @@
               </div>
             </div>
           </div>
+
+          <div>
+            <label class="block text-sm font-medium text-fiori-text mb-2">
+              <lucide-icon name="building" class="w-4 h-4 mr-1 inline"></lucide-icon>
+              Área
+            </label>
+            <div class="relative">
+              <input 
+                type="text" 
+                id="areaFilter"
+                formControlName="areaFilter"
+                (input)="onAreaFilterChange($event)"
+                (focus)="showAreaDropdown = true"
+                (blur)="onAreaBlur()"
+                placeholder="Buscar área..."
+                class="w-full pl-10 pr-3 py-2 text-sm border border-fiori-border rounded-lg bg-fiori-surface focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all">
+              <lucide-icon name="building" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-fiori-subtext w-4 h-4"></lucide-icon>
+              
+              <!-- Dropdown completo con scroll -->
+              <div *ngIf="showAreaDropdown" 
+                   class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                <div 
+                  (mousedown)="onAreaSelected(null)"
+                  class="px-3 py-2 text-sm cursor-pointer hover:bg-fiori-hover transition-colors flex items-center gap-2 border-b border-fiori-border sticky top-0 bg-fiori-surface">
+                  <lucide-icon name="globe" class="w-4 h-4 text-fiori-primary"></lucide-icon>
+                  <span class="text-fiori-text font-medium">Todas las áreas</span>
+                </div>
+                <div *ngFor="let area of filteredAreas" 
+                     (mousedown)="onAreaSelected(area)"
+                     class="px-3 py-2 text-sm cursor-pointer hover:bg-fiori-hover transition-colors flex items-center gap-2">
+                  <lucide-icon name="building" class="w-4 h-4 text-fiori-subtext"></lucide-icon>
+                  <span class="text-fiori-text">{{ area.descripcion }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          
+          
         </div>
         <div class="mt-4 flex gap-2">
           <button 

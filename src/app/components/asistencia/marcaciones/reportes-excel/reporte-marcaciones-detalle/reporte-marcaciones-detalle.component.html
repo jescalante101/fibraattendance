@@ -38,7 +38,7 @@
           formControlName="dateRange"
           placeholder="Seleccionar rango de fechas"
           [compact]="true"
-          size="sm"
+          size="md"
           theme="fiori"
           [disableHolidays]="true">
         </app-date-range-picker>
@@ -47,6 +47,43 @@
           <mat-icon class="text-xs mr-1">error</mat-icon>
           Requerido
         </p>
+      </div>
+
+      
+      <!-- Sede -->
+      <div>
+        <label class="block text-sm font-medium text-fiori-text mb-1">
+          <mat-icon class="text-sm mr-1">location_on</mat-icon>
+          Sede
+        </label>
+        <div class="relative">
+          <input 
+            type="text" 
+            formControlName="sedeFilter"
+            (input)="onSedeFilterChange($event)"
+            (focus)="showSedeDropdown = true"
+            (blur)="onSedeBlur()"
+            placeholder="Buscar sede..."
+            class="w-full pl-10 pr-3 py-2 border border-fiori-border rounded-md text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all text-sm">
+          <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-fiori-subtext text-sm">location_on</mat-icon>
+          
+          <!-- Dropdown -->
+          <div *ngIf="showSedeDropdown" 
+               class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+            <div 
+              (mousedown)="onSedeSelected(null)"
+              class="px-3 py-2 text-sm cursor-pointer hover:bg-fiori-hover transition-colors flex items-center gap-2 border-b border-fiori-border sticky top-0 bg-fiori-surface">
+              <mat-icon class="text-sm text-fiori-primary">public</mat-icon>
+              <span class="text-fiori-text font-medium">Todas las sedes</span>
+            </div>
+            <div *ngFor="let sede of filteredSedes" 
+                 (mousedown)="onSedeSelected(sede)"
+                 class="px-3 py-2 text-sm cursor-pointer hover:bg-fiori-hover transition-colors flex items-center gap-2">
+              <mat-icon class="text-sm text-fiori-subtext">location_on</mat-icon>
+              <span class="text-fiori-text">{{ sede.descripcion }}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Área -->
@@ -85,41 +122,6 @@
         </div>
       </div>
 
-      <!-- Sede -->
-      <div>
-        <label class="block text-sm font-medium text-fiori-text mb-1">
-          <mat-icon class="text-sm mr-1">location_on</mat-icon>
-          Sede
-        </label>
-        <div class="relative">
-          <input 
-            type="text" 
-            formControlName="sedeFilter"
-            (input)="onSedeFilterChange($event)"
-            (focus)="showSedeDropdown = true"
-            (blur)="onSedeBlur()"
-            placeholder="Buscar sede..."
-            class="w-full pl-10 pr-3 py-2 border border-fiori-border rounded-md text-fiori-text focus:ring-2 focus:ring-fiori-primary focus:border-fiori-primary transition-all text-sm">
-          <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-fiori-subtext text-sm">location_on</mat-icon>
-          
-          <!-- Dropdown -->
-          <div *ngIf="showSedeDropdown" 
-               class="absolute z-50 w-full mt-1 bg-fiori-surface border border-fiori-border rounded-md shadow-lg max-h-48 overflow-y-auto">
-            <div 
-              (mousedown)="onSedeSelected(null)"
-              class="px-3 py-2 text-sm cursor-pointer hover:bg-fiori-hover transition-colors flex items-center gap-2 border-b border-fiori-border sticky top-0 bg-fiori-surface">
-              <mat-icon class="text-sm text-fiori-primary">public</mat-icon>
-              <span class="text-fiori-text font-medium">Todas las sedes</span>
-            </div>
-            <div *ngFor="let sede of filteredSedes" 
-                 (mousedown)="onSedeSelected(sede)"
-                 class="px-3 py-2 text-sm cursor-pointer hover:bg-fiori-hover transition-colors flex items-center gap-2">
-              <mat-icon class="text-sm text-fiori-subtext">location_on</mat-icon>
-              <span class="text-fiori-text">{{ sede.descripcion }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
       
     </div>
 

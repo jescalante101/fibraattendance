@@ -1,0 +1,4010 @@
+{
+    "success": true,
+    "message": "Datos obtenidos correctamente",
+    "data": [
+        {
+            "nro_Doc": "62814452",
+            "colaborador": "ACHO NACIMENTO, NIEL EDVIN",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:51",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 8,
+            "totalHorasExtras1": 2,
+            "totalHorasExtras2": 1,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 5,
+            "totalFaltas": 0,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "74395293",
+            "colaborador": "ALAVA SHAPIAMA, DIELMYTH VIRIDIANA",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:50",
+                    "horaSalida": "07:05",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:56",
+                    "horaSalida": "07:07",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:42",
+                    "horaSalida": "Falta Marcación",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:54",
+                    "horaSalida": "07:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:12",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 32,
+            "totalHorasExtras1": 8,
+            "totalHorasExtras2": 4,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "48894453",
+            "colaborador": "ALAVA TAMANI, CANDY LLOMIRA",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:52",
+                    "horaSalida": "19:03",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:53",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:58",
+                    "horaSalida": "19:03",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "07:01",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "07:03",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "60113925",
+            "colaborador": "AQUITUARI MURAYARI, CARLOS ALBERTO",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE EMPAQUE",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:59",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:59",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:59",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:58",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "06:59",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "48943948",
+            "colaborador": "ASPAJO PISCO, ESTEFANI LUISA",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:57",
+                    "horaSalida": "07:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "19:00",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:54",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:54",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 32,
+            "totalHorasExtras1": 8,
+            "totalHorasExtras2": 4,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 2,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "74426709",
+            "colaborador": "CANGO CALDERON, ELZAR",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:53",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:54",
+                    "horaSalida": "13:05",
+                    "horasNormales": 6,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "07:00",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "07:00",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "07:05",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 38,
+            "totalHorasExtras1": 8,
+            "totalHorasExtras2": 4,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "71327091",
+            "colaborador": "CONDORI CULQUI, CESAR DIEGO",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:50",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "07:02",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:49",
+                    "horaSalida": "19:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:55",
+                    "horaSalida": "19:03",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "06:54",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "48771561",
+            "colaborador": "DAVILA TORRES, DIERAN ARON HERMES",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "19:21",
+                    "horaSalida": "07:06",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:55",
+                    "horaSalida": "07:08",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:44",
+                    "horaSalida": "Falta Marcación",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:57",
+                    "horaSalida": "07:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:50",
+                    "horaSalida": "07:12",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 32,
+            "totalHorasExtras1": 8,
+            "totalHorasExtras2": 4,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "62760434",
+            "colaborador": "DEL AGUILA HUANIO, BELLA ROSSANA",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:52",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "07:04",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:55",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "07:03",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 32,
+            "totalHorasExtras1": 8,
+            "totalHorasExtras2": 4,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 2,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "80503612",
+            "colaborador": "ESPINOZA RIOS, WILQUINSON",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:52",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:54",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:50",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:57",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "19:00",
+                    "horaSalida": "07:03",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "48885067",
+            "colaborador": "FIGUEROA LUNA, YOLA VERONICA",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:55",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "19:00",
+                    "horaSalida": "07:03",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:54",
+                    "horaSalida": "07:07",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "42087561",
+            "colaborador": "FLORES JAIME, JUAN CARLOS",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:56",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:58",
+                    "horaSalida": "19:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:59",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:52",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "07:03",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "45283040",
+            "colaborador": "GARZON SANCHEZ, MARGARITA",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:49",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:52",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:56",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:57",
+                    "horaSalida": "19:03",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "06:43",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "41680633",
+            "colaborador": "HILARIO CONDEMARIN, MARTIN DAVID",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:46",
+                    "horaSalida": "07:12",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "19:21",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:57",
+                    "horaSalida": "07:10",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "74816539",
+            "colaborador": "HUACCHA RAMOS, BETSY DAYANNA",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:46",
+                    "horaSalida": "07:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:53",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:43",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:51",
+                    "horaSalida": "07:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:50",
+                    "horaSalida": "07:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "70745455",
+            "colaborador": "HUALI PACHECO, EDUARDO ALONSO ISRAEL",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:45",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:57",
+                    "horaSalida": "07:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "10814381",
+            "colaborador": "HUALI TORRES, ISRAEL VICTORIANO",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "SUPERVISOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:49",
+                    "horaSalida": "19:15",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "Falta Marcación",
+                    "horaSalida": "19:01",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:54",
+                    "horaSalida": "19:15",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:55",
+                    "horaSalida": "19:14",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "07:06",
+                    "horaSalida": "19:20",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 32,
+            "totalHorasExtras1": 8,
+            "totalHorasExtras2": 4,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 2,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "41536611",
+            "colaborador": "INGA LITANO, PEDRO",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "19:00",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:46",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "19:00",
+                    "horaSalida": "07:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "43345076",
+            "colaborador": "LAURA CHICLLA, DAMACIO",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE EMPAQUE",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:54",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:56",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:57",
+                    "horaSalida": "19:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:53",
+                    "horaSalida": "19:03",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "07:02",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "60580014",
+            "colaborador": "LINARES GUTIERREZ, SANGELA",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE MALLA EXTRUIDA",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "19:17",
+                    "horaSalida": "07:07",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "19:01",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:51",
+                    "horaSalida": "07:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 32,
+            "totalHorasExtras1": 8,
+            "totalHorasExtras2": 4,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 2,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "75130882",
+            "colaborador": "LIZANO CHUMPITAZ, MARÍA DE LOS ANGELES",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "Falta Marcación",
+                    "horaSalida": "18:45",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "S.I. ENFERMEDAD O ACCIDENTE (PRIMEROS VEINTE DIAS)",
+                    "horaSalida": "S.I. ENFERMEDAD O ACCIDENTE (PRIMEROS VEINTE DIAS)",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PERMISO",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "S.I. ENFERMEDAD O ACCIDENTE (PRIMEROS VEINTE DIAS)",
+                    "horaSalida": "S.I. ENFERMEDAD O ACCIDENTE (PRIMEROS VEINTE DIAS)",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PERMISO",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 0,
+            "totalHorasExtras1": 0,
+            "totalHorasExtras2": 0,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 4,
+            "totalPermisos": 2
+        },
+        {
+            "nro_Doc": "77482952",
+            "colaborador": "LUNA ARBILDO, CONSUELO",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:56",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:58",
+                    "horaSalida": "14:12",
+                    "horasNormales": 7,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:52",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:54",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "07:03",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 39,
+            "totalHorasExtras1": 8,
+            "totalHorasExtras2": 4,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "73672649",
+            "colaborador": "LUNA ARBILDO, JUAN",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:50",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:47",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:58",
+                    "horaSalida": "07:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "73026636",
+            "colaborador": "MECHATO TEZEN, TANIA MIRENY",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:49",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:48",
+                    "horaSalida": "19:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:50",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:51",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "06:50",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "48552993",
+            "colaborador": "MIGUEL CONDOLI, RUTH ESTHER",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 0,
+            "totalHorasExtras1": 0,
+            "totalHorasExtras2": 0,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 6,
+            "totalFaltas": 0,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "003416668",
+            "colaborador": "MORALES MALDONADO, YORFREDDY JOSE",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:50",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:47",
+                    "horaSalida": "07:05",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:03",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:57",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "41755079",
+            "colaborador": "MORANTE LLOCYA, SAUL",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:56",
+                    "horaSalida": "19:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:58",
+                    "horaSalida": "19:05",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "07:01",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:53",
+                    "horaSalida": "19:03",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "07:03",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "46350020",
+            "colaborador": "MOZOMBITE LINARES, DIANA JULIANA",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "Falta Marcación",
+                    "horaSalida": "07:02",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:54",
+                    "horaSalida": "07:03",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 24,
+            "totalHorasExtras1": 6,
+            "totalHorasExtras2": 3,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 3,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "46415774",
+            "colaborador": "MOZOMBITE PIÑA, DERBY",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:08",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:03",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:46",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:58",
+                    "horaSalida": "07:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "62126541",
+            "colaborador": "NUÑEZ ESCALANTE, LESLY PRISCILA",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE MALLA EXTRUIDA",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:55",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:54",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:55",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:58",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "06:56",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "44334698",
+            "colaborador": "PAREDES CHANCHARI, MERLY",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:50",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:54",
+                    "horaSalida": "02:07",
+                    "horasNormales": 7,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:56",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:50",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 39,
+            "totalHorasExtras1": 8,
+            "totalHorasExtras2": 4,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "75429586",
+            "colaborador": "PAZ BERRU, CESAR AUGUSTO",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:51",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:52",
+                    "horaSalida": "13:00",
+                    "horasNormales": 6,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:52",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:52",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "06:51",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 38,
+            "totalHorasExtras1": 8,
+            "totalHorasExtras2": 4,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "75429584",
+            "colaborador": "PAZ BERRU, JUANITA",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:55",
+                    "horaSalida": "07:03",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:50",
+                    "horaSalida": "07:18",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 16,
+            "totalHorasExtras1": 4,
+            "totalHorasExtras2": 2,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 4,
+            "totalFaltas": 0,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "42578118",
+            "colaborador": "PEREDA GALICIA, JOSE LORENZO",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "19:10",
+                    "horaSalida": "06:52",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "19:01",
+                    "horaSalida": "06:55",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "19:03",
+                    "horaSalida": "06:57",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "19:00",
+                    "horaSalida": "06:55",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "19:09",
+                    "horaSalida": "19:09",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 32,
+            "totalHorasExtras1": 8,
+            "totalHorasExtras2": 4,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "42426485",
+            "colaborador": "PORTOCARRERO FASABY, ROY GENIX",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:52",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:57",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:58",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:53",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 32,
+            "totalHorasExtras1": 8,
+            "totalHorasExtras2": 4,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 2,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "77238601",
+            "colaborador": "POTENCIANO CHINGUEL, NUEVA NANCY",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:57",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:50",
+                    "horaSalida": "19:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:52",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:54",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "12:49",
+                    "horaSalida": "19:01",
+                    "horasNormales": 6,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 38,
+            "totalHorasExtras1": 8,
+            "totalHorasExtras2": 4,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "47250118",
+            "colaborador": "RAMOS ARIRAMA, JOEL",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:54",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:57",
+                    "horaSalida": "19:05",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:57",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:53",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "07:03",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "77294297",
+            "colaborador": "RIVERA TAMANI, VIVIANA ASUCENA",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "08:02",
+                    "horaSalida": "12:48",
+                    "horasNormales": 4.77,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "08:19",
+                    "horaSalida": "16:02",
+                    "horasNormales": 7,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "08:15",
+                    "horaSalida": "16:05",
+                    "horasNormales": 7.83,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "08:29",
+                    "horaSalida": "16:01",
+                    "horasNormales": 7,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 26.6,
+            "totalHorasExtras1": 0,
+            "totalHorasExtras2": 0,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 2,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "48904202",
+            "colaborador": "RIVEROS POMA, JOSE ANTONIO ANGEL",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 0,
+            "totalHorasExtras1": 0,
+            "totalHorasExtras2": 0,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 6,
+            "totalFaltas": 0,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "43473686",
+            "colaborador": "ROJAS VASQUEZ, WILMER",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:45",
+                    "horaSalida": "19:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:49",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:48",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:45",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "06:47",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "48493010",
+            "colaborador": "RUIZ HUAYNACARI, ATILIO",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:52",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:54",
+                    "horaSalida": "13:04",
+                    "horasNormales": 6,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:59",
+                    "horaSalida": "19:05",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:55",
+                    "horaSalida": "19:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "07:03",
+                    "horaSalida": "19:06",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 38,
+            "totalHorasExtras1": 8,
+            "totalHorasExtras2": 4,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "74418441",
+            "colaborador": "SALVADOR BERRU, ADALINO",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:53",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:51",
+                    "horaSalida": "07:03",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:50",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:58",
+                    "horaSalida": "07:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "41128017",
+            "colaborador": "SOLANO YALLICO, HERNAN HERMINIO",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:54",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:56",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:58",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:54",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "07:04",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "75190805",
+            "colaborador": "SOLSOL FERREYRA, ESTEBAN ELY",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:50",
+                    "horaSalida": "07:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:53",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:52",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:58",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:51",
+                    "horaSalida": "01:05",
+                    "horasNormales": 6,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 38,
+            "totalHorasExtras1": 8,
+            "totalHorasExtras2": 4,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "47338319",
+            "colaborador": "TAMANI PIÑA, CLAUDIA ROXANA",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:46",
+                    "horaSalida": "07:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:58",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "42329387",
+            "colaborador": "TARICUARIMA CASHU, NERY",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:46",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:03",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:58",
+                    "horaSalida": "07:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "77333090",
+            "colaborador": "TOTE SIQUIHUA, EDUAR LLAMPIER",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:50",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:54",
+                    "horaSalida": "19:06",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:56",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:52",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "07:02",
+                    "horaSalida": "19:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "46549957",
+            "colaborador": "VALENCIA PINTO, YOBER ANDRES",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:46",
+                    "horaSalida": "07:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:57",
+                    "horaSalida": "07:12",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "70019875",
+            "colaborador": "VENTURO MIRANDA, EDINSON GUSTAVO",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:50",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "06:53",
+                    "horaSalida": "19:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "06:47",
+                    "horaSalida": "19:00",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "06:43",
+                    "horaSalida": "19:05",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "06:47",
+                    "horaSalida": "19:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "46527395",
+            "colaborador": "YAICATE ACHO, ALEXANDER",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "06:55",
+                    "horaSalida": "19:04",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 8,
+            "totalHorasExtras1": 2,
+            "totalHorasExtras2": 1,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 5,
+            "totalFaltas": 0,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "47457234",
+            "colaborador": "YAICATE ACHO, MAGALY",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "OPERADOR DE RASCHELL",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "18:49",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:01",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "18:46",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "18:48",
+                    "horaSalida": "07:02",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "18:57",
+                    "horaSalida": "07:05",
+                    "horasNormales": 8,
+                    "horasExtras1": 2,
+                    "horasExtras2": 1,
+                    "horasExtras100": 0,
+                    "estado": "PRESENTE",
+                    "tipoTurno": "NOCHE"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "FALTA",
+                    "horaSalida": "FALTA",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "FALTA",
+                    "tipoTurno": "NOCHE"
+                }
+            },
+            "totalHorasNormales": 40,
+            "totalHorasExtras1": 10,
+            "totalHorasExtras2": 5,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 0,
+            "totalFaltas": 1,
+            "totalPermisos": 0
+        },
+        {
+            "nro_Doc": "72633301",
+            "colaborador": "YAICATE MACAYO, JHON LENON",
+            "area": "RASCHEL",
+            "sede": "SEDE CHILCA 02",
+            "cargo": "AYUDANTE DE EMPAQUE",
+            "fechaIngreso": "2025-08-25T00:00:00",
+            "asistenciaPorDia": {
+                "2025-08-25T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-26T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-27T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-28T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-29T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                },
+                "2025-08-30T00:00:00": {
+                    "horaEntrada": "VACACIONES",
+                    "horaSalida": "VACACIONES",
+                    "horasNormales": 0,
+                    "horasExtras1": 0,
+                    "horasExtras2": 0,
+                    "horasExtras100": 0,
+                    "estado": "VACACIONES",
+                    "tipoTurno": "DIA"
+                }
+            },
+            "totalHorasNormales": 0,
+            "totalHorasExtras1": 0,
+            "totalHorasExtras2": 0,
+            "totalHorasExtras100": 0,
+            "totalVacaciones": 6,
+            "totalFaltas": 0,
+            "totalPermisos": 0
+        }
+    ]
+}

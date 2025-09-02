@@ -70,12 +70,14 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
     private rhAreaService: RhAreaService,
     private categoriaAuxiliarService: CategoriaAuxiliarService
   ) {
+    console.log('🏗️ Constructor called at:', new Date().toISOString());
     this.initializeForm();
     this.setupGridOptions();
   }
 
   ngOnInit() {
-    this.loadInitialData();
+    console.log('🎯 ngOnInit called at:', new Date().toISOString());
+    this.setupHeaderConfigSubscription();
   }
 
   ngOnDestroy() {
@@ -102,46 +104,98 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
     });
   }
 
-  private loadInitialData() {
-    const headerConfig = this.headerConfigService.getCurrentHeaderConfig();
-    const companyId = headerConfig?.selectedEmpresa?.companiaId;
+  private setupHeaderConfigSubscription() {
+    console.log('🔄 Setting up HeaderConfig subscription...');
+    
+    // Primero obtener la configuración inicial
+    const initialConfig = this.headerConfigService.getCurrentHeaderConfig();
+    if (initialConfig) {
+      console.log('📋 Initial header config:', initialConfig);
+      this.loadMasterDataFromConfig(initialConfig);
+    }
+
+    // Luego suscribirse a cambios
+    this.headerConfigService.getHeaderConfig$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(config => {
+        console.log('🔄 Header config changed:', config);
+        if (config) {
+          this.loadMasterDataFromConfig(config);
+        }
+      });
+  }
+
+  private loadMasterDataFromConfig(config: any) {
+    console.log('🚀 loadMasterDataFromConfig called at:', new Date().toISOString());
+    const companyId = config?.selectedEmpresa?.companiaId;
+    
+    console.log('🏢 Company ID from config:', companyId);
 
     if (!companyId) {
-      this.toastService.error('Error', 'No se pudo obtener el ID de la compañía');
+      console.warn('⚠️ No company ID available in config');
       return;
     }
 
+    // Clear existing areas when company changes
+    this.allAreas = [];
+    this.filteredAreas = [];
+    
     // Cargar áreas y sedes
-    this.loadAreas(companyId);
-    this.loadSedes(companyId);
+    this.loadAreas(companyId.toString());
+    this.loadSedes();
   }
 
   private loadAreas(companyId: string) {
+    console.log('🔄 loadAreas called with companyId:', companyId);
+    
+    // Siempre recargar areas cuando se llame (similar al patrón exitoso)
+    console.log('🔄 Loading areas from API...');
     this.rhAreaService.getAreas(companyId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (areas) => {
-          this.allAreas = areas || [];
+          console.log('📊 Raw areas from API:', areas?.length || 0);
+          
+          // Deduplicar por areaId para evitar duplicados del backend
+          const uniqueAreas = areas ? 
+            areas.filter((area, index, self) => 
+              index === self.findIndex(a => a.areaId === area.areaId)
+            ) : [];
+          
+          console.log('🔄 After deduplication:', uniqueAreas.length);
+          console.log('📋 Unique areas:', uniqueAreas.map(a => `${a.areaId}: ${a.descripcion}`));
+          
+          this.allAreas = uniqueAreas;
           this.filteredAreas = [...this.allAreas];
+          console.log('✅ Areas set in component, total:', this.allAreas.length);
         },
         error: (error) => {
-          console.error('Error loading areas:', error);
+          console.error('❌ Error loading areas:', error);
           this.allAreas = [];
           this.filteredAreas = [];
         }
       });
   }
 
-  private loadSedes(companyId: string) {
+  private loadSedes() {
+    console.log('🔄 loadSedes called');
+    
+    // Solo cargar sedes si no están ya cargadas
+    if (this.allSedes.length > 0) {
+      console.log('✅ Sedes already loaded, skipping...');
+      return;
+    }
+
     this.categoriaAuxiliarService.getCategoriasAuxiliar()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (sedes) => {
+          console.log('📊 Sedes loaded:', sedes?.length || 0);
           this.allSedes = sedes || [];
           this.filteredSedes = [...this.allSedes];
         },
         error: (error) => {
-          console.error('Error loading sedes:', error);
+          console.error('❌ Error loading sedes:', error);
           this.allSedes = [];
           this.filteredSedes = [];
         }
@@ -449,8 +503,8 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
     
     this.columnDefs = [
       // Columnas de empleado sin sticky - mejor legibilidad
-      { headerName: 'N° Doc', field: 'nroDoc', width: 90, cellClass: 'text-center' },
-      { headerName: 'Colaborador', field: 'nombre', width: 200, cellClass: 'font-medium' },
+      { headerName: 'N° Doc', field: 'nroDoc', width: 90, pinned:'left',  cellClass: 'text-center' },
+      { headerName: 'Colaborador', field: 'nombre',  pinned:'left', width: 200, cellClass: 'font-medium' },
       { headerName: 'Área', field: 'area',  width: 120 },
       { headerName: 'Sede', field: 'sede',  width: 100 },
       { headerName: 'Cargo', field: 'cargo', width: 140 },
@@ -632,14 +686,25 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
   }
 
   onAreaFilterChange(event: any): void {
-    const value = event.target?.value || '';
-    this.areaFilterTerm = value;
-    this.filteredAreas = this.allAreas.filter(area => 
-      area.descripcion.toLowerCase().includes(value.toLowerCase())
-    );
+    const filterValue = (event.target.value || '').toLowerCase().trim();
+    this.areaFilterTerm = event.target.value || '';
     
-    // Reset selection if typing
-    if (value !== this.selectedArea?.descripcion) {
+    console.log('🔍 onAreaFilterChange called with:', filterValue);
+    console.log('📊 allAreas length:', this.allAreas.length);
+    console.log('📋 allAreas data:', this.allAreas.map(a => a.descripcion));
+    
+    if (!filterValue) {
+      this.filteredAreas = [...this.allAreas];
+      console.log('🌟 Reset filter - showing all areas:', this.filteredAreas.length);
+    } else {
+      this.filteredAreas = this.allAreas.filter(area =>
+        area.descripcion.toLowerCase().includes(filterValue)
+      );
+      console.log('🎯 Filtered areas:', this.filteredAreas.length, 'matches for:', filterValue);
+    }
+    
+    // Reset selection if typing new text
+    if (filterValue !== this.selectedArea?.descripcion?.toLowerCase()) {
       this.selectedArea = null;
     }
   }
@@ -673,13 +738,18 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
   }
 
   onSedeFilterChange(event: any): void {
-    const value = event.target?.value || '';
+    const value = (event.target?.value || '').trim();
     this.sedeFilterTerm = value;
-    this.filteredSedes = this.allSedes.filter(sede => 
-      sede.descripcion.toLowerCase().includes(value.toLowerCase())
-    );
     
-    // Reset selection if typing
+    if (!value) {
+      this.filteredSedes = [...this.allSedes];
+    } else {
+      this.filteredSedes = this.allSedes.filter(sede => 
+        sede.descripcion.toLowerCase().includes(value.toLowerCase())
+      );
+    }
+    
+    // Reset selection if typing new text
     if (value !== this.selectedSede?.descripcion) {
       this.selectedSede = null;
     }
@@ -778,6 +848,8 @@ export class ReporteHorasExtrasComponent implements OnInit, OnDestroy {
     this.selectedSede = null;
     this.areaFilterTerm = '';
     this.sedeFilterTerm = '';
+    
+    // Reset filtered lists to show all items
     this.filteredAreas = [...this.allAreas];
     this.filteredSedes = [...this.allSedes];
     

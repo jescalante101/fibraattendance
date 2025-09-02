@@ -306,7 +306,7 @@ export const gridOptionsFioriWithDynamicResize: GridOptions = {
   onGridReady: onGridReady,
   onFirstDataRendered: onFirstDataRendered,
   onGridSizeChanged: onGridSizeChanged,
-  getRowHeight: getRowHeight,
+  //*getRowHeight: getRowHeight,
 };
 
 // Opciones del Grid con Dynamic Height + Width habilitado

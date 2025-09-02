@@ -113,6 +113,9 @@ import { ModalCrearCompensatorioComponent } from './components/asistencia/compen
 import { ModalCompensatoryDayFormComponent } from './components/asistencia/compensatory-day/modal-compensatory-day-form/modal-compensatory-day-form.component';
 import { ModalEmpleadoDetalleComponent } from './components/asistencia/reportes/reporte-personal-turnos/modal-empleado-detalle/modal-empleado-detalle.component';
 import { ModalEmpleadoSinTurnoDetalleComponent } from './components/asistencia/reportes/reporte-personal-turnos/modal-empleado-sin-turno-detalle/modal-empleado-sin-turno-detalle.component';
+import { PersonnelWhitelistComponent } from './components/personal/organizacion/personnel-whitelist/personnel-whitelist.component';
+import { ModalPersonnelWhitelistFormComponent } from './components/personal/organizacion/personnel-whitelist/modal-personnel-whitelist-form/modal-personnel-whitelist-form.component';
+import { ModalBulkPersonnelWhitelistComponent } from './components/personal/organizacion/personnel-whitelist/modal-bulk-personnel-whitelist/modal-bulk-personnel-whitelist.component';
 
 // Registrar módulos de AG-Grid globalmente
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -184,7 +187,10 @@ registerLocaleData(localeEs);
         ModalCrearCompensatorioComponent,
         ModalCompensatoryDayFormComponent,
         ModalEmpleadoDetalleComponent,
-        ModalEmpleadoSinTurnoDetalleComponent
+        ModalEmpleadoSinTurnoDetalleComponent,
+        PersonnelWhitelistComponent,
+        ModalPersonnelWhitelistFormComponent,
+        ModalBulkPersonnelWhitelistComponent
 
     ],
     exports: [

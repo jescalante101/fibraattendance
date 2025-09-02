@@ -1,0 +1,115 @@
+/* Estilos personalizados para Personnel Whitelist Component */
+
+/* Estados de loading */
+.loading-overlay {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(2px);
+}
+
+/* Filtros mejorados */
+.filter-section {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+/* AG-Grid customizations */
+:host ::ng-deep .ag-theme-quartz {
+  --ag-header-height: 48px;
+  --ag-row-height: 42px;
+  --ag-font-family: "72", "Segoe UI", Arial, sans-serif;
+  --ag-font-size: 13px;
+}
+
+/* Custom cell renderers */
+:host ::ng-deep .ag-cell {
+  display: flex;
+  align-items: center;
+}
+
+/* Action buttons in grid */
+:host ::ng-deep .ag-cell .action-buttons {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+:host ::ng-deep .ag-cell .action-button {
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+:host ::ng-deep .ag-cell .action-button:hover {
+  transform: scale(1.05);
+}
+
+/* Status indicators */
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.status-active {
+  background-color: #107e3e;
+}
+
+.status-inactive {
+  background-color: #bb0000;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .filter-section {
+    padding: 12px;
+  }
+  
+  .filter-section .flex {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .filter-section .flex > div {
+    min-width: 100% !important;
+  }
+}
+
+/* Empty state improvements */
+.empty-state-container {
+  background: radial-gradient(ellipse at center, #f8f9fa 0%, #ffffff 100%);
+}
+
+/* Loading animation improvements */
+@keyframes pulse-fiori {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading-text {
+  animation: pulse-fiori 2s infinite;
+}
+
+/* Form field focus states */
+:host ::ng-deep input:focus,
+:host ::ng-deep select:focus {
+  box-shadow: 0 0 0 2px rgba(10, 110, 209, 0.1);
+  border-color: #0a6ed1;
+}
+
+/* Button hover animations */
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(10, 110, 209, 0.2);
+}
+
+/* Pagination integration */
+:host ::ng-deep app-fiori-paginator {
+  border-top: 1px solid #d1d1d1;
+  background-color: #f9f9f9;
+}

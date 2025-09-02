@@ -55,7 +55,6 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadHeaderConfig();
-    this.loadMasterData();
   }
 
   ngOnDestroy(): void {
@@ -188,12 +187,14 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
   private loadHeaderConfig(): void {
     this.headerConfig = this.headerConfigService.getCurrentHeaderConfig();
     this.applyHeaderConfigToForm();
+    this.loadMasterData();
 
     this.headerConfigService.getHeaderConfig$()
       .pipe(takeUntil(this.destroy$))
       .subscribe((config: HeaderConfig | null) => {
         this.headerConfig = config;
         this.applyHeaderConfigToForm();
+        this.loadMasterData();
       });
   }
 
@@ -209,32 +210,64 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
   // ===== MASTER DATA LOADING =====
   
   private loadMasterData(): void {
-    // Cargar sedes
-    this.categoriaAuxiliarService.getCategoriasAuxiliar().subscribe({
-      next: (sedes) => {
-        this.sedes = sedes;
-        this.filteredSedes = [...sedes];
-      },
-      error: (error) => console.error('Error loading sedes:', error)
-    });
+    if (!this.headerConfig?.selectedEmpresa?.companiaId) {
+      console.warn('No se puede cargar datos maestros sin compañía seleccionada');
+      return;
+    }
 
-    // Cargar áreas
-    this.rhAreaService.getAreas(this.headerConfig?.selectedEmpresa?.companiaId?.toString() || '').subscribe({
-      next: (areas) => {
-        this.areas = areas;
-        this.filteredAreas = [...areas];
-      },
-      error: (error) => console.error('Error loading areas:', error)
-    });
+    // Cargar sedes solo si no están cargadas
+    if (this.sedes.length === 0) {
+      this.categoriaAuxiliarService.getCategoriasAuxiliar()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (sedes) => {
+            this.sedes = sedes || [];
+            this.filteredSedes = [...this.sedes];
+          },
+          error: (error) => console.error('Error loading sedes:', error)
+        });
+    }
+
+    // Cargar áreas basadas en la compañía actual
+    const companiaId = this.headerConfig.selectedEmpresa.companiaId.toString();
+    this.rhAreaService.getAreas(companiaId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (areas) => {
+          this.areas = areas || [];
+          this.filteredAreas = [...this.areas];
+          
+          // Limpiar selección de área si ya no existe en la nueva lista
+          const currentAreaId = this.filterForm.get('areaId')?.value;
+          if (currentAreaId && !this.areas.some(a => a.areaId === currentAreaId)) {
+            this.filterForm.patchValue({
+              areaId: '',
+              areaFilter: ''
+            });
+          }
+        },
+        error: (error) => console.error('Error loading areas:', error)
+      });
   }
 
   // ===== AUTOCOMPLETE METHODS =====
   
   onAreaFilterChange(event: any) {
-    const filterValue = event.target.value.toLowerCase();
-    this.filteredAreas = this.areas.filter(area =>
-      area.descripcion.toLowerCase().includes(filterValue)
-    );
+    const filterValue = (event.target.value || '').toLowerCase().trim();
+    
+    if (!filterValue) {
+      this.filteredAreas = [...this.areas];
+    } else {
+      this.filteredAreas = this.areas.filter(area =>
+        area.descripcion.toLowerCase().includes(filterValue)
+      );
+    }
+    
+    // Reset selection if typing new text
+    const currentAreaFilter = this.filterForm.get('areaFilter')?.value || '';
+    if (currentAreaFilter !== event.target.value) {
+      this.filterForm.patchValue({ areaId: '' }, { emitEvent: false });
+    }
   }
 
   onAreaSelected(area: RhArea | null) {
@@ -244,12 +277,12 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
       this.filterForm.patchValue({
         areaId: area.areaId,
         areaFilter: area.descripcion
-      });
+      }, { emitEvent: false });
     } else {
       this.filterForm.patchValue({
         areaId: '',
         areaFilter: ''
-      });
+      }, { emitEvent: false });
     }
   }
 
@@ -260,10 +293,21 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
   }
 
   onSedeFilterChange(event: any) {
-    const filterValue = event.target.value.toLowerCase();
-    this.filteredSedes = this.sedes.filter(sede =>
-      sede.descripcion.toLowerCase().includes(filterValue)
-    );
+    const filterValue = (event.target.value || '').toLowerCase().trim();
+    
+    if (!filterValue) {
+      this.filteredSedes = [...this.sedes];
+    } else {
+      this.filteredSedes = this.sedes.filter(sede =>
+        sede.descripcion.toLowerCase().includes(filterValue)
+      );
+    }
+    
+    // Reset selection if typing new text
+    const currentSedeFilter = this.filterForm.get('sedeFilter')?.value || '';
+    if (currentSedeFilter !== event.target.value) {
+      this.filterForm.patchValue({ sedeId: '' }, { emitEvent: false });
+    }
   }
 
   onSedeSelected(sede: CategoriaAuxiliar | null) {
@@ -273,12 +317,12 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
       this.filterForm.patchValue({
         sedeId: sede.categoriaAuxiliarId,
         sedeFilter: sede.descripcion
-      });
+      }, { emitEvent: false });
     } else {
       this.filterForm.patchValue({
         sedeId: '',
         sedeFilter: ''
-      });
+      }, { emitEvent: false });
     }
   }
 
@@ -307,6 +351,11 @@ export class ReporteAsistenciaExcelComponent implements OnInit, OnDestroy {
       companiaId: this.headerConfig?.selectedEmpresa?.companiaId || '',
       planillaId: this.headerConfig?.selectedPlanilla?.planillaId || ''
     });
+    
+    // Reset filtered lists
+    this.filteredAreas = [...this.areas];
+    this.filteredSedes = [...this.sedes];
+    
     this.applyHeaderConfigToForm();
     this.rowData = [];
   }

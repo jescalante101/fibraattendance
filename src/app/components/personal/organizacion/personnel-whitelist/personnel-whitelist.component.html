@@ -1,0 +1,128 @@
+<div class="w-full mx-auto p-6 bg-fiori-background min-h-screen">
+  <!-- Header compacto -->
+  <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border p-3 mb-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 bg-fiori-primary/10 rounded-lg flex items-center justify-center">
+          <lucide-icon name="user-check" class="w-4 h-4 text-fiori-primary"></lucide-icon>
+        </div>
+        <div>
+          <div class="text-lg font-semibold text-fiori-text">
+            Lista Blanca Personal
+          </div>
+          <div class="text-xs text-fiori-subtext">
+            {{ totalCount }} empleados en lista blanca
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Botones de acción compactos -->
+    <div class="mt-3 pt-3 border-t border-fiori-border">
+      <div class="flex items-center space-x-2">
+        <button
+          (click)="openBulkRegistration()"
+          class="inline-flex items-center px-3 py-1.5 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors"
+        >
+          <lucide-icon name="user-plus-2" class="w-4 h-4 mr-1"></lucide-icon>
+          Registro Masivo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de lista blanca -->
+  <div class="bg-fiori-surface rounded-lg shadow-fioriSm border border-fiori-border overflow-hidden">
+    <div class="px-4 py-3 border-b border-fiori-border bg-fiori-muted">
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-lg font-semibold text-fiori-text">
+          Empleados en Lista Blanca
+        </div>
+        <div class="flex items-center space-x-3">
+          <div class="text-sm text-fiori-subtext">
+            <span>Mostrando {{ whitelistData.length }} de {{ totalCount }} registros</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Filtros compactos -->
+      <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+        <div class="flex items-center justify-end">
+          <!-- Búsqueda general -->
+          <div class="relative min-w-[280px]">
+            <lucide-icon name="search" class="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-fiori-subtext"></lucide-icon>
+            <input
+              type="text"
+              formControlName="searchTerm"
+              placeholder="Buscar empleado..."
+              class="w-full pl-7 pr-2 py-1.5 text-xs border border-gray-300 rounded-md bg-white focus:ring-1 focus:ring-fiori-primary focus:border-fiori-primary"
+            />
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Overlay de loading -->
+    <div
+      *ngIf="loading"
+      class="absolute inset-0 z-10 flex items-center justify-center bg-white/70"
+    >
+      <div class="text-center p-4">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-fiori-primary mb-2"></div>
+        <p class="text-sm text-fiori-subtext">Cargando lista blanca...</p>
+      </div>
+    </div>
+
+    <!-- ag-Grid Container -->
+    <div class="relative h-[60vh]">
+      <!-- ag-Grid -->
+      <div class="ag-theme-quartz w-full h-full">
+        <ag-grid-angular
+          #agGrid
+          [columnDefs]="columnDefs"
+          [rowData]="rowData"
+          class="w-full h-full"
+          [gridOptions]="gridOptions"
+          (gridReady)="onGridReady($event)"
+        ></ag-grid-angular>
+      </div>
+
+      <!-- Estado vacío -->
+      <div
+        *ngIf="!loading && (!whitelistData || whitelistData.length === 0)"
+        class="absolute inset-0 flex items-center justify-center bg-fiori-surface"
+      >
+        <div class="text-center p-8">
+          <div class="w-16 h-16 bg-fiori-background rounded-xl flex items-center justify-center mx-auto mb-4">
+            <lucide-icon name="user-check" class="w-8 h-8 text-fiori-subtext"></lucide-icon>
+          </div>
+          <div class="text-lg font-semibold text-fiori-text mb-2">
+            No hay empleados en la lista blanca
+          </div>
+          <p class="text-fiori-subtext mb-4 max-w-sm">
+            No se encontraron empleados en la lista blanca con los filtros aplicados
+          </p>
+          <button
+            (click)="createNew()"
+            class="inline-flex items-center px-4 py-2 bg-fiori-primary text-white text-sm font-medium rounded-lg hover:bg-fiori-secondary transition-colors"
+          >
+            <lucide-icon name="plus" class="w-4 h-4 mr-2"></lucide-icon>
+            Agregar Primer Empleado
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paginador -->
+    <app-fiori-paginator
+      [totalRecords]="totalCount"
+      [pageSize]="pageSize"
+      [pageNumber]="page"
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      [showAllOption]="true"
+      [loading]="loading"
+      (pageChange)="onPageChangeCustom($event)"
+    >
+    </app-fiori-paginator>
+  </div>
+</div>

@@ -149,12 +149,15 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
       fechaInicio,
       fechaFin,
       pageNumber: 1,
-      pageSize: 10000
+      pageSize: 10000,
+      companiaId: this.headerConfig?.selectedEmpresa?.companiaId || '',
+      planillaId: this.headerConfig?.selectedPlanilla?.planillaId || ''
     };
 
     this.isLoading = true;
     this.reportData = null;
     
+    console.log("params", params);
     
     // Load weekly attendance report
     this.attendanceMatrixService.getWeeklyAttendanceReport(params).subscribe({
@@ -561,7 +564,10 @@ export class ReporteAsistenciaMensualComponent implements OnInit, OnDestroy {
       fechaInicio,
       fechaFin,
       pageNumber: 1,
+      companiaId: this.headerConfig?.selectedEmpresa?.companiaId || '',
+      planillaId: this.headerConfig?.selectedPlanilla?.planillaId || '',
       pageSize: 10000 // O un número grande para exportar todo
+
     };
 
     this.isExporting = true;

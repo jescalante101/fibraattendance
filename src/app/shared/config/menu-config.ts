@@ -44,6 +44,7 @@ export const MENU_SECTIONS: MenuSection[] = [
           { label: 'Usuario-Sede', link: '/panel/personal/organizacion/usuario-sede', permission: 'personal.usuario_sede.view' },
           { label: 'Sede-Área-Centro de Costo', link: '/panel/personal/organizacion/sede-area-costo', permission: 'personal.sede_area_costo.view' },
           { label: 'Sede-Centro de Costo', link: '/panel/personal/organizacion/sede-ccosto', permission: 'personal.sede_ccosto.view' },
+          { label: 'Lista Blanca Personal', link: '/panel/personal/organizacion/personnel-whitelist', permission: 'personal.personnel_whitelist.view' },
           { label: 'Feriados', link: '/panel/personal/organizacion/holidays', permission: 'personal.holidays.view' }
         ]
       },

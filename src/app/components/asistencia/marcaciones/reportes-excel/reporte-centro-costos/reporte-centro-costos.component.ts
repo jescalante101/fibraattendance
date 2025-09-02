@@ -145,7 +145,9 @@ export class ReporteCentroCostosComponent implements OnInit, OnDestroy {
       fechaInicio,
       fechaFin,
       pageNumber: 1,
-      pageSize: 10000
+      pageSize: 10000,
+      companiaId: this.headerConfig?.selectedEmpresa?.companiaId || '',
+      planillaId: this.headerConfig?.selectedPlanilla?.planillaId || ''
     };
 
     this.isLoading = true;

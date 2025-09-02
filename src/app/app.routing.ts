@@ -36,6 +36,7 @@ import { PersonalTransferComponent } from "./components/personal/transferencias/
 import { ReportePersonalTurnosComponent } from "./components/asistencia/reportes/reporte-personal-turnos/reporte-personal-turnos.component";
 import { PermissionManagerComponent } from "./components/dev/permission-manager/permission-manager.component";
 import { CompensatoryDayComponent } from "./components/asistencia/compensatory-day/compensatory-day.component";
+import { PersonnelWhitelistComponent } from "./components/personal/organizacion/personnel-whitelist/personnel-whitelist.component";
 
 
 
@@ -60,6 +61,7 @@ const appRoutes: Routes = [
         { path: 'personal/organizacion/cargo', component: CargoComponent },
         { path: 'personal/organizacion/usuario-sede', component: UsuarioSedeComponent },
         { path: 'personal/organizacion/sede-ccosto', component: SedeCcostoComponent },
+        { path: 'personal/organizacion/personnel-whitelist', component: PersonnelWhitelistComponent },
         { path: 'personal/organizacion/holidays', component: HolidaysComponent },
 
         // Employee routes

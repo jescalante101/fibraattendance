@@ -1,0 +1,361 @@
+<!-- Contenido del Modal de Registro Masivo Lista Blanca -->
+<div class="h-full flex flex-col">
+  
+  <!-- Contenido principal con scroll -->
+  <div class="flex-1 overflow-y-auto">
+    
+    <!-- Configuración de Registro - Compacta -->
+    <div class="px-5 py-3 bg-gradient-to-r from-slate-50 to-blue-50 border-b border-slate-200">
+      <!-- Header compacto -->
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center space-x-2">
+          <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+            <lucide-icon name="user-plus-2" class="w-3.5 h-3.5 text-white"></lucide-icon>
+          </div>
+          <div>
+            <h3 class="text-base font-semibold text-slate-800">Configuración de Registro Masivo</h3>
+          </div>
+        </div>
+        <!-- Badge de estado compacto -->
+        <div class="px-2 py-1 rounded-full border text-xs transition-all"
+            [ngClass]="isFormValid ? 
+              'bg-emerald-50 border-emerald-200 text-emerald-700' : 
+              'bg-amber-50 border-amber-200 text-amber-700'">
+          <div class="flex items-center space-x-1">
+            <div class="w-1.5 h-1.5 rounded-full"
+                [ngClass]="isFormValid ? 'bg-emerald-500' : 'bg-amber-500'"></div>
+            <span class="font-medium">
+              {{ isFormValid ? 'OK' : 'Pendiente' }}
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Configuración en Cards - Responsivo y Compacto -->
+      <form [formGroup]="bulkForm">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+        
+        <!-- Autocomplete de Sede - Compacto -->
+        <div class="relative">
+          <label for="sedeSearch" class="block text-xs font-medium text-slate-600 mb-1">
+            Sede <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <input 
+              type="text" 
+              id="sedeSearch"
+              formControlName="sedeSearch"
+              (input)="onSedeSearchChange($event)"
+              (focus)="showSedeDropdown = true"
+              (blur)="onSedeBlur()"
+           
+              (keydown)="onSedeKeydown($event)"
+              placeholder="Buscar sede..."
+              class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-slate-50 text-slate-800 transition-colors"
+              [class.border-red-300]="getFieldError('sedeSearch')"
+              [class.bg-red-50]="getFieldError('sedeSearch')">
+            <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+              <lucide-icon name="building" class="w-4 h-4 text-slate-400"></lucide-icon>
+            </div>
+            
+            <!-- Dropdown de sedes -->
+            <div *ngIf="showSedeDropdown && filteredSedes.length > 0" 
+                 class="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+              <div *ngFor="let sede of filteredSedes; let i = index; trackBy: trackBySedeId" 
+                   (mousedown)="selectSede(sede)" 
+                   class="px-4 py-3 cursor-pointer border-b border-slate-100 last:border-b-0 transition-colors"
+                   [class.bg-blue-50]="i === highlightedSedeIndex"
+                   [class.hover:bg-slate-50]="i !== highlightedSedeIndex">
+                <div class="flex items-center space-x-3">
+                  <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <lucide-icon name="building" class="w-3 h-3 text-blue-600"></lucide-icon>
+                  </div>
+                  <div>
+                    <div class="text-sm font-medium text-slate-700">{{ sede.descripcion }}</div>
+                    <div class="text-xs text-slate-500">ID: {{ sede.categoriaAuxiliarId }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div *ngIf="getFieldError('sedeSearch')" class="mt-1 text-xs text-red-600">
+            <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+            {{ getFieldError('sedeSearch') }}
+          </div>
+        </div>
+
+        <!-- Autocomplete de Área - Compacto -->
+        <div class="relative">
+          <label for="areaSearch" class="block text-xs font-medium text-slate-600 mb-1">
+            Área <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <input 
+              type="text" 
+              id="areaSearch"
+              formControlName="areaSearch"
+              (input)="onAreaSearchChange($event)"
+              (focus)="onAreaSearchFocus()"
+              (blur)="onAreaBlur()"
+              (keydown)="onAreaKeydown($event)"
+              placeholder="Primero seleccione una sede..."
+              [disabled]="!formData.sedeId"
+              class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-slate-50 text-slate-800 transition-colors disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
+              [class.border-red-300]="getFieldError('areaSearch')"
+              [class.bg-red-50]="getFieldError('areaSearch')">
+            <div class="absolute left-2 top-1/2 transform -translate-y-1/2">
+              <lucide-icon name="layers" class="w-4 h-4 text-slate-400"></lucide-icon>
+            </div>
+            
+            <!-- Dropdown de áreas -->
+            <div *ngIf="showAreaDropdown && filteredAreas.length > 0 && formData.sedeId" 
+                 class="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+              <div *ngFor="let area of filteredAreas; let i = index; trackBy: trackByAreaId" 
+                   (mousedown)="selectArea(area)" 
+                   class="px-4 py-3 cursor-pointer border-b border-slate-100 last:border-b-0 transition-colors"
+                   [class.bg-blue-50]="i === highlightedAreaIndex"
+                   [class.hover:bg-slate-50]="i !== highlightedAreaIndex">
+                <div class="flex items-center space-x-3">
+                  <div class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
+                    <lucide-icon name="layers" class="w-3 h-3 text-green-600"></lucide-icon>
+                  </div>
+                  <div>
+                    <div class="text-sm font-medium text-slate-700">{{ area.descripcion }}</div>
+                    <div class="text-xs text-slate-500">ID: {{ area.areaId }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div *ngIf="getFieldError('areaSearch')" class="mt-1 text-xs text-red-600">
+            <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+            {{ getFieldError('areaSearch') }}
+          </div>
+        </div>
+
+        <!-- Observaciones -->
+        <div>
+          <label for="remarks" class="block text-xs font-medium text-slate-600 mb-1">Observaciones</label>
+          <div class="relative">
+            <textarea
+              id="remarks"
+              formControlName="remarks"
+              rows="2"
+              placeholder="Observaciones del registro masivo..."
+              class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-slate-50 text-slate-800 transition-colors resize-none"
+              [class.border-red-300]="getFieldError('remarks')"
+              [class.bg-red-50]="getFieldError('remarks')"
+            ></textarea>
+            <div class="absolute bottom-1 right-2 text-xs text-slate-400">
+              {{ bulkForm.get('remarks')?.value?.length || 0 }}/500
+            </div>
+          </div>
+          <div *ngIf="getFieldError('remarks')" class="mt-1 text-xs text-red-600">
+            <lucide-icon name="alert-circle" class="w-3 h-3 inline mr-1"></lucide-icon>
+            {{ getFieldError('remarks') }}
+          </div>
+        </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Contenido Principal - Estructura del Mockup -->
+    <div class="flex-1 flex overflow-hidden min-h-0" >
+      
+      <!-- Panel Izquierdo - Empleados Disponibles -->
+      <div class="flex-1 flex flex-col bg-white min-w-0">
+        <!-- Header del panel izquierdo - Compacto -->
+        <div class="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-slate-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                <lucide-icon name="users" class="w-3 h-3 text-white"></lucide-icon>
+              </div>
+              <div>
+                <h3 class="text-sm font-semibold text-slate-800">Empleados Disponibles</h3>
+                <p class="text-xs text-slate-500" *ngIf="formData.areaName">
+                  {{ formData.areaName }}
+                </p>
+              </div>
+            </div>
+            <!-- Contador de resultados -->
+            <div class="flex items-center space-x-2 text-sm text-slate-600">
+              <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span class="font-medium">{{ employeeStats.available }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ag-Grid Empleados Disponibles -->
+        <div class="flex-1 ag-theme-quartz p-2" style="min-height: 400px;">
+          <!-- Loading overlay -->
+          <div *ngIf="loadingEmployees" class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+            <div class="text-center">
+              <div class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-2"></div>
+              <p class="text-sm text-slate-600">Cargando empleados...</p>
+            </div>
+          </div>
+          
+          <ag-grid-angular
+            #availableGrid
+            [columnDefs]="availableEmployeesColumnDefs"
+            [rowData]="availableEmployees"
+            [gridOptions]="availableEmployeesGridOptions"
+            (gridReady)="onAvailableGridReady($event)"
+            (selectionChanged)="onAvailableSelectionChanged()"
+            class="w-full h-full rounded-lg overflow-hidden">
+          </ag-grid-angular>
+        </div>
+
+        <!-- Footer del panel izquierdo - Compacto -->
+        <div class="px-4 py-2 border-t border-slate-100 bg-slate-50">
+            <div class="text-xs text-slate-600 text-center">
+                <span class="font-medium">{{ getSelectedAvailableCount() }}</span> de {{ employeeStats.available }} seleccionados
+            </div>
+        </div>
+      </div>
+
+      <!-- Acciones Centrales -->
+      <div class="flex flex-col items-center justify-center px-2 bg-slate-50 border-l border-r border-slate-200">
+        <div class="space-y-2">
+          <button
+            (click)="addSelectedEmployees()"
+            [disabled]="getSelectedAvailableCount() === 0"
+            class="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all transform hover:scale-110"
+            title="Agregar Seleccionados">
+            <lucide-icon name="arrow-right" class="w-5 h-5"></lucide-icon>
+          </button>
+          <button
+            (click)="removeAllEmployees()"
+            [disabled]="selectedEmployees.length === 0"
+            class="p-2 bg-red-100 text-red-700 rounded-full hover:bg-red-200 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-all transform hover:scale-110"
+            title="Quitar Todos">
+            <lucide-icon name="arrow-left" class="w-5 h-5"></lucide-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel Derecho - Empleados Seleccionados -->
+      <div class="flex-1 flex flex-col bg-white min-w-0">
+        <!-- Header del panel derecho - Compacto -->
+        <div class="px-4 py-2 bg-gradient-to-r from-emerald-50 to-green-50 border-b border-slate-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-6 h-6 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center">
+                <lucide-icon name="user-check" class="w-3 h-3 text-white"></lucide-icon>
+              </div>
+              <div>
+                <h3 class="text-sm font-semibold text-slate-800">Empleados Seleccionados</h3>
+                <p class="text-xs text-slate-500">
+                  Para agregar a Lista Blanca
+                </p>
+              </div>
+            </div>
+            <!-- Badge contador compacto -->
+            <div class="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
+              {{ employeeStats.selected }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado vacío o ag-Grid -->
+        <div class="flex-1 flex flex-col min-h-0" *ngIf="selectedEmployees.length > 0; else emptyState">
+          <!-- ag-Grid Empleados Seleccionados -->
+          <div class="flex-1 ag-theme-quartz p-2" style="min-height: 400px;">
+            <ag-grid-angular
+              #selectedGrid
+              [columnDefs]="selectedEmployeesColumnDefs"
+              [rowData]="selectedEmployees"
+              [gridOptions]="selectedEmployeesGridOptions"
+              (gridReady)="onSelectedGridReady($event)"
+              class="w-full h-full rounded-lg overflow-hidden">
+            </ag-grid-angular>
+          </div>
+
+          <!-- Footer del panel derecho - Compacto -->
+          <div class="px-4 py-2 border-t border-slate-100 bg-slate-50">
+            <div class="text-xs text-slate-600 text-center">
+                Listos para agregar a Lista Blanca en <span class="font-medium">{{ formData.areaName }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado vacío -->
+        <ng-template #emptyState>
+          <div class="flex-1 flex flex-col items-center justify-center text-center p-8">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+              <lucide-icon name="users" class="w-8 h-8 text-slate-400"></lucide-icon>
+            </div>
+            <h4 class="text-lg font-medium text-slate-700 mb-2">Ningún empleado seleccionado</h4>
+            <p class="text-sm text-slate-500 max-w-md">
+              Selecciona empleados del panel izquierdo para agregar a la Lista Blanca Personal.
+            </p>
+            <div class="mt-6 text-xs text-slate-400 bg-slate-50 px-3 py-2 rounded-lg">
+              💡 Tip: Selecciona múltiples empleados usando las casillas de verificación
+            </div>
+          </div>
+        </ng-template>
+      </div>
+
+    </div>
+
+    <!-- Estado de carga de empleados -->
+    <div *ngIf="!formData.sedeId || !formData.areaId" class="flex-1 flex items-center justify-center bg-gray-50">
+      <div class="text-center">
+        <lucide-icon name="users" class="w-16 h-16 text-gray-400 mx-auto mb-4"></lucide-icon>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ !formData.sedeId ? 'Seleccione una Sede' : 'Seleccione un Área' }}</h3>
+        <p class="text-sm text-gray-600">{{ !formData.sedeId ? 'Primero debe seleccionar una sede' : 'Después debe seleccionar un área para cargar los empleados disponibles' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer del Modal -->
+  <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex-shrink-0">
+    <div class="flex items-center justify-between">
+      <!-- Información de estado -->
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-2">
+          <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+          <span class="text-sm text-gray-600">{{ employeeStats.selected }} empleados seleccionados</span>
+        </div>
+        <div class="flex items-center space-x-2" *ngIf="formData.areaName">
+          <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+          <span class="text-sm text-gray-600">
+            Área: {{ formData.areaName }}
+          </span>
+        </div>
+      </div>
+      
+      <!-- Botones de acción -->
+      <div class="flex items-center space-x-3">
+        <button
+          (click)="onSave()"
+          [disabled]="!isFormValid || saving"
+          class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-2"
+        >
+          <lucide-icon 
+            *ngIf="saving" 
+            name="loader-2" 
+            class="w-4 h-4 animate-spin"
+          ></lucide-icon>
+          <lucide-icon 
+            *ngIf="!saving" 
+            name="save" 
+            class="w-4 h-4"
+          ></lucide-icon>
+          <span>{{ saving ? 'Registrando...' : 'Agregar a Lista Blanca' }}</span>
+        </button>
+
+        <button
+          (click)="onCancel()"
+          class="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          Cancelar
+        </button>
+        
+      </div>
+    </div>
+  </div>
+</div>

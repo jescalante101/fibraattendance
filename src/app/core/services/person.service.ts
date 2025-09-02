@@ -33,6 +33,7 @@ export class PersonService {
   getEmpleados(page: number = 1, pageSize: number = 15):Observable<any>{
     return this.http.get<any>(`${this.apiUrl}Personal/organizacion/listarempleados?page=${page}&pageSize=${pageSize}`,);
   }
+  
   getCeses():Observable<any[]>{
     return this.http.get<any[]>(`${this.apiUrl}Personal/organizacion/listarCeses`,);
   }

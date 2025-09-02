@@ -408,14 +408,19 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
         next: (sedesAreas) => {
           this.allSedesAreas = sedesAreas || [];
           
-          // Extraer todas las sedes únicas
-          this.filteredSedes = this.allSedesAreas.map(sa => ({
+          // Extraer todas las sedes y deduplicar por siteId
+          const allSedes = this.allSedesAreas.map(sa => ({
             siteId: sa.siteId,
             siteName: sa.siteName,
             descripcion: sa.siteName // Para compatibilidad con el template
           }));
           
-          // Extraer todas las áreas de todas las sedes
+          // Deduplicar sedes por siteId para evitar duplicados
+          this.filteredSedes = allSedes.filter((sede, index, self) => 
+            index === self.findIndex(s => s.siteId === sede.siteId)
+          );
+          
+          // Extraer todas las áreas de todas las sedes y deduplicar por areaId
           const allAreas = this.allSedesAreas.flatMap(sa => 
             sa.areas.map(area => ({
               areaId: area.areaId,
@@ -425,13 +430,21 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
             }))
           );
           
-          this.filteredAreas = allAreas;
+          // Deduplicar áreas por areaId para evitar duplicados
+          const uniqueAreas = allAreas.filter((area, index, self) => 
+            index === self.findIndex(a => a.areaId === area.areaId)
+          );
+          
+          this.filteredAreas = uniqueAreas;
           
           console.log('📊 Datos de usuario cargados:', {
             sedesAreas: this.allSedesAreas.length,
             sedes: this.filteredSedes.length,
-            areas: this.filteredAreas.length
+            areas: this.filteredAreas.length,
+            areasBeforeDedup: allAreas.length,
+            areasAfterDedup: uniqueAreas.length
           });
+          console.log('📋 Areas únicas:', uniqueAreas.map(a => `${a.areaId}: ${a.areaName}`));
         },
         error: (error) => {
           this.errorHandlerService.handleLoadError(error, 'datos de filtros del usuario');
@@ -604,20 +617,27 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     this.areaFilterTerm = '';
     this.sedeFilterTerm = '';
     
-    // Restablecer las opciones filtradas
-    this.filteredSedes = this.allSedesAreas.map(sa => ({
+    // Restablecer las opciones filtradas y deduplicar sedes
+    const allSedes = this.allSedesAreas.map(sa => ({
       siteId: sa.siteId,
       siteName: sa.siteName,
       descripcion: sa.siteName
     }));
+    this.filteredSedes = allSedes.filter((sede, index, self) => 
+      index === self.findIndex(s => s.siteId === sede.siteId)
+    );
     
-    this.filteredAreas = this.allSedesAreas.flatMap(sa => 
+    // Deduplicar áreas al restablecer
+    const allAreas = this.allSedesAreas.flatMap(sa => 
       sa.areas.map(area => ({
         areaId: area.areaId,
         areaName: area.areaName,
         descripcion: area.areaName,
         siteId: sa.siteId
       }))
+    );
+    this.filteredAreas = allAreas.filter((area, index, self) => 
+      index === self.findIndex(a => a.areaId === area.areaId)
     );
     
     this.initializeDateRange();
@@ -707,13 +727,17 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
           siteId: sa.siteId
         })));
     } else {
-      availableAreas = this.allSedesAreas.flatMap(sa => 
+      const allAreas = this.allSedesAreas.flatMap(sa => 
         sa.areas.map(area => ({
           areaId: area.areaId,
           areaName: area.areaName,
           descripcion: area.areaName,
           siteId: sa.siteId
         }))
+      );
+      // Deduplicar áreas por areaId
+      availableAreas = allAreas.filter((area, index, self) => 
+        index === self.findIndex(a => a.areaId === area.areaId)
       );
     }
     
@@ -739,13 +763,17 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
             siteId: sa.siteId
           })));
       } else {
-        this.filteredAreas = this.allSedesAreas.flatMap(sa => 
+        const allAreas = this.allSedesAreas.flatMap(sa => 
           sa.areas.map(area => ({
             areaId: area.areaId,
             areaName: area.areaName,
             descripcion: area.areaName,
             siteId: sa.siteId
           }))
+        );
+        // Deduplicar áreas por areaId
+        this.filteredAreas = allAreas.filter((area, index, self) => 
+          index === self.findIndex(a => a.areaId === area.areaId)
         );
       }
     }

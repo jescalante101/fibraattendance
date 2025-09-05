@@ -142,7 +142,8 @@ export const MENU_SECTIONS: MenuSection[] = [
         icon: 'code',
         permission: 'system.dev.tools',
         submenu: [
-          { label: 'Permission Manager', link: '/panel/dev/permission-manager', permission: 'system.dev.permission_manager' }
+          { label: 'Permission Manager', link: '/panel/dev/permission-manager', permission: 'system.dev.permission_manager' },
+          { label: 'Prueba Test', link: '/panel/dev/permission-test', permission: 'system.dev.permission_test' }
         ]
       }
     ]

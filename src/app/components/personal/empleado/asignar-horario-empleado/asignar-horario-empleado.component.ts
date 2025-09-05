@@ -24,6 +24,9 @@ import { AuthService, User } from 'src/app/core/services/auth.service';
 import { AppUserService, SedeArea } from 'src/app/core/services/app-user.services';
 import { ModalCompensatoryDayFormComponent } from 'src/app/components/asistencia/compensatory-day/modal-compensatory-day-form/modal-compensatory-day-form.component';
 import { ErrorHandlerService } from 'src/app/shared/services/error-handler.service';
+import * as XLSX from 'xlsx-js-style';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-asignar-horario-empleado',
@@ -148,12 +151,34 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
   sedesAreas: SedeArea[] = [];
 
   ngOnInit(): void {
+    this.setCurrentWeekDates();
     this.setupGenericFilter();
     this.setupAgGrid();
     this.cargarAsignaciones();   
   }
 
-
+  private setCurrentWeekDates(): void {
+    const today = new Date();
+    const currentDay = today.getDay(); // 0 = domingo, 1 = lunes, ..., 6 = sábado
+    
+    // Calcular el lunes de esta semana
+    const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay; // Si es domingo, retroceder 6 días
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + mondayOffset);
+    
+    // Calcular el domingo de esta semana
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    
+    // Formatear fechas como YYYY-MM-DD
+    this.startDate = monday.toISOString().split('T')[0];
+    this.endDate = sunday.toISOString().split('T')[0];
+    
+    console.log('Semana actual configurada:', {
+      lunes: this.startDate,
+      domingo: this.endDate
+    });
+  }
 
   cargarAsignaciones() {
     this.loading = true;
@@ -851,6 +876,246 @@ export class AsignarHorarioEmpleadoComponent implements OnInit {
         // this.cargarAsignaciones();
       }
     });
+  }
+
+  // ===== EXPORT METHODS =====
+
+  private async getEmployeeAssignmentsForExport(): Promise<EmployeeScheduleAssignment[]> {
+    const userna = this.authService.getCurrentUser();
+    if (!userna) {
+      return [];
+    }
+
+    return new Promise((resolve, reject) => {
+      this.appUserService.getSedesAreas(userna.id).subscribe({
+        next: (sedesAreas) => {
+          const locationId = sedesAreas.map(item => item.siteId);
+          
+          if (locationId.length > 0) {
+            // Usar pageSize 500 para exportación
+            this.employeeScheduleAssignmentService.getEmployeeScheduleAssignments(
+              1, // Primera página
+              500, // 500 registros
+              this.filtro,
+              this.startDate,
+              this.endDate,
+              locationId
+            ).subscribe({
+              next: (res) => {
+                if (res.exito && res.data?.items) {
+                  resolve(res.data.items);
+                } else {
+                  resolve([]);
+                }
+              },
+              error: (err) => {
+                console.error('Error obteniendo asignaciones para exportar:', err);
+                reject(err);
+              }
+            });
+          } else {
+            resolve([]);
+          }
+        },
+        error: (err) => {
+          console.error('Error obteniendo sedes:', err);
+          reject(err);
+        }
+      });
+    });
+  }
+
+  async exportToExcel(): Promise<void> {
+    try {
+      console.log('Iniciando exportación a Excel...');
+      const assignmentsData = await this.getEmployeeAssignmentsForExport();
+      
+      if (!assignmentsData || assignmentsData.length === 0) {
+        console.warn('No hay datos para exportar');
+        return;
+      }
+
+      // Preparar datos para el Excel
+      const excelData = assignmentsData.map(assignment => ({
+        'ID Personal': assignment.employeeId || '',
+        'Documento': assignment.nroDoc || '',
+        'Empleado': assignment.fullNameEmployee || '',
+        'Turno': assignment.scheduleName || '',
+        'Ubicación': assignment.locationName || '',
+        'Área': assignment.areaName || '',
+        'Compañía': assignment.companiaId || '',
+        'Centro de Costo': assignment.ccostDescription || '',
+        'Fecha Inicio': assignment.startDate ? new Date(assignment.startDate).toLocaleDateString('es-PE', { timeZone: 'UTC' }) : '',
+        'Fecha Fin': assignment.endDate ? new Date(assignment.endDate).toLocaleDateString('es-PE', { timeZone: 'UTC' }) : 'Permanente',
+        'Observaciones': assignment.remarks || ''
+      }));
+
+      // Crear workbook
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      
+      // Configurar anchos de columna
+      const columnWidths = [
+        { wch: 12 }, // ID Personal
+        { wch: 15 }, // Documento
+        { wch: 50 }, // Empleado (más ancho)
+        { wch: 25 }, // Turno
+        { wch: 30 }, // Ubicación
+        { wch: 25 }, // Área
+        { wch: 15 }, // Compañía
+        { wch: 30 }, // Centro de Costo
+        { wch: 15 }, // Fecha Inicio
+        { wch: 15 }, // Fecha Fin
+        { wch: 40 }  // Observaciones
+      ];
+      worksheet['!cols'] = columnWidths;
+
+      // Estilos para encabezados
+      const headerStyle = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: "0070F3" } },
+        alignment: { horizontal: "center", vertical: "center" },
+        border: {
+          top: { style: "thin", color: { rgb: "000000" } },
+          bottom: { style: "thin", color: { rgb: "000000" } },
+          left: { style: "thin", color: { rgb: "000000" } },
+          right: { style: "thin", color: { rgb: "000000" } }
+        }
+      };
+
+      // Aplicar estilos a los encabezados
+      const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+      for (let col = range.s.c; col <= range.e.c; col++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+        if (!worksheet[cellAddress]) continue;
+        worksheet[cellAddress].s = headerStyle;
+      }
+
+      // Estilos para celdas de datos
+      const dataStyle = {
+        border: {
+          top: { style: "thin", color: { rgb: "CCCCCC" } },
+          bottom: { style: "thin", color: { rgb: "CCCCCC" } },
+          left: { style: "thin", color: { rgb: "CCCCCC" } },
+          right: { style: "thin", color: { rgb: "CCCCCC" } }
+        },
+        alignment: { vertical: "center" }
+      };
+
+      // Aplicar estilos a las celdas de datos
+      for (let row = 1; row <= range.e.r; row++) {
+        for (let col = range.s.c; col <= range.e.c; col++) {
+          const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+          if (!worksheet[cellAddress]) continue;
+          worksheet[cellAddress].s = dataStyle;
+        }
+      }
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Asignaciones Horarios');
+
+      // Generar nombre de archivo con fecha actual
+      const now = new Date();
+      const fileName = `asignaciones_horarios_${now.getFullYear()}_${(now.getMonth() + 1).toString().padStart(2, '0')}_${now.getDate().toString().padStart(2, '0')}.xlsx`;
+      
+      XLSX.writeFile(workbook, fileName);
+      console.log('Excel exportado correctamente:', fileName);
+      
+    } catch (error) {
+      console.error('Error al exportar a Excel:', error);
+    }
+  }
+
+  async exportToPDF(): Promise<void> {
+    try {
+      console.log('Iniciando exportación a PDF...');
+      const assignmentsData = await this.getEmployeeAssignmentsForExport();
+      
+      if (!assignmentsData || assignmentsData.length === 0) {
+        console.warn('No hay datos para exportar');
+        return;
+      }
+
+      const doc = new jsPDF('l', 'mm', 'a4'); // Landscape orientation
+      
+      // Título del documento
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Reporte de Asignaciones de Horarios', 15, 15);
+
+      // Información del filtro aplicado
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      let yPos = 25;
+      
+      if (this.startDate && this.endDate) {
+        const startDate = new Date(this.startDate).toLocaleDateString('es-PE');
+        const endDate = new Date(this.endDate).toLocaleDateString('es-PE');
+        doc.text(`Período: ${startDate} - ${endDate}`, 15, yPos);
+        yPos += 5;
+      }
+      
+      if (this.filtro) {
+        doc.text(`Filtro: ${this.filtro}`, 15, yPos);
+        yPos += 5;
+      }
+
+      doc.text(`Total de asignaciones: ${assignmentsData.length}`, 15, yPos);
+      yPos += 5;
+
+      // Preparar datos para la tabla
+      const tableData = assignmentsData.map(assignment => [
+        assignment.employeeId || '',
+        assignment.nroDoc || '',
+        assignment.fullNameEmployee || '',
+        assignment.scheduleName || '',
+        assignment.locationName || '',
+        assignment.areaName || '',
+        assignment.startDate ? new Date(assignment.startDate).toLocaleDateString('es-PE', { timeZone: 'UTC' }) : '',
+        assignment.endDate ? new Date(assignment.endDate).toLocaleDateString('es-PE', { timeZone: 'UTC' }) : 'Permanente'
+      ]);
+
+      // Configurar la tabla
+      autoTable(doc, {
+        head: [['ID', 'Doc.', 'Empleado', 'Turno', 'Ubicación', 'Área', 'F. Inicio', 'F. Fin']],
+        body: tableData,
+        startY: yPos + 5,
+        styles: {
+          fontSize: 7,
+          cellPadding: 1.5
+        },
+        headStyles: {
+          fillColor: [0, 112, 243], // Color azul similar al de la UI
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          fontSize: 8
+        },
+        columnStyles: {
+          0: { cellWidth: 15 }, // ID
+          1: { cellWidth: 20 }, // Documento
+          2: { cellWidth: 60 }, // Empleado (más ancho)
+          3: { cellWidth: 30 }, // Turno
+          4: { cellWidth: 35 }, // Ubicación
+          5: { cellWidth: 35 }, // Área
+          6: { cellWidth: 20 }, // F. Inicio
+          7: { cellWidth: 20 }  // F. Fin
+        },
+        alternateRowStyles: {
+          fillColor: [248, 249, 250]
+        },
+        margin: { left: 15, right: 15 },
+        tableWidth: 'auto'
+      });
+
+      // Generar nombre de archivo con fecha actual
+      const now = new Date();
+      const fileName = `asignaciones_horarios_${now.getFullYear()}_${(now.getMonth() + 1).toString().padStart(2, '0')}_${now.getDate().toString().padStart(2, '0')}.pdf`;
+      
+      doc.save(fileName);
+      console.log('PDF exportado correctamente:', fileName);
+      
+    } catch (error) {
+      console.error('Error al exportar a PDF:', error);
+    }
   }
 
 }

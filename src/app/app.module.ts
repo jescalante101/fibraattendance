@@ -116,6 +116,7 @@ import { ModalEmpleadoSinTurnoDetalleComponent } from './components/asistencia/r
 import { PersonnelWhitelistComponent } from './components/personal/organizacion/personnel-whitelist/personnel-whitelist.component';
 import { ModalPersonnelWhitelistFormComponent } from './components/personal/organizacion/personnel-whitelist/modal-personnel-whitelist-form/modal-personnel-whitelist-form.component';
 import { ModalBulkPersonnelWhitelistComponent } from './components/personal/organizacion/personnel-whitelist/modal-bulk-personnel-whitelist/modal-bulk-personnel-whitelist.component';
+import { PruebaTestComponent } from './components/asistencia/prueba/prueba-test/prueba-test.component';
 
 // Registrar módulos de AG-Grid globalmente
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -190,7 +191,8 @@ registerLocaleData(localeEs);
         ModalEmpleadoSinTurnoDetalleComponent,
         PersonnelWhitelistComponent,
         ModalPersonnelWhitelistFormComponent,
-        ModalBulkPersonnelWhitelistComponent
+        ModalBulkPersonnelWhitelistComponent,
+        PruebaTestComponent
 
     ],
     exports: [

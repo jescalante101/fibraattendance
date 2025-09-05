@@ -37,6 +37,7 @@ import { ReportePersonalTurnosComponent } from "./components/asistencia/reportes
 import { PermissionManagerComponent } from "./components/dev/permission-manager/permission-manager.component";
 import { CompensatoryDayComponent } from "./components/asistencia/compensatory-day/compensatory-day.component";
 import { PersonnelWhitelistComponent } from "./components/personal/organizacion/personnel-whitelist/personnel-whitelist.component";
+import { PruebaTestComponent } from "./components/asistencia/prueba/prueba-test/prueba-test.component";
 
 
 
@@ -91,7 +92,8 @@ const appRoutes: Routes = [
         { path: 'asistencia/compensatory-day', component: CompensatoryDayComponent },
         
         // Dev Tools routes (restricted to sistemas@dev.com)
-        { path: 'dev/permission-manager', component: PermissionManagerComponent }
+        { path: 'dev/permission-manager', component: PermissionManagerComponent },
+        { path: 'dev/permission-test', component: PruebaTestComponent }
       ]
     },
     

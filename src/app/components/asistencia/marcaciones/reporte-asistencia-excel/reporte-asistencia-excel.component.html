@@ -106,23 +106,47 @@
       </div>
 
       <!-- Botones de acción -->
-      <div class="flex items-center gap-3 mt-4 pt-4 border-t border-fiori-border">
-        <button 
-          type="submit"
-          [disabled]="loading || filterForm.invalid"
-          class="inline-flex items-center gap-2 px-4 py-2 bg-fiori-primary text-white text-sm font-medium rounded-md hover:bg-fiori-secondary focus:ring-1 focus:ring-fiori-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-          <lucide-icon [name]="loading ? 'refresh-cw' : 'search'" 
-                       [class]="loading ? 'w-4 h-4 animate-spin' : 'w-4 h-4'"></lucide-icon>
-          <span>{{ loading ? 'Buscando...' : 'Buscar' }}</span>
-        </button>
+      <div class="flex items-center justify-between gap-3 mt-4 pt-4 border-t border-fiori-border">
+        <!-- Botones de filtro (izquierda) -->
+        <div class="flex items-center gap-3">
+          <button 
+            type="submit"
+            [disabled]="loading || filterForm.invalid"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-fiori-primary text-white text-sm font-medium rounded-md hover:bg-fiori-secondary focus:ring-1 focus:ring-fiori-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <lucide-icon [name]="loading ? 'refresh-cw' : 'search'" 
+                         [class]="loading ? 'w-4 h-4 animate-spin' : 'w-4 h-4'"></lucide-icon>
+            <span>{{ loading ? 'Buscando...' : 'Buscar' }}</span>
+          </button>
 
-        <button 
-          type="button"
-          (click)="onClearFilters()"
-          class="inline-flex items-center gap-2 px-3 py-2 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-md hover:bg-fiori-hover transition-colors">
-          <lucide-icon name="x-circle" class="w-4 h-4"></lucide-icon>
-          <span>Limpiar</span>
-        </button>
+          <button 
+            type="button"
+            (click)="onClearFilters()"
+            class="inline-flex items-center gap-2 px-3 py-2 bg-fiori-muted text-fiori-subtext text-sm font-medium rounded-md hover:bg-fiori-hover transition-colors">
+            <lucide-icon name="x-circle" class="w-4 h-4"></lucide-icon>
+            <span>Limpiar</span>
+          </button>
+        </div>
+
+        <!-- Botones de exportación (derecha) -->
+        <div class="flex items-center gap-2">
+          <button 
+            type="button"
+            (click)="exportToExcel()"
+            [disabled]="loading || !rowData || rowData.length === 0"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:ring-1 focus:ring-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <lucide-icon name="file-spreadsheet" class="w-4 h-4"></lucide-icon>
+            <span>Excel</span>
+          </button>
+
+          <button 
+            type="button"
+            (click)="exportToPDF()"
+            [disabled]="loading || !rowData || rowData.length === 0"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:ring-1 focus:ring-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <lucide-icon name="file-text" class="w-4 h-4"></lucide-icon>
+            <span>PDF</span>
+          </button>
+        </div>
       </div>
     </form>
   </div>

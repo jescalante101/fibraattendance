@@ -19,6 +19,9 @@ import { GenericFilterConfig, FilterState, FilterChangeEvent } from 'src/app/sha
 import { ColumnManagerConfig, ColumnConfig, ColumnChangeEvent } from 'src/app/shared/column-manager/column-config.interface';
 import { ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { createFioriGridOptions } from 'src/app/shared/ag-grid-theme-fiori';
+import * as XLSX from 'xlsx-js-style';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-empleado',
@@ -1059,6 +1062,255 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
           }
         }
       });
+    }
+  }
+
+  // ===== EXPORT METHODS =====
+
+  private async getEmployeesForExport(): Promise<Employee[]> {
+    const empresaId = this.headerConfig?.selectedEmpresa?.companiaId?.toString() || '';
+    const planillaId = this.headerConfig?.selectedPlanilla?.planillaId?.toString() || '';
+    const periodoId = this.headerConfig?.selectedPeriodo?.periodoId?.toString() || '';
+    
+    const ccosto = null;
+    const sede = this.selectedCategoriaAuxiliar;
+    const areaId = this.selectedRhArea;
+
+    const params: EmployeesParameters = {
+      searchText: this.filtro,
+      page: 1, // Primera página
+      pagesize: 500, // 500 registros
+      areaId: areaId || null,
+      ccostoId: ccosto || null,
+      sede: sede || null,
+      periodoId: periodoId || null,
+      planillaId: planillaId || null,
+      companiaId: empresaId || null
+    };
+
+    return new Promise((resolve, reject) => {
+      this.personalService.getPersonalActivo(params)
+        .subscribe({
+          next: res => {
+            if (res.exito && res.data?.items) {
+              resolve(res.data.items);
+            } else {
+              resolve([]);
+            }
+          },
+          error: err => {
+            console.error('Error obteniendo empleados para exportar:', err);
+            reject(err);
+          }
+        });
+    });
+  }
+
+  async exportToExcel(): Promise<void> {
+    try {
+      console.log('Iniciando exportación a Excel...');
+      const employeesData = await this.getEmployeesForExport();
+      
+      if (!employeesData || employeesData.length === 0) {
+        console.warn('No hay datos para exportar');
+        return;
+      }
+
+      // Preparar datos para el Excel
+      const excelData = employeesData.map(emp => ({
+        'ID Personal': emp.personalId || '',
+        'Documento': emp.nroDoc || '',
+        'Apellido Paterno': emp.apellidoPaterno || '',
+        'Apellido Materno': emp.apellidoMaterno || '',
+        'Nombres': emp.nombres || '',
+        'Empleado': `${emp.apellidoPaterno} ${emp.apellidoMaterno}, ${emp.nombres}`,
+        'Sede': emp.categoriaAuxiliarDescripcion || '',
+        'Área': emp.areaDescripcion || '',
+        'Cargo': emp.cargoDescripcion || '',
+        'Centro de Costo': emp.ccostoDescripcion || '',
+        'Fecha Ingreso': emp.fechaIngreso ? new Date(emp.fechaIngreso).toLocaleDateString('es-PE', { timeZone: 'UTC' }) : '',
+        'Fecha Cese': emp.fechaCese ? new Date(emp.fechaCese).toLocaleDateString('es-PE', { timeZone: 'UTC' }) : 'Activo',
+        'Correo Electrónico': emp.email || '',
+        'Teléfono': emp.telefono || ''
+      }));
+
+      // Crear workbook
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      
+      // Configurar anchos de columna
+      const columnWidths = [
+        { wch: 12 }, // ID Personal
+        { wch: 15 }, // Documento
+        { wch: 20 }, // Apellido Paterno
+        { wch: 20 }, // Apellido Materno
+        { wch: 20 }, // Nombres
+        { wch: 50 }, // Empleado (más ancho)
+        { wch: 20 }, // Sede
+        { wch: 25 }, // Área
+        { wch: 25 }, // Cargo
+        { wch: 25 }, // Centro de Costo
+        { wch: 15 }, // Fecha Ingreso
+        { wch: 15 }, // Fecha Cese
+        { wch: 30 }, // Correo Electrónico
+        { wch: 15 }  // Teléfono
+      ];
+      worksheet['!cols'] = columnWidths;
+
+      // Estilos para encabezados
+      const headerStyle = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: "0070F3" } },
+        alignment: { horizontal: "center", vertical: "center" },
+        border: {
+          top: { style: "thin", color: { rgb: "000000" } },
+          bottom: { style: "thin", color: { rgb: "000000" } },
+          left: { style: "thin", color: { rgb: "000000" } },
+          right: { style: "thin", color: { rgb: "000000" } }
+        }
+      };
+
+      // Aplicar estilos a los encabezados
+      const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+      for (let col = range.s.c; col <= range.e.c; col++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+        if (!worksheet[cellAddress]) continue;
+        worksheet[cellAddress].s = headerStyle;
+      }
+
+      // Estilos para celdas de datos
+      const dataStyle = {
+        border: {
+          top: { style: "thin", color: { rgb: "CCCCCC" } },
+          bottom: { style: "thin", color: { rgb: "CCCCCC" } },
+          left: { style: "thin", color: { rgb: "CCCCCC" } },
+          right: { style: "thin", color: { rgb: "CCCCCC" } }
+        },
+        alignment: { vertical: "center" }
+      };
+
+      // Aplicar estilos a las celdas de datos
+      for (let row = 1; row <= range.e.r; row++) {
+        for (let col = range.s.c; col <= range.e.c; col++) {
+          const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+          if (!worksheet[cellAddress]) continue;
+          worksheet[cellAddress].s = dataStyle;
+        }
+      }
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Personal');
+
+      // Generar nombre de archivo con fecha actual
+      const now = new Date();
+      const fileName = `personal_${now.getFullYear()}_${(now.getMonth() + 1).toString().padStart(2, '0')}_${now.getDate().toString().padStart(2, '0')}.xlsx`;
+      
+      XLSX.writeFile(workbook, fileName);
+      console.log('Excel exportado correctamente:', fileName);
+      
+    } catch (error) {
+      console.error('Error al exportar a Excel:', error);
+    }
+  }
+
+  async exportToPDF(): Promise<void> {
+    try {
+      console.log('Iniciando exportación a PDF...');
+      const employeesData = await this.getEmployeesForExport();
+      
+      if (!employeesData || employeesData.length === 0) {
+        console.warn('No hay datos para exportar');
+        return;
+      }
+
+      const doc = new jsPDF('l', 'mm', 'a4'); // Landscape orientation
+      
+      // Título del documento
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Reporte de Personal', 15, 15);
+
+      // Información del filtro aplicado
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      let yPos = 25;
+      
+      if (this.headerConfig?.selectedEmpresa?.descripcion) {
+        doc.text(`Empresa: ${this.headerConfig.selectedEmpresa.descripcion}`, 15, yPos);
+        yPos += 5;
+      }
+      
+      if (this.selectedCategoriaAuxiliar && this.categoriaAuxiliarList.length > 0) {
+        const sede = this.categoriaAuxiliarList.find(s => s.categoriaAuxiliarId === this.selectedCategoriaAuxiliar);
+        if (sede) {
+          doc.text(`Sede: ${sede.descripcion}`, 15, yPos);
+          yPos += 5;
+        }
+      }
+      
+      if (this.selectedRhArea && this.rhAreaList.length > 0) {
+        const area = this.rhAreaList.find(a => a.areaId === this.selectedRhArea);
+        if (area) {
+          doc.text(`Área: ${area.descripcion}`, 15, yPos);
+          yPos += 5;
+        }
+      }
+
+      doc.text(`Total de empleados: ${employeesData.length}`, 15, yPos);
+      yPos += 5;
+
+      // Preparar datos para la tabla
+      const tableData = employeesData.map(emp => [
+        emp.personalId || '',
+        emp.nroDoc || '',
+        `${emp.apellidoPaterno} ${emp.apellidoMaterno}, ${emp.nombres}`,
+        emp.categoriaAuxiliarDescripcion || '',
+        emp.areaDescripcion || '',
+        emp.cargoDescripcion || '',
+        emp.fechaIngreso ? new Date(emp.fechaIngreso).toLocaleDateString('es-PE', { timeZone: 'UTC' }) : '',
+        emp.fechaCese ? new Date(emp.fechaCese).toLocaleDateString('es-PE', { timeZone: 'UTC' }) : 'Activo'
+      ]);
+
+      // Configurar la tabla
+      autoTable(doc, {
+        head: [['ID', 'Documento', 'Empleado', 'Sede', 'Área', 'Cargo', 'F. Ingreso', 'Estado']],
+        body: tableData,
+        startY: yPos + 5,
+        styles: {
+          fontSize: 7,
+          cellPadding: 1.5
+        },
+        headStyles: {
+          fillColor: [0, 112, 243], // Color azul similar al de la UI
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          fontSize: 8
+        },
+        columnStyles: {
+          0: { cellWidth: 15 }, // ID
+          1: { cellWidth: 25 }, // Documento
+          2: { cellWidth: 60 }, // Empleado (más ancho)
+          3: { cellWidth: 30 }, // Sede
+          4: { cellWidth: 35 }, // Área
+          5: { cellWidth: 35 }, // Cargo
+          6: { cellWidth: 25 }, // F. Ingreso
+          7: { cellWidth: 20 }  // Estado
+        },
+        alternateRowStyles: {
+          fillColor: [248, 249, 250]
+        },
+        margin: { left: 15, right: 15 },
+        tableWidth: 'auto'
+      });
+
+      // Generar nombre de archivo con fecha actual
+      const now = new Date();
+      const fileName = `personal_${now.getFullYear()}_${(now.getMonth() + 1).toString().padStart(2, '0')}_${now.getDate().toString().padStart(2, '0')}.pdf`;
+      
+      doc.save(fileName);
+      console.log('PDF exportado correctamente:', fileName);
+      
+    } catch (error) {
+      console.error('Error al exportar a PDF:', error);
     }
   }
 }

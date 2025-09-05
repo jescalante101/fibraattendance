@@ -850,7 +850,9 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
         'Fecha Inicio': emp.startDate ? new Date(emp.startDate).toLocaleDateString('es-ES') : '',
         'Fecha Fin': emp.endDate ? new Date(emp.endDate).toLocaleDateString('es-ES') : 'Indefinido',
         'Sede': emp.locationName || '',
-        'Área': emp.areaName || ''
+        'Área': emp.areaName || '',
+        'Centro de Costo': emp.ccostDescription || '',
+        'Creado Por': emp.createdBy || 'Sistema'
       }));
       const wsConTurno = XLSX.utils.json_to_sheet(dataConTurno);
       const headerRowConTurno = Object.keys(dataConTurno[0] || {}).length;
@@ -876,7 +878,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
         }
       });
       
-      wsConTurno['!cols'] = [ { wch: 12 }, { wch: 35 }, { wch: 12 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 25 } ];
+      wsConTurno['!cols'] = [ { wch: 12 }, { wch: 35 }, { wch: 12 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 25 }, { wch: 30 }, { wch: 20 } ];
       XLSX.utils.book_append_sheet(workbook, wsConTurno, 'Personal Con Turno');
       
       // Hoja 2: Personal Pendiente de Asignación
@@ -951,12 +953,14 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
         emp.scheduleName || 'Sin nombre',
         emp.startDate ? new Date(emp.startDate).toLocaleDateString('es-ES') : '',
         emp.endDate ? new Date(emp.endDate).toLocaleDateString('es-ES') : 'Indefinido',
-        emp.areaName || ''
+        emp.areaName || '',
+        emp.ccostDescription || '',
+        emp.createdBy || 'Sistema'
       ]);
       
       autoTable(doc, {
         startY: 40,
-        head: [['ID', 'Nombre Completo', 'Estado', 'Turno/Horario', 'Fecha Inicio', 'Fecha Fin', 'Área']],
+        head: [['ID', 'Nombre Completo', 'Estado', 'Turno/Horario', 'Fecha Inicio', 'Fecha Fin', 'Área', 'Centro de Costo', 'Creado Por']],
         body: dataConTurno,
         styles: { fontSize: 7 },
         headStyles: { fillColor: [34, 197, 94] },

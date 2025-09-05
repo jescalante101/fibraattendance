@@ -51,7 +51,7 @@ const appRoutes: Routes = [
       canActivateChild: [AuthGuard, PermissionsGuard],
       children: [
         // Default panel route
-        { path: '', component: EmpleadoComponent },
+        { path: '', component: AsignarHorarioEmpleadoComponent },
         
         // Personal/Organization routes
         { path: 'personal/organizacion', component: EmpleadoComponent },

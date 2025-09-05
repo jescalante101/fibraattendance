@@ -37,7 +37,7 @@ export class TransactionService {
         return this.http.get<TransactionResponse<TransactionComplete>>(
             `${this.apiUrl}analisis/paginado`, 
             { params: httpParams }  // 🔥 ¡Esto faltaba!
-        );    
+        );   
     }
 
     // sin paginacion

@@ -221,7 +221,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
     this.columnsConTurno = [
       {
         headerName: 'ID Personal',
-        field: 'employeeId',
+        field: 'nroDoc',
         minWidth: 100,
         maxWidth: 120,
         cellRenderer: (params: any) => `<div class="flex items-center"><div class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium cursor-pointer hover:bg-green-200 transition-colors" title="Click para ver detalles">#${params.value}</div></div>`,
@@ -843,7 +843,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       
       // Hoja 1: Personal CON Turno
       const dataConTurno = conTurno.map(emp => ({
-        'ID Personal': emp.employeeId,
+        'ID Personal': emp.nroDoc,
         'Nombre Completo': emp.fullNameEmployee || '',
         'Estado': emp.isTerminated ? 'Cesado' : emp.isOnVacation ? 'Vacaciones' : 'Activo',
         'Turno/Horario': emp.scheduleName || 'Sin nombre',
@@ -947,7 +947,7 @@ export class ReportePersonalTurnosComponent implements OnInit, OnDestroy, AfterV
       doc.setFontSize(12);
       doc.text(`Personal CON Turno (${totalConTurno})`, 15, 35);
       const dataConTurno = conTurno.map(emp => [
-        emp.employeeId,
+        emp.nroDoc,
         emp.fullNameEmployee || '',
         emp.isTerminated ? 'Cesado' : emp.isOnVacation ? 'Vacaciones' : 'Activo',
         emp.scheduleName || 'Sin nombre',

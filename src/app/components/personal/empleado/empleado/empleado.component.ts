@@ -22,6 +22,9 @@ import { createFioriGridOptions } from 'src/app/shared/ag-grid-theme-fiori';
 import * as XLSX from 'xlsx-js-style';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { AppUserSiteService } from 'src/app/core/services/app-user-site.service';
+import { AppUserService } from 'src/app/core/services/app-user.services';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-empleado',
@@ -38,7 +41,9 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private snackBar: MatSnackBar,
     private modalService:ModalService,
-    private headerConfigService: HeaderConfigService
+    private headerConfigService: HeaderConfigService,
+    private appUserService: AppUserService,
+    private authService: AuthService
   )
      { }
   mostrarBotonAsignar = false;
@@ -155,6 +160,8 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
   };
   gridApi: any;
 
+  
+
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       this.mostrarBotonAsignar = params['modoAsignar'] === 'true' || params['modoAsignar'] === true;
@@ -167,6 +174,7 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
         console.log('Header config cambió:', config);
         this.headerConfig = config;
         // Recargar empleados cuando cambie la configuración
+        this.loadSitesByUser()
         this.getEmployees();
         this.getRhAreas();
       });
@@ -187,6 +195,22 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
     this.displayedColumns = this.mostrarBotonAsignar
       ? ['select', 'nroDoc', 'apellidoPaterno', 'apellidoMaterno', 'nombres', 'categoriaAuxiliarDescripcion', 'areaDescripcion', 'asignar']
       : ['personalId', 'nroDoc', 'apellidoPaterno', 'apellidoMaterno', 'nombres', 'categoriaAuxiliarDescripcion', 'areaDescripcion', 'acciones'];
+  }
+
+  loadSitesByUser(){
+    const user=this.authService.getCurrentUser()
+    if(user){
+      this.appUserService.getSedesAreas(user.id).subscribe({
+        next: res => {
+          this.selectedCategoriaAuxiliar=res[0].siteId
+        },
+        error: _ => {
+          this.selectedCategoriaAuxiliar = '';
+          this.selectedRhArea = '';
+        }
+      });
+    }
+    
   }
 
   getEmployees() {
@@ -216,6 +240,7 @@ export class EmpleadoComponent implements OnInit, OnDestroy {
     
     console.log('Parametros de búsqueda:', params);
     
+
 
     this.personalService.getPersonalActivo(
      params// ccosto (usando empresa)
